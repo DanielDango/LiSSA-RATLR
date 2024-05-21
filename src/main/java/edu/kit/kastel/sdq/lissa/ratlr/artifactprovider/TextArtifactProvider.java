@@ -22,7 +22,7 @@ public class TextArtifactProvider extends ArtifactProvider {
         if (!path.exists()) {
             throw new IllegalArgumentException("Path does not exist");
         }
-        this.artifactType = Artifact.ArtifactType.from(configuration.arguments().get("type"));
+        this.artifactType = Artifact.ArtifactType.from(configuration.arguments().get("artifact_type"));
         this.artifacts = new ArrayList<>();
         this.loadFiles();
     }

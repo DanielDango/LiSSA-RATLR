@@ -7,9 +7,12 @@ import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheManager;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Artifact;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class SentencePreprocessor extends Preprocessor {
 
@@ -22,7 +25,7 @@ public class SentencePreprocessor extends Preprocessor {
     @Override
     public List<Element> preprocess(Artifact artifact) {
         String data = artifact.getContent() + artifact.getContent();
-        String key = UUID.fromString(data).toString();
+        String key = UUID.nameUUIDFromBytes(data.getBytes(StandardCharsets.UTF_8)).toString();
 
         Preprocessed cachedPreprocessed = cache.get(key, Preprocessed.class);
         if (cachedPreprocessed != null) {
@@ -35,17 +38,21 @@ public class SentencePreprocessor extends Preprocessor {
     }
 
     private Preprocessed preprocessIntern(Artifact artifact) {
-        DocumentBySentenceSplitter splitter = new DocumentBySentenceSplitter(-1, -1);
+        DocumentBySentenceSplitter splitter = new DocumentBySentenceSplitter(Integer.MAX_VALUE, 0);
         String[] sentences = splitter.split(artifact.getContent());
         List<Element> elements = new ArrayList<>();
         for (int i = 0; i < sentences.length; i++) {
             String sentence = sentences[i];
-            Element sentenceAsElement = new Element(artifact.getIdentifier() + "$" + i, artifact.getType(), sentence, 1, artifact, true);
+            Element sentenceAsElement = new Element(artifact.getIdentifier() + SEPARATOR + i, artifact.getType(), sentence, 1, artifact, true);
             elements.add(sentenceAsElement);
         }
         return new Preprocessed(elements);
     }
 
     private record Preprocessed(List<Element> elements) {
+        public List<Element> elements() {
+            this.elements.forEach(it -> it.init(elements.stream().collect(Collectors.toMap(Element::getIdentifier, Function.identity()))));
+            return elements;
+        }
     }
 }

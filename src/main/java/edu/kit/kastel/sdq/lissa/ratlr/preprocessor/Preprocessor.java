@@ -7,6 +7,8 @@ import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 import java.util.List;
 
 public abstract class Preprocessor {
+    public static final String SEPARATOR = "$";
+
     public abstract List<Element> preprocess(Artifact artifact);
 
     public static Preprocessor createPreprocessor(RatlrConfiguration.ModuleConfiguration configuration) {

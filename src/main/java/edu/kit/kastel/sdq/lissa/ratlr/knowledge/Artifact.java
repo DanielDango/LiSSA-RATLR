@@ -14,7 +14,7 @@ public final class Artifact extends Knowledge {
     }
 
     public enum ArtifactType {
-        TEXT, CODE;
+        TEXT, CODE, REQUIREMENT;
 
         public static ArtifactType from(String type) {
             for (ArtifactType artifactType : values()) {
@@ -22,7 +22,7 @@ public final class Artifact extends Knowledge {
                     return artifactType;
                 }
             }
-            throw new IllegalArgumentException("Unknown artifact type");
+            throw new IllegalArgumentException("Unknown artifact type '" + type + "'");
         }
     }
 }

@@ -1,6 +1,7 @@
 package edu.kit.kastel.sdq.lissa.ratlr.knowledge;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Map;
@@ -8,13 +9,22 @@ import java.util.Map;
 public final class Element extends Knowledge {
     @JsonProperty
     private final int granularity;
-    private transient Knowledge parent;
+    @JsonIgnore
+    private Knowledge parent;
     @JsonProperty
     private final String parentId;
     @JsonProperty
     private final boolean compare;
 
+
     @JsonCreator
+    private Element(@JsonProperty("identifier") String identifier, @JsonProperty("type") String type, @JsonProperty("content") String content, @JsonProperty("granularity") int granularity, @JsonProperty("parentId") String parentId, @JsonProperty("compare") boolean compare) {
+        super(identifier, type, content);
+        this.granularity = granularity;
+        this.parentId = parentId;
+        this.compare = compare;
+    }
+
     public Element(String identifier, String type, String content, int granularity, Knowledge parent, boolean compare) {
         super(identifier, type, content);
         this.granularity = granularity;

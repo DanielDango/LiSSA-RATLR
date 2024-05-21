@@ -5,11 +5,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.kit.kastel.sdq.lissa.ratlr.artifactprovider.ArtifactProvider;
 import edu.kit.kastel.sdq.lissa.ratlr.preprocessor.Preprocessor;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
 
 public class Main {
-    public static void main(String[] args) throws JsonProcessingException {
-        RatlrConfiguration configuration = new ObjectMapper().readValue("config.json", RatlrConfiguration.class);
+    public static void main(String[] args) throws IOException {
+        RatlrConfiguration configuration = new ObjectMapper().readValue(new File("config.json"), RatlrConfiguration.class);
 
         ArtifactProvider sourceArtifactProvider = ArtifactProvider.createArtifactProvider(configuration.sourceArtifactProvider());
         ArtifactProvider targetArtifactProvider = ArtifactProvider.createArtifactProvider(configuration.targetArtifactProvider());

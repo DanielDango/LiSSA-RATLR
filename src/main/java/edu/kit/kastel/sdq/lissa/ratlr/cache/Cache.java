@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class Cache {
     private static final int MAX_DIRTY = 100;
@@ -24,7 +25,7 @@ public class Cache {
                 data = mapper.readValue(file, new TypeReference<Map<String, String>>() {
                 });
             } catch (IOException e) {
-                throw new IllegalArgumentException("Could not read cache file");
+                throw new IllegalArgumentException("Could not read cache file", e);
             }
         }
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
@@ -32,7 +33,7 @@ public class Cache {
                 try {
                     mapper.writeValue(file, data);
                 } catch (IOException e) {
-                    throw new IllegalArgumentException("Could not write cache file");
+                    throw new IllegalArgumentException("Could not write cache file", e);
                 }
             }
         }));
@@ -49,7 +50,7 @@ public class Cache {
                 mapper.writeValue(file, data);
                 dirty = 0;
             } catch (IOException e) {
-                throw new IllegalArgumentException("Could not write cache file");
+                throw new IllegalArgumentException("Could not write cache file", e);
             }
         }
     }
@@ -60,7 +61,11 @@ public class Cache {
 
     public <T> T get(String key, Class<T> clazz) {
         try {
-            return mapper.readValue(data.get(key), clazz);
+            var jsonData = this.data.get(key);
+            if (jsonData == null) {
+                return null;
+            }
+            return mapper.readValue(jsonData, clazz);
         } catch (JsonProcessingException e) {
             throw new IllegalArgumentException("Could not deserialize object", e);
         }
@@ -68,7 +73,7 @@ public class Cache {
 
     public <T> void put(String key, T value) {
         try {
-            put(key, mapper.writeValueAsString(value));
+            put(key, mapper.writeValueAsString(Objects.requireNonNull(value)));
         } catch (JsonProcessingException e) {
             throw new IllegalArgumentException("Could not serialize object", e);
         }
