@@ -1,6 +1,5 @@
 package edu.kit.kastel.sdq.lissa.ratlr;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.kit.kastel.sdq.lissa.ratlr.artifactprovider.ArtifactProvider;
 import edu.kit.kastel.sdq.lissa.ratlr.preprocessor.Preprocessor;

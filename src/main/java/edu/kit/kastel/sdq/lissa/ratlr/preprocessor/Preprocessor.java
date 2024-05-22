@@ -14,6 +14,7 @@ public abstract class Preprocessor {
     public static Preprocessor createPreprocessor(RatlrConfiguration.ModuleConfiguration configuration) {
         return switch (configuration.name()) {
         case "sentence" -> new SentencePreprocessor(configuration);
+        case "code_chunking" -> new CodeChunkingPreprocessor(configuration);
         default -> throw new IllegalStateException("Unexpected value: " + configuration.name());
         };
     }

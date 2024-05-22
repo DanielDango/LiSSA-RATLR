@@ -16,9 +16,9 @@ public final class Element extends Knowledge {
     @JsonProperty
     private final boolean compare;
 
-
     @JsonCreator
-    private Element(@JsonProperty("identifier") String identifier, @JsonProperty("type") String type, @JsonProperty("content") String content, @JsonProperty("granularity") int granularity, @JsonProperty("parentId") String parentId, @JsonProperty("compare") boolean compare) {
+    private Element(@JsonProperty("identifier") String identifier, @JsonProperty("type") String type, @JsonProperty("content") String content,
+            @JsonProperty("granularity") int granularity, @JsonProperty("parentId") String parentId, @JsonProperty("compare") boolean compare) {
         super(identifier, type, content);
         this.granularity = granularity;
         this.parentId = parentId;
