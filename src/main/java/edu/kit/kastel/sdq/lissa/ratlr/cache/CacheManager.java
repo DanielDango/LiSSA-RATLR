@@ -19,6 +19,8 @@ public final class CacheManager {
     }
 
     public Cache getCache(String name) {
+        name = name.replace(":", "__");
+
         if (caches.containsKey(name)) {
             return caches.get(name);
         }

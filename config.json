@@ -28,9 +28,7 @@
   },
   "embedding_creator": {
     "name": "ollama",
-    "args": {
-      "path": "path-to-embeddings"
-    }
+    "args": {}
   },
   "source_store": {
     "name": "custom",
