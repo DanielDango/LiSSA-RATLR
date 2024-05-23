@@ -15,6 +15,7 @@ public abstract class EmbeddingCreator {
     public static EmbeddingCreator createEmbeddingCreator(RatlrConfiguration.ModuleConfiguration configuration) {
         return switch (configuration.name()) {
         case "ollama" -> new OllamaEmbeddingCreator(configuration);
+        case "openai" -> new OpenAiEmbeddingCreator(configuration);
         default -> throw new IllegalStateException("Unexpected value: " + configuration.name());
         };
     }

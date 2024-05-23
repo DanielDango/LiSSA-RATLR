@@ -22,7 +22,7 @@ public class CodeChunkingPreprocessor extends Preprocessor {
 
     public CodeChunkingPreprocessor(RatlrConfiguration.ModuleConfiguration configuration) {
         this.language = Objects.requireNonNull(RecursiveSplitter.Language.valueOf(configuration.arguments().get("language")));
-        this.chunkSize = Integer.parseInt(Objects.requireNonNull(configuration.arguments().getOrDefault("chunkSize", "60")));
+        this.chunkSize = Integer.parseInt(Objects.requireNonNull(configuration.arguments().getOrDefault("chunk_size", "60")));
         this.cache = CacheManager.getInstance().getCache(this.getClass().getSimpleName() + language + chunkSize);
     }
 

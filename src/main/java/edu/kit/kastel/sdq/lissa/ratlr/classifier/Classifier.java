@@ -24,6 +24,7 @@ public abstract class Classifier {
     public static Classifier createClassifier(RatlrConfiguration.ModuleConfiguration configuration) {
         return switch (configuration.name()) {
         case "simple_ollama" -> new SimpleOllamaClassifier(configuration);
+        case "simple_openai" -> new SimpleOpenAiClassifier(configuration);
         default -> throw new IllegalStateException("Unexpected value: " + configuration.name());
         };
     }
