@@ -4,12 +4,15 @@ import dev.langchain4j.model.embedding.EmbeddingModel;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.Cache;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheManager;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 abstract class CachedEmbeddingCreator extends EmbeddingCreator {
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final Cache cache;
     private final EmbeddingModel embeddingModel;
 
@@ -29,6 +32,7 @@ abstract class CachedEmbeddingCreator extends EmbeddingCreator {
             if (cachedEmbedding != null) {
                 embeddings.add(cachedEmbedding);
             } else {
+                logger.info("Calculating embedding for: {}", element.getIdentifier());
                 float[] embedding = embeddingModel.embed(element.getContent()).content().vector();
                 cache.put(key, embedding);
                 embeddings.add(embedding);
