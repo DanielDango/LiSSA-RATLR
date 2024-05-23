@@ -2,6 +2,8 @@ package edu.kit.kastel.sdq.lissa.ratlr;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.kit.kastel.sdq.lissa.ratlr.artifactprovider.ArtifactProvider;
+import edu.kit.kastel.sdq.lissa.ratlr.classifier.Classifier;
+import edu.kit.kastel.sdq.lissa.ratlr.elementstore.ElementStore;
 import edu.kit.kastel.sdq.lissa.ratlr.embeddingcreator.EmbeddingCreator;
 import edu.kit.kastel.sdq.lissa.ratlr.preprocessor.Preprocessor;
 
@@ -21,6 +23,8 @@ public class Main {
 
         EmbeddingCreator embeddingCreator = EmbeddingCreator.createEmbeddingCreator(configuration.embeddingCreator());
 
+        var classifier = Classifier.createClassifier(configuration.classifier());
+
         // RUN
         var sourceArtifacts = sourceArtifactProvider.getArtifacts();
         var targetArtifacts = targetArtifactProvider.getArtifacts();
@@ -29,6 +33,11 @@ public class Main {
 
         var sourceEmbeddings = embeddingCreator.calculateEmbeddings(sourceElements);
         var targetEmbeddings = embeddingCreator.calculateEmbeddings(targetElements);
+
+        var sourceStore = new ElementStore(configuration.sourceStore(), sourceElements, sourceEmbeddings);
+        var targetStore = new ElementStore(configuration.targetStore(), targetElements, targetEmbeddings);
+
+        var results = classifier.classify(sourceStore, targetStore);
 
     }
 }

@@ -65,6 +65,11 @@ public class Cache {
             if (jsonData == null) {
                 return null;
             }
+
+            if (clazz == String.class) {
+                return (T) jsonData;
+            }
+
             return mapper.readValue(jsonData, clazz);
         } catch (JsonProcessingException e) {
             throw new IllegalArgumentException("Could not deserialize object", e);

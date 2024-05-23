@@ -45,7 +45,7 @@
     }
   },
   "classifier": {
-    "name": "reasoning_ollama",
+    "name": "simple_ollama",
     "args": {}
   },
   "result_aggregator": {
