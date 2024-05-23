@@ -41,6 +41,10 @@ public class SentencePreprocessor extends Preprocessor {
         DocumentBySentenceSplitter splitter = new DocumentBySentenceSplitter(Integer.MAX_VALUE, 0);
         String[] sentences = splitter.split(artifact.getContent());
         List<Element> elements = new ArrayList<>();
+
+        Element artifactAsElement = new Element(artifact.getIdentifier(), artifact.getType(), artifact.getContent(), 0, null, false);
+        elements.add(artifactAsElement);
+
         for (int i = 0; i < sentences.length; i++) {
             String sentence = sentences[i];
             Element sentenceAsElement = new Element(artifact.getIdentifier() + SEPARATOR + i, artifact.getType(), sentence, 1, artifact, true);

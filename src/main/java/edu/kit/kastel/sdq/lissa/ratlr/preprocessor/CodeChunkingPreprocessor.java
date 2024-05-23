@@ -44,6 +44,9 @@ public class CodeChunkingPreprocessor extends Preprocessor {
         List<String> segments = RecursiveSplitter.fromLanguage(language, chunkSize).splitText(artifact.getContent());
         List<Element> elements = new ArrayList<>();
 
+        Element artifactAsElement = new Element(artifact.getIdentifier(), artifact.getType(), artifact.getContent(), 0, null, false);
+        elements.add(artifactAsElement);
+
         for (int i = 0; i < segments.size(); i++) {
             String segment = segments.get(i);
             Element segmentAsElement = new Element(artifact.getIdentifier() + SEPARATOR + i, artifact.getType(), segment, 1, artifact, true);

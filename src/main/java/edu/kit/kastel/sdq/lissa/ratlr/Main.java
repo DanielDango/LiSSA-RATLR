@@ -6,6 +6,7 @@ import edu.kit.kastel.sdq.lissa.ratlr.classifier.Classifier;
 import edu.kit.kastel.sdq.lissa.ratlr.elementstore.ElementStore;
 import edu.kit.kastel.sdq.lissa.ratlr.embeddingcreator.EmbeddingCreator;
 import edu.kit.kastel.sdq.lissa.ratlr.preprocessor.Preprocessor;
+import edu.kit.kastel.sdq.lissa.ratlr.resultaggregator.ResultAggregator;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,8 +23,8 @@ public class Main {
         Preprocessor targetPreprocessor = Preprocessor.createPreprocessor(configuration.targetPreprocessor());
 
         EmbeddingCreator embeddingCreator = EmbeddingCreator.createEmbeddingCreator(configuration.embeddingCreator());
-
-        var classifier = Classifier.createClassifier(configuration.classifier());
+        Classifier classifier = Classifier.createClassifier(configuration.classifier());
+        ResultAggregator aggregator = ResultAggregator.createResultAggregator(configuration.resultAggregator());
 
         // RUN
         var sourceArtifacts = sourceArtifactProvider.getArtifacts();
@@ -37,7 +38,9 @@ public class Main {
         var sourceStore = new ElementStore(configuration.sourceStore(), sourceElements, sourceEmbeddings);
         var targetStore = new ElementStore(configuration.targetStore(), targetElements, targetEmbeddings);
 
-        var results = classifier.classify(sourceStore, targetStore);
+        var llmResults = classifier.classify(sourceStore, targetStore);
+        var traceLinks = aggregator.aggregate(llmResults);
+        System.out.println(traceLinks);
 
     }
 }

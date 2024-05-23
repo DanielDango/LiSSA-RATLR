@@ -46,15 +46,10 @@ public final class OllamaUtils {
         ollamaApiField.set(client, newApi);
     }
 
-    private static Object getOllamaApi(Object client) {
-        try {
-            var ollamaApiField = client.getClass().getDeclaredField("ollamaApi");
-            ollamaApiField.setAccessible(true);
-            return ollamaApiField.get(client);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+    private static Object getOllamaApi(Object client) throws Exception {
+        var ollamaApiField = client.getClass().getDeclaredField("ollamaApi");
+        ollamaApiField.setAccessible(true);
+        return ollamaApiField.get(client);
     }
 
     private static Gson getGson(Object client) throws Exception {
