@@ -2,6 +2,7 @@ package edu.kit.kastel.sdq.lissa.ratlr.artifactprovider;
 
 import edu.kit.kastel.sdq.lissa.ratlr.RatlrConfiguration;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Artifact;
+import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Knowledge;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,6 +10,7 @@ import java.io.UncheckedIOException;
 import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class TextArtifactProvider extends ArtifactProvider {
@@ -46,7 +48,9 @@ public class TextArtifactProvider extends ArtifactProvider {
 
     @Override
     public List<Artifact> getArtifacts() {
-        return new ArrayList<>(artifacts);
+        var artifacts = new ArrayList<>(this.artifacts);
+        artifacts.sort(Comparator.comparing(Knowledge::getIdentifier));
+        return artifacts;
     }
 
     @Override

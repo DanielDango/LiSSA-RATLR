@@ -48,16 +48,18 @@ abstract class SimpleClassifier extends Classifier {
     }
 
     private String classify(Element source, Element target) {
-        String key = UUID.nameUUIDFromBytes((source.getContent() + target.getContent()).getBytes()).toString();
+        String request = TEMPLATE.replace("{source_type}", source.getType())
+                .replace("{source_content}", source.getContent())
+                .replace("{target_type}", target.getType())
+                .replace("{target_content}", target.getContent());
+
+        String key = UUID.nameUUIDFromBytes(request.getBytes()).toString();
         String cachedResponse = cache.get(key, String.class);
         if (cachedResponse != null) {
             return cachedResponse;
         } else {
             logger.info("Classifying: {} and {}", source.getIdentifier(), target.getIdentifier());
-            String response = llm.generate(TEMPLATE.replace("{source_type}", source.getType())
-                    .replace("{source_content}", source.getContent())
-                    .replace("{target_type}", target.getType())
-                    .replace("{target_content}", target.getContent()));
+            String response = llm.generate(request);
             cache.put(key, response);
             return response;
         }
