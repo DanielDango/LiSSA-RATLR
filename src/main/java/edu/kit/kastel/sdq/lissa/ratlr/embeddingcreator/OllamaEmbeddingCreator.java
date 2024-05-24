@@ -3,9 +3,10 @@ package edu.kit.kastel.sdq.lissa.ratlr.embeddingcreator;
 import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.model.ollama.OllamaEmbeddingModel;
 import edu.kit.kastel.sdq.lissa.ratlr.RatlrConfiguration;
-import edu.kit.kastel.sdq.lissa.ratlr.utils.OllamaUtils;
+import okhttp3.Credentials;
 
 import java.time.Duration;
+import java.util.Map;
 
 public class OllamaEmbeddingCreator extends CachedEmbeddingCreator {
 
@@ -19,11 +20,10 @@ public class OllamaEmbeddingCreator extends CachedEmbeddingCreator {
         String user = System.getenv("OLLAMA_EMBEDDING_USER");
         String password = System.getenv("OLLAMA_EMBEDDING_PASSWORD");
 
-        OllamaEmbeddingModel ollamaEmbedding = new OllamaEmbeddingModel(host, model, Duration.ofMinutes(5), 3);
+        var ollamaEmbedding = new OllamaEmbeddingModel.OllamaEmbeddingModelBuilder().baseUrl(host).modelName(model).timeout(Duration.ofMinutes(5));
         if (user != null && password != null) {
-            OllamaUtils.setAuthForOllama(ollamaEmbedding, host, Duration.ofMinutes(5), user, password);
+            ollamaEmbedding.customHeaders(Map.of("Authorization", Credentials.basic(user, password)));
         }
-
-        return ollamaEmbedding;
+        return ollamaEmbedding.build();
     }
 }
