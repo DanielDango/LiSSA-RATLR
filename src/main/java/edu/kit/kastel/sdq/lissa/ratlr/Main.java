@@ -1,6 +1,7 @@
 package edu.kit.kastel.sdq.lissa.ratlr;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import edu.kit.kastel.sdq.lissa.ratlr.artifactprovider.ArtifactProvider;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.Classifier;
 import edu.kit.kastel.sdq.lissa.ratlr.elementstore.ElementStore;
@@ -13,9 +14,12 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
 import java.util.Collection;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class Main {
@@ -58,10 +62,10 @@ public class Main {
         var traceLinks = aggregator.aggregate(llmResults);
 
         logger.info("Evaluating Results");
-        generateStatistics(args, traceLinks);
+        generateStatistics(args, traceLinks, configuration);
     }
 
-    private static void generateStatistics(String[] args, Set<TraceLink> traceLinks) throws IOException {
+    private static void generateStatistics(String[] args, Set<TraceLink> traceLinks, RatlrConfiguration configuration) throws IOException {
         File groundTruth = new File(args[GROUND_TRUTH_INDEX]);
         Set<TraceLink> validTraceLinks = Files.readAllLines(groundTruth.toPath())
                 .stream()
@@ -85,5 +89,17 @@ public class Main {
         logger.info("Precision: {}", precision);
         logger.info("Recall: {}", recall);
         logger.info("F1: {}", f1);
+
+        // Store information to one file (config and results)
+        var resultFile = new File("results-" + UUID.nameUUIDFromBytes(configuration.toString().getBytes(StandardCharsets.UTF_8)) + ".md");
+        Files.writeString(resultFile.toPath(), "## Configuration\n```json\n" + new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT)
+                .writeValueAsString(configuration) + "\n```\n\n");
+        Files.writeString(resultFile.toPath(), "## Results\n", StandardOpenOption.APPEND);
+        Files.writeString(resultFile.toPath(), "* True Positives: " + truePositives.size() + "\n", StandardOpenOption.APPEND);
+        Files.writeString(resultFile.toPath(), "* False Positives: " + falsePositives.size() + "\n", StandardOpenOption.APPEND);
+        Files.writeString(resultFile.toPath(), "* False Negatives: " + falseNegatives.size() + "\n", StandardOpenOption.APPEND);
+        Files.writeString(resultFile.toPath(), "* Precision: " + precision + "\n", StandardOpenOption.APPEND);
+        Files.writeString(resultFile.toPath(), "* Recall: " + recall + "\n", StandardOpenOption.APPEND);
+        Files.writeString(resultFile.toPath(), "* F1: " + f1 + "\n", StandardOpenOption.APPEND);
     }
 }

@@ -15,6 +15,7 @@ public abstract class Preprocessor {
         return switch (configuration.name()) {
         case "sentence" -> new SentencePreprocessor(configuration);
         case "code_chunking" -> new CodeChunkingPreprocessor(configuration);
+        case "code_method" -> new CodeMethodPreprocessor(configuration);
         default -> throw new IllegalStateException("Unexpected value: " + configuration.name());
         };
     }
