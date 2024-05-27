@@ -8,7 +8,9 @@ import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.output.Response;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.Cache;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheManager;
+import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Artifact;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
+import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Knowledge;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -38,6 +40,20 @@ public abstract class ReasoningClassifier extends Classifier {
     protected final ClassificationResult classify(Element source, List<Element> targets) {
         List<Element> relatedTargets = new ArrayList<>();
 
+        var targetsToConsider = targets;
+        if (useOriginalArtifacts) {
+            targetsToConsider = new ArrayList<>();
+            for (var target : targets) {
+                Knowledge artifact = target;
+                while (artifact instanceof Element artifactAsElement) {
+                    artifact = artifactAsElement.getParent();
+                }
+                // Now we have the artifact
+                assert artifact instanceof Artifact;
+                targetsToConsider.add(new Element(artifact.getIdentifier(), artifact.getType(), artifact.getContent(), 0, null, true));
+            }
+
+        }
         for (var target : targets) {
             String llmResponse = classify(source, target);
             boolean isRelated = isRelated(llmResponse);
