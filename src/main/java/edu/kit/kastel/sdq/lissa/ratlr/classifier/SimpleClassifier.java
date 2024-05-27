@@ -4,16 +4,12 @@ import dev.langchain4j.model.chat.ChatLanguageModel;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.Cache;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheManager;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 abstract class SimpleClassifier extends Classifier {
-
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private static final String TEMPLATE = """
             Question: Here are two parts of software development artifacts. \n
