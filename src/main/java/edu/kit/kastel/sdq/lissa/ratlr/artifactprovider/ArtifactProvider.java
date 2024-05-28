@@ -13,6 +13,7 @@ public abstract class ArtifactProvider {
     public static ArtifactProvider createArtifactProvider(RatlrConfiguration.ModuleConfiguration configuration) {
         return switch (configuration.name()) {
         case "text" -> new TextArtifactProvider(configuration);
+        case "recursive_text" -> new RecursiveTextArtifactProvider(configuration);
         default -> throw new IllegalStateException("Unexpected value: " + configuration.name());
         };
     }

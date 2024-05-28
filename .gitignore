@@ -35,5 +35,6 @@ build/
 .DS_Store
 
 .env
-datasets
-results-*.md
+/cache*
+/datasets
+/results-*.md
