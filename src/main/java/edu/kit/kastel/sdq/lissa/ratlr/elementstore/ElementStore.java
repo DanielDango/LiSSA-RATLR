@@ -1,6 +1,6 @@
 package edu.kit.kastel.sdq.lissa.ratlr.elementstore;
 
-import edu.kit.kastel.sdq.lissa.ratlr.RatlrConfiguration;
+import edu.kit.kastel.sdq.lissa.ratlr.Configuration;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.Pair;
 
@@ -16,12 +16,12 @@ public class ElementStore {
     private final List<Pair<Element, float[]>> elementsWithEmbedding;
     private final int maxResults;
 
-    public ElementStore(RatlrConfiguration.ModuleConfiguration configuration, List<Element> elements, List<float[]> embeddings) {
+    public ElementStore(Configuration.ModuleConfiguration configuration, List<Element> elements, List<float[]> embeddings) {
         if (elements.size() != embeddings.size()) {
             throw new IllegalArgumentException("The number of elements and embeddings must be equal.");
         }
 
-        this.maxResults = Integer.parseInt(configuration.arguments().getOrDefault("max_results", "10"));
+        this.maxResults = configuration.argumentAsInt("max_results", 10);
 
         elementsWithEmbedding = new ArrayList<>();
         idToElementWithEmbedding = new HashMap<>();

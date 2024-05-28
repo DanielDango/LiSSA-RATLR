@@ -1,22 +1,21 @@
 package edu.kit.kastel.sdq.lissa.ratlr.artifactprovider;
 
-import edu.kit.kastel.sdq.lissa.ratlr.RatlrConfiguration;
+import edu.kit.kastel.sdq.lissa.ratlr.Configuration;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Artifact;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Objects;
 import java.util.Scanner;
 
 public class RecursiveTextArtifactProvider extends TextArtifactProvider {
 
     private final String[] extensions;
 
-    public RecursiveTextArtifactProvider(RatlrConfiguration.ModuleConfiguration configuration) {
+    public RecursiveTextArtifactProvider(Configuration.ModuleConfiguration configuration) {
         super(configuration);
-        this.extensions = Objects.requireNonNull(configuration.arguments().get("extensions")).toLowerCase().split(",");
+        this.extensions = configuration.argumentAsString("extensions").toLowerCase().split(",");
     }
 
     @Override

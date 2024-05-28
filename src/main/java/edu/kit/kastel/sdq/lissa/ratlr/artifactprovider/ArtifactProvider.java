@@ -1,6 +1,6 @@
 package edu.kit.kastel.sdq.lissa.ratlr.artifactprovider;
 
-import edu.kit.kastel.sdq.lissa.ratlr.RatlrConfiguration;
+import edu.kit.kastel.sdq.lissa.ratlr.Configuration;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Artifact;
 
 import java.util.List;
@@ -10,7 +10,7 @@ public abstract class ArtifactProvider {
 
     public abstract Artifact getArtifact(String identifier);
 
-    public static ArtifactProvider createArtifactProvider(RatlrConfiguration.ModuleConfiguration configuration) {
+    public static ArtifactProvider createArtifactProvider(Configuration.ModuleConfiguration configuration) {
         return switch (configuration.name()) {
         case "text" -> new TextArtifactProvider(configuration);
         case "recursive_text" -> new RecursiveTextArtifactProvider(configuration);

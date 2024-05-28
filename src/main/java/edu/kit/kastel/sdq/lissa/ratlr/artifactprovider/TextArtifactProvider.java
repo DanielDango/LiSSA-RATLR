@@ -1,6 +1,6 @@
 package edu.kit.kastel.sdq.lissa.ratlr.artifactprovider;
 
-import edu.kit.kastel.sdq.lissa.ratlr.RatlrConfiguration;
+import edu.kit.kastel.sdq.lissa.ratlr.Configuration;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Artifact;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Knowledge;
 
@@ -16,12 +16,12 @@ public class TextArtifactProvider extends ArtifactProvider {
     protected final Artifact.ArtifactType artifactType;
     protected final List<Artifact> artifacts;
 
-    public TextArtifactProvider(RatlrConfiguration.ModuleConfiguration configuration) {
-        this.path = new File(configuration.arguments().get("path"));
+    public TextArtifactProvider(Configuration.ModuleConfiguration configuration) {
+        this.path = new File(configuration.argumentAsString("path"));
         if (!path.exists()) {
             throw new IllegalArgumentException("Path does not exist: " + path.getAbsolutePath());
         }
-        this.artifactType = Artifact.ArtifactType.from(configuration.arguments().get("artifact_type"));
+        this.artifactType = Artifact.ArtifactType.from(configuration.argumentAsString("artifact_type"));
         this.artifacts = new ArrayList<>();
     }
 

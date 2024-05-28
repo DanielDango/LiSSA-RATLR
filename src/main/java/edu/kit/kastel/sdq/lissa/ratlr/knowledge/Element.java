@@ -10,7 +10,7 @@ public final class Element extends Knowledge {
     @JsonProperty
     private final int granularity;
     @JsonIgnore
-    private Knowledge parent;
+    private Element parent;
     @JsonProperty
     private final String parentId;
     @JsonProperty
@@ -25,7 +25,7 @@ public final class Element extends Knowledge {
         this.compare = compare;
     }
 
-    public Element(String identifier, String type, String content, int granularity, Knowledge parent, boolean compare) {
+    public Element(String identifier, String type, String content, int granularity, Element parent, boolean compare) {
         super(identifier, type, content);
         this.granularity = granularity;
         this.parentId = parent == null ? null : parent.getIdentifier();
@@ -33,7 +33,7 @@ public final class Element extends Knowledge {
         this.compare = compare;
     }
 
-    public void init(Map<String, ? extends Knowledge> otherKnowledge) {
+    public void init(Map<String, ? extends Element> otherKnowledge) {
         if (parentId != null) {
             parent = otherKnowledge.get(parentId);
         }
@@ -43,7 +43,7 @@ public final class Element extends Knowledge {
         return granularity;
     }
 
-    public Knowledge getParent() {
+    public Element getParent() {
         return parent;
     }
 

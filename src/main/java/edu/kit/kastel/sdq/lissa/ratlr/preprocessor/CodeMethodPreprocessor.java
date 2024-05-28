@@ -1,6 +1,6 @@
 package edu.kit.kastel.sdq.lissa.ratlr.preprocessor;
 
-import edu.kit.kastel.sdq.lissa.ratlr.RatlrConfiguration;
+import edu.kit.kastel.sdq.lissa.ratlr.Configuration;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.Cache;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheManager;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Artifact;
@@ -21,8 +21,8 @@ public class CodeMethodPreprocessor extends CachedPreprocessor {
 
     private final Language language;
 
-    public CodeMethodPreprocessor(RatlrConfiguration.ModuleConfiguration configuration) {
-        this.language = Objects.requireNonNull(Language.valueOf(configuration.arguments().get("language")));
+    public CodeMethodPreprocessor(Configuration.ModuleConfiguration configuration) {
+        this.language = Objects.requireNonNull(Language.valueOf(configuration.argumentAsString("language")));
     }
 
     @Override

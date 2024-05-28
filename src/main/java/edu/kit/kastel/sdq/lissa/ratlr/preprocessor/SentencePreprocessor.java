@@ -1,7 +1,7 @@
 package edu.kit.kastel.sdq.lissa.ratlr.preprocessor;
 
 import dev.langchain4j.data.document.splitter.DocumentBySentenceSplitter;
-import edu.kit.kastel.sdq.lissa.ratlr.RatlrConfiguration;
+import edu.kit.kastel.sdq.lissa.ratlr.Configuration;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.Cache;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheManager;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Artifact;
@@ -18,7 +18,7 @@ public class SentencePreprocessor extends Preprocessor {
 
     private final Cache cache;
 
-    public SentencePreprocessor(RatlrConfiguration.ModuleConfiguration configuration) {
+    public SentencePreprocessor(Configuration.ModuleConfiguration configuration) {
         this.cache = CacheManager.getInstance().getCache(this.getClass().getSimpleName());
     }
 
@@ -47,7 +47,7 @@ public class SentencePreprocessor extends Preprocessor {
 
         for (int i = 0; i < sentences.length; i++) {
             String sentence = sentences[i];
-            Element sentenceAsElement = new Element(artifact.getIdentifier() + SEPARATOR + i, artifact.getType(), sentence, 1, artifact, true);
+            Element sentenceAsElement = new Element(artifact.getIdentifier() + SEPARATOR + i, artifact.getType(), sentence, 1, artifactAsElement, true);
             elements.add(sentenceAsElement);
         }
         return new Preprocessed(elements);

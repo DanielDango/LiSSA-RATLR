@@ -1,6 +1,6 @@
 package edu.kit.kastel.sdq.lissa.ratlr.resultaggregator;
 
-import edu.kit.kastel.sdq.lissa.ratlr.RatlrConfiguration;
+import edu.kit.kastel.sdq.lissa.ratlr.Configuration;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.Classifier;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
@@ -13,9 +13,9 @@ public class AnyResultAggregator extends ResultAggregator {
     private final int sourceGranularity;
     private final int targetGranularity;
 
-    public AnyResultAggregator(RatlrConfiguration.ModuleConfiguration configuration) {
-        this.sourceGranularity = Integer.parseInt(configuration.arguments().getOrDefault("source_granularity", "0"));
-        this.targetGranularity = Integer.parseInt(configuration.arguments().getOrDefault("target_granularity", "0"));
+    public AnyResultAggregator(Configuration.ModuleConfiguration configuration) {
+        this.sourceGranularity = configuration.argumentAsInt("source_granularity", 0);
+        this.targetGranularity = configuration.argumentAsInt("target_granularity", 0);
     }
 
     @Override

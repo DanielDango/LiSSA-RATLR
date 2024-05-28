@@ -2,12 +2,12 @@ package edu.kit.kastel.sdq.lissa.ratlr.embeddingcreator;
 
 import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.model.openai.OpenAiEmbeddingModel;
-import edu.kit.kastel.sdq.lissa.ratlr.RatlrConfiguration;
+import edu.kit.kastel.sdq.lissa.ratlr.Configuration;
 
 public class OpenAiEmbeddingCreator extends CachedEmbeddingCreator {
 
-    public OpenAiEmbeddingCreator(RatlrConfiguration.ModuleConfiguration configuration) {
-        super(configuration.arguments().getOrDefault("model", "text-embedding-ada-002"));
+    public OpenAiEmbeddingCreator(Configuration.ModuleConfiguration configuration) {
+        super(configuration.argumentAsString("model", "text-embedding-ada-002"));
     }
 
     @Override

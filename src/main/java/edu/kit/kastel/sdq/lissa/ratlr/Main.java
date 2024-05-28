@@ -1,7 +1,6 @@
 package edu.kit.kastel.sdq.lissa.ratlr;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import edu.kit.kastel.sdq.lissa.ratlr.artifactprovider.ArtifactProvider;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.Classifier;
 import edu.kit.kastel.sdq.lissa.ratlr.elementstore.ElementStore;
@@ -28,7 +27,7 @@ public class Main {
     private static final int GROUND_TRUTH_INDEX = 0;
 
     public static void main(String[] args) throws IOException {
-        RatlrConfiguration configuration = new ObjectMapper().readValue(new File("config.json"), RatlrConfiguration.class);
+        Configuration configuration = new ObjectMapper().readValue(new File("config.json"), Configuration.class);
 
         ArtifactProvider sourceArtifactProvider = ArtifactProvider.createArtifactProvider(configuration.sourceArtifactProvider());
         ArtifactProvider targetArtifactProvider = ArtifactProvider.createArtifactProvider(configuration.targetArtifactProvider());
@@ -65,7 +64,7 @@ public class Main {
         generateStatistics(args, traceLinks, configuration);
     }
 
-    private static void generateStatistics(String[] args, Set<TraceLink> traceLinks, RatlrConfiguration configuration) throws IOException {
+    private static void generateStatistics(String[] args, Set<TraceLink> traceLinks, Configuration configuration) throws IOException {
         File groundTruth = new File(args[GROUND_TRUTH_INDEX]);
         Set<TraceLink> validTraceLinks = Files.readAllLines(groundTruth.toPath())
                 .stream()
@@ -92,8 +91,8 @@ public class Main {
 
         // Store information to one file (config and results)
         var resultFile = new File("results-" + UUID.nameUUIDFromBytes(configuration.toString().getBytes(StandardCharsets.UTF_8)) + ".md");
-        Files.writeString(resultFile.toPath(), "## Configuration\n```json\n" + new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT)
-                .writeValueAsString(configuration) + "\n```\n\n");
+        logger.info("Storing results to " + resultFile.getName());
+        Files.writeString(resultFile.toPath(), "## Configuration\n```json\n" + configuration.serializeAndDestroyConfiguration() + "\n```\n\n");
         Files.writeString(resultFile.toPath(), "## Results\n", StandardOpenOption.APPEND);
         Files.writeString(resultFile.toPath(), "* True Positives: " + truePositives.size() + "\n", StandardOpenOption.APPEND);
         Files.writeString(resultFile.toPath(), "* False Positives: " + falsePositives.size() + "\n", StandardOpenOption.APPEND);

@@ -1,6 +1,6 @@
 package edu.kit.kastel.sdq.lissa.ratlr.preprocessor;
 
-import edu.kit.kastel.sdq.lissa.ratlr.RatlrConfiguration;
+import edu.kit.kastel.sdq.lissa.ratlr.Configuration;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.Cache;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheManager;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Artifact;
@@ -15,9 +15,9 @@ public class CodeChunkingPreprocessor extends CachedPreprocessor {
     private final RecursiveSplitter.Language language;
     private final int chunkSize;
 
-    public CodeChunkingPreprocessor(RatlrConfiguration.ModuleConfiguration configuration) {
-        this.language = Objects.requireNonNull(RecursiveSplitter.Language.valueOf(configuration.arguments().get("language")));
-        this.chunkSize = Integer.parseInt(Objects.requireNonNull(configuration.arguments().getOrDefault("chunk_size", "60")));
+    public CodeChunkingPreprocessor(Configuration.ModuleConfiguration configuration) {
+        this.language = Objects.requireNonNull(RecursiveSplitter.Language.valueOf(configuration.argumentAsString("language")));
+        this.chunkSize = configuration.argumentAsInt("chunk_size", 60);
     }
 
     @Override
@@ -34,7 +34,7 @@ public class CodeChunkingPreprocessor extends CachedPreprocessor {
 
         for (int i = 0; i < segments.size(); i++) {
             String segment = segments.get(i);
-            Element segmentAsElement = new Element(artifact.getIdentifier() + SEPARATOR + i, artifact.getType(), segment, 1, artifact, true);
+            Element segmentAsElement = new Element(artifact.getIdentifier() + SEPARATOR + i, artifact.getType(), segment, 1, artifactAsElement, true);
             elements.add(segmentAsElement);
         }
 
