@@ -48,6 +48,12 @@
             <artifactId>langchain4j-open-ai</artifactId>
             <version>${langchain4j.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>io.github.ardoco.tlr</groupId>
+            <artifactId>model-provider</artifactId>
+            <version>1.0.0</version>
+        </dependency>
         <dependency>
             <groupId>io.github.bonede</groupId>
             <artifactId>tree-sitter</artifactId>
