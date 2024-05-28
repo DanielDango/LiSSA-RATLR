@@ -6,6 +6,7 @@ import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.output.Response;
+import edu.kit.kastel.sdq.lissa.ratlr.RatlrConfiguration;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.Cache;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheManager;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Artifact;
@@ -26,11 +27,11 @@ public abstract class ReasoningClassifier extends Classifier {
     private final boolean useOriginalArtifacts;
     private final boolean useSystemMessage;
 
-    protected ReasoningClassifier(String model, int promptId, boolean useOriginalArtifacts, boolean useSystemMessage) {
+    protected ReasoningClassifier(RatlrConfiguration.ModuleConfiguration configuration, String model) {
         this.cache = CacheManager.getInstance().getCache(this.getClass().getSimpleName() + "_" + model);
-        this.prompt = Prompt.values()[promptId].prompt;
-        this.useOriginalArtifacts = useOriginalArtifacts;
-        this.useSystemMessage = useSystemMessage;
+        this.prompt = Prompt.values()[Integer.parseInt(configuration.arguments().getOrDefault("prompt_id", "0"))].prompt;
+        this.useOriginalArtifacts = Boolean.parseBoolean(configuration.arguments().getOrDefault("use_original_artifacts", "false"));
+        this.useSystemMessage = Boolean.parseBoolean(configuration.arguments().getOrDefault("use_system_message", "true"));
         this.llm = createChatModel(model);
     }
 
