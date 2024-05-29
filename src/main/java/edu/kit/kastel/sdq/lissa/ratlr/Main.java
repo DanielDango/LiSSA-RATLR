@@ -6,6 +6,7 @@ import edu.kit.kastel.sdq.lissa.ratlr.classifier.Classifier;
 import edu.kit.kastel.sdq.lissa.ratlr.elementstore.ElementStore;
 import edu.kit.kastel.sdq.lissa.ratlr.embeddingcreator.EmbeddingCreator;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
+import edu.kit.kastel.sdq.lissa.ratlr.postprocessor.TraceLinkIdPostprocessor;
 import edu.kit.kastel.sdq.lissa.ratlr.preprocessor.Preprocessor;
 import edu.kit.kastel.sdq.lissa.ratlr.resultaggregator.ResultAggregator;
 import org.slf4j.Logger;
@@ -39,6 +40,8 @@ public class Main {
         Classifier classifier = Classifier.createClassifier(configuration.classifier());
         ResultAggregator aggregator = ResultAggregator.createResultAggregator(configuration.resultAggregator());
 
+        TraceLinkIdPostprocessor traceLinkIdPostProcessor = TraceLinkIdPostprocessor.createTraceLinkIdPostprocessor(configuration.traceLinkIdPostprocessor());
+
         // RUN
         logger.info("Loading artifacts");
         var sourceArtifacts = sourceArtifactProvider.getArtifacts();
@@ -60,16 +63,22 @@ public class Main {
         var llmResults = classifier.classify(sourceStore, targetStore);
         var traceLinks = aggregator.aggregate(llmResults);
 
+        logger.info("Postprocessing Tracelinks");
+        traceLinks = traceLinkIdPostProcessor.postprocess(traceLinks);
+
         logger.info("Evaluating Results");
         generateStatistics(args, traceLinks, configuration);
     }
 
     private static void generateStatistics(String[] args, Set<TraceLink> traceLinks, Configuration configuration) throws IOException {
         File groundTruth = new File(args[GROUND_TRUTH_INDEX]);
+        boolean header = args.length > 1 && args[1].equals("header");
+        logger.info("Skipping header: {}", header);
         Set<TraceLink> validTraceLinks = Files.readAllLines(groundTruth.toPath())
                 .stream()
+                .skip(header ? 1 : 0)
                 .map(l -> l.split(","))
-                .map(it -> new TraceLink(it[0] + ".txt", it[1] + ".java"))
+                .map(it -> new TraceLink(it[0], it[1]))
                 .collect(Collectors.toSet());
         logger.info("Valid TraceLinks: {}", validTraceLinks.size());
         logger.info("Found TraceLinks: {}", traceLinks.size());

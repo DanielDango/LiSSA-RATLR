@@ -17,8 +17,8 @@ public record Configuration(@JsonProperty("source_artifact_provider") ModuleConf
                             @JsonProperty("target_preprocessor") ModuleConfiguration targetPreprocessor,
                             @JsonProperty("embedding_creator") ModuleConfiguration embeddingCreator,
                             @JsonProperty("source_store") ModuleConfiguration sourceStore, @JsonProperty("target_store") ModuleConfiguration targetStore,
-                            @JsonProperty("classifier") ModuleConfiguration classifier,
-                            @JsonProperty("result_aggregator") ModuleConfiguration resultAggregator) {
+                            @JsonProperty("classifier") ModuleConfiguration classifier, @JsonProperty("result_aggregator") ModuleConfiguration resultAggregator,
+                            @JsonProperty("tracelinkid_postprocessor") ModuleConfiguration traceLinkIdPostprocessor) {
 
     public String serializeAndDestroyConfiguration() throws IOException {
         sourceArtifactProvider.finalizeForSerialization();
@@ -30,6 +30,9 @@ public record Configuration(@JsonProperty("source_artifact_provider") ModuleConf
         targetStore.finalizeForSerialization();
         classifier.finalizeForSerialization();
         resultAggregator.finalizeForSerialization();
+        if (traceLinkIdPostprocessor != null) {
+            traceLinkIdPostprocessor.finalizeForSerialization();
+        }
         return new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT).writeValueAsString(this);
     }
 

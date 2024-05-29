@@ -25,7 +25,9 @@ public class RecursiveTextArtifactProvider extends TextArtifactProvider {
                 if (Files.isRegularFile(it) && hasCorrectExtension(it)) {
                     try (Scanner scan = new Scanner(it.toFile()).useDelimiter("\\A")) {
                         String content = scan.next();
-                        artifacts.add(new Artifact(it.getFileName().toString(), artifactType, content));
+                        var relativePath = this.path.toPath().relativize(it);
+                        String pathWithDefinedSeparators = relativePath.toString().replace("\\", "/");
+                        artifacts.add(new Artifact(pathWithDefinedSeparators, artifactType, content));
                     } catch (IOException e) {
                         throw new UncheckedIOException(e);
                     }
