@@ -14,7 +14,7 @@ public final class ChatModels {
         String password = System.getenv("OLLAMA_PASSWORD");
 
         var ollama = OllamaChatModel.builder().baseUrl(host).modelName(model).timeout(Duration.ofMinutes(5)).temperature(0.0);
-        if (user != null && password != null) {
+        if (user != null && password != null && !user.isEmpty() && !password.isEmpty()) {
             ollama.customHeaders(Map.of("Authorization", Credentials.basic(user, password)));
         }
         return ollama.build();

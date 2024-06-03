@@ -21,7 +21,7 @@ public class OllamaEmbeddingCreator extends CachedEmbeddingCreator {
         String password = System.getenv("OLLAMA_EMBEDDING_PASSWORD");
 
         var ollamaEmbedding = new OllamaEmbeddingModel.OllamaEmbeddingModelBuilder().baseUrl(host).modelName(model).timeout(Duration.ofMinutes(5));
-        if (user != null && password != null) {
+        if (user != null && password != null && !user.isEmpty() && !password.isEmpty()) {
             ollamaEmbedding.customHeaders(Map.of("Authorization", Credentials.basic(user, password)));
         }
         return ollamaEmbedding.build();
