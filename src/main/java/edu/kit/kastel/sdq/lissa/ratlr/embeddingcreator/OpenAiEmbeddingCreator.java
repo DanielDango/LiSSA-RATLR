@@ -3,6 +3,7 @@ package edu.kit.kastel.sdq.lissa.ratlr.embeddingcreator;
 import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.model.openai.OpenAiEmbeddingModel;
 import edu.kit.kastel.sdq.lissa.ratlr.Configuration;
+import edu.kit.kastel.sdq.lissa.ratlr.Environment;
 
 public class OpenAiEmbeddingCreator extends CachedEmbeddingCreator {
 
@@ -12,8 +13,8 @@ public class OpenAiEmbeddingCreator extends CachedEmbeddingCreator {
 
     @Override
     protected EmbeddingModel createEmbeddingModel(String model) {
-        String openAiOrganizationId = System.getenv("OPENAI_ORGANIZATION_ID");
-        String openAiApiKey = System.getenv("OPENAI_API_KEY");
+        String openAiOrganizationId = Environment.getenv("OPENAI_ORGANIZATION_ID");
+        String openAiApiKey = Environment.getenv("OPENAI_API_KEY");
         if (openAiOrganizationId == null || openAiApiKey == null) {
             throw new IllegalStateException("OPENAI_ORGANIZATION_ID or OPENAI_API_KEY environment variable not set");
         }
