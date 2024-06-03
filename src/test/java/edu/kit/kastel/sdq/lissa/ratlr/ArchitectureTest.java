@@ -5,7 +5,6 @@ import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.lang.ArchRule;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 @AnalyzeClasses(packages = "edu.kit.kastel.sdq.lissa.ratlr")
 class ArchitectureTest {

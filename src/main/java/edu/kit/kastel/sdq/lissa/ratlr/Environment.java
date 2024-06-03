@@ -5,6 +5,10 @@ import io.github.cdimascio.dotenv.Dotenv;
 public final class Environment {
     private static final Dotenv DOTENV = Dotenv.configure().load();
 
+    private Environment() {
+        throw new IllegalAccessError("Utility class");
+    }
+
     public static String getenv(String key) {
         String dotenvValue = DOTENV.get(key);
         if (dotenvValue != null)
