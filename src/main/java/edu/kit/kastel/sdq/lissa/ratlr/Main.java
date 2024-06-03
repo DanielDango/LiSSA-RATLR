@@ -99,7 +99,8 @@ public class Main {
         logger.info("F1: {}", f1);
 
         // Store information to one file (config and results)
-        var resultFile = new File("results-" + UUID.nameUUIDFromBytes(configuration.toString().getBytes(StandardCharsets.UTF_8)) + ".md");
+        var resultFile = new File("results-" + configuration.traceLinkIdPostprocessor().name() + "-" + UUID.nameUUIDFromBytes(configuration.toString()
+                .getBytes(StandardCharsets.UTF_8)) + ".md");
         logger.info("Storing results to " + resultFile.getName());
         Files.writeString(resultFile.toPath(), "## Configuration\n```json\n" + configuration.serializeAndDestroyConfiguration() + "\n```\n\n");
         Files.writeString(resultFile.toPath(), "## Results\n", StandardOpenOption.APPEND);
