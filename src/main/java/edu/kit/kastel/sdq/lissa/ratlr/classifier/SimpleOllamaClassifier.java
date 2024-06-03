@@ -6,7 +6,7 @@ import edu.kit.kastel.sdq.lissa.ratlr.Configuration;
 public class SimpleOllamaClassifier extends SimpleClassifier {
 
     public SimpleOllamaClassifier(Configuration.ModuleConfiguration configuration) {
-        super(configuration.argumentAsString("model", "llama3:8b"));
+        super(configuration, configuration.argumentAsString("model", "llama3:8b"));
     }
 
     @Override

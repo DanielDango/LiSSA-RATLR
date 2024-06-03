@@ -41,7 +41,9 @@
   },
   "classifier" : {
     "name" : "simple_ollama",
-    "args" : { }
+    "args" : {
+      "template": "Question: Here are two parts of software development artifact\n{source_type}: '''{source_content}'''\n{target_type}: '''{target_content}'''\nDo I need to change one if the other changes?\nAnswer with 'yes' or 'no'."
+    }
   },
   "result_aggregator" : {
     "name" : "any_connection",

@@ -1,6 +1,7 @@
 package edu.kit.kastel.sdq.lissa.ratlr.classifier;
 
 import dev.langchain4j.model.chat.ChatLanguageModel;
+import edu.kit.kastel.sdq.lissa.ratlr.Configuration;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.Cache;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheManager;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
@@ -11,7 +12,7 @@ import java.util.UUID;
 
 abstract class SimpleClassifier extends Classifier {
 
-    private static final String TEMPLATE = """
+    private static final String DEFAULT_TEMPLATE = """
             Question: Here are two parts of software development artifacts. \n
             {source_type}: '''{source_content}''' \n
             {target_type}: '''{target_content}'''
@@ -21,8 +22,10 @@ abstract class SimpleClassifier extends Classifier {
 
     private final Cache cache;
     private final ChatLanguageModel llm;
+    private final String template;
 
-    protected SimpleClassifier(String model) {
+    protected SimpleClassifier(Configuration.ModuleConfiguration configuration, String model) {
+        this.template = configuration.argumentAsString("template", DEFAULT_TEMPLATE);
         this.cache = CacheManager.getInstance().getCache(this.getClass().getSimpleName() + "_" + model);
         this.llm = createChatModel(model);
     }
@@ -44,7 +47,7 @@ abstract class SimpleClassifier extends Classifier {
     }
 
     private String classify(Element source, Element target) {
-        String request = TEMPLATE.replace("{source_type}", source.getType())
+        String request = template.replace("{source_type}", source.getType())
                 .replace("{source_content}", source.getContent())
                 .replace("{target_type}", target.getType())
                 .replace("{target_content}", target.getContent());
