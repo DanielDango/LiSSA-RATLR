@@ -68,7 +68,7 @@ public class ElementStore {
     }
 
     private List<Pair<Element, Float>> findSimilarWithDistancesByCosineSimilarity(float[] queryVector) {
-        var elements = getAllElements(true);
+        var elements = getAllElementsIntern(true);
         List<Pair<Element, Float>> similarElements = new ArrayList<>();
         for (var element : elements) {
             float[] elementVector = element.second();
@@ -117,7 +117,10 @@ public class ElementStore {
         if (maxResults > 0) {
             throw new IllegalStateException("You should set retriever to false to activate this feature.");
         }
+        return getAllElementsIntern(onlyCompare);
+    }
 
+    private List<Pair<Element, float[]>> getAllElementsIntern(boolean onlyCompare) {
         List<Pair<Element, float[]>> elements = new ArrayList<>();
         for (Pair<Element, float[]> element : elementsWithEmbedding) {
             if (!onlyCompare || element.first().isCompare()) {
