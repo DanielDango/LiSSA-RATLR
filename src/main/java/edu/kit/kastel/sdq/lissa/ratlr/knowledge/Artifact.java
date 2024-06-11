@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 public final class Artifact extends Knowledge {
 
     public Artifact(String identifier, ArtifactType type, String content) {
-        super(identifier, type.toString().toLowerCase(), content);
+        super(identifier, type.toString().replace("_", " ").toLowerCase(), content);
     }
 
     @JsonCreator
@@ -14,11 +14,11 @@ public final class Artifact extends Knowledge {
     }
 
     public enum ArtifactType {
-        TEXT, CODE, REQUIREMENT;
+        TEXT, SOURCE_CODE, CODE, REQUIREMENT;
 
         public static ArtifactType from(String type) {
             for (ArtifactType artifactType : values()) {
-                if (artifactType.toString().equalsIgnoreCase(type)) {
+                if (artifactType.toString().equalsIgnoreCase(type.replace(" ", "_"))) {
                     return artifactType;
                 }
             }

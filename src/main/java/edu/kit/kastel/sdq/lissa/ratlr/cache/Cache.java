@@ -25,7 +25,7 @@ public class Cache {
                 data = mapper.readValue(file, new TypeReference<Map<String, String>>() {
                 });
             } catch (IOException e) {
-                throw new IllegalArgumentException("Could not read cache file", e);
+                throw new IllegalArgumentException("Could not read cache file (" + file.getName() + ")", e);
             }
         }
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {

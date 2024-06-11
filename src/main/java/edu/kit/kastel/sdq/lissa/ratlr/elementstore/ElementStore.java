@@ -16,15 +16,37 @@ public class ElementStore {
     private final List<Pair<Element, float[]>> elementsWithEmbedding;
     private final int maxResults;
 
-    public ElementStore(Configuration.ModuleConfiguration configuration, List<Element> elements, List<float[]> embeddings) {
+    /**
+     * Creates a new element store.
+     * 
+     * @param configuration       The configuration of the module.
+     * @param similarityRetriever Whether the element store should be used as a retriever. If set to false, you can retrieve all elements. If set to true, you
+     *                            can find similar elements.
+     */
+    public ElementStore(Configuration.ModuleConfiguration configuration, boolean similarityRetriever) {
+        if (similarityRetriever) {
+            this.maxResults = configuration.argumentAsInt("max_results", 10);
+            if (maxResults < 1) {
+                throw new IllegalArgumentException("The maximum number of results must be greater than 0.");
+            }
+        } else {
+            this.maxResults = -1;
+        }
+
+        elementsWithEmbedding = new ArrayList<>();
+        idToElementWithEmbedding = new HashMap<>();
+
+    }
+
+    public void setup(List<Element> elements, List<float[]> embeddings) {
+        if (!elementsWithEmbedding.isEmpty() || !idToElementWithEmbedding.isEmpty()) {
+            throw new IllegalStateException("The element store is already set up.");
+        }
+
         if (elements.size() != embeddings.size()) {
             throw new IllegalArgumentException("The number of elements and embeddings must be equal.");
         }
 
-        this.maxResults = configuration.argumentAsInt("max_results", 10);
-
-        elementsWithEmbedding = new ArrayList<>();
-        idToElementWithEmbedding = new HashMap<>();
         for (int i = 0; i < elements.size(); i++) {
             var element = elements.get(i);
             var embedding = embeddings.get(i);
@@ -34,11 +56,14 @@ public class ElementStore {
         }
     }
 
-    public List<Element> findSimilar(float[] queryVector) {
+    public final List<Element> findSimilar(float[] queryVector) {
         return findSimilarWithDistances(queryVector).stream().map(Pair::first).toList();
     }
 
     public List<Pair<Element, Float>> findSimilarWithDistances(float[] queryVector) {
+        if (maxResults < 0) {
+            throw new IllegalStateException("You should set retriever to true to activate this feature.");
+        }
         return findSimilarWithDistancesByCosineSimilarity(queryVector);
     }
 
@@ -89,6 +114,10 @@ public class ElementStore {
     }
 
     public List<Pair<Element, float[]>> getAllElements(boolean onlyCompare) {
+        if (maxResults > 0) {
+            throw new IllegalStateException("You should set retriever to false to activate this feature.");
+        }
+
         List<Pair<Element, float[]>> elements = new ArrayList<>();
         for (Pair<Element, float[]> element : elementsWithEmbedding) {
             if (!onlyCompare || element.first().isCompare()) {

@@ -37,10 +37,15 @@ public class Main {
         Preprocessor targetPreprocessor = Preprocessor.createPreprocessor(configuration.targetPreprocessor());
 
         EmbeddingCreator embeddingCreator = EmbeddingCreator.createEmbeddingCreator(configuration.embeddingCreator());
+        ElementStore sourceStore = new ElementStore(configuration.sourceStore(), false);
+        ElementStore targetStore = new ElementStore(configuration.targetStore(), true);
+
         Classifier classifier = Classifier.createClassifier(configuration.classifier());
         ResultAggregator aggregator = ResultAggregator.createResultAggregator(configuration.resultAggregator());
 
         TraceLinkIdPostprocessor traceLinkIdPostProcessor = TraceLinkIdPostprocessor.createTraceLinkIdPostprocessor(configuration.traceLinkIdPostprocessor());
+
+        configuration.serializeAndDestroyConfiguration();
 
         // RUN
         logger.info("Loading artifacts");
@@ -56,8 +61,8 @@ public class Main {
         var targetEmbeddings = embeddingCreator.calculateEmbeddings(targetElements);
 
         logger.info("Building element stores");
-        var sourceStore = new ElementStore(configuration.sourceStore(), sourceElements, sourceEmbeddings);
-        var targetStore = new ElementStore(configuration.targetStore(), targetElements, targetEmbeddings);
+        sourceStore.setup(sourceElements, sourceEmbeddings);
+        targetStore.setup(targetElements, targetEmbeddings);
 
         logger.info("Classifying Tracelinks");
         var llmResults = classifier.classify(sourceStore, targetStore);

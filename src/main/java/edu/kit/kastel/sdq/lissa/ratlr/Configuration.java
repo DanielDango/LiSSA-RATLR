@@ -102,8 +102,19 @@ public record Configuration(@JsonProperty("source_artifact_provider") ModuleConf
         }
 
         void finalizeForSerialization() {
+            if (finalized) {
+                return;
+            }
+
             finalized = true;
             arguments.putAll(retrievedArguments);
+
+            for (var argumentKey : arguments.keySet()) {
+                if (!retrievedArguments.containsKey(argumentKey)) {
+                    throw new IllegalStateException("Argument with key " + argumentKey + " not retrieved from configuration " + this);
+                }
+            }
+
         }
 
         @Override
