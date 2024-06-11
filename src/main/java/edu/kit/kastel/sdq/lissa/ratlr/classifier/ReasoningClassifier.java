@@ -52,7 +52,7 @@ public abstract class ReasoningClassifier extends Classifier {
             }
 
         }
-        for (var target : targets) {
+        for (var target : targetsToConsider) {
             String llmResponse = classify(source, target);
             boolean isRelated = isRelated(llmResponse);
             if (isRelated) {
