@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Objects;
 
 public class Cache {
-    private static final int MAX_DIRTY = 100;
+    private static final int MAX_DIRTY = 10;
     private final File file;
     private final ObjectMapper mapper;
     private Map<String, String> data = new HashMap<>();
