@@ -17,6 +17,7 @@ public abstract class Preprocessor {
         case "code_chunking" -> new CodeChunkingPreprocessor(configuration);
         case "code_method" -> new CodeMethodPreprocessor(configuration);
         case "model_uml" -> new ModelUMLPreprocessor(configuration);
+        case "artifact" -> new SingleArtifactPreprocessor();
         default -> throw new IllegalStateException("Unexpected value: " + configuration.name());
         };
     }

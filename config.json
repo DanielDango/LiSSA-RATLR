@@ -14,7 +14,7 @@
     }
   },
   "source_preprocessor" : {
-    "name" : "sentence",
+    "name" : "artifact",
     "args" : { }
   },
   "target_preprocessor" : {

@@ -50,8 +50,8 @@ public abstract class ReasoningClassifier extends Classifier {
                 // Now we have the artifact
                 targetsToConsider.add(new Element(artifact.getIdentifier(), artifact.getType(), artifact.getContent(), 0, null, true));
             }
-
         }
+
         for (var target : targetsToConsider) {
             String llmResponse = classify(source, target);
             boolean isRelated = isRelated(llmResponse);
