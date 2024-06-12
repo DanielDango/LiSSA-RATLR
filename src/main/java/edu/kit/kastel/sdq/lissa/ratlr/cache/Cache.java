@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -30,13 +32,20 @@ public class Cache {
         }
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             if (dirty > 0) {
-                try {
-                    mapper.writeValue(file, data);
-                } catch (IOException e) {
-                    throw new IllegalArgumentException("Could not write cache file", e);
-                }
+                write();
             }
         }));
+    }
+
+    private void write() {
+        try {
+            File tempFile = new File(file.getAbsolutePath() + ".tmp.json");
+            mapper.writeValue(tempFile, data);
+            Files.move(tempFile.toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            dirty = 0;
+        } catch (IOException e) {
+            throw new IllegalArgumentException("Could not write cache file", e);
+        }
     }
 
     public void put(String key, String value) {
@@ -46,12 +55,7 @@ public class Cache {
         }
 
         if (dirty > MAX_DIRTY) {
-            try {
-                mapper.writeValue(file, data);
-                dirty = 0;
-            } catch (IOException e) {
-                throw new IllegalArgumentException("Could not write cache file", e);
-            }
+            write();
         }
     }
 
