@@ -3,14 +3,18 @@ package edu.kit.kastel.sdq.lissa.ratlr.artifactprovider;
 import edu.kit.kastel.sdq.lissa.ratlr.Configuration;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Artifact;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Knowledge;
+import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.UncheckedIOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.*;
 
 public class TextArtifactProvider extends ArtifactProvider {
+
+    private static final Logger logger = LoggerFactory.getLogger(TextArtifactProvider.class);
 
     protected final File path;
     protected final Artifact.ArtifactType artifactType;
@@ -35,10 +39,13 @@ public class TextArtifactProvider extends ArtifactProvider {
 
         files.stream().map(File::toPath).forEach(it -> {
             if (Files.isRegularFile(it)) {
-                try (Scanner scan = new Scanner(it.toFile()).useDelimiter("\\A")) {
-                    String content = scan.next();
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                try (BufferedReader reader = new BufferedReader(new FileReader(it.toFile()))) {
+                    IOUtils.copy(reader, bos, StandardCharsets.UTF_8);
+                    String content = bos.toString(StandardCharsets.UTF_8);
                     artifacts.add(new Artifact(it.getFileName().toString(), artifactType, content));
                 } catch (IOException e) {
+                    logger.error("{}: {}", e.getMessage(), it.toFile(), e);
                     throw new UncheckedIOException(e);
                 }
             }
