@@ -76,6 +76,11 @@ public class Main {
     }
 
     private static void generateStatistics(String[] args, Set<TraceLink> traceLinks, Configuration configuration) throws IOException {
+        if (args.length == 0) {
+            logger.info("Skipping statistics generation since no path to ground truth has been provided as first command line argument");
+            return;
+        }
+
         File groundTruth = new File(args[GROUND_TRUTH_INDEX]);
         boolean header = args.length > 1 && args[1].equals("header");
         logger.info("Skipping header: {}", header);
