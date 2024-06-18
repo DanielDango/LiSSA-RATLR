@@ -3,14 +3,14 @@
     "name" : "text",
     "args" : {
       "artifact_type" : "requirement",
-      "path" : "./datasets/iTrust/UC"
+      "path" : "./datasets/eTour_en/UC"
     }
   },
   "target_artifact_provider" : {
     "name" : "text",
     "args" : {
       "artifact_type" : "source code",
-      "path" : "./datasets/iTrust/CC"
+      "path" : "./datasets/eTour_en/CC"
     }
   },
   "source_preprocessor" : {
@@ -35,13 +35,12 @@
   "target_store" : {
     "name" : "custom",
     "args" : {
-      "max_results" : "20"
+      "max_results" : "Infinity"
     }
   },
   "classifier" : {
-    "name" : "reasoning_ollama",
+    "name" : "simple_ollama",
     "args" : {
-      "use_original_artifacts": "true"
     }
   },
   "result_aggregator" : {

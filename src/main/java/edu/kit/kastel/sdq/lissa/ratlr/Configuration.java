@@ -58,6 +58,10 @@ public record Configuration(@JsonProperty("source_artifact_provider") ModuleConf
             return name;
         }
 
+        public boolean hasArgument(String key) {
+            return this.arguments.get(key) != null;
+        }
+
         public String argumentAsString(String key) {
             if (finalized) {
                 throw new IllegalStateException("Configuration already finalized for serialization");
