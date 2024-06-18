@@ -12,6 +12,7 @@ import java.util.Map;
 
 public class ElementStore {
 
+    public static final String MAX_RESULTS_INFINITY_ARGUMENT = "infinity";
     private final Map<String, Pair<Element, float[]>> idToElementWithEmbedding;
     private final List<Pair<Element, float[]>> elementsWithEmbedding;
     private final int maxResults;
@@ -25,9 +26,16 @@ public class ElementStore {
      */
     public ElementStore(Configuration.ModuleConfiguration configuration, boolean similarityRetriever) {
         if (similarityRetriever) {
-            this.maxResults = configuration.argumentAsInt("max_results", 10);
-            if (maxResults < 1) {
-                throw new IllegalArgumentException("The maximum number of results must be greater than 0.");
+            boolean isInfinity = configuration.hasArgument("max_results") && configuration.argumentAsString("max_results")
+                    .equalsIgnoreCase(MAX_RESULTS_INFINITY_ARGUMENT);
+
+            if (isInfinity) {
+                this.maxResults = Integer.MAX_VALUE;
+            } else {
+                this.maxResults = configuration.argumentAsInt("max_results", 10);
+                if (maxResults < 1) {
+                    throw new IllegalArgumentException("The maximum number of results must be greater than 0.");
+                }
             }
         } else {
             this.maxResults = -1;
