@@ -111,10 +111,11 @@ public class Cache {
      * If it wasn't empty to begin with, merging can never happen.
      * 
      * @param other the other cache to retrieve the information to merge from
+     * @param forceMerge if true, the other cache will be merged into this cache, even if keys would be overridden
      * @return the collection to which all keys of the other cache are added, which would have overridden existing keys. If not empty, merging is not possible.
      *
      */
-    public Set<String> addAllEntries(Cache other) {
+    public Set<String> addAllEntries(Cache other, boolean forceMerge) {
         Set<String> keyCollector = new TreeSet<>();
         Map<String, String> thisData = new HashMap<>(this.data);
         Map<String, String> otherData = new HashMap<>(other.data);
@@ -133,10 +134,12 @@ public class Cache {
                 // One value is null, the other is not .. this is also fine
                 continue;
             }
-            logger.warn("Key '{}' would have been overridden by other cache", key);
+            logger.warn("Key '{}' would have been overridden by other cache ({})", key, this.file.getName());
+            logger.debug("  Current value: '{}'", thisValue);
+            logger.debug("  Other value: '{}'", otherValue);
             keyCollector.add(key);
         }
-        if (keyCollector.isEmpty()) {
+        if (keyCollector.isEmpty() || forceMerge) {
             addAllEntriesInternal(other);
         }
         return keyCollector;
