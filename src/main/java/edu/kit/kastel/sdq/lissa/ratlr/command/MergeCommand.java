@@ -41,7 +41,7 @@ public class MergeCommand implements Runnable {
                     merge(CacheManagerConverter.getCacheManager(sourcePath.getParent()), sourcePath);
                 }
             } catch (IOException e) {
-                logger.error(e.getMessage());
+                logger.warn("Source path '%s' caused an exception while accessing the path: %s".formatted(sourcePath, e.getMessage()));
             }
         });
     }
@@ -51,7 +51,7 @@ public class MergeCommand implements Runnable {
             try {
                 merge(sourceManager.getCache(path, false), targetManager.getCache(path, true));
             } catch (IllegalArgumentException e) {
-                logger.warn("skipping because: %s".formatted(e.getMessage()));
+                logger.warn("Source path '%s' caused an exception while merging: %s".formatted(path, e.getMessage()));
             }
         });
     }
@@ -60,10 +60,10 @@ public class MergeCommand implements Runnable {
         Set<String> overridingKeys = new HashSet<>();
         target.merge(source, overridingKeys);
         if (!overridingKeys.isEmpty()) {
-            logger.warn("skipping source file '%s' as it contains %d keys with different value than target cache file".formatted(source.getFile().getPath(),
+            logger.warn("Skipping source file '%s' as it contains %d keys with different value than target cache file".formatted(source.getFile().getPath(),
                     overridingKeys.size()));
         }
-        logger.info("merged '%s' into '%s'".formatted(source.getFile().getPath(), target.getFile().getPath()));
+        logger.info("Merged '%s' into '%s'".formatted(source.getFile().getPath(), target.getFile().getPath()));
     }
 
     private static class CacheManagerConverter implements CommandLine.ITypeConverter<CacheManager> {
