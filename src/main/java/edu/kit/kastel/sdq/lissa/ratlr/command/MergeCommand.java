@@ -10,9 +10,7 @@ import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @CommandLine.Command(name = "merge", mixinStandardHelpOptions = true, description = "Merges cache files of source paths into own default cache or target path")
 public class MergeCommand implements Runnable {
@@ -57,13 +55,13 @@ public class MergeCommand implements Runnable {
     }
 
     private void merge(Cache source, Cache target) {
-        Set<String> overridingKeys = new HashSet<>();
-        target.merge(source, overridingKeys);
+        var overridingKeys = target.addAllEntries(source);
         if (!overridingKeys.isEmpty()) {
             logger.warn("Skipping source file '%s' as it contains %d keys with different value than target cache file".formatted(source.getFile().getPath(),
                     overridingKeys.size()));
+        } else {
+            logger.info("Merged '%s' into '%s'".formatted(source.getFile().getPath(), target.getFile().getPath()));
         }
-        logger.info("Merged '%s' into '%s'".formatted(source.getFile().getPath(), target.getFile().getPath()));
     }
 
     private static class CacheManagerConverter implements CommandLine.ITypeConverter<CacheManager> {

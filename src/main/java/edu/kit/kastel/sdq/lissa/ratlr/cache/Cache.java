@@ -3,17 +3,17 @@ package edu.kit.kastel.sdq.lissa.ratlr.cache;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 public class Cache {
+    private static final Logger logger = LoggerFactory.getLogger(Cache.class);
     private static final int MAX_DIRTY = 10;
     private final File file;
     private final ObjectMapper mapper;
@@ -99,7 +99,7 @@ public class Cache {
      * 
      * @param other the other cache to retrieve the information to merge from
      */
-    private void merge(Cache other) {
+    private void addAllEntriesInternal(Cache other) {
         this.data.putAll(other.data);
         write();
     }
@@ -110,17 +110,35 @@ public class Cache {
      * If {@code keyCollector} still is empty after invoking this method, the contents have been merged.
      * If it wasn't empty to begin with, merging can never happen.
      * 
-     * @param other        the other cache to retrieve the information to merge from
-     * @param keyCollector the collection to which all keys of the other cache are added, which would have overridden existing keys.
-     *                     Must not be {@code null}.
+     * @param other the other cache to retrieve the information to merge from
+     * @return the collection to which all keys of the other cache are added, which would have overridden existing keys. If not empty, merging is not possible.
+     *
      */
-    public void merge(Cache other, Collection<String> keyCollector) {
-        other.data.entrySet()
-                .stream()
-                .filter(entry -> this.data.containsKey(entry.getKey()) && !this.data.get(entry.getKey()).equals(entry.getValue()))
-                .forEach(entry -> keyCollector.add(entry.getKey()));
-        if (keyCollector.isEmpty()) {
-            merge(other);
+    public Set<String> addAllEntries(Cache other) {
+        Set<String> keyCollector = new TreeSet<>();
+        Map<String, String> thisData = new HashMap<>(this.data);
+        Map<String, String> otherData = new HashMap<>(other.data);
+
+        Set<String> allKeys = new HashSet<>(thisData.keySet());
+        allKeys.addAll(otherData.keySet());
+
+        for (String key : allKeys) {
+            String thisValue = thisData.get(key);
+            String otherValue = otherData.get(key);
+            if (Objects.equals(thisValue, otherValue)) {
+                // Equal values are fine
+                continue;
+            }
+            if (thisValue == null || otherValue == null) {
+                // One value is null, the other is not .. this is also fine
+                continue;
+            }
+            logger.warn("Key '{}' would have been overridden by other cache", key);
+            keyCollector.add(key);
         }
+        if (keyCollector.isEmpty()) {
+            addAllEntriesInternal(other);
+        }
+        return keyCollector;
     }
 }
