@@ -19,28 +19,50 @@ public class AnyResultAggregator extends ResultAggregator {
     }
 
     @Override
-    public Set<TraceLink> aggregate(List<Classifier.ClassificationResult> classificationResults) {
+    public Set<TraceLink> aggregate(List<Element> sourceElements, List<Element> targetElements, List<Classifier.ClassificationResult> classificationResults) {
         Set<TraceLink> traceLinks = new LinkedHashSet<>();
         for (var result : classificationResults) {
-            var source = result.source();
-            while (source.getGranularity() > this.sourceGranularity) {
-                var parent = source.getParent();
-                if (!(parent instanceof Element parentAsElement))
-                    throw new IllegalStateException("Parent is not an element");
-                source = parentAsElement;
-            }
-
-            for (var candidate : result.targets()) {
-                var target = candidate;
-                while (target.getGranularity() > this.targetGranularity) {
-                    var parent = target.getParent();
-                    if (!(parent instanceof Element parentAsElement))
-                        throw new IllegalStateException("Parent is not an element");
-                    target = parentAsElement;
+            var sourceElementsForTraceLink = buildListOfValidElements(result.source(), sourceGranularity, sourceElements);
+            for (var target : result.targets()) {
+                var targetElementsForTraceLink = buildListOfValidElements(target, targetGranularity, targetElements);
+                for (var sourceElement : sourceElementsForTraceLink) {
+                    for (var targetElement : targetElementsForTraceLink) {
+                        traceLinks.add(new TraceLink(sourceElement.getIdentifier(), targetElement.getIdentifier()));
+                    }
                 }
-                traceLinks.add(new TraceLink(source.getIdentifier(), target.getIdentifier()));
             }
         }
         return traceLinks;
+    }
+
+    private static List<Element> buildListOfValidElements(Element element, int desiredGranularity, List<Element> allElements) {
+        if (element.getGranularity() == desiredGranularity) {
+            return List.of(element);
+        }
+
+        if (element.getGranularity() < desiredGranularity) {
+            // Element is more course grained than the desired granularity -> find all children that are on the desired granularity
+            List<Element> possibleChildren = allElements.stream().filter(it -> it.getGranularity() == desiredGranularity).toList();
+            // Filter all children that are not transitive children of the element
+            return possibleChildren.stream().filter(it -> isTransitiveChildOf(it, element)).toList();
+        }
+
+        // Element is more fine-grained than the desired granularity -> find all parents that are on the desired granularity
+        List<Element> possibleParents = allElements.stream().filter(it -> it.getGranularity() == desiredGranularity).toList();
+        // Filter all parents that are not transitive parents of the element
+        List<Element> validParents = possibleParents.stream().filter(it -> isTransitiveChildOf(element, it)).toList();
+        assert validParents.size() <= 1;
+        return validParents;
+    }
+
+    private static boolean isTransitiveChildOf(Element possibleChild, Element parent) {
+        Element currentElement = possibleChild;
+        while (currentElement != null) {
+            if (parent == currentElement) {
+                return true;
+            }
+            currentElement = currentElement.getParent();
+        }
+        return false;
     }
 }

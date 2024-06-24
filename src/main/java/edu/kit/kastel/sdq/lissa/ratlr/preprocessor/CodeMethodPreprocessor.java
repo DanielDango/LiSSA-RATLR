@@ -93,8 +93,4 @@ public class CodeMethodPreprocessor extends CachedPreprocessor {
         }
         return classBodies;
     }
-
-    public enum Language {
-        JAVA
-    }
 }

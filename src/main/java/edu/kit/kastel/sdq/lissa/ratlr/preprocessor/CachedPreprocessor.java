@@ -5,6 +5,7 @@ import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Artifact;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -15,21 +16,29 @@ public abstract class CachedPreprocessor extends Preprocessor {
     private Cache cache;
 
     @Override
-    public final List<Element> preprocess(Artifact artifact) {
+    public final List<Element> preprocess(List<Artifact> artifacts) {
         if (cache == null) {
             this.cache = Objects.requireNonNull(createCache());
         }
 
-        String key = UUID.nameUUIDFromBytes(artifact.getContent().getBytes(StandardCharsets.UTF_8)).toString();
+        List<Element> elements = new ArrayList<>();
 
-        Preprocessed cachedPreprocessed = cache.get(key, Preprocessed.class);
-        if (cachedPreprocessed != null) {
-            return cachedPreprocessed.elements();
+        for (Artifact artifact : artifacts) {
+
+            String key = UUID.nameUUIDFromBytes(artifact.getContent().getBytes(StandardCharsets.UTF_8)).toString();
+
+            Preprocessed cachedPreprocessed = cache.get(key, Preprocessed.class);
+            if (cachedPreprocessed != null) {
+                elements.addAll(cachedPreprocessed.elements());
+                continue;
+            }
+
+            Preprocessed preprocessed = new Preprocessed(preprocessIntern(artifact));
+            cache.put(key, preprocessed);
+            elements.addAll(preprocessed.elements());
         }
 
-        Preprocessed preprocessed = new Preprocessed(preprocessIntern(artifact));
-        cache.put(key, preprocessed);
-        return preprocessed.elements();
+        return elements;
     }
 
     protected abstract Cache createCache();

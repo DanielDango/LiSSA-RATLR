@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
-import java.util.Collection;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -53,8 +52,8 @@ public class Main {
         var targetArtifacts = targetArtifactProvider.getArtifacts();
 
         logger.info("Preprocessing artifacts");
-        var sourceElements = sourceArtifacts.stream().map(sourcePreprocessor::preprocess).flatMap(Collection::stream).toList();
-        var targetElements = targetArtifacts.stream().map(targetPreprocessor::preprocess).flatMap(Collection::stream).toList();
+        var sourceElements = sourcePreprocessor.preprocess(sourceArtifacts);
+        var targetElements = targetPreprocessor.preprocess(targetArtifacts);
 
         logger.info("Calculating embeddings");
         var sourceEmbeddings = embeddingCreator.calculateEmbeddings(sourceElements);
@@ -66,7 +65,7 @@ public class Main {
 
         logger.info("Classifying Tracelinks");
         var llmResults = classifier.classify(sourceStore, targetStore);
-        var traceLinks = aggregator.aggregate(llmResults);
+        var traceLinks = aggregator.aggregate(sourceElements, targetElements, llmResults);
 
         logger.info("Postprocessing Tracelinks");
         traceLinks = traceLinkIdPostProcessor.postprocess(traceLinks);
