@@ -17,12 +17,12 @@ public class MergeCommand implements Runnable {
 
     private static final Logger logger = LoggerFactory.getLogger(MergeCommand.class);
 
-    @CommandLine.Parameters(description = "The source paths of the cache files which are used to get the content to merge. If directories are specified, all files in those will be taken.")
+    @CommandLine.Parameters(description = "The source paths of the cache files which are used to get the content to merge. If directories are specified, all files in those will be taken. Nothing will be merged into those.")
     private String[] sourcePaths;
 
     @CommandLine.Option(names = { "-t",
-            "--target" }, defaultValue = CommandLine.Option.NULL_VALUE, converter = CacheManagerConverter.class, description = "Specifies the target cache directory if another one than the default cache should be used to merge the information into.")
-    private CacheManager targetManager;
+            "--target" }, converter = CacheManagerConverter.class, description = "Sets the target directory to get merged into if another one than the default cache should be used.")
+    private CacheManager targetManager = CacheManager.getDefaultInstance();
 
     @Override
     public void run() {
