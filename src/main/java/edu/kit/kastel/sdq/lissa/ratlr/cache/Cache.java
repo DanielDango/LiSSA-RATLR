@@ -41,7 +41,8 @@ public class Cache {
         try {
             File tempFile = new File(file.getAbsolutePath() + ".tmp.json");
             mapper.writeValue(tempFile, data);
-            Files.move(tempFile.toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(tempFile.toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            Files.delete(tempFile.toPath());
             dirty = 0;
         } catch (IOException e) {
             throw new IllegalArgumentException("Could not write cache file", e);
