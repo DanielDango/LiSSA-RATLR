@@ -22,7 +22,7 @@ public class CodeChunkingPreprocessor extends CachedPreprocessor {
 
     @Override
     protected Cache createCache() {
-        return CacheManager.getInstance().getCache(this.getClass().getSimpleName() + language + chunkSize);
+        return CacheManager.getDefaultInstance().getCache(this.getClass().getSimpleName() + language + chunkSize);
     }
 
     protected List<Element> preprocessIntern(Artifact artifact) {

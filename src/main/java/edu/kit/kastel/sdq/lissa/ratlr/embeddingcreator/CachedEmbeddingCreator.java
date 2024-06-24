@@ -18,7 +18,7 @@ abstract class CachedEmbeddingCreator extends EmbeddingCreator {
     private final EmbeddingModel embeddingModel;
 
     protected CachedEmbeddingCreator(String model) {
-        this.cache = CacheManager.getInstance().getCache(this.getClass().getSimpleName() + "_" + Objects.requireNonNull(model));
+        this.cache = CacheManager.getDefaultInstance().getCache(this.getClass().getSimpleName() + "_" + Objects.requireNonNull(model));
         this.embeddingModel = Objects.requireNonNull(createEmbeddingModel(model));
     }
 

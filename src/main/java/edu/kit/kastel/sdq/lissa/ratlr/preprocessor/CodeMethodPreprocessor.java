@@ -27,7 +27,7 @@ public class CodeMethodPreprocessor extends CachedPreprocessor {
 
     @Override
     protected Cache createCache() {
-        return CacheManager.getInstance().getCache(this.getClass().getSimpleName() + language);
+        return CacheManager.getDefaultInstance().getCache(this.getClass().getSimpleName() + language);
     }
 
     @Override

@@ -19,7 +19,7 @@ public class SentencePreprocessor extends Preprocessor {
     private final Cache cache;
 
     public SentencePreprocessor(Configuration.ModuleConfiguration configuration) {
-        this.cache = CacheManager.getInstance().getCache(this.getClass().getSimpleName());
+        this.cache = CacheManager.getDefaultInstance().getCache(this.getClass().getSimpleName());
     }
 
     @Override

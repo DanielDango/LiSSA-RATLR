@@ -26,7 +26,7 @@ public abstract class ReasoningClassifier extends Classifier {
     private final boolean useSystemMessage;
 
     protected ReasoningClassifier(Configuration.ModuleConfiguration configuration, String model) {
-        this.cache = CacheManager.getInstance().getCache(this.getClass().getSimpleName() + "_" + model);
+        this.cache = CacheManager.getDefaultInstance().getCache(this.getClass().getSimpleName() + "_" + model);
         this.prompt = Prompt.values()[configuration.argumentAsInt("prompt_id", 0)].prompt;
         this.useOriginalArtifacts = configuration.argumentAsBoolean("use_original_artifacts", false);
         this.useSystemMessage = configuration.argumentAsBoolean("use_system_message", true);

@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -35,6 +36,10 @@ public class Cache {
                 write();
             }
         }));
+    }
+
+    public File getFile() {
+        return file;
     }
 
     private void write() {
@@ -85,6 +90,36 @@ public class Cache {
             put(key, mapper.writeValueAsString(Objects.requireNonNull(value)));
         } catch (JsonProcessingException e) {
             throw new IllegalArgumentException("Could not serialize object", e);
+        }
+    }
+
+    /**
+     * Merges another cache into this one and updates the cache file. If a key already exists the value of the other cache will be taken.
+     * 
+     * @param other the other cache to retrieve the information to merge from
+     */
+    private void merge(Cache other) {
+        this.data.putAll(other.data);
+        write();
+    }
+
+    /**
+     * Merges another cache into this one if no existing key gets overridden.
+     * Overriding means updating an existing value into a different one.
+     * If {@code keyCollector} still is empty after invoking this method, the contents have been merged.
+     * If it wasn't empty to begin with, merging can never happen.
+     * 
+     * @param other        the other cache to retrieve the information to merge from
+     * @param keyCollector the collection to which all keys of the other cache are added, which would have overridden existing keys.
+     *                     Must not be {@code null}.
+     */
+    public void merge(Cache other, Collection<String> keyCollector) {
+        other.data.entrySet()
+                .stream()
+                .filter(entry -> this.data.containsKey(entry.getKey()) && !this.data.get(entry.getKey()).equals(entry.getValue()))
+                .forEach(entry -> keyCollector.add(entry.getKey()));
+        if (keyCollector.isEmpty()) {
+            merge(other);
         }
     }
 }

@@ -26,7 +26,7 @@ abstract class SimpleClassifier extends Classifier {
 
     protected SimpleClassifier(Configuration.ModuleConfiguration configuration, String model) {
         this.template = configuration.argumentAsString("template", DEFAULT_TEMPLATE);
-        this.cache = CacheManager.getInstance().getCache(this.getClass().getSimpleName() + "_" + model);
+        this.cache = CacheManager.getDefaultInstance().getCache(this.getClass().getSimpleName() + "_" + model);
         this.llm = createChatModel(model);
     }
 
