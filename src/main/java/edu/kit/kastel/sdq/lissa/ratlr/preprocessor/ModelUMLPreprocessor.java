@@ -28,23 +28,25 @@ public class ModelUMLPreprocessor extends Preprocessor {
     }
 
     @Override
-    public List<Element> preprocess(Artifact artifact) {
+    public List<Element> preprocess(List<Artifact> artifacts) {
         List<Element> elements = new ArrayList<>();
-        Element artifactAsElement = new Element(artifact.getIdentifier(), artifact.getType(), artifact.getContent(), 0, null, false);
-        elements.add(artifactAsElement);
 
-        String xml = artifact.getContent();
-        UmlModelRoot umlModel = new UmlModel(new ByteArrayInputStream(xml.getBytes())).getModel();
+        for (Artifact artifact : artifacts) {
+            Element artifactAsElement = new Element(artifact.getIdentifier(), artifact.getType(), artifact.getContent(), 0, null, false);
+            elements.add(artifactAsElement);
 
-        AtomicInteger counter = new AtomicInteger(0);
-        for (UmlComponent umlComponent : umlModel.getComponents()) {
-            this.addComponent(counter, umlComponent, artifactAsElement, elements);
+            String xml = artifact.getContent();
+            UmlModelRoot umlModel = new UmlModel(new ByteArrayInputStream(xml.getBytes())).getModel();
+
+            AtomicInteger counter = new AtomicInteger(0);
+            for (UmlComponent umlComponent : umlModel.getComponents()) {
+                this.addComponent(counter, umlComponent, artifactAsElement, elements);
+            }
+
+            for (UmlInterface umlInterface : umlModel.getInterfaces()) {
+                this.addInterface(counter, umlInterface, artifactAsElement, elements);
+            }
         }
-
-        for (UmlInterface umlInterface : umlModel.getInterfaces()) {
-            this.addInterface(counter, umlInterface, artifactAsElement, elements);
-        }
-
         return elements;
     }
 

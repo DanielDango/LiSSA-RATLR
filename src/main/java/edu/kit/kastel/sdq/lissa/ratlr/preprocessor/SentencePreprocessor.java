@@ -23,18 +23,23 @@ public class SentencePreprocessor extends Preprocessor {
     }
 
     @Override
-    public List<Element> preprocess(Artifact artifact) {
-        String data = artifact.getContent() + artifact.getContent();
-        String key = UUID.nameUUIDFromBytes(data.getBytes(StandardCharsets.UTF_8)).toString();
+    public List<Element> preprocess(List<Artifact> artifacts) {
+        List<Element> elements = new ArrayList<>();
+        for (Artifact artifact : artifacts) {
 
-        Preprocessed cachedPreprocessed = cache.get(key, Preprocessed.class);
-        if (cachedPreprocessed != null) {
-            return cachedPreprocessed.elements();
+            String data = artifact.getContent() + artifact.getContent();
+            String key = UUID.nameUUIDFromBytes(data.getBytes(StandardCharsets.UTF_8)).toString();
+
+            Preprocessed cachedPreprocessed = cache.get(key, Preprocessed.class);
+            if (cachedPreprocessed != null) {
+                return cachedPreprocessed.elements();
+            }
+
+            Preprocessed preprocessed = preprocessIntern(artifact);
+            cache.put(key, preprocessed);
+            elements.addAll(preprocessed.elements());
         }
-
-        Preprocessed preprocessed = preprocessIntern(artifact);
-        cache.put(key, preprocessed);
-        return preprocessed.elements();
+        return elements;
     }
 
     private Preprocessed preprocessIntern(Artifact artifact) {
