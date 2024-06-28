@@ -110,7 +110,7 @@ public class Cache {
      * If {@code keyCollector} still is empty after invoking this method, the contents have been merged.
      * If it wasn't empty to begin with, merging can never happen.
      * 
-     * @param other the other cache to retrieve the information to merge from
+     * @param other      the other cache to retrieve the information to merge from
      * @param forceMerge if true, the other cache will be merged into this cache, even if keys would be overridden
      * @return the collection to which all keys of the other cache are added, which would have overridden existing keys. If not empty, merging is not possible.
      *
