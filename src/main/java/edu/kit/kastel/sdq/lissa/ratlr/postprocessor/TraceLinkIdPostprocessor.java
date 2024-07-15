@@ -11,6 +11,7 @@ public abstract class TraceLinkIdPostprocessor {
         case "req2code" -> new ReqCodePostprocessor();
         case "sad2code" -> new SadCodePostprocessor();
 
+        case "identity" -> new IdentityPostprocessor();
         case null -> new IdentityPostprocessor();
         default -> throw new IllegalStateException("Unexpected value: " + moduleConfiguration.name());
         };

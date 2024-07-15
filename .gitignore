@@ -39,3 +39,7 @@ build/
 /datasets
 /results-*.md
 /results
+/old
+/configs
+/results*.tgz
+

@@ -30,6 +30,7 @@ public abstract class Classifier {
         case "simple_ollama" -> new SimpleOllamaClassifier(configuration);
         case "simple_openai" -> new SimpleOpenAiClassifier(configuration);
         case "reasoning_ollama" -> new ReasoningOllamaClassifier(configuration);
+        case "reasoning_openai" -> new ReasoningOpenAiClassifier(configuration);
         default -> throw new IllegalStateException("Unexpected value: " + configuration.name());
         };
     }
