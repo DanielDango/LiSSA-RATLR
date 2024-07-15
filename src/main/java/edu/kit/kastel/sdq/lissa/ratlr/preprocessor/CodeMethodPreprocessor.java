@@ -1,8 +1,6 @@
 package edu.kit.kastel.sdq.lissa.ratlr.preprocessor;
 
 import edu.kit.kastel.sdq.lissa.ratlr.Configuration;
-import edu.kit.kastel.sdq.lissa.ratlr.cache.Cache;
-import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheManager;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Artifact;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 import org.treesitter.TSNode;
@@ -17,7 +15,7 @@ import java.util.Objects;
 /**
  * Split at the beginning of a class (class declaration to first split) and beginning of each method (method declaration to second split)
  */
-public class CodeMethodPreprocessor extends CachedPreprocessor {
+public class CodeMethodPreprocessor extends Preprocessor {
 
     private final Language language;
 
@@ -26,12 +24,16 @@ public class CodeMethodPreprocessor extends CachedPreprocessor {
     }
 
     @Override
-    protected Cache createCache() {
-        return CacheManager.getDefaultInstance().getCache(this.getClass().getSimpleName() + language);
+    public List<Element> preprocess(List<Artifact> artifacts) {
+        List<Element> elements = new ArrayList<>();
+        for (Artifact artifact : artifacts) {
+            List<Element> preprocessed = preprocess(artifact);
+            elements.addAll(preprocessed);
+        }
+        return elements;
     }
 
-    @Override
-    protected List<Element> preprocessIntern(Artifact artifact) {
+    protected List<Element> preprocess(Artifact artifact) {
         List<Element> elements = new ArrayList<>();
         Element artifactAsElement = new Element(artifact.getIdentifier(), artifact.getType(), artifact.getContent(), 0, null, false);
         elements.add(artifactAsElement);

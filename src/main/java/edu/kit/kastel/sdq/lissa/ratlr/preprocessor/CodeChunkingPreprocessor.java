@@ -1,8 +1,6 @@
 package edu.kit.kastel.sdq.lissa.ratlr.preprocessor;
 
 import edu.kit.kastel.sdq.lissa.ratlr.Configuration;
-import edu.kit.kastel.sdq.lissa.ratlr.cache.Cache;
-import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheManager;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Artifact;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 
@@ -10,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class CodeChunkingPreprocessor extends CachedPreprocessor {
+public class CodeChunkingPreprocessor extends Preprocessor {
 
     private final RecursiveSplitter.Language language;
     private final int chunkSize;
@@ -21,11 +19,16 @@ public class CodeChunkingPreprocessor extends CachedPreprocessor {
     }
 
     @Override
-    protected Cache createCache() {
-        return CacheManager.getDefaultInstance().getCache(this.getClass().getSimpleName() + language + chunkSize);
+    public List<Element> preprocess(List<Artifact> artifacts) {
+        List<Element> elements = new ArrayList<>();
+        for (Artifact artifact : artifacts) {
+            List<Element> preprocessed = preprocess(artifact);
+            elements.addAll(preprocessed);
+        }
+        return elements;
     }
 
-    protected List<Element> preprocessIntern(Artifact artifact) {
+    protected List<Element> preprocess(Artifact artifact) {
         List<String> segments = RecursiveSplitter.fromLanguage(language, chunkSize).splitText(artifact.getContent());
         List<Element> elements = new ArrayList<>();
 
