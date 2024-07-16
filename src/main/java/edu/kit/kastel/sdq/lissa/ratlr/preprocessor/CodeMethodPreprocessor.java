@@ -8,7 +8,9 @@ import org.treesitter.TSParser;
 import org.treesitter.TSTree;
 import org.treesitter.TreeSitterJava;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -27,8 +29,14 @@ public class CodeMethodPreprocessor extends Preprocessor {
     public List<Element> preprocess(List<Artifact> artifacts) {
         List<Element> elements = new ArrayList<>();
         for (Artifact artifact : artifacts) {
-            List<Element> preprocessed = preprocess(artifact);
-            elements.addAll(preprocessed);
+            try {
+                List<Element> preprocessed = preprocess(artifact);
+                elements.addAll(preprocessed);
+            } catch (Exception e) {
+                System.out.println("Error while processing artifact " + artifact.getIdentifier());
+                List<Element> preprocessed = preprocess(artifact);
+                elements.addAll(preprocessed);
+            }
         }
         return elements;
     }
@@ -52,12 +60,15 @@ public class CodeMethodPreprocessor extends Preprocessor {
         TSParser parser = new TSParser();
         parser.setLanguage(new TreeSitterJava());
 
-        TSTree tree = parser.parseString(null, javaFile.getContent());
+        String content = javaFile.getContent();
+        byte[] javaContentInBytes = content.getBytes(StandardCharsets.UTF_8);
+
+        TSTree tree = parser.parseString(null, content);
         var classBodies = parseClassBodies(tree.getRootNode());
         int classStart = 0;
         for (int i = 0; i < classBodies.size(); i++) {
             var classBody = classBodies.get(i);
-            var text = javaFile.getContent().substring(classStart, classBody.getStartByte());
+            var text = new String(Arrays.copyOfRange(javaContentInBytes, classStart, classBody.getStartByte()));
             var classElement = new Element(javaFile.getIdentifier() + SEPARATOR + i, "source code class definition", text, 1, javaFile, false);
             elements.add(classElement);
 
@@ -65,7 +76,7 @@ public class CodeMethodPreprocessor extends Preprocessor {
             var methods = parseMethods(classBody);
             for (int j = 0; j < methods.size(); j++) {
                 var method = methods.get(j);
-                var methodText = javaFile.getContent().substring(methodStart, method.getEndByte());
+                String methodText = new String(Arrays.copyOfRange(javaContentInBytes, methodStart, method.getEndByte()));
                 var methodElement = new Element(classElement.getIdentifier() + SEPARATOR + j, "source code method", methodText, 2, classElement, true);
                 elements.add(methodElement);
                 methodStart = method.getEndByte();
