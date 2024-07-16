@@ -29,14 +29,9 @@ public class CodeMethodPreprocessor extends Preprocessor {
     public List<Element> preprocess(List<Artifact> artifacts) {
         List<Element> elements = new ArrayList<>();
         for (Artifact artifact : artifacts) {
-            try {
                 List<Element> preprocessed = preprocess(artifact);
                 elements.addAll(preprocessed);
-            } catch (Exception e) {
-                System.out.println("Error while processing artifact " + artifact.getIdentifier());
-                List<Element> preprocessed = preprocess(artifact);
-                elements.addAll(preprocessed);
-            }
+
         }
         return elements;
     }
