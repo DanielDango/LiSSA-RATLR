@@ -41,5 +41,6 @@ build/
 /results
 /old
 /configs
+/execution
 /results*.tgz
 
