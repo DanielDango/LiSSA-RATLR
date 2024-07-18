@@ -52,8 +52,17 @@ public abstract class ReasoningClassifier extends Classifier {
             }
         }
 
+        var sourceToConsider = source;
+        /* TODO Maybe reactivate the sourceToConsider in the future ..
+        if(useOriginalArtifacts){
+            while (sourceToConsider.getParent() != null) {
+                sourceToConsider = sourceToConsider.getParent();
+            }
+        }
+        */
+
         for (var target : targetsToConsider) {
-            String llmResponse = classify(source, target);
+            String llmResponse = classify(sourceToConsider, target);
             boolean isRelated = isRelated(llmResponse);
             if (isRelated) {
                 relatedTargets.add(target);
