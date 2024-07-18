@@ -54,7 +54,7 @@ public class Cache {
         }
     }
 
-    public void put(String key, String value) {
+    public synchronized void put(String key, String value) {
         String old = data.put(key, value);
         if (old == null || !old.equals(value)) {
             dirty++;
@@ -65,11 +65,7 @@ public class Cache {
         }
     }
 
-    public String get(String key) {
-        return data.get(key);
-    }
-
-    public <T> T get(String key, Class<T> clazz) {
+    public synchronized <T> T get(String key, Class<T> clazz) {
         try {
             var jsonData = this.data.get(key);
             if (jsonData == null) {
@@ -86,7 +82,7 @@ public class Cache {
         }
     }
 
-    public <T> void put(String key, T value) {
+    public synchronized <T> void put(String key, T value) {
         try {
             put(key, mapper.writeValueAsString(Objects.requireNonNull(value)));
         } catch (JsonProcessingException e) {
@@ -115,7 +111,7 @@ public class Cache {
      * @return the collection to which all keys of the other cache are added, which would have overridden existing keys. If not empty, merging is not possible.
      *
      */
-    public Set<String> addAllEntries(Cache other, boolean forceMerge) {
+    public synchronized Set<String> addAllEntries(Cache other, boolean forceMerge) {
         Set<String> keyCollector = new TreeSet<>();
         Map<String, String> thisData = new HashMap<>(this.data);
         Map<String, String> otherData = new HashMap<>(other.data);
