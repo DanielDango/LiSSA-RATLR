@@ -14,7 +14,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 public abstract class Classifier {
-    private static final int THREADS = 80;
+    private static final int THREADS = 100;
 
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 

@@ -5,7 +5,7 @@ import edu.kit.kastel.sdq.lissa.ratlr.Configuration;
 
 public class SimpleOpenAiClassifier extends SimpleClassifier {
     public SimpleOpenAiClassifier(Configuration.ModuleConfiguration configuration) {
-        super(configuration, configuration.argumentAsString("model", "gpt-3.5-turbo-0125"));
+        super(configuration, configuration.argumentAsString("model", "gpt-4o-mini"));
     }
 
     @Override
