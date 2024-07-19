@@ -9,4 +9,9 @@ public class MockClassifier extends Classifier {
     protected ClassificationResult classify(Element source, List<Element> targets) {
         return new ClassificationResult(source, targets);
     }
+
+    @Override
+    protected Classifier copyOf() {
+        return new MockClassifier();
+    }
 }

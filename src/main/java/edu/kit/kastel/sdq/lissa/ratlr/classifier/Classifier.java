@@ -23,7 +23,7 @@ public abstract class Classifier {
         ExecutorService executor = Executors.newFixedThreadPool(THREADS);
         for (var query : sourceStore.getAllElements(true)) {
             var targetCandidates = targetStore.findSimilar(query.second());
-            var futureResult = executor.submit(() -> classify(query.first(), targetCandidates));
+            var futureResult = executor.submit(() -> copyOf().classify(query.first(), targetCandidates));
             futureResults.add(futureResult);
         }
 
@@ -40,6 +40,8 @@ public abstract class Classifier {
     }
 
     protected abstract ClassificationResult classify(Element source, List<Element> targets);
+
+    protected abstract Classifier copyOf();
 
     public static Classifier createClassifier(Configuration.ModuleConfiguration configuration) {
         return switch (configuration.name()) {

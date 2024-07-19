@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-abstract class SimpleClassifier extends Classifier {
+public abstract class SimpleClassifier extends Classifier {
 
     private static final String DEFAULT_TEMPLATE = """
             Question: Here are two parts of software development artifacts. \n
@@ -23,12 +23,28 @@ abstract class SimpleClassifier extends Classifier {
     private final Cache cache;
     private final ChatLanguageModel llm;
     private final String template;
+    private final String model;
 
     protected SimpleClassifier(Configuration.ModuleConfiguration configuration, String model) {
         this.template = configuration.argumentAsString("template", DEFAULT_TEMPLATE);
         this.cache = CacheManager.getDefaultInstance().getCache(this.getClass().getSimpleName() + "_" + model);
+        this.model = model;
         this.llm = createChatModel(model);
     }
+
+    protected SimpleClassifier(Cache cache, String model, ChatLanguageModel llm, String template) {
+        this.cache = cache;
+        this.model = model;
+        this.llm = llm;
+        this.template = template;
+    }
+
+    @Override
+    protected final Classifier copyOf() {
+        return copyOf(cache, model, createChatModel(model), template);
+    }
+
+    protected abstract SimpleClassifier copyOf(Cache cache, String model, ChatLanguageModel llm, String template);
 
     protected abstract ChatLanguageModel createChatModel(String model);
 

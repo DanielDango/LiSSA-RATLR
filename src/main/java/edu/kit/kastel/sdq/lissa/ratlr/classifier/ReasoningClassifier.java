@@ -24,14 +24,33 @@ public abstract class ReasoningClassifier extends Classifier {
     private final String prompt;
     private final boolean useOriginalArtifacts;
     private final boolean useSystemMessage;
+    private final String model;
 
     protected ReasoningClassifier(Configuration.ModuleConfiguration configuration, String model) {
         this.cache = CacheManager.getDefaultInstance().getCache(this.getClass().getSimpleName() + "_" + model);
         this.prompt = Prompt.values()[configuration.argumentAsInt("prompt_id", 0)].prompt;
         this.useOriginalArtifacts = configuration.argumentAsBoolean("use_original_artifacts", false);
         this.useSystemMessage = configuration.argumentAsBoolean("use_system_message", true);
+        this.model = model;
         this.llm = createChatModel(model);
     }
+
+    protected ReasoningClassifier(Cache cache, String model, ChatLanguageModel llm, String prompt, boolean useOriginalArtifacts, boolean useSystemMessage) {
+        this.cache = cache;
+        this.model = model;
+        this.llm = llm;
+        this.prompt = prompt;
+        this.useOriginalArtifacts = useOriginalArtifacts;
+        this.useSystemMessage = useSystemMessage;
+    }
+
+    @Override
+    protected final Classifier copyOf() {
+        return copyOf(cache, model, createChatModel(model), prompt, useOriginalArtifacts, useSystemMessage);
+    }
+
+    protected abstract ReasoningClassifier copyOf(Cache cache, String model, ChatLanguageModel llm, String prompt, boolean useOriginalArtifacts,
+            boolean useSystemMessage);
 
     protected abstract ChatLanguageModel createChatModel(String model);
 
