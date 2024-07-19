@@ -17,8 +17,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Main {
@@ -72,6 +71,7 @@ public class Main {
 
         logger.info("Evaluating Results");
         generateStatistics(args, traceLinks, configuration);
+        saveTraceLinks(traceLinks, configuration);
     }
 
     private static void generateStatistics(String[] args, Set<TraceLink> traceLinks, Configuration configuration) throws IOException {
@@ -119,5 +119,17 @@ public class Main {
         Files.writeString(resultFile.toPath(), "* Precision: " + precision + "\n", StandardOpenOption.APPEND);
         Files.writeString(resultFile.toPath(), "* Recall: " + recall + "\n", StandardOpenOption.APPEND);
         Files.writeString(resultFile.toPath(), "* F1: " + f1 + "\n", StandardOpenOption.APPEND);
+    }
+
+    private static void saveTraceLinks(Set<TraceLink> traceLinks, Configuration configuration) throws IOException {
+        var fileName = "traceLinks-" + configuration.traceLinkIdPostprocessor().name() + "-" + UUID.nameUUIDFromBytes(configuration.toString()
+                .getBytes(StandardCharsets.UTF_8)) + ".csv";
+        logger.info("Storing trace links to {}", fileName);
+
+        List<TraceLink> orderedTraceLinks = new ArrayList<>(traceLinks);
+        orderedTraceLinks.sort(Comparator.comparing(TraceLink::sourceId).thenComparing(TraceLink::targetId));
+
+        String csvResult = orderedTraceLinks.stream().map(it -> it.sourceId() + "," + it.targetId()).collect(Collectors.joining("\n"));
+        Files.writeString(new File(fileName).toPath(), csvResult, StandardOpenOption.CREATE);
     }
 }
