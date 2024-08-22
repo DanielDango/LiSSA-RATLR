@@ -1,7 +1,9 @@
 package edu.kit.kastel.sdq.lissa.ratlr;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.kit.kastel.mcse.ardoco.metrics.ClassificationMetricsCalculator;
 import edu.kit.kastel.sdq.lissa.ratlr.artifactprovider.ArtifactProvider;
+import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheManager;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.Classifier;
 import edu.kit.kastel.sdq.lissa.ratlr.elementstore.ElementStore;
 import edu.kit.kastel.sdq.lissa.ratlr.embeddingcreator.EmbeddingCreator;
@@ -9,12 +11,12 @@ import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
 import edu.kit.kastel.sdq.lissa.ratlr.postprocessor.TraceLinkIdPostprocessor;
 import edu.kit.kastel.sdq.lissa.ratlr.preprocessor.Preprocessor;
 import edu.kit.kastel.sdq.lissa.ratlr.resultaggregator.ResultAggregator;
+import edu.kit.kastel.sdq.lissa.ratlr.utils.KeyGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.util.*;
@@ -26,7 +28,9 @@ public class Main {
     private static final int GROUND_TRUTH_INDEX = 0;
 
     public static void main(String[] args) throws IOException {
-        Configuration configuration = new ObjectMapper().readValue(new File("config.json"), Configuration.class);
+        var configFile = args.length == 0 ? "config.json" : args[0];
+        Configuration configuration = new ObjectMapper().readValue(new File(configFile), Configuration.class);
+        CacheManager.setCacheDir(configuration.cacheDir());
 
         ArtifactProvider sourceArtifactProvider = ArtifactProvider.createArtifactProvider(configuration.sourceArtifactProvider());
         ArtifactProvider targetArtifactProvider = ArtifactProvider.createArtifactProvider(configuration.targetArtifactProvider());
@@ -70,18 +74,18 @@ public class Main {
         traceLinks = traceLinkIdPostProcessor.postprocess(traceLinks);
 
         logger.info("Evaluating Results");
-        generateStatistics(args, traceLinks, configuration);
+        generateStatistics(traceLinks, configuration);
         saveTraceLinks(traceLinks, configuration);
     }
 
-    private static void generateStatistics(String[] args, Set<TraceLink> traceLinks, Configuration configuration) throws IOException {
-        if (args.length == 0) {
+    private static void generateStatistics(Set<TraceLink> traceLinks, Configuration configuration) throws IOException {
+        if (configuration.goldStandardConfiguration() == null || configuration.goldStandardConfiguration().path() == null) {
             logger.info("Skipping statistics generation since no path to ground truth has been provided as first command line argument");
             return;
         }
 
-        File groundTruth = new File(args[GROUND_TRUTH_INDEX]);
-        boolean header = args.length > 1 && args[1].equals("header");
+        File groundTruth = new File(configuration.goldStandardConfiguration().path());
+        boolean header = configuration.goldStandardConfiguration().hasHeader();
         logger.info("Skipping header: {}", header);
         Set<TraceLink> validTraceLinks = Files.readAllLines(groundTruth.toPath())
                 .stream()
@@ -89,41 +93,27 @@ public class Main {
                 .map(l -> l.split(","))
                 .map(it -> new TraceLink(it[0], it[1]))
                 .collect(Collectors.toSet());
-        logger.info("Valid TraceLinks: {}", validTraceLinks.size());
-        logger.info("Found TraceLinks: {}", traceLinks.size());
 
-        Set<TraceLink> truePositives = traceLinks.stream().filter(validTraceLinks::contains).collect(Collectors.toSet());
-        Set<TraceLink> falsePositives = traceLinks.stream().filter(it -> !validTraceLinks.contains(it)).collect(Collectors.toSet());
-        Set<TraceLink> falseNegatives = validTraceLinks.stream().filter(it -> !traceLinks.contains(it)).collect(Collectors.toSet());
-
-        logger.info("True Positives: {}", truePositives.size());
-        logger.info("False Positives: {}", falsePositives.size());
-        logger.info("False Negatives: {}", falseNegatives.size());
-
-        double precision = (double) truePositives.size() / (truePositives.size() + falsePositives.size());
-        double recall = (double) truePositives.size() / (truePositives.size() + falseNegatives.size());
-        double f1 = 2 * precision * recall / (precision + recall);
-        logger.info("Precision: {}", precision);
-        logger.info("Recall: {}", recall);
-        logger.info("F1: {}", f1);
+        ClassificationMetricsCalculator cmc = ClassificationMetricsCalculator.getInstance();
+        var classification = cmc.calculateMetrics(traceLinks, validTraceLinks, null);
+        classification.prettyPrint();
 
         // Store information to one file (config and results)
-        var resultFile = new File("results-" + configuration.traceLinkIdPostprocessor().name() + "-" + UUID.nameUUIDFromBytes(configuration.toString()
-                .getBytes(StandardCharsets.UTF_8)) + ".md");
-        logger.info("Storing results to " + resultFile.getName());
+        var resultFile = new File("results-" + configuration.traceLinkIdPostprocessor().name() + "-" + KeyGenerator.generateKey(configuration
+                .toString()) + ".md");
+        logger.info("Storing results to {}", resultFile.getName());
         Files.writeString(resultFile.toPath(), "## Configuration\n```json\n" + configuration.serializeAndDestroyConfiguration() + "\n```\n\n");
         Files.writeString(resultFile.toPath(), "## Results\n", StandardOpenOption.APPEND);
-        Files.writeString(resultFile.toPath(), "* True Positives: " + truePositives.size() + "\n", StandardOpenOption.APPEND);
-        Files.writeString(resultFile.toPath(), "* False Positives: " + falsePositives.size() + "\n", StandardOpenOption.APPEND);
-        Files.writeString(resultFile.toPath(), "* False Negatives: " + falseNegatives.size() + "\n", StandardOpenOption.APPEND);
-        Files.writeString(resultFile.toPath(), "* Precision: " + precision + "\n", StandardOpenOption.APPEND);
-        Files.writeString(resultFile.toPath(), "* Recall: " + recall + "\n", StandardOpenOption.APPEND);
-        Files.writeString(resultFile.toPath(), "* F1: " + f1 + "\n", StandardOpenOption.APPEND);
+        Files.writeString(resultFile.toPath(), "* True Positives: " + classification.getTp().size() + "\n", StandardOpenOption.APPEND);
+        Files.writeString(resultFile.toPath(), "* False Positives: " + classification.getFp().size() + "\n", StandardOpenOption.APPEND);
+        Files.writeString(resultFile.toPath(), "* False Negatives: " + classification.getFn().size() + "\n", StandardOpenOption.APPEND);
+        Files.writeString(resultFile.toPath(), "* Precision: " + classification.getPrecision() + "\n", StandardOpenOption.APPEND);
+        Files.writeString(resultFile.toPath(), "* Recall: " + classification.getRecall() + "\n", StandardOpenOption.APPEND);
+        Files.writeString(resultFile.toPath(), "* F1: " + classification.getF1() + "\n", StandardOpenOption.APPEND);
     }
 
     private static void saveTraceLinks(Set<TraceLink> traceLinks, Configuration configuration) throws IOException {
-        var fileName = "traceLinks-" + configuration.traceLinkIdPostprocessor().name() + "-" + UUID.nameUUIDFromBytes(configuration.toString()
-                .getBytes(StandardCharsets.UTF_8)) + ".csv";
+        var fileName = "traceLinks-" + configuration.traceLinkIdPostprocessor().name() + "-" + KeyGenerator.generateKey(configuration.toString()) + ".csv";
         logger.info("Storing trace links to {}", fileName);
 
         List<TraceLink> orderedTraceLinks = new ArrayList<>(traceLinks);
