@@ -1,5 +1,6 @@
 package edu.kit.kastel.sdq.lissa.ratlr.knowledge;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -14,21 +15,26 @@ public abstract sealed class Knowledge permits Artifact, Element {
     @JsonProperty
     private final String content;
 
+    @JsonIgnore
+    private final String normalizedContent;
+
     protected Knowledge(String identifier, String type, String content) {
         this.identifier = identifier;
         this.type = type;
         this.content = content;
+        this.normalizedContent = content.replace("\r\n", "\n");
     }
 
-    public String getContent() {
-        return content;
+    public final String getContent() {
+        // We do want to return the normalized content here
+        return normalizedContent;
     }
 
-    public String getIdentifier() {
+    public final String getIdentifier() {
         return identifier;
     }
 
-    public String getType() {
+    public final String getType() {
         return type;
     }
 }

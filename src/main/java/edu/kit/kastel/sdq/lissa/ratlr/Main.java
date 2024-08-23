@@ -25,8 +25,6 @@ import java.util.stream.Collectors;
 public class Main {
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
-    private static final int GROUND_TRUTH_INDEX = 0;
-
     public static void main(String[] args) throws IOException {
         var configFile = args.length == 0 ? "config.json" : args[0];
         Configuration configuration = new ObjectMapper().readValue(new File(configFile), Configuration.class);

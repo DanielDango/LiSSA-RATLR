@@ -33,7 +33,7 @@ public final class Element extends Knowledge {
         this.compare = compare;
     }
 
-    public void init(Map<String, ? extends Element> otherKnowledge) {
+    public void init(Map<String, Element> otherKnowledge) {
         if (parentId != null) {
             parent = otherKnowledge.get(parentId);
         }
