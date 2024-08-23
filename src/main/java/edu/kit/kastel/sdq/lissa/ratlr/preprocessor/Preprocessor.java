@@ -1,10 +1,10 @@
 package edu.kit.kastel.sdq.lissa.ratlr.preprocessor;
 
+import java.util.List;
+
 import edu.kit.kastel.sdq.lissa.ratlr.Configuration;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Artifact;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
-
-import java.util.List;
 
 /**
  * A preprocessor extracts elements based on the given artifacts.

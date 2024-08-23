@@ -19,7 +19,8 @@ public class OpenAiEmbeddingCreator extends CachedEmbeddingCreator {
         if (openAiOrganizationId == null || openAiApiKey == null) {
             throw new IllegalStateException("OPENAI_ORGANIZATION_ID or OPENAI_API_KEY environment variable not set");
         }
-        return new OpenAiEmbeddingModel.OpenAiEmbeddingModelBuilder().modelName(model)
+        return new OpenAiEmbeddingModel.OpenAiEmbeddingModelBuilder()
+                .modelName(model)
                 .organizationId(openAiOrganizationId)
                 .apiKey(openAiApiKey)
                 .maxRetries(0)

@@ -1,12 +1,12 @@
 package edu.kit.kastel.sdq.lissa.ratlr.preprocessor;
 
-import edu.kit.kastel.sdq.lissa.ratlr.Configuration;
-import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Artifact;
-import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import edu.kit.kastel.sdq.lissa.ratlr.Configuration;
+import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Artifact;
+import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 
 /**
  * This preprocessor splits the code into chunks of a given size.
@@ -23,7 +23,10 @@ public class CodeChunkingPreprocessor extends Preprocessor {
     private final int chunkSize;
 
     public CodeChunkingPreprocessor(Configuration.ModuleConfiguration configuration) {
-        this.languages = Arrays.stream(configuration.argumentAsString("language").split(",")).map(RecursiveSplitter.Language::valueOf).toList();
+        this.languages = Arrays.stream(
+                        configuration.argumentAsString("language").split(","))
+                .map(RecursiveSplitter.Language::valueOf)
+                .toList();
         this.chunkSize = configuration.argumentAsInt("chunk_size", 60);
     }
 
@@ -42,12 +45,14 @@ public class CodeChunkingPreprocessor extends Preprocessor {
         List<String> segments = this.generateSegments(artifact);
         List<Element> elements = new ArrayList<>();
 
-        Element artifactAsElement = new Element(artifact.getIdentifier(), artifact.getType(), artifact.getContent(), 0, null, false);
+        Element artifactAsElement =
+                new Element(artifact.getIdentifier(), artifact.getType(), artifact.getContent(), 0, null, false);
         elements.add(artifactAsElement);
 
         for (int i = 0; i < segments.size(); i++) {
             String segment = segments.get(i);
-            Element segmentAsElement = new Element(artifact.getIdentifier() + SEPARATOR + i, artifact.getType(), segment, 1, artifactAsElement, true);
+            Element segmentAsElement = new Element(
+                    artifact.getIdentifier() + SEPARATOR + i, artifact.getType(), segment, 1, artifactAsElement, true);
             elements.add(segmentAsElement);
         }
 
@@ -60,7 +65,8 @@ public class CodeChunkingPreprocessor extends Preprocessor {
     }
 
     private RecursiveSplitter.Language getLanguage(Artifact artifact) {
-        String ending = artifact.getIdentifier().substring(artifact.getIdentifier().lastIndexOf(".") + 1);
+        String ending =
+                artifact.getIdentifier().substring(artifact.getIdentifier().lastIndexOf(".") + 1);
         return switch (ending) {
             case "java" -> RecursiveSplitter.Language.JAVA;
             case "py" -> RecursiveSplitter.Language.PYTHON;

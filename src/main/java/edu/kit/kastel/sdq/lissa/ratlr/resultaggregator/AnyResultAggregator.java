@@ -1,13 +1,13 @@
 package edu.kit.kastel.sdq.lissa.ratlr.resultaggregator;
 
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+
 import edu.kit.kastel.sdq.lissa.ratlr.Configuration;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.ClassificationResult;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
-
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
 
 public class AnyResultAggregator extends ResultAggregator {
     private final int sourceGranularity;
@@ -19,10 +19,14 @@ public class AnyResultAggregator extends ResultAggregator {
     }
 
     @Override
-    public Set<TraceLink> aggregate(List<Element> sourceElements, List<Element> targetElements, List<ClassificationResult> classificationResults) {
+    public Set<TraceLink> aggregate(
+            List<Element> sourceElements,
+            List<Element> targetElements,
+            List<ClassificationResult> classificationResults) {
         Set<TraceLink> traceLinks = new LinkedHashSet<>();
         for (var result : classificationResults) {
-            var sourceElementsForTraceLink = buildListOfValidElements(result.source(), sourceGranularity, sourceElements);
+            var sourceElementsForTraceLink =
+                    buildListOfValidElements(result.source(), sourceGranularity, sourceElements);
             var target = result.target();
             var targetElementsForTraceLink = buildListOfValidElements(target, targetGranularity, targetElements);
             for (var sourceElement : sourceElementsForTraceLink) {
@@ -34,22 +38,33 @@ public class AnyResultAggregator extends ResultAggregator {
         return traceLinks;
     }
 
-    private static List<Element> buildListOfValidElements(Element element, int desiredGranularity, List<Element> allElements) {
+    private static List<Element> buildListOfValidElements(
+            Element element, int desiredGranularity, List<Element> allElements) {
         if (element.getGranularity() == desiredGranularity) {
             return List.of(element);
         }
 
         if (element.getGranularity() < desiredGranularity) {
-            // Element is more course grained than the desired granularity -> find all children that are on the desired granularity
-            List<Element> possibleChildren = allElements.stream().filter(it -> it.getGranularity() == desiredGranularity).toList();
+            // Element is more course grained than the desired granularity -> find all children that are on the desired
+            // granularity
+            List<Element> possibleChildren = allElements.stream()
+                    .filter(it -> it.getGranularity() == desiredGranularity)
+                    .toList();
             // Filter all children that are not transitive children of the element
-            return possibleChildren.stream().filter(it -> isTransitiveChildOf(it, element)).toList();
+            return possibleChildren.stream()
+                    .filter(it -> isTransitiveChildOf(it, element))
+                    .toList();
         }
 
-        // Element is more fine-grained than the desired granularity -> find all parents that are on the desired granularity
-        List<Element> possibleParents = allElements.stream().filter(it -> it.getGranularity() == desiredGranularity).toList();
+        // Element is more fine-grained than the desired granularity -> find all parents that are on the desired
+        // granularity
+        List<Element> possibleParents = allElements.stream()
+                .filter(it -> it.getGranularity() == desiredGranularity)
+                .toList();
         // Filter all parents that are not transitive parents of the element
-        List<Element> validParents = possibleParents.stream().filter(it -> isTransitiveChildOf(element, it)).toList();
+        List<Element> validParents = possibleParents.stream()
+                .filter(it -> isTransitiveChildOf(element, it))
+                .toList();
         assert validParents.size() <= 1;
         return validParents;
     }

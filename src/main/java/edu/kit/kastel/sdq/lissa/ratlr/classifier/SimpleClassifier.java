@@ -1,5 +1,8 @@
 package edu.kit.kastel.sdq.lissa.ratlr.classifier;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import edu.kit.kastel.sdq.lissa.ratlr.Configuration;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.Cache;
@@ -7,12 +10,10 @@ import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheManager;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.KeyGenerator;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class SimpleClassifier extends Classifier {
 
-    private static final String DEFAULT_TEMPLATE = """
+    private static final String DEFAULT_TEMPLATE =
+            """
             Question: Here are two parts of software development artifacts. \n
             {source_type}: '''{source_content}''' \n
             {target_type}: '''{target_content}'''
@@ -29,7 +30,8 @@ public class SimpleClassifier extends Classifier {
     public SimpleClassifier(Configuration.ModuleConfiguration configuration) {
         this.provider = new ChatLanguageModelProvider(configuration);
         this.template = configuration.argumentAsString("template", DEFAULT_TEMPLATE);
-        this.cache = CacheManager.getDefaultInstance().getCache(this.getClass().getSimpleName() + "_" + provider.modelName());
+        this.cache = CacheManager.getDefaultInstance()
+                .getCache(this.getClass().getSimpleName() + "_" + provider.modelName());
         this.llm = provider.createChatModel();
     }
 
@@ -56,7 +58,9 @@ public class SimpleClassifier extends Classifier {
                 relatedTargets.add(target);
             }
         }
-        return relatedTargets.stream().map(relatedTarget -> ClassificationResult.of(source, relatedTarget)).toList();
+        return relatedTargets.stream()
+                .map(relatedTarget -> ClassificationResult.of(source, relatedTarget))
+                .toList();
     }
 
     private String classify(Element source, Element target) {
@@ -76,5 +80,4 @@ public class SimpleClassifier extends Classifier {
             return response;
         }
     }
-
 }

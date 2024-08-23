@@ -1,11 +1,12 @@
 package edu.kit.kastel.sdq.lissa.ratlr;
 
-import io.github.cdimascio.dotenv.Dotenv;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
+import io.github.cdimascio.dotenv.Dotenv;
 
 public final class Environment {
     private static final Logger logger = LoggerFactory.getLogger(Environment.class);
@@ -17,8 +18,7 @@ public final class Environment {
 
     public static String getenv(String key) {
         String dotenvValue = DOTENV == null ? null : DOTENV.get(key);
-        if (dotenvValue != null)
-            return dotenvValue;
+        if (dotenvValue != null) return dotenvValue;
         return System.getenv(key);
     }
 
@@ -30,7 +30,7 @@ public final class Environment {
         return env;
     }
 
-    private synchronized static Dotenv load() {
+    private static synchronized Dotenv load() {
         if (DOTENV != null) {
             return DOTENV;
         }

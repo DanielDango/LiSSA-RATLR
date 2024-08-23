@@ -1,14 +1,14 @@
 package edu.kit.kastel.sdq.lissa.ratlr.elementstore;
 
-import edu.kit.kastel.sdq.lissa.ratlr.Configuration;
-import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
-import edu.kit.kastel.sdq.lissa.ratlr.utils.Pair;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import edu.kit.kastel.sdq.lissa.ratlr.Configuration;
+import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
+import edu.kit.kastel.sdq.lissa.ratlr.utils.Pair;
 
 public class ElementStore {
 
@@ -19,15 +19,15 @@ public class ElementStore {
 
     /**
      * Creates a new element store.
-     * 
+     *
      * @param configuration       The configuration of the module.
      * @param similarityRetriever Whether the element store should be used as a retriever. If set to false, you can retrieve all elements. If set to true, you
      *                            can find similar elements.
      */
     public ElementStore(Configuration.ModuleConfiguration configuration, boolean similarityRetriever) {
         if (similarityRetriever) {
-            boolean isInfinity = configuration.hasArgument("max_results") && configuration.argumentAsString("max_results")
-                    .equalsIgnoreCase(MAX_RESULTS_INFINITY_ARGUMENT);
+            boolean isInfinity = configuration.hasArgument("max_results")
+                    && configuration.argumentAsString("max_results").equalsIgnoreCase(MAX_RESULTS_INFINITY_ARGUMENT);
 
             if (isInfinity) {
                 this.maxResults = Integer.MAX_VALUE;
@@ -43,7 +43,6 @@ public class ElementStore {
 
         elementsWithEmbedding = new ArrayList<>();
         idToElementWithEmbedding = new HashMap<>();
-
     }
 
     public void setup(List<Element> elements, List<float[]> embeddings) {
@@ -114,7 +113,8 @@ public class ElementStore {
     public List<Pair<Element, float[]>> getElementsByParentId(String parentId) {
         List<Pair<Element, float[]>> elements = new ArrayList<>();
         for (Pair<Element, float[]> element : elementsWithEmbedding) {
-            if (element.first().getParent() != null && element.first().getParent().getIdentifier().equals(parentId)) {
+            if (element.first().getParent() != null
+                    && element.first().getParent().getIdentifier().equals(parentId)) {
                 elements.add(new Pair<>(element.first(), Arrays.copyOf(element.second(), element.second().length)));
             }
         }

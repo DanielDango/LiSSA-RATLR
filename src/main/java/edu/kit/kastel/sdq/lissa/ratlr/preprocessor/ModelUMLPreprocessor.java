@@ -1,5 +1,12 @@
 package edu.kit.kastel.sdq.lissa.ratlr.preprocessor;
 
+import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import edu.kit.kastel.mcse.ardoco.tlr.models.connectors.generators.architecture.uml.parser.UmlComponent;
 import edu.kit.kastel.mcse.ardoco.tlr.models.connectors.generators.architecture.uml.parser.UmlInterface;
 import edu.kit.kastel.mcse.ardoco.tlr.models.connectors.generators.architecture.uml.parser.UmlModel;
@@ -8,13 +15,6 @@ import edu.kit.kastel.mcse.ardoco.tlr.models.connectors.generators.architecture.
 import edu.kit.kastel.sdq.lissa.ratlr.Configuration;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Artifact;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
-
-import java.io.ByteArrayInputStream;
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * This preprocessor extracts information from a given UML model.
@@ -41,7 +41,8 @@ public class ModelUMLPreprocessor extends Preprocessor {
         List<Element> elements = new ArrayList<>();
 
         for (Artifact artifact : artifacts) {
-            Element artifactAsElement = new Element(artifact.getIdentifier(), artifact.getType(), artifact.getContent(), 0, null, false);
+            Element artifactAsElement =
+                    new Element(artifact.getIdentifier(), artifact.getType(), artifact.getContent(), 0, null, false);
             elements.add(artifactAsElement);
 
             String xml = artifact.getContent();
@@ -59,7 +60,8 @@ public class ModelUMLPreprocessor extends Preprocessor {
         return elements;
     }
 
-    private void addInterface(AtomicInteger counter, UmlInterface umlInterface, Element artifactAsElement, List<Element> elements) {
+    private void addInterface(
+            AtomicInteger counter, UmlInterface umlInterface, Element artifactAsElement, List<Element> elements) {
         Set<String> representation = new LinkedHashSet<>();
         representation.add("Type: " + umlInterface.getType() + ", Name: " + umlInterface.getName());
         if (includeOperations) {
@@ -68,12 +70,18 @@ public class ModelUMLPreprocessor extends Preprocessor {
             }
         }
         String content = String.join("", representation);
-        String identifier = artifactAsElement.getIdentifier() + SEPARATOR + counter.getAndIncrement() + SEPARATOR + umlInterface.getId();
-        Element resultingElement = new Element(identifier, artifactAsElement.getType(), content, 1, artifactAsElement, false);
+        String identifier = artifactAsElement.getIdentifier()
+                + SEPARATOR
+                + counter.getAndIncrement()
+                + SEPARATOR
+                + umlInterface.getId();
+        Element resultingElement =
+                new Element(identifier, artifactAsElement.getType(), content, 1, artifactAsElement, false);
         elements.add(resultingElement);
     }
 
-    private void addComponent(AtomicInteger counter, UmlComponent component, Element artifactAsElement, List<Element> elements) {
+    private void addComponent(
+            AtomicInteger counter, UmlComponent component, Element artifactAsElement, List<Element> elements) {
         Set<String> representation = new LinkedHashSet<>();
         representation.add("Type: " + component.getType() + ", Name: " + component.getName());
         if (includeInterfaceRealizations) {
@@ -82,7 +90,9 @@ public class ModelUMLPreprocessor extends Preprocessor {
             }
         }
         if (includeOperations) {
-            for (OwnedOperation operation : component.getProvided().stream().flatMap(it -> it.getOperations().stream()).toList()) {
+            for (OwnedOperation operation : component.getProvided().stream()
+                    .flatMap(it -> it.getOperations().stream())
+                    .toList()) {
                 representation.add("\nOperation: " + operation.getName());
             }
         }
@@ -93,8 +103,13 @@ public class ModelUMLPreprocessor extends Preprocessor {
         }
 
         String content = String.join("", representation);
-        String identifier = artifactAsElement.getIdentifier() + SEPARATOR + counter.getAndIncrement() + SEPARATOR + component.getId();
-        Element resultingElement = new Element(identifier, artifactAsElement.getType(), content, 1, artifactAsElement, true);
+        String identifier = artifactAsElement.getIdentifier()
+                + SEPARATOR
+                + counter.getAndIncrement()
+                + SEPARATOR
+                + component.getId();
+        Element resultingElement =
+                new Element(identifier, artifactAsElement.getType(), content, 1, artifactAsElement, true);
         elements.add(resultingElement);
     }
 }

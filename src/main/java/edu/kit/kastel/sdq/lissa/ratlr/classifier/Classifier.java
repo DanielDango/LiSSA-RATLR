@@ -1,11 +1,5 @@
 package edu.kit.kastel.sdq.lissa.ratlr.classifier;
 
-import edu.kit.kastel.sdq.lissa.ratlr.Configuration;
-import edu.kit.kastel.sdq.lissa.ratlr.elementstore.ElementStore;
-import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -13,6 +7,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import edu.kit.kastel.sdq.lissa.ratlr.Configuration;
+import edu.kit.kastel.sdq.lissa.ratlr.elementstore.ElementStore;
+import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 
 public abstract class Classifier {
     private static final int THREADS = 100;
@@ -38,7 +39,10 @@ public abstract class Classifier {
             throw new IllegalStateException(e);
         }
 
-        return futureResults.stream().map(Future::resultNow).flatMap(Collection::stream).toList();
+        return futureResults.stream()
+                .map(Future::resultNow)
+                .flatMap(Collection::stream)
+                .toList();
     }
 
     protected abstract List<ClassificationResult> classify(Element source, List<Element> targets);
@@ -53,5 +57,4 @@ public abstract class Classifier {
             default -> throw new IllegalStateException("Unexpected value: " + configuration.name());
         };
     }
-
 }

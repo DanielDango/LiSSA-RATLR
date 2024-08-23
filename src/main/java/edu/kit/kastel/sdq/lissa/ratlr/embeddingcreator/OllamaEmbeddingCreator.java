@@ -1,13 +1,13 @@
 package edu.kit.kastel.sdq.lissa.ratlr.embeddingcreator;
 
+import java.time.Duration;
+import java.util.Map;
+
 import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.model.ollama.OllamaEmbeddingModel;
 import edu.kit.kastel.sdq.lissa.ratlr.Configuration;
 import edu.kit.kastel.sdq.lissa.ratlr.Environment;
 import okhttp3.Credentials;
-
-import java.time.Duration;
-import java.util.Map;
 
 public class OllamaEmbeddingCreator extends CachedEmbeddingCreator {
 
@@ -21,7 +21,10 @@ public class OllamaEmbeddingCreator extends CachedEmbeddingCreator {
         String user = Environment.getenv("OLLAMA_EMBEDDING_USER");
         String password = Environment.getenv("OLLAMA_EMBEDDING_PASSWORD");
 
-        var ollamaEmbedding = new OllamaEmbeddingModel.OllamaEmbeddingModelBuilder().baseUrl(host).modelName(model).timeout(Duration.ofMinutes(5));
+        var ollamaEmbedding = new OllamaEmbeddingModel.OllamaEmbeddingModelBuilder()
+                .baseUrl(host)
+                .modelName(model)
+                .timeout(Duration.ofMinutes(5));
         if (user != null && password != null && !user.isEmpty() && !password.isEmpty()) {
             ollamaEmbedding.customHeaders(Map.of("Authorization", Credentials.basic(user, password)));
         }

@@ -1,16 +1,17 @@
 package edu.kit.kastel.sdq.lissa.ratlr.artifactprovider;
 
-import edu.kit.kastel.sdq.lissa.ratlr.Configuration;
-import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Artifact;
-import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Knowledge;
-import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.*;
+
+import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import edu.kit.kastel.sdq.lissa.ratlr.Configuration;
+import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Artifact;
+import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Knowledge;
 
 /**
  * Provides text-based artifact for a configured path. The filename is used as identifier.
@@ -62,8 +63,7 @@ public class TextArtifactProvider extends ArtifactProvider {
 
     @Override
     public List<Artifact> getArtifacts() {
-        if (artifacts.isEmpty())
-            this.loadFiles();
+        if (artifacts.isEmpty()) this.loadFiles();
         var artifacts = new ArrayList<>(this.artifacts);
         artifacts.sort(Comparator.comparing(Knowledge::getIdentifier));
         return artifacts;
@@ -71,8 +71,7 @@ public class TextArtifactProvider extends ArtifactProvider {
 
     @Override
     public Artifact getArtifact(String identifier) {
-        if (artifacts.isEmpty())
-            this.loadFiles();
+        if (artifacts.isEmpty()) this.loadFiles();
         return artifacts.stream()
                 .filter(it -> it.getIdentifier().equals(identifier))
                 .findFirst()

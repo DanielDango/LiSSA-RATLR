@@ -14,6 +14,7 @@ public class KeyGenerator {
         }
         // Normalize lineendings
         String normalized = input.replaceAll("\r\n", "\n");
-        return UUID.nameUUIDFromBytes(normalized.getBytes(StandardCharsets.UTF_8)).toString();
+        return UUID.nameUUIDFromBytes(normalized.getBytes(StandardCharsets.UTF_8))
+                .toString();
     }
 }

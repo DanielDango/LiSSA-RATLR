@@ -1,5 +1,15 @@
 package edu.kit.kastel.sdq.lissa.ratlr;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.kit.kastel.mcse.ardoco.metrics.ClassificationMetricsCalculator;
 import edu.kit.kastel.sdq.lissa.ratlr.artifactprovider.ArtifactProvider;
@@ -12,15 +22,6 @@ import edu.kit.kastel.sdq.lissa.ratlr.postprocessor.TraceLinkIdPostprocessor;
 import edu.kit.kastel.sdq.lissa.ratlr.preprocessor.Preprocessor;
 import edu.kit.kastel.sdq.lissa.ratlr.resultaggregator.ResultAggregator;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.KeyGenerator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.StandardOpenOption;
-import java.util.*;
-import java.util.stream.Collectors;
 
 public class Main {
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
@@ -30,8 +31,10 @@ public class Main {
         Configuration configuration = new ObjectMapper().readValue(new File(configFile), Configuration.class);
         CacheManager.setCacheDir(configuration.cacheDir());
 
-        ArtifactProvider sourceArtifactProvider = ArtifactProvider.createArtifactProvider(configuration.sourceArtifactProvider());
-        ArtifactProvider targetArtifactProvider = ArtifactProvider.createArtifactProvider(configuration.targetArtifactProvider());
+        ArtifactProvider sourceArtifactProvider =
+                ArtifactProvider.createArtifactProvider(configuration.sourceArtifactProvider());
+        ArtifactProvider targetArtifactProvider =
+                ArtifactProvider.createArtifactProvider(configuration.targetArtifactProvider());
 
         Preprocessor sourcePreprocessor = Preprocessor.createPreprocessor(configuration.sourcePreprocessor());
         Preprocessor targetPreprocessor = Preprocessor.createPreprocessor(configuration.targetPreprocessor());
@@ -43,7 +46,8 @@ public class Main {
         Classifier classifier = Classifier.createClassifier(configuration.classifier());
         ResultAggregator aggregator = ResultAggregator.createResultAggregator(configuration.resultAggregator());
 
-        TraceLinkIdPostprocessor traceLinkIdPostProcessor = TraceLinkIdPostprocessor.createTraceLinkIdPostprocessor(configuration.traceLinkIdPostprocessor());
+        TraceLinkIdPostprocessor traceLinkIdPostProcessor =
+                TraceLinkIdPostprocessor.createTraceLinkIdPostprocessor(configuration.traceLinkIdPostprocessor());
 
         configuration.serializeAndDestroyConfiguration();
 
@@ -77,16 +81,17 @@ public class Main {
     }
 
     private static void generateStatistics(Set<TraceLink> traceLinks, Configuration configuration) throws IOException {
-        if (configuration.goldStandardConfiguration() == null || configuration.goldStandardConfiguration().path() == null) {
-            logger.info("Skipping statistics generation since no path to ground truth has been provided as first command line argument");
+        if (configuration.goldStandardConfiguration() == null
+                || configuration.goldStandardConfiguration().path() == null) {
+            logger.info(
+                    "Skipping statistics generation since no path to ground truth has been provided as first command line argument");
             return;
         }
 
         File groundTruth = new File(configuration.goldStandardConfiguration().path());
         boolean header = configuration.goldStandardConfiguration().hasHeader();
         logger.info("Skipping header: {}", header);
-        Set<TraceLink> validTraceLinks = Files.readAllLines(groundTruth.toPath())
-                .stream()
+        Set<TraceLink> validTraceLinks = Files.readAllLines(groundTruth.toPath()).stream()
                 .skip(header ? 1 : 0)
                 .map(l -> l.split(","))
                 .map(it -> new TraceLink(it[0], it[1]))
@@ -97,27 +102,44 @@ public class Main {
         classification.prettyPrint();
 
         // Store information to one file (config and results)
-        var resultFile = new File("results-" + configuration.traceLinkIdPostprocessor().name() + "-" + KeyGenerator.generateKey(configuration
-                .toString()) + ".md");
+        var resultFile =
+                new File("results-" + configuration.traceLinkIdPostprocessor().name() + "-"
+                        + KeyGenerator.generateKey(configuration.toString()) + ".md");
         logger.info("Storing results to {}", resultFile.getName());
-        Files.writeString(resultFile.toPath(), "## Configuration\n```json\n" + configuration.serializeAndDestroyConfiguration() + "\n```\n\n");
+        Files.writeString(
+                resultFile.toPath(),
+                "## Configuration\n```json\n" + configuration.serializeAndDestroyConfiguration() + "\n```\n\n");
         Files.writeString(resultFile.toPath(), "## Results\n", StandardOpenOption.APPEND);
-        Files.writeString(resultFile.toPath(), "* True Positives: " + classification.getTruePositives().size() + "\n", StandardOpenOption.APPEND);
-        Files.writeString(resultFile.toPath(), "* False Positives: " + classification.getFalsePositives().size() + "\n", StandardOpenOption.APPEND);
-        Files.writeString(resultFile.toPath(), "* False Negatives: " + classification.getFalseNegatives().size() + "\n", StandardOpenOption.APPEND);
-        Files.writeString(resultFile.toPath(), "* Precision: " + classification.getPrecision() + "\n", StandardOpenOption.APPEND);
-        Files.writeString(resultFile.toPath(), "* Recall: " + classification.getRecall() + "\n", StandardOpenOption.APPEND);
+        Files.writeString(
+                resultFile.toPath(),
+                "* True Positives: " + classification.getTruePositives().size() + "\n",
+                StandardOpenOption.APPEND);
+        Files.writeString(
+                resultFile.toPath(),
+                "* False Positives: " + classification.getFalsePositives().size() + "\n",
+                StandardOpenOption.APPEND);
+        Files.writeString(
+                resultFile.toPath(),
+                "* False Negatives: " + classification.getFalseNegatives().size() + "\n",
+                StandardOpenOption.APPEND);
+        Files.writeString(
+                resultFile.toPath(), "* Precision: " + classification.getPrecision() + "\n", StandardOpenOption.APPEND);
+        Files.writeString(
+                resultFile.toPath(), "* Recall: " + classification.getRecall() + "\n", StandardOpenOption.APPEND);
         Files.writeString(resultFile.toPath(), "* F1: " + classification.getF1() + "\n", StandardOpenOption.APPEND);
     }
 
     private static void saveTraceLinks(Set<TraceLink> traceLinks, Configuration configuration) throws IOException {
-        var fileName = "traceLinks-" + configuration.traceLinkIdPostprocessor().name() + "-" + KeyGenerator.generateKey(configuration.toString()) + ".csv";
+        var fileName = "traceLinks-" + configuration.traceLinkIdPostprocessor().name() + "-"
+                + KeyGenerator.generateKey(configuration.toString()) + ".csv";
         logger.info("Storing trace links to {}", fileName);
 
         List<TraceLink> orderedTraceLinks = new ArrayList<>(traceLinks);
         orderedTraceLinks.sort(Comparator.comparing(TraceLink::sourceId).thenComparing(TraceLink::targetId));
 
-        String csvResult = orderedTraceLinks.stream().map(it -> it.sourceId() + "," + it.targetId()).collect(Collectors.joining("\n"));
+        String csvResult = orderedTraceLinks.stream()
+                .map(it -> it.sourceId() + "," + it.targetId())
+                .collect(Collectors.joining("\n"));
         Files.writeString(new File(fileName).toPath(), csvResult, StandardOpenOption.CREATE);
     }
 }

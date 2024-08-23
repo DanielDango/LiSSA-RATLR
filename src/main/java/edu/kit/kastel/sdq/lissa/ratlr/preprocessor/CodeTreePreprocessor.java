@@ -1,10 +1,10 @@
 package edu.kit.kastel.sdq.lissa.ratlr.preprocessor;
 
+import java.util.*;
+
 import edu.kit.kastel.sdq.lissa.ratlr.Configuration;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Artifact;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
-
-import java.util.*;
 
 /**
  * This preprocessor creates a tree structure from the code artifacts. It does not only consider code files but also the package declaration.
@@ -33,9 +33,14 @@ public class CodeTreePreprocessor extends Preprocessor {
 
         Map<String, List<Artifact>> packagesToClasses = new HashMap<>();
         for (Artifact artifact : artifacts) {
-            List<String> packageDeclaration = Arrays.stream(artifact.getContent().split("\n")).filter(line -> line.trim().startsWith("package")).toList();
+            List<String> packageDeclaration = Arrays.stream(
+                            artifact.getContent().split("\n"))
+                    .filter(line -> line.trim().startsWith("package"))
+                    .toList();
             assert packageDeclaration.size() <= 1;
-            String packageName = packageDeclaration.isEmpty() ? "" : packageDeclaration.getFirst().split(" ")[1].replace(";", "");
+            String packageName = packageDeclaration.isEmpty()
+                    ? ""
+                    : packageDeclaration.getFirst().split(" ")[1].replace(";", "");
             packagesToClasses.putIfAbsent(packageName, new ArrayList<>());
             packagesToClasses.get(packageName).add(artifact);
         }
@@ -43,14 +48,27 @@ public class CodeTreePreprocessor extends Preprocessor {
         for (Map.Entry<String, List<Artifact>> entry : packagesToClasses.entrySet()) {
             String packageName = entry.getKey();
             List<Artifact> classes = entry.getValue();
-            String packageDescription = """
+            String packageDescription =
+                    """
                     This package is called %s and contains the following classes: %s
-                    """.formatted(packageName, classes.stream().map(Artifact::getIdentifier).toList());
+                    """
+                            .formatted(
+                                    packageName,
+                                    classes.stream()
+                                            .map(Artifact::getIdentifier)
+                                            .toList());
 
-            Element packageElement = new Element("package-" + packageName, "source code package definition", packageDescription, 0, null, true);
+            Element packageElement = new Element(
+                    "package-" + packageName, "source code package definition", packageDescription, 0, null, true);
             result.add(packageElement);
             for (Artifact clazz : classes) {
-                Element classElement = new Element(clazz.getIdentifier(), "source code class definition", clazz.getContent(), 1, packageElement, true);
+                Element classElement = new Element(
+                        clazz.getIdentifier(),
+                        "source code class definition",
+                        clazz.getContent(),
+                        1,
+                        packageElement,
+                        true);
                 result.add(classElement);
             }
         }

@@ -15,8 +15,7 @@ class RecursiveSplitter {
 
     public RecursiveSplitter(List<String> separators, int chunkSize) {
         this.chunkSize = chunkSize;
-        if (separators.isEmpty())
-            throw new IllegalArgumentException("No separators provided");
+        if (separators.isEmpty()) throw new IllegalArgumentException("No separators provided");
         this.separators = new ArrayList<>(separators);
     }
 
@@ -101,10 +100,10 @@ class RecursiveSplitter {
         }
 
         if (_splits.size() % 2 == 0) {
-            splits.add(_splits.get(_splits.size() - 1));
+            splits.add(_splits.getLast());
         }
 
-        splits.addFirst(_splits.get(0));
+        splits.addFirst(_splits.getFirst());
         splits.removeIf(String::isEmpty);
         return splits;
     }
@@ -120,15 +119,16 @@ class RecursiveSplitter {
             int _len = d.length();
             if (total + _len + (!currentDoc.isEmpty() ? separatorLen : 0) > chunkSize) {
                 if (total > chunkSize) {
-                    System.err.println("Created a chunk of size " + total + " which is greater than the chunk size " + chunkSize);
+                    System.err.println(
+                            "Created a chunk of size " + total + " which is greater than the chunk size " + chunkSize);
                 }
                 if (!currentDoc.isEmpty()) {
                     String doc = joinDocs(currentDoc, separator);
                     if (doc != null && !doc.isBlank()) {
                         docs.add(doc);
                     }
-                    while (total > 0 || (total + _len + (!currentDoc.isEmpty() ? separatorLen : 0) > chunkSize && total > 0)) {
-                        total -= currentDoc.get(0).length() + (currentDoc.size() > 1 ? separatorLen : 0);
+                    while (total > 0) {
+                        total -= currentDoc.getFirst().length() + (currentDoc.size() > 1 ? separatorLen : 0);
                         currentDoc.removeFirst();
                     }
                 }
@@ -155,15 +155,29 @@ class RecursiveSplitter {
     public static List<String> getSeparatorsForLanguage(Language language) {
         // Taken from LangChain (Python)
         return switch (language) {
-            case JAVA -> List.of("\nclass ", "\npublic ", "\nprotected ", "\nprivate ", "\nstatic ", "\nif ", "\nfor ", "\nwhile ", "\nswitch ", "\ncase ",
-                    "\n\n", "\n", " ", "");
+            case JAVA -> List.of(
+                    "\nclass ",
+                    "\npublic ",
+                    "\nprotected ",
+                    "\nprivate ",
+                    "\nstatic ",
+                    "\nif ",
+                    "\nfor ",
+                    "\nwhile ",
+                    "\nswitch ",
+                    "\ncase ",
+                    "\n\n",
+                    "\n",
+                    " ",
+                    "");
             case PYTHON -> List.of("\nclass ", "\ndef ", "\n\tdef ", "\n\n", "\n", " ", "");
-            // Add other languages as needed...
+                // Add other languages as needed...
             default -> throw new IllegalArgumentException("Unsupported language: " + language);
         };
     }
 
     public enum Language {
-        JAVA, PYTHON
+        JAVA,
+        PYTHON
     }
 }

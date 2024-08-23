@@ -1,9 +1,9 @@
 package edu.kit.kastel.sdq.lissa.ratlr.postprocessor;
 
-import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
-
 import java.util.LinkedHashSet;
 import java.util.Set;
+
+import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
 
 public class ReqCodePostprocessor extends TraceLinkIdPostprocessor {
     @Override

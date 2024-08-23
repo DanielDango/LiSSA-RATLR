@@ -1,19 +1,18 @@
 package edu.kit.kastel.sdq.lissa.ratlr.preprocessor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import dev.langchain4j.data.document.splitter.DocumentBySentenceSplitter;
 import edu.kit.kastel.sdq.lissa.ratlr.Configuration;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Artifact;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * This preprocessor splits a text into sentences.
  */
 public class SentencePreprocessor extends Preprocessor {
-    public SentencePreprocessor(Configuration.ModuleConfiguration configuration) {
-    }
+    public SentencePreprocessor(Configuration.ModuleConfiguration configuration) {}
 
     @Override
     public List<Element> preprocess(List<Artifact> artifacts) {
@@ -30,12 +29,14 @@ public class SentencePreprocessor extends Preprocessor {
         String[] sentences = splitter.split(artifact.getContent());
         List<Element> elements = new ArrayList<>();
 
-        Element artifactAsElement = new Element(artifact.getIdentifier(), artifact.getType(), artifact.getContent(), 0, null, false);
+        Element artifactAsElement =
+                new Element(artifact.getIdentifier(), artifact.getType(), artifact.getContent(), 0, null, false);
         elements.add(artifactAsElement);
 
         for (int i = 0; i < sentences.length; i++) {
             String sentence = sentences[i];
-            Element sentenceAsElement = new Element(artifact.getIdentifier() + SEPARATOR + i, artifact.getType(), sentence, 1, artifactAsElement, true);
+            Element sentenceAsElement = new Element(
+                    artifact.getIdentifier() + SEPARATOR + i, artifact.getType(), sentence, 1, artifactAsElement, true);
             elements.add(sentenceAsElement);
         }
         return elements;

@@ -1,10 +1,10 @@
 package edu.kit.kastel.sdq.lissa.ratlr.contextprovider;
 
+import java.util.stream.Collectors;
+
 import edu.kit.kastel.sdq.lissa.ratlr.elementstore.ElementStore;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.Pair;
-
-import java.util.stream.Collectors;
 
 // Currently complex contexts are not needed for the evaluation of LiSSA
 public class ContextProvider {
@@ -15,13 +15,13 @@ public class ContextProvider {
      * The contents are concatenated into a before string and after string.
      */
     public static Pair<String, String> getNeighbors(ElementStore elementStore, Element element, int pre, int post) {
-        if (pre <= 0 && post <= 0)
-            return EMPTY_CONTEXT;
+        if (pre <= 0 && post <= 0) return EMPTY_CONTEXT;
 
-        if (element.getParent() == null)
-            return EMPTY_CONTEXT;
+        if (element.getParent() == null) return EMPTY_CONTEXT;
 
-        var siblings = elementStore.getElementsByParentId(element.getParent().getIdentifier()).stream().map(Pair::first).toList();
+        var siblings = elementStore.getElementsByParentId(element.getParent().getIdentifier()).stream()
+                .map(Pair::first)
+                .toList();
         // TODO ensure that they are sorted
         int index = siblings.indexOf(element);
         int preStart = Math.max(0, index - pre);

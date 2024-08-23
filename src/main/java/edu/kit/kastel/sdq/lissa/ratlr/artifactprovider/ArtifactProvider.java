@@ -1,9 +1,9 @@
 package edu.kit.kastel.sdq.lissa.ratlr.artifactprovider;
 
+import java.util.List;
+
 import edu.kit.kastel.sdq.lissa.ratlr.Configuration;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Artifact;
-
-import java.util.List;
 
 /**
  * Provides artifacts for LiSSA approach.
@@ -24,5 +24,4 @@ public abstract class ArtifactProvider {
             default -> throw new IllegalStateException("Unexpected value: " + configuration.name());
         };
     }
-
 }

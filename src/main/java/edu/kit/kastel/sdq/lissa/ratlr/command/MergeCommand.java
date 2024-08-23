@@ -1,10 +1,6 @@
 package edu.kit.kastel.sdq.lissa.ratlr.command;
 
-import edu.kit.kastel.sdq.lissa.ratlr.cache.Cache;
-import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import picocli.CommandLine;
+import static edu.kit.kastel.sdq.lissa.ratlr.cache.CacheManager.DEFAULT_CACHE_DIRECTORY;
 
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
@@ -12,18 +8,31 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
-import static edu.kit.kastel.sdq.lissa.ratlr.cache.CacheManager.DEFAULT_CACHE_DIRECTORY;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-@CommandLine.Command(name = "merge", mixinStandardHelpOptions = true, description = "Merges cache files of source paths into own default cache or target path")
+import edu.kit.kastel.sdq.lissa.ratlr.cache.Cache;
+import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheManager;
+import picocli.CommandLine;
+
+@CommandLine.Command(
+        name = "merge",
+        mixinStandardHelpOptions = true,
+        description = "Merges cache files of source paths into own default cache or target path")
 public class MergeCommand implements Runnable {
 
     private static final Logger logger = LoggerFactory.getLogger(MergeCommand.class);
 
-    @CommandLine.Parameters(description = "The source paths of the cache files which are used to get the content to merge. If directories are specified, all files in those will be taken. Nothing will be merged into those.")
+    @CommandLine.Parameters(
+            description =
+                    "The source paths of the cache files which are used to get the content to merge. If directories are specified, all files in those will be taken. Nothing will be merged into those.")
     private String[] sourcePaths;
 
-    @CommandLine.Option(names = { "-t",
-            "--target" }, converter = CacheManagerConverter.class, description = "Sets the target directory to get merged into if another one than the default cache should be used.")
+    @CommandLine.Option(
+            names = {"-t", "--target"},
+            converter = CacheManagerConverter.class,
+            description =
+                    "Sets the target directory to get merged into if another one than the default cache should be used.")
     private CacheManager targetManager = CacheManager.getDefaultInstance();
 
     @Override
@@ -41,7 +50,8 @@ public class MergeCommand implements Runnable {
                     merge(CacheManagerConverter.getCacheManager(sourcePath.getParent()), sourcePath);
                 }
             } catch (IOException e) {
-                logger.warn("Source path '%s' caused an exception while accessing the path: %s".formatted(sourcePath, e.getMessage()));
+                logger.warn("Source path '%s' caused an exception while accessing the path: %s"
+                        .formatted(sourcePath, e.getMessage()));
             }
         });
     }
@@ -59,10 +69,11 @@ public class MergeCommand implements Runnable {
     private void merge(Cache source, Cache target) {
         var overridingKeys = target.addAllEntries(source, true);
         if (!overridingKeys.isEmpty()) {
-            logger.warn("Source file '%s' as it contains %d keys with different value than target cache file".formatted(source.getFile().getPath(),
-                    overridingKeys.size()));
+            logger.warn("Source file '%s' as it contains %d keys with different value than target cache file"
+                    .formatted(source.getFile().getPath(), overridingKeys.size()));
         } else {
-            logger.info("Merged '%s' into '%s'".formatted(source.getFile().getPath(), target.getFile().getPath()));
+            logger.info("Merged '%s' into '%s'"
+                    .formatted(source.getFile().getPath(), target.getFile().getPath()));
         }
     }
 

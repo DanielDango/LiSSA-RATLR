@@ -14,7 +14,10 @@ public final class Artifact extends Knowledge {
     }
 
     public enum ArtifactType {
-        SOURCE_CODE, SOFTWARE_ARCHITECTURE_DOCUMENTATION, REQUIREMENT, SOFTWARE_ARCHITECTURE_MODEL;
+        SOURCE_CODE,
+        SOFTWARE_ARCHITECTURE_DOCUMENTATION,
+        REQUIREMENT,
+        SOFTWARE_ARCHITECTURE_MODEL;
 
         public static ArtifactType from(String type) {
             for (ArtifactType artifactType : values()) {

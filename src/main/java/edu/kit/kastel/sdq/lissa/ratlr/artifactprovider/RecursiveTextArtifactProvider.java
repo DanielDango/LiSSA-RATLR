@@ -1,13 +1,13 @@
 package edu.kit.kastel.sdq.lissa.ratlr.artifactprovider;
 
-import edu.kit.kastel.sdq.lissa.ratlr.Configuration;
-import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Artifact;
-
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Scanner;
+
+import edu.kit.kastel.sdq.lissa.ratlr.Configuration;
+import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Artifact;
 
 /**
  * Provides text-based and other artifacts for a configured path. The relative path is used as identifier.
@@ -24,7 +24,8 @@ public class RecursiveTextArtifactProvider extends TextArtifactProvider {
 
     public RecursiveTextArtifactProvider(Configuration.ModuleConfiguration configuration) {
         super(configuration);
-        this.extensions = configuration.argumentAsString("extensions").toLowerCase().split(",");
+        this.extensions =
+                configuration.argumentAsString("extensions").toLowerCase().split(",");
     }
 
     @Override
@@ -36,7 +37,8 @@ public class RecursiveTextArtifactProvider extends TextArtifactProvider {
                         if (scan.hasNext()) {
                             String content = scan.next();
                             var relativePath = this.path.toPath().relativize(it);
-                            String pathWithDefinedSeparators = relativePath.toString().replace("\\", "/");
+                            String pathWithDefinedSeparators =
+                                    relativePath.toString().replace("\\", "/");
                             artifacts.add(new Artifact(pathWithDefinedSeparators, artifactType, content));
                         }
                     } catch (IOException e) {

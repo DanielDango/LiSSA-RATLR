@@ -1,5 +1,14 @@
 package edu.kit.kastel.sdq.lissa.ratlr.embeddingcreator;
 
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.knuddels.jtokkit.Encodings;
 import com.knuddels.jtokkit.api.Encoding;
 import com.knuddels.jtokkit.api.EncodingRegistry;
@@ -8,14 +17,6 @@ import edu.kit.kastel.sdq.lissa.ratlr.cache.Cache;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheManager;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.KeyGenerator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
 abstract class CachedEmbeddingCreator extends EmbeddingCreator {
     // TODO Handle Token Length better .. 8192 is the length for ada
@@ -29,7 +30,8 @@ abstract class CachedEmbeddingCreator extends EmbeddingCreator {
     private final int threads;
 
     protected CachedEmbeddingCreator(String model, int threads, String... params) {
-        this.cache = CacheManager.getDefaultInstance().getCache(this.getClass().getSimpleName() + "_" + Objects.requireNonNull(model));
+        this.cache = CacheManager.getDefaultInstance()
+                .getCache(this.getClass().getSimpleName() + "_" + Objects.requireNonNull(model));
         this.embeddingModel = Objects.requireNonNull(createEmbeddingModel(model, params));
         this.rawNameOfModel = model;
         this.threads = Math.max(1, threads);
@@ -39,8 +41,7 @@ abstract class CachedEmbeddingCreator extends EmbeddingCreator {
 
     @Override
     public final List<float[]> calculateEmbeddings(List<Element> elements) {
-        if (threads == 1)
-            return calculateEmbeddingsSequential(elements);
+        if (threads == 1) return calculateEmbeddingsSequential(elements);
 
         int threadCount = Math.min(threads, elements.size());
         int numberOfElementsPerThread = elements.size() / threadCount;
@@ -64,7 +65,10 @@ abstract class CachedEmbeddingCreator extends EmbeddingCreator {
         } catch (InterruptedException e) {
             throw new IllegalStateException(e);
         }
-        return futureResults.stream().map(Future::resultNow).flatMap(Collection::stream).toList();
+        return futureResults.stream()
+                .map(Future::resultNow)
+                .flatMap(Collection::stream)
+                .toList();
     }
 
     private List<float[]> calculateEmbeddingsSequential(List<Element> elements) {
@@ -79,7 +83,8 @@ abstract class CachedEmbeddingCreator extends EmbeddingCreator {
         return embeddings;
     }
 
-    private static float[] calculateFinalEmbedding(EmbeddingModel embeddingModel, Cache cache, String rawNameOfModel, Element element) {
+    private static float[] calculateFinalEmbedding(
+            EmbeddingModel embeddingModel, Cache cache, String rawNameOfModel, Element element) {
         String key = KeyGenerator.generateKey(element.getContent());
         float[] cachedEmbedding = cache.get(key, float[].class);
         if (cachedEmbedding != null) {
@@ -87,7 +92,8 @@ abstract class CachedEmbeddingCreator extends EmbeddingCreator {
         } else {
             LOGGER.info("Calculating embedding for: {}", element.getIdentifier());
             try {
-                float[] embedding = embeddingModel.embed(element.getContent()).content().vector();
+                float[] embedding =
+                        embeddingModel.embed(element.getContent()).content().vector();
                 cache.put(key, embedding);
                 return embedding;
             } catch (Exception e) {
@@ -98,7 +104,8 @@ abstract class CachedEmbeddingCreator extends EmbeddingCreator {
         }
     }
 
-    private static float[] tryToFixWithLength(EmbeddingModel embeddingModel, Cache cache, String rawNameOfModel, String key, String content) {
+    private static float[] tryToFixWithLength(
+            EmbeddingModel embeddingModel, Cache cache, String rawNameOfModel, String key, String content) {
         String newKey = key + "_fixed_" + MAX_TOKEN_LENGTH;
         float[] cachedEmbedding = cache.get(newKey, float[].class);
         if (cachedEmbedding != null) {
@@ -107,10 +114,12 @@ abstract class CachedEmbeddingCreator extends EmbeddingCreator {
         }
         EncodingRegistry registry = Encodings.newDefaultEncodingRegistry();
         Encoding encoding = registry.getEncodingForModel(rawNameOfModel)
-                .orElseThrow(() -> new IllegalArgumentException("Unknown Embedding Model. Don't know how to handle previous exception"));
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Unknown Embedding Model. Don't know how to handle previous exception"));
         int tokens = encoding.countTokens(content);
         if (tokens < MAX_TOKEN_LENGTH)
-            throw new IllegalArgumentException("Token length was not too long. Don't know how to handle previous exception");
+            throw new IllegalArgumentException(
+                    "Token length was not too long. Don't know how to handle previous exception");
 
         // Binary search for max length of string
         int left = 0;

@@ -1,5 +1,10 @@
 package edu.kit.kastel.sdq.lissa.ratlr.classifier;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.SystemMessage;
@@ -12,11 +17,6 @@ import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheManager;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.KeyGenerator;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 public class ReasoningClassifier extends Classifier {
     private final Cache cache;
     private final ChatLanguageModelProvider provider;
@@ -28,14 +28,20 @@ public class ReasoningClassifier extends Classifier {
 
     public ReasoningClassifier(Configuration.ModuleConfiguration configuration) {
         this.provider = new ChatLanguageModelProvider(configuration);
-        this.cache = CacheManager.getDefaultInstance().getCache(this.getClass().getSimpleName() + "_" + provider.modelName());
+        this.cache = CacheManager.getDefaultInstance()
+                .getCache(this.getClass().getSimpleName() + "_" + provider.modelName());
         this.prompt = Prompt.values()[configuration.argumentAsInt("prompt_id", 0)].prompt;
         this.useOriginalArtifacts = configuration.argumentAsBoolean("use_original_artifacts", false);
         this.useSystemMessage = configuration.argumentAsBoolean("use_system_message", true);
         this.llm = this.provider.createChatModel();
     }
 
-    private ReasoningClassifier(Cache cache, ChatLanguageModelProvider provider, String prompt, boolean useOriginalArtifacts, boolean useSystemMessage) {
+    private ReasoningClassifier(
+            Cache cache,
+            ChatLanguageModelProvider provider,
+            String prompt,
+            boolean useOriginalArtifacts,
+            boolean useSystemMessage) {
         this.cache = cache;
         this.provider = provider;
         this.prompt = prompt;
@@ -62,7 +68,8 @@ public class ReasoningClassifier extends Classifier {
                     artifact = artifact.getParent();
                 }
                 // Now we have the artifact
-                targetsToConsider.add(new Element(artifact.getIdentifier(), artifact.getType(), artifact.getContent(), 0, null, true));
+                targetsToConsider.add(new Element(
+                        artifact.getIdentifier(), artifact.getType(), artifact.getContent(), 0, null, true));
             }
         }
 
@@ -82,7 +89,9 @@ public class ReasoningClassifier extends Classifier {
                 relatedTargets.add(target);
             }
         }
-        return relatedTargets.stream().map(relatedTarget -> ClassificationResult.of(source, relatedTarget)).toList();
+        return relatedTargets.stream()
+                .map(relatedTarget -> ClassificationResult.of(source, relatedTarget))
+                .toList();
     }
 
     private boolean isRelated(String llmResponse) {
@@ -98,7 +107,8 @@ public class ReasoningClassifier extends Classifier {
     private String classify(Element source, Element target) {
         List<ChatMessage> messages = new ArrayList<>();
         if (useSystemMessage)
-            messages.add(new SystemMessage("Your job is to determine if there is a traceability link between two artifacts of a system."));
+            messages.add(new SystemMessage(
+                    "Your job is to determine if there is a traceability link between two artifacts of a system."));
 
         String request = prompt.replace("{source_type}", source.getType())
                 .replace("{source_content}", source.getContent())

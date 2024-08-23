@@ -1,9 +1,9 @@
 package edu.kit.kastel.sdq.lissa.ratlr.embeddingcreator;
 
+import java.util.List;
+
 import edu.kit.kastel.sdq.lissa.ratlr.Configuration;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
-
-import java.util.List;
 
 public abstract class EmbeddingCreator {
     public float[] calculateEmbedding(Element element) {

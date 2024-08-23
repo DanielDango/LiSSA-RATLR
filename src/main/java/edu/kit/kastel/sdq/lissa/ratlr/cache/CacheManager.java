@@ -24,29 +24,26 @@ public final class CacheManager {
      * Creates a new instance using the specified cache directory.
      * As this constructor is designed to provide a cache manager for different cache sources, the directory is expected to already exist.
      * Use {@link CacheManager#getDefaultInstance()} to access the default cache directory.
-     * 
+     *
      * @param cacheDir the cache directory to use
      * @throws IllegalArgumentException if the default cache directory is provided or cacheDir is not a directory
      */
     public CacheManager(Path cacheDir) throws IOException {
-        if (!Files.exists(cacheDir))
-            Files.createDirectory(cacheDir);
+        if (!Files.exists(cacheDir)) Files.createDirectory(cacheDir);
         if (!Files.isDirectory(cacheDir)) {
             throw new IllegalArgumentException("path is not a directory: " + cacheDir);
         }
         this.directoryOfCaches = cacheDir;
-
     }
 
     public static CacheManager getDefaultInstance() {
-        if (DEFAULT_INSTANCE_MANAGER == null)
-            throw new IllegalStateException("Cache directory not set");
+        if (DEFAULT_INSTANCE_MANAGER == null) throw new IllegalStateException("Cache directory not set");
         return DEFAULT_INSTANCE_MANAGER;
     }
 
     /**
      * Returns the cache for the name. Designed for model intern purposes.
-     * 
+     *
      * @param name the name of the cache without file ending
      * @return the cache for the name
      */
@@ -68,7 +65,7 @@ public final class CacheManager {
 
     /**
      * Returns the cache for an existing file.
-     * 
+     *
      * @param path   the path pointing to the existing cache file
      * @param create whether the cache file should be created if it doesn't exist
      * @return the cache for an existing file
