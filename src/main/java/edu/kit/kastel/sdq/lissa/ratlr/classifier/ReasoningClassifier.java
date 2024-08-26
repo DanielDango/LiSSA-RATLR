@@ -100,6 +100,8 @@ public class ReasoningClassifier extends Classifier {
         boolean related = false;
         if (matcher.find()) {
             related = matcher.group().toLowerCase().contains("yes");
+        } else {
+            logger.debug("No trace tag found in response: {}", llmResponse);
         }
         return related;
     }
