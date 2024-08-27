@@ -54,7 +54,6 @@ public class TextArtifactProvider extends ArtifactProvider {
                     String content = bos.toString(StandardCharsets.UTF_8);
                     artifacts.add(new Artifact(it.getFileName().toString(), artifactType, content));
                 } catch (IOException e) {
-                    logger.error("{}: {}", e.getMessage(), it.toFile(), e);
                     throw new UncheckedIOException(e);
                 }
             }
@@ -64,9 +63,9 @@ public class TextArtifactProvider extends ArtifactProvider {
     @Override
     public List<Artifact> getArtifacts() {
         if (artifacts.isEmpty()) this.loadFiles();
-        var artifacts = new ArrayList<>(this.artifacts);
-        artifacts.sort(Comparator.comparing(Knowledge::getIdentifier));
-        return artifacts;
+        var orderedArtifacts = new ArrayList<>(this.artifacts);
+        orderedArtifacts.sort(Comparator.comparing(Knowledge::getIdentifier));
+        return orderedArtifacts;
     }
 
     @Override

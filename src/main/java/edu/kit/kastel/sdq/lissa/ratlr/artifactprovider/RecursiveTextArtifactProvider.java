@@ -5,6 +5,7 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Scanner;
+import java.util.stream.Stream;
 
 import edu.kit.kastel.sdq.lissa.ratlr.Configuration;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Artifact;
@@ -30,13 +31,13 @@ public class RecursiveTextArtifactProvider extends TextArtifactProvider {
 
     @Override
     protected void loadFiles() {
-        try {
-            Files.walk(this.path.toPath()).forEach(it -> {
-                if (Files.isRegularFile(it) && hasCorrectExtension(it)) {
-                    try (Scanner scan = new Scanner(it.toFile()).useDelimiter("\\A")) {
+        try (Stream<Path> files = Files.walk(this.path.toPath())) {
+            files.forEach(file -> {
+                if (Files.isRegularFile(file) && hasCorrectExtension(file)) {
+                    try (Scanner scan = new Scanner(file.toFile()).useDelimiter("\\A")) {
                         if (scan.hasNext()) {
                             String content = scan.next();
-                            var relativePath = this.path.toPath().relativize(it);
+                            var relativePath = this.path.toPath().relativize(file);
                             String pathWithDefinedSeparators =
                                     relativePath.toString().replace("\\", "/");
                             artifacts.add(new Artifact(pathWithDefinedSeparators, artifactType, content));

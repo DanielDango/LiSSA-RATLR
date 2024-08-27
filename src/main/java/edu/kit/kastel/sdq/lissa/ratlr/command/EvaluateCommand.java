@@ -43,7 +43,7 @@ public class EvaluateCommand implements Runnable {
             addSpecifiedConfigPaths(configsToEvaluate);
         }
 
-        logger.info("Found %d config files to invoke".formatted(configsToEvaluate.size()));
+        logger.info("Found {} config files to invoke", configsToEvaluate.size());
         configsToEvaluate.forEach(config -> {
             logger.info("Invoking the pipeline with '%s'".formatted(config));
             try {

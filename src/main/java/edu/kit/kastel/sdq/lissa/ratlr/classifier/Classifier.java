@@ -34,10 +34,15 @@ public abstract class Classifier {
 
         try {
             executor.shutdown();
-            executor.awaitTermination(1, TimeUnit.DAYS);
+            boolean success = executor.awaitTermination(1, TimeUnit.DAYS);
+            if (!success) {
+                logger.error("Classification did not finish in time.");
+            }
         } catch (InterruptedException e) {
-            throw new IllegalStateException(e);
+            Thread.currentThread().interrupt();
         }
+
+        executor.close();
 
         return futureResults.stream()
                 .map(Future::resultNow)

@@ -22,7 +22,7 @@ abstract class CachedEmbeddingCreator extends EmbeddingCreator {
     // TODO Handle Token Length better .. 8192 is the length for ada
     private static final int MAX_TOKEN_LENGTH = 8000;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CachedEmbeddingCreator.class);
+    private static final Logger STATIC_LOGGER = LoggerFactory.getLogger(CachedEmbeddingCreator.class);
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final Cache cache;
     private final EmbeddingModel embeddingModel;
@@ -53,18 +53,24 @@ abstract class CachedEmbeddingCreator extends EmbeddingCreator {
             int end = i == threadCount - 1 ? elements.size() : (i + 1) * numberOfElementsPerThread;
             List<Element> subList = elements.subList(start, end);
             futureResults.add(executor.submit(() -> {
-                var embeddingModel = createEmbeddingModel(this.rawNameOfModel);
-                return calculateEmbeddingsSequential(embeddingModel, subList);
+                var embeddingModelInstance = createEmbeddingModel(this.rawNameOfModel);
+                return calculateEmbeddingsSequential(embeddingModelInstance, subList);
             }));
         }
         logger.info("Waiting for classification to finish. Elements in queue: {}", futureResults.size());
 
         try {
             executor.shutdown();
-            executor.awaitTermination(1, TimeUnit.DAYS);
+            boolean success = executor.awaitTermination(1, TimeUnit.DAYS);
+            if (!success) {
+                logger.error("Embedding did not finish in time.");
+            }
         } catch (InterruptedException e) {
-            throw new IllegalStateException(e);
+            Thread.currentThread().interrupt();
         }
+
+        executor.close();
+
         return futureResults.stream()
                 .map(Future::resultNow)
                 .flatMap(Collection::stream)
@@ -90,14 +96,15 @@ abstract class CachedEmbeddingCreator extends EmbeddingCreator {
         if (cachedEmbedding != null) {
             return cachedEmbedding;
         } else {
-            LOGGER.info("Calculating embedding for: {}", element.getIdentifier());
+            STATIC_LOGGER.info("Calculating embedding for: {}", element.getIdentifier());
             try {
                 float[] embedding =
                         embeddingModel.embed(element.getContent()).content().vector();
                 cache.put(key, embedding);
                 return embedding;
             } catch (Exception e) {
-                LOGGER.error("Error while calculating embedding for .. try to fix ..: {}", element.getIdentifier());
+                STATIC_LOGGER.error(
+                        "Error while calculating embedding for .. try to fix ..: {}", element.getIdentifier());
                 // Probably the length was too long .. check that
                 return tryToFixWithLength(embeddingModel, cache, rawNameOfModel, key, element.getContent());
             }
@@ -109,7 +116,7 @@ abstract class CachedEmbeddingCreator extends EmbeddingCreator {
         String newKey = key + "_fixed_" + MAX_TOKEN_LENGTH;
         float[] cachedEmbedding = cache.get(newKey, float[].class);
         if (cachedEmbedding != null) {
-            LOGGER.info("using fixed embedding for: {}", key);
+            STATIC_LOGGER.info("using fixed embedding for: {}", key);
             return cachedEmbedding;
         }
         EncodingRegistry registry = Encodings.newDefaultEncodingRegistry();
@@ -136,7 +143,7 @@ abstract class CachedEmbeddingCreator extends EmbeddingCreator {
         }
         String fixedContent = content.substring(0, left);
         float[] embedding = embeddingModel.embed(fixedContent).content().vector();
-        LOGGER.info("using fixed embedding for: {}", key);
+        STATIC_LOGGER.info("using fixed embedding for: {}", key);
         cache.put(newKey, embedding);
         return embedding;
     }

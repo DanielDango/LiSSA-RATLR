@@ -13,7 +13,7 @@ public class KeyGenerator {
             throw new IllegalArgumentException("Input must not be null");
         }
         // Normalize lineendings
-        String normalized = input.replaceAll("\r\n", "\n");
+        String normalized = input.replace("\r\n", "\n");
         return UUID.nameUUIDFromBytes(normalized.getBytes(StandardCharsets.UTF_8))
                 .toString();
     }

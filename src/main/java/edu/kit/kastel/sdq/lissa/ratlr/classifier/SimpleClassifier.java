@@ -14,10 +14,13 @@ public class SimpleClassifier extends Classifier {
 
     private static final String DEFAULT_TEMPLATE =
             """
-            Question: Here are two parts of software development artifacts. \n
-            {source_type}: '''{source_content}''' \n
+            Question: Here are two parts of software development artifacts.
+
+            {source_type}: '''{source_content}'''
+
             {target_type}: '''{target_content}'''
-            Are they related? \n
+            Are they related?
+
             Answer with 'yes' or 'no'.
             """;
 

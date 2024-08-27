@@ -9,15 +9,15 @@ import java.util.Map;
 public final class CacheManager {
     public static final String DEFAULT_CACHE_DIRECTORY = "cache";
 
-    private static CacheManager DEFAULT_INSTANCE_MANAGER;
+    private static CacheManager defaultInstanceManager;
     private final Path directoryOfCaches;
     private final Map<String, Cache> caches = new HashMap<>();
 
     public static synchronized void setCacheDir(String directory) throws IOException {
-        if (DEFAULT_INSTANCE_MANAGER != null) {
+        if (defaultInstanceManager != null) {
             throw new IllegalStateException("Cache directory already set");
         }
-        DEFAULT_INSTANCE_MANAGER = new CacheManager(Path.of(directory == null ? DEFAULT_CACHE_DIRECTORY : directory));
+        defaultInstanceManager = new CacheManager(Path.of(directory == null ? DEFAULT_CACHE_DIRECTORY : directory));
     }
 
     /**
@@ -37,8 +37,8 @@ public final class CacheManager {
     }
 
     public static CacheManager getDefaultInstance() {
-        if (DEFAULT_INSTANCE_MANAGER == null) throw new IllegalStateException("Cache directory not set");
-        return DEFAULT_INSTANCE_MANAGER;
+        if (defaultInstanceManager == null) throw new IllegalStateException("Cache directory not set");
+        return defaultInstanceManager;
     }
 
     /**

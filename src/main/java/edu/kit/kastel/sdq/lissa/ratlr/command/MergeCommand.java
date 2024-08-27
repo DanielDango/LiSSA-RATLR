@@ -69,11 +69,15 @@ public class MergeCommand implements Runnable {
     private void merge(Cache source, Cache target) {
         var overridingKeys = target.addAllEntries(source, true);
         if (!overridingKeys.isEmpty()) {
-            logger.warn("Source file '%s' as it contains %d keys with different value than target cache file"
-                    .formatted(source.getFile().getPath(), overridingKeys.size()));
+            logger.warn(
+                    "Source file '{}' as it contains {} keys with different value than target cache file",
+                    source.getFile().getPath(),
+                    overridingKeys.size());
         } else {
-            logger.info("Merged '%s' into '%s'"
-                    .formatted(source.getFile().getPath(), target.getFile().getPath()));
+            logger.info(
+                    "Merged '{}' into '{}'",
+                    source.getFile().getPath(),
+                    target.getFile().getPath());
         }
     }
 
