@@ -43,7 +43,8 @@ public class ChatLanguageModelProvider {
         this.model = switch (platform) {
             case OPENAI -> configuration.argumentAsString("model", "gpt-4o-mini");
             case OLLAMA -> configuration.argumentAsString("model", "llama3:8b");
-            default -> throw new IllegalArgumentException("Unsupported platform: " + platform);};
+            default -> throw new IllegalArgumentException("Unsupported platform: " + platform);
+        };
         this.seed = configuration.argumentAsInt("seed", DEFAULT_SEED);
     }
 
