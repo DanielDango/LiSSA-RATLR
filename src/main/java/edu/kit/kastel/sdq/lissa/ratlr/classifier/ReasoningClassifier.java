@@ -30,7 +30,7 @@ public class ReasoningClassifier extends Classifier {
         this.provider = new ChatLanguageModelProvider(configuration);
         this.cache = CacheManager.getDefaultInstance()
                 .getCache(this.getClass().getSimpleName() + "_" + provider.modelName());
-        this.prompt = Prompt.values()[configuration.argumentAsInt("prompt_id", 0)].prompt;
+        this.prompt = configuration.argumentAsStringByEnumIndex("prompt", 0, Prompt.values(), it -> it.prompt);
         this.useOriginalArtifacts = configuration.argumentAsBoolean("use_original_artifacts", false);
         this.useSystemMessage = configuration.argumentAsBoolean("use_system_message", true);
         this.llm = this.provider.createChatModel();

@@ -1,9 +1,11 @@
 package edu.kit.kastel.sdq.lissa.ratlr;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -129,6 +131,33 @@ public record Configuration(
 
         public boolean argumentAsBoolean(String key, boolean defaultValue) {
             return Boolean.parseBoolean(argumentAsString(key, String.valueOf(defaultValue)));
+        }
+
+        public <E extends Enum<E>> String argumentAsStringByEnumIndex(
+                String key, int defaultIndex, E[] values, Function<E, String> transform) {
+            if (finalized) {
+                throw new IllegalStateException("Configuration already finalized for serialization");
+            }
+
+            String value = arguments.getOrDefault(key, String.valueOf(defaultIndex));
+            // If not a number, it can be the text itself
+            try {
+                int index = Integer.parseInt(value);
+                if (index < 0 || index >= values.length) {
+                    throw new IllegalArgumentException(
+                            "Index " + index + " out of bounds for enum " + Arrays.toString(values));
+                }
+                value = transform.apply(values[index]);
+            } catch (NumberFormatException e) {
+                // It's not a number, so it's the text itself
+            }
+
+            String retrievedArgument = retrievedArguments.put(key, value);
+            if (retrievedArgument != null && !retrievedArgument.equals(value)) {
+                throw new IllegalArgumentException("Default argument for key " + key + " already set to "
+                        + retrievedArgument + " and cannot be changed to " + value);
+            }
+            return value;
         }
 
         void finalizeForSerialization() {
