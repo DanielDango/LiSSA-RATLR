@@ -43,6 +43,7 @@ build/
 /configs
 /execution
 /results*.tgz
+/results-*
 /evaluation
 /evaluation*
 /trace*.csv

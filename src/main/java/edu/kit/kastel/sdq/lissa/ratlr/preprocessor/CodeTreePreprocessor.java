@@ -16,9 +16,11 @@ import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 public class CodeTreePreprocessor extends Preprocessor {
 
     private final Language language;
+    private final boolean compareClasses;
 
     public CodeTreePreprocessor(Configuration.ModuleConfiguration configuration) {
         this.language = Objects.requireNonNull(Language.valueOf(configuration.argumentAsString("language")));
+        this.compareClasses = configuration.argumentAsBoolean("compare_classes", false);
     }
 
     @Override
@@ -68,7 +70,7 @@ public class CodeTreePreprocessor extends Preprocessor {
                         clazz.getContent(),
                         1,
                         packageElement,
-                        true);
+                        compareClasses);
                 result.add(classElement);
             }
         }

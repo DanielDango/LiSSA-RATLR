@@ -60,7 +60,7 @@ public class ChatLanguageModelProvider {
         var ollama = OllamaChatModel.builder()
                 .baseUrl(host)
                 .modelName(model)
-                .timeout(Duration.ofMinutes(10))
+                .timeout(Duration.ofMinutes(15))
                 .temperature(0.0)
                 .seed(seed);
         if (user != null && password != null && !user.isEmpty() && !password.isEmpty()) {
