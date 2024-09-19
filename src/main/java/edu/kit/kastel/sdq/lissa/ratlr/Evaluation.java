@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -14,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.kit.kastel.mcse.ardoco.metrics.ClassificationMetricsCalculator;
 import edu.kit.kastel.sdq.lissa.ratlr.artifactprovider.ArtifactProvider;
+import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheManager;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.Classifier;
 import edu.kit.kastel.sdq.lissa.ratlr.elementstore.ElementStore;
 import edu.kit.kastel.sdq.lissa.ratlr.embeddingcreator.EmbeddingCreator;
@@ -33,6 +37,7 @@ public class Evaluation {
 
     public void run() throws IOException {
         Configuration configuration = new ObjectMapper().readValue(config.toFile(), Configuration.class);
+        CacheManager.setCacheDir(configuration.cacheDir());
 
         ArtifactProvider sourceArtifactProvider =
                 ArtifactProvider.createArtifactProvider(configuration.sourceArtifactProvider());
@@ -53,9 +58,6 @@ public class Evaluation {
                 TraceLinkIdPostprocessor.createTraceLinkIdPostprocessor(configuration.traceLinkIdPostprocessor());
 
         configuration.serializeAndDestroyConfiguration();
-
-        if (configuration.goldStandardConfiguration() == null)
-            throw new IllegalArgumentException("Gold standard configuration is missing");
 
         // RUN
         logger.info("Loading artifacts");
@@ -83,19 +85,25 @@ public class Evaluation {
 
         logger.info("Evaluating Results");
         generateStatistics(traceLinks, configuration);
+        saveTraceLinks(traceLinks, configuration);
     }
 
     private void generateStatistics(Set<TraceLink> traceLinks, Configuration configuration) throws IOException {
-        logger.info(
-                "Skipping header: {}", configuration.goldStandardConfiguration().hasHeader());
-        Set<TraceLink> validTraceLinks =
-                Files.readAllLines(Path.of(
-                                configuration.goldStandardConfiguration().path()))
-                        .stream()
-                        .skip(configuration.goldStandardConfiguration().hasHeader() ? 1 : 0)
-                        .map(l -> l.split(","))
-                        .map(it -> new TraceLink(it[0], it[1]))
-                        .collect(Collectors.toSet());
+        if (configuration.goldStandardConfiguration() == null
+                || configuration.goldStandardConfiguration().path() == null) {
+            logger.info(
+                    "Skipping statistics generation since no path to ground truth has been provided as first command line argument");
+            return;
+        }
+
+        File groundTruth = new File(configuration.goldStandardConfiguration().path());
+        boolean header = configuration.goldStandardConfiguration().hasHeader();
+        logger.info("Skipping header: {}", header);
+        Set<TraceLink> validTraceLinks = Files.readAllLines(groundTruth.toPath()).stream()
+                .skip(header ? 1 : 0)
+                .map(l -> l.split(","))
+                .map(it -> new TraceLink(it[0], it[1]))
+                .collect(Collectors.toSet());
 
         ClassificationMetricsCalculator cmc = ClassificationMetricsCalculator.getInstance();
         var classification = cmc.calculateMetrics(traceLinks, validTraceLinks, null);
@@ -126,5 +134,18 @@ public class Evaluation {
         Files.writeString(
                 resultFile.toPath(), "* Recall: " + classification.getRecall() + "\n", StandardOpenOption.APPEND);
         Files.writeString(resultFile.toPath(), "* F1: " + classification.getF1() + "\n", StandardOpenOption.APPEND);
+    }
+
+    private void saveTraceLinks(Set<TraceLink> traceLinks, Configuration configuration) throws IOException {
+        var fileName = "traceLinks-" + configuration.getConfigurationIdentifierForFile(config.toFile()) + ".csv";
+        logger.info("Storing trace links to {}", fileName);
+
+        List<TraceLink> orderedTraceLinks = new ArrayList<>(traceLinks);
+        orderedTraceLinks.sort(Comparator.comparing(TraceLink::sourceId).thenComparing(TraceLink::targetId));
+
+        String csvResult = orderedTraceLinks.stream()
+                .map(it -> it.sourceId() + "," + it.targetId())
+                .collect(Collectors.joining("\n"));
+        Files.writeString(new File(fileName).toPath(), csvResult, StandardOpenOption.CREATE);
     }
 }
