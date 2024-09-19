@@ -21,14 +21,14 @@ import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
 import edu.kit.kastel.sdq.lissa.ratlr.postprocessor.TraceLinkIdPostprocessor;
 import edu.kit.kastel.sdq.lissa.ratlr.preprocessor.Preprocessor;
 import edu.kit.kastel.sdq.lissa.ratlr.resultaggregator.ResultAggregator;
-import edu.kit.kastel.sdq.lissa.ratlr.utils.KeyGenerator;
 
 public class Main {
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
     public static void main(String[] args) throws IOException {
-        var configFile = args.length == 0 ? "config.json" : args[0];
-        Configuration configuration = new ObjectMapper().readValue(new File(configFile), Configuration.class);
+        var configFilePath = args.length == 0 ? "config.json" : args[0];
+        var configFile = new File(configFilePath);
+        Configuration configuration = new ObjectMapper().readValue(configFile, Configuration.class);
         CacheManager.setCacheDir(configuration.cacheDir());
 
         ArtifactProvider sourceArtifactProvider =
@@ -76,11 +76,12 @@ public class Main {
         traceLinks = traceLinkIdPostProcessor.postprocess(traceLinks);
 
         logger.info("Evaluating Results");
-        generateStatistics(traceLinks, configuration);
-        saveTraceLinks(traceLinks, configuration);
+        generateStatistics(traceLinks, configFile, configuration);
+        saveTraceLinks(traceLinks, configFile, configuration);
     }
 
-    private static void generateStatistics(Set<TraceLink> traceLinks, Configuration configuration) throws IOException {
+    private static void generateStatistics(Set<TraceLink> traceLinks, File configFile, Configuration configuration)
+            throws IOException {
         if (configuration.goldStandardConfiguration() == null
                 || configuration.goldStandardConfiguration().path() == null) {
             logger.info(
@@ -102,9 +103,7 @@ public class Main {
         classification.prettyPrint();
 
         // Store information to one file (config and results)
-        var resultFile =
-                new File("results-" + configuration.traceLinkIdPostprocessor().name() + "-"
-                        + KeyGenerator.generateKey(configuration.toString()) + ".md");
+        var resultFile = new File("results-" + configuration.getConfigurationIdentifierForFile(configFile) + ".md");
         logger.info("Storing results to {}", resultFile.getName());
         Files.writeString(
                 resultFile.toPath(),
@@ -129,9 +128,9 @@ public class Main {
         Files.writeString(resultFile.toPath(), "* F1: " + classification.getF1() + "\n", StandardOpenOption.APPEND);
     }
 
-    private static void saveTraceLinks(Set<TraceLink> traceLinks, Configuration configuration) throws IOException {
-        var fileName = "traceLinks-" + configuration.traceLinkIdPostprocessor().name() + "-"
-                + KeyGenerator.generateKey(configuration.toString()) + ".csv";
+    private static void saveTraceLinks(Set<TraceLink> traceLinks, File configFile, Configuration configuration)
+            throws IOException {
+        var fileName = "traceLinks-" + configuration.getConfigurationIdentifierForFile(configFile) + ".csv";
         logger.info("Storing trace links to {}", fileName);
 
         List<TraceLink> orderedTraceLinks = new ArrayList<>(traceLinks);

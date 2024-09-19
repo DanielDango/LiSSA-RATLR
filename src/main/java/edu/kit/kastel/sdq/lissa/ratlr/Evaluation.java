@@ -21,7 +21,6 @@ import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
 import edu.kit.kastel.sdq.lissa.ratlr.postprocessor.TraceLinkIdPostprocessor;
 import edu.kit.kastel.sdq.lissa.ratlr.preprocessor.Preprocessor;
 import edu.kit.kastel.sdq.lissa.ratlr.resultaggregator.ResultAggregator;
-import edu.kit.kastel.sdq.lissa.ratlr.utils.KeyGenerator;
 
 public class Evaluation {
 
@@ -104,8 +103,7 @@ public class Evaluation {
 
         // Store information to one file (config and results)
         var resultFile =
-                new File("results-" + configuration.traceLinkIdPostprocessor().name() + "-"
-                        + KeyGenerator.generateKey(configuration.toString()) + ".md");
+                new File("results-" + configuration.getConfigurationIdentifierForFile(config.toFile()) + ".md");
         logger.info("Storing results to {}", resultFile.getName());
         Files.writeString(
                 resultFile.toPath(),

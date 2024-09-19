@@ -1,5 +1,6 @@
 package edu.kit.kastel.sdq.lissa.ratlr;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -13,6 +14,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import edu.kit.kastel.sdq.lissa.ratlr.utils.KeyGenerator;
 import io.soabase.recordbuilder.core.RecordBuilder;
 
 @RecordBuilder()
@@ -57,6 +59,10 @@ public record Configuration(
                 + targetPreprocessor + ", embeddingCreator=" + embeddingCreator + ", sourceStore=" + sourceStore
                 + ", targetStore=" + targetStore + ", classifier=" + classifier + ", resultAggregator="
                 + resultAggregator + ", traceLinkIdPostprocessor=" + traceLinkIdPostprocessor + '}';
+    }
+
+    public String getConfigurationIdentifierForFile(File configurationFile) {
+        return configurationFile.getName() + "_" + KeyGenerator.generateKey(this.toString());
     }
 
     public record GoldStandardConfiguration(
