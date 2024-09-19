@@ -47,3 +47,4 @@ build/
 /evaluation
 /evaluation*
 /trace*.csv
+/config.json
