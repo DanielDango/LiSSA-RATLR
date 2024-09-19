@@ -42,7 +42,7 @@ public class Cache {
         return file;
     }
 
-    private void write() {
+    public synchronized void write() {
         try {
             File tempFile = new File(file.getAbsolutePath() + ".tmp.json");
             mapper.writeValue(tempFile, data);

@@ -14,7 +14,14 @@ public final class CacheManager {
     private final Map<String, Cache> caches = new HashMap<>();
 
     public static synchronized void setCacheDir(String directory) throws IOException {
+        if (defaultInstanceManager != null) {
+            defaultInstanceManager.shutdown();
+        }
         defaultInstanceManager = new CacheManager(Path.of(directory == null ? DEFAULT_CACHE_DIRECTORY : directory));
+    }
+
+    private void shutdown() {
+        caches.values().forEach(Cache::write);
     }
 
     /**
