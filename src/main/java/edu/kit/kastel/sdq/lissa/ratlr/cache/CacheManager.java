@@ -14,9 +14,6 @@ public final class CacheManager {
     private final Map<String, Cache> caches = new HashMap<>();
 
     public static synchronized void setCacheDir(String directory) throws IOException {
-        if (defaultInstanceManager != null) {
-            throw new IllegalStateException("Cache directory already set");
-        }
         defaultInstanceManager = new CacheManager(Path.of(directory == null ? DEFAULT_CACHE_DIRECTORY : directory));
     }
 
