@@ -31,6 +31,7 @@ public class SimpleClassifier extends Classifier {
     private final String template;
 
     public SimpleClassifier(Configuration.ModuleConfiguration configuration) {
+        super(ChatLanguageModelProvider.supportsThreads(configuration) ? DEFAULT_THREAD_COUNT : 1);
         this.provider = new ChatLanguageModelProvider(configuration);
         this.template = configuration.argumentAsString("template", DEFAULT_TEMPLATE);
         this.cache = CacheManager.getDefaultInstance()
@@ -39,6 +40,7 @@ public class SimpleClassifier extends Classifier {
     }
 
     private SimpleClassifier(Cache cache, ChatLanguageModelProvider provider, String template) {
+        super(provider.supportsThreads() ? DEFAULT_THREAD_COUNT : 1);
         this.cache = cache;
         this.provider = provider;
         this.template = template;

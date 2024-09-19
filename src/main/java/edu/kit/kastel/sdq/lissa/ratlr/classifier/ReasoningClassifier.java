@@ -27,6 +27,7 @@ public class ReasoningClassifier extends Classifier {
     private final boolean useSystemMessage;
 
     public ReasoningClassifier(Configuration.ModuleConfiguration configuration) {
+        super(ChatLanguageModelProvider.supportsThreads(configuration) ? DEFAULT_THREAD_COUNT : 1);
         this.provider = new ChatLanguageModelProvider(configuration);
         this.cache = CacheManager.getDefaultInstance()
                 .getCache(this.getClass().getSimpleName() + "_" + provider.modelName());
@@ -42,6 +43,7 @@ public class ReasoningClassifier extends Classifier {
             String prompt,
             boolean useOriginalArtifacts,
             boolean useSystemMessage) {
+        super(provider.supportsThreads() ? DEFAULT_THREAD_COUNT : 1);
         this.cache = cache;
         this.provider = provider;
         this.prompt = prompt;

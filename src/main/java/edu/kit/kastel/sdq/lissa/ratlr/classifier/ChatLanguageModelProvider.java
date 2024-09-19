@@ -52,6 +52,14 @@ public class ChatLanguageModelProvider {
         return Objects.requireNonNull(model, "Model not initialized");
     }
 
+    public static boolean supportsThreads(Configuration.ModuleConfiguration configuration) {
+        return configuration.name().contains(OPENAI);
+    }
+
+    public boolean supportsThreads() {
+        return platform.equals(OPENAI);
+    }
+
     private static OllamaChatModel createOllamaChatModel(String model, int seed) {
         String host = Environment.getenv("OLLAMA_HOST");
         String user = Environment.getenv("OLLAMA_USER");

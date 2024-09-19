@@ -16,14 +16,20 @@ import edu.kit.kastel.sdq.lissa.ratlr.elementstore.ElementStore;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 
 public abstract class Classifier {
-    private static final int THREADS = 100;
+    protected static final int DEFAULT_THREAD_COUNT = 100;
+
     static final String CONFIG_NAME_SEPARATOR = "_";
 
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final int threads;
+
+    protected Classifier(int threads) {
+        this.threads = Math.max(1, threads);
+    }
 
     public List<ClassificationResult> classify(ElementStore sourceStore, ElementStore targetStore) {
         List<Future<List<ClassificationResult>>> futureResults = new ArrayList<>();
-        ExecutorService executor = Executors.newFixedThreadPool(THREADS);
+        ExecutorService executor = Executors.newFixedThreadPool(threads);
         for (var query : sourceStore.getAllElements(true)) {
             var targetCandidates = targetStore.findSimilar(query.second());
             var futureResult = executor.submit(() -> copyOf().classify(query.first(), targetCandidates));
