@@ -63,12 +63,12 @@ TEMPLATE = """
 """
 
 # Configurations
-datasets = ["CM1Dataset", "GANNT", "ModisDataset"]
-postprocessors = ["req2req", "req2req", "identity"]
+datasets = ["CM1Dataset", "GANNT", "ModisDataset", "CCHIT", "WARC"]
+postprocessors = ["req2req", "req2req", "identity", "identity", "req2req"]
 
 classifier_modes = ["simple", "reasoning"]
 gpt_models = ["gpt-4o-mini-2024-07-18", "gpt-4o-2024-08-06"]
-ollama_models = ["llama3.1:8b-instruct-fp16", "codellama:13b", "gemma2:27b"]
+ollama_models = ["llama3.1:8b-instruct-fp16", "codellama:13b"]
 
 # Generate
 gpt_args = ["\"model\": \"<<CLASSIFIER_MODEL>>\"".replace("<<CLASSIFIER_MODEL>>", model) for model in gpt_models]
