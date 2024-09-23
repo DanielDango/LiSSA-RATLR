@@ -63,8 +63,8 @@ TEMPLATE = """
 """
 
 # Configurations
-datasets = ["CM1Dataset", "GANNT", "ModisDataset", "CCHIT", "WARC", "dronology"]
-postprocessors = ["req2req", "req2req", "identity", "identity", "req2req", "identity"]
+datasets = ["CM1Dataset", "GANNT", "ModisDataset", "CCHIT", "WARC", "dronology", "CM1-NASA"]
+postprocessors = ["req2req", "req2req", "identity", "identity", "req2req", "identity", "identity"]
 
 classifier_modes = ["simple", "reasoning"]
 gpt_models = ["gpt-4o-mini-2024-07-18", "gpt-4o-2024-08-06"]
