@@ -22,12 +22,12 @@ TEMPLATE = """
     }
   },
   "source_preprocessor" : {
-    "name" : "artifact",
+    "name" : "<<SOURCE_PREPROCESSOR>>",
     "args" : {}
   },
   "target_preprocessor" : {
-    "name" : "artifact",
-    "args" : {}
+    "name" : "<<TARGET_PREPROCESSOR>>",
+    "args" : <<TARGET_PREPROCESSOR_ARGS>>
   },
   "embedding_creator" : {
     "name" : "openai",
@@ -66,6 +66,10 @@ TEMPLATE = """
 datasets = ["SMOS", "eTour_en"]
 postprocessors = ["req2code", "req2code"]
 
+source_preprocessors = ["artifact", "sentence", "sentence"]
+target_preprocessors = ["artifact", "code_chunking", "code_method"]
+target_preprocessors_arguments = ["{}",'{"chunk_size": "200", "language": "JAVA" }','{"language": "JAVA"}']
+
 classifier_modes = ["simple", "reasoning"]
 gpt_models = ["gpt-4o-mini-2024-07-18"]
 
@@ -77,11 +81,12 @@ for seed in seeds:
     os.makedirs(f"./configs/req2code-{seed}", exist_ok=True)
     # Generate
     gpt_args = [("\"model\": \"<<CLASSIFIER_MODEL>>\", \"seed\": \""+seed+"\"").replace("<<CLASSIFIER_MODEL>>", model) for model in gpt_models]
-    for dataset, postprocessor in zip(datasets, postprocessors):
-        with open(f"./configs/req2code-{seed}/{dataset}_no_llm.json", "w") as f:
-            f.write(TEMPLATE.replace("<<SEED>>", seed).replace("<<DATASET>>", dataset).replace("<<CLASSIFIER_MODE>>", "mock").replace("<<ARGS>>", "").replace("<<POSTPROCESSOR>>", postprocessor))
-        for classifier_mode in classifier_modes:
-            for gpt_model, gpt_arg in zip(gpt_models, gpt_args):
-                with open(f"./configs/req2code-{seed}/{dataset}_{classifier_mode}_gpt_{gpt_model}.json", "w") as f:
-                    f.write(TEMPLATE.replace("<<SEED>>", seed).replace("<<DATASET>>", dataset).replace("<<CLASSIFIER_MODE>>", classifier_mode+"_openai").replace("<<ARGS>>", gpt_arg).replace("<<POSTPROCESSOR>>", postprocessor))
+    for source_pre, target_pre, target_pre_args in zip(source_preprocessors, target_preprocessors, target_preprocessors_arguments):
+        for dataset, postprocessor in zip(datasets, postprocessors):
+            with open(f"./configs/req2code-{seed}/{dataset}_{source_pre}_{target_pre}_no_llm.json", "w") as f:
+                f.write(TEMPLATE.replace("<<SEED>>", seed).replace("<<DATASET>>", dataset).replace("<<CLASSIFIER_MODE>>", "mock").replace("<<ARGS>>", "").replace("<<POSTPROCESSOR>>", postprocessor).replace("<<SOURCE_PREPROCESSOR>>", source_pre).replace("<<TARGET_PREPROCESSOR>>", target_pre).replace("<<TARGET_PREPROCESSOR_ARGS>>", target_pre_args))
+            for classifier_mode in classifier_modes:
+                for gpt_model, gpt_arg in zip(gpt_models, gpt_args):
+                    with open(f"./configs/req2code-{seed}/{dataset}_{source_pre}_{target_pre}_{classifier_mode}_gpt_{gpt_model}.json", "w") as f:
+                        f.write(TEMPLATE.replace("<<SEED>>", seed).replace("<<DATASET>>", dataset).replace("<<CLASSIFIER_MODE>>", classifier_mode+"_openai").replace("<<ARGS>>", gpt_arg).replace("<<POSTPROCESSOR>>", postprocessor).replace("<<SOURCE_PREPROCESSOR>>", source_pre).replace("<<TARGET_PREPROCESSOR>>", target_pre).replace("<<TARGET_PREPROCESSOR_ARGS>>", target_pre_args))
 
