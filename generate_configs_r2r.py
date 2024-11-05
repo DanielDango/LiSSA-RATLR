@@ -65,7 +65,7 @@ TEMPLATE = """
 # Configurations
 datasets = ["CM1Dataset", "GANNT", "ModisDataset", "CCHIT", "WARC", "dronology", "CM1-NASA"]
 postprocessors = ["req2req", "req2req", "identity", "identity", "req2req", "identity", "identity"]
-retrieval_counts = [str(x) for x in [4, 4, 20, 4, 4, 4, 4]]
+retrieval_counts = [str(x) for x in [4, 4, 4, 4, 4, 4, 4]]
 
 classifier_modes = ["simple", "reasoning"]
 gpt_models = ["gpt-4o-mini-2024-07-18", "gpt-4o-2024-08-06"]
@@ -77,7 +77,7 @@ ollama_args = ["\"model\": \"<<CLASSIFIER_MODEL>>\"".replace("<<CLASSIFIER_MODEL
 
 for dataset, postprocessor, retrieval_count in zip(datasets, postprocessors, retrieval_counts):
     with open(f"./configs/req2req/{dataset}_no_llm.json", "w") as f:
-        f.write(TEMPLATE.replace("<<DATASET>>", dataset).replace("<<CLASSIFIER_MODE>>", "mock").replace("<<ARGS>>", "").replace("<<POSTPROCESSOR>>", postprocessor).replace("RETRIEVAL_COUNT", retrieval_count))
+        f.write(TEMPLATE.replace("<<DATASET>>", dataset).replace("<<CLASSIFIER_MODE>>", "mock").replace("<<ARGS>>", "").replace("<<POSTPROCESSOR>>", postprocessor).replace("<<RETRIEVAL_COUNT>>", retrieval_count))
     for classifier_mode in classifier_modes:
         for gpt_model, gpt_arg in zip(gpt_models, gpt_args):
             with open(f"./configs/req2req/{dataset}_{classifier_mode}_gpt_{gpt_model}.json", "w") as f:
