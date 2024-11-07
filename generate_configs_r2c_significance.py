@@ -63,8 +63,8 @@ TEMPLATE = """
 """
 
 # Configurations
-datasets = ["SMOS", "eTour_en"]
-postprocessors = ["req2code", "req2code"]
+datasets = ["SMOS", "eTour_en", "iTrust"]
+postprocessors = ["req2code", "req2code", "req2code"]
 
 source_preprocessors = ["artifact"] #, "sentence", "sentence"]
 target_preprocessors = ["artifact"] #, "code_chunking", "code_method"]
