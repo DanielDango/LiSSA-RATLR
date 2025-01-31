@@ -21,9 +21,9 @@ You can access the paper [here](https://ardoco.de/c/icse25).
 ## Features
 
 - **Generic Applicability**: LiSSA is designed to recover traceability links across various types of software artifacts, including:
-  - Requirements to code
-  - Documentation to code
-  - Architecture documentation to architecture models
+  - [Requirements to code](https://ardoco.de/c/icse25)
+  - [Documentation to code](https://ardoco.de/c/icse25)
+  - [Architecture documentation to architecture models](https://ardoco.de/c/icse25)
 
 - **Retrieval-Augmented Generation**: By combining LLMs with RAG, LiSSA enhances the accuracy and relevance of the recovered traceability links.
 
