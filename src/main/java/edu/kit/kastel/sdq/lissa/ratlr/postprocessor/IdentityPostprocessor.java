@@ -1,16 +1,17 @@
+/* Licensed under MIT 2025. */
 package edu.kit.kastel.sdq.lissa.ratlr.postprocessor;
 
 import java.util.HashSet;
 import java.util.Set;
 
-import edu.kit.kastel.sdq.lissa.ratlr.Configuration;
+import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
 
 public class IdentityPostprocessor extends TraceLinkIdPostprocessor {
 
     private final boolean reverse;
 
-    public IdentityPostprocessor(Configuration.ModuleConfiguration moduleConfiguration) {
+    public IdentityPostprocessor(ModuleConfiguration moduleConfiguration) {
         this.reverse = moduleConfiguration.argumentAsBoolean("reverse", false);
     }
 

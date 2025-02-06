@@ -1,3 +1,4 @@
+/* Licensed under MIT 2025. */
 package edu.kit.kastel.sdq.lissa.ratlr.elementstore;
 
 import java.util.ArrayList;
@@ -6,7 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import edu.kit.kastel.sdq.lissa.ratlr.Configuration;
+import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.Pair;
 
@@ -24,7 +25,7 @@ public class ElementStore {
      * @param similarityRetriever Whether the element store should be used as a retriever. If set to false, you can retrieve all elements. If set to true, you
      *                            can find similar elements.
      */
-    public ElementStore(Configuration.ModuleConfiguration configuration, boolean similarityRetriever) {
+    public ElementStore(ModuleConfiguration configuration, boolean similarityRetriever) {
         if (similarityRetriever) {
             boolean isInfinity = configuration.hasArgument("max_results")
                     && configuration.argumentAsString("max_results").equalsIgnoreCase(MAX_RESULTS_INFINITY_ARGUMENT);

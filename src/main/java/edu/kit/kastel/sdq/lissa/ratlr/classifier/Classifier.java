@@ -1,3 +1,4 @@
+/* Licensed under MIT 2025. */
 package edu.kit.kastel.sdq.lissa.ratlr.classifier;
 
 import java.util.ArrayList;
@@ -11,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import edu.kit.kastel.sdq.lissa.ratlr.Configuration;
+import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
 import edu.kit.kastel.sdq.lissa.ratlr.elementstore.ElementStore;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 
@@ -60,7 +61,7 @@ public abstract class Classifier {
 
     protected abstract Classifier copyOf();
 
-    public static Classifier createClassifier(Configuration.ModuleConfiguration configuration) {
+    public static Classifier createClassifier(ModuleConfiguration configuration) {
         return switch (configuration.name().split(CONFIG_NAME_SEPARATOR)[0]) {
             case "mock" -> new MockClassifier();
             case "simple" -> new SimpleClassifier(configuration);
