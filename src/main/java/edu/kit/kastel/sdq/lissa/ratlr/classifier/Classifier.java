@@ -22,7 +22,7 @@ public abstract class Classifier {
     static final String CONFIG_NAME_SEPARATOR = "_";
 
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
-    private final int threads;
+    protected final int threads;
 
     protected Classifier(int threads) {
         this.threads = Math.max(1, threads);

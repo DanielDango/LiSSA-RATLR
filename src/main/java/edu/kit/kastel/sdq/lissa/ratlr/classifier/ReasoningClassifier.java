@@ -40,12 +40,13 @@ public class ReasoningClassifier extends Classifier {
     }
 
     private ReasoningClassifier(
+            int threads,
             Cache cache,
             ChatLanguageModelProvider provider,
             String prompt,
             boolean useOriginalArtifacts,
             boolean useSystemMessage) {
-        super(provider.supportsThreads() ? DEFAULT_THREAD_COUNT : 1);
+        super(threads);
         this.cache = cache;
         this.provider = provider;
         this.prompt = prompt;
@@ -56,7 +57,7 @@ public class ReasoningClassifier extends Classifier {
 
     @Override
     protected final Classifier copyOf() {
-        return new ReasoningClassifier(cache, provider, prompt, useOriginalArtifacts, useSystemMessage);
+        return new ReasoningClassifier(threads, cache, provider, prompt, useOriginalArtifacts, useSystemMessage);
     }
 
     @Override

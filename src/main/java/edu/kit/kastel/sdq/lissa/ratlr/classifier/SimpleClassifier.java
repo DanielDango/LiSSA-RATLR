@@ -41,8 +41,8 @@ public class SimpleClassifier extends Classifier {
         this.llm = provider.createChatModel();
     }
 
-    private SimpleClassifier(Cache cache, ChatLanguageModelProvider provider, String template) {
-        super(provider.supportsThreads() ? DEFAULT_THREAD_COUNT : 1);
+    private SimpleClassifier(int threads, Cache cache, ChatLanguageModelProvider provider, String template) {
+        super(threads);
         this.cache = cache;
         this.provider = provider;
         this.template = template;
@@ -51,7 +51,7 @@ public class SimpleClassifier extends Classifier {
 
     @Override
     protected final Classifier copyOf() {
-        return new SimpleClassifier(cache, provider, template);
+        return new SimpleClassifier(threads, cache, provider, template);
     }
 
     @Override

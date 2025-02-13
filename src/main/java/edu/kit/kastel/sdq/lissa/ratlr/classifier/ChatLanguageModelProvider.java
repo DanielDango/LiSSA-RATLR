@@ -61,11 +61,7 @@ public class ChatLanguageModelProvider {
     }
 
     public static boolean supportsThreads(ModuleConfiguration configuration) {
-        return configuration.name().contains(OPENAI);
-    }
-
-    public boolean supportsThreads() {
-        return platform.equals(OPENAI);
+        return configuration.name().contains(OPENAI) || configuration.name().contains(BLABLADOR);
     }
 
     private static OllamaChatModel createOllamaChatModel(String model, int seed) {
