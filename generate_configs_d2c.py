@@ -211,7 +211,7 @@ seeds = ["133742243"]
 import os
 
 for seed in seeds:
-    os.makedirs(f"./configs/doc2code", exist_ok=True)
+    os.makedirs("./configs/doc2code", exist_ok=True)
     # Generate
     with open(f"./configs/doc2code/bigbluebutton_{seed}.json", "w") as f:
         f.write(TEMPLATE_BBB.replace("<<SEED>>", seed))

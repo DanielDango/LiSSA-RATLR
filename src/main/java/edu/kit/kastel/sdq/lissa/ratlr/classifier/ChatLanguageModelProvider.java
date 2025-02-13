@@ -3,7 +3,6 @@ package edu.kit.kastel.sdq.lissa.ratlr.classifier;
 
 import java.time.Duration;
 import java.util.Map;
-import java.util.Objects;
 
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.ollama.OllamaChatModel;
@@ -20,7 +19,7 @@ public class ChatLanguageModelProvider {
     public static final int DEFAULT_SEED = 133742243;
 
     private final String platform;
-    private String model;
+    private String modelName;
     private int seed;
 
     public ChatLanguageModelProvider(ModuleConfiguration configuration) {
@@ -35,25 +34,26 @@ public class ChatLanguageModelProvider {
 
     public ChatLanguageModel createChatModel() {
         return switch (platform) {
-            case OPENAI -> createOpenAiChatModel(model, seed);
-            case OLLAMA -> createOllamaChatModel(model, seed);
-            case BLABLADOR -> createBlabladorChatModel(model, seed);
+            case OPENAI -> createOpenAiChatModel(modelName, seed);
+            case OLLAMA -> createOllamaChatModel(modelName, seed);
+            case BLABLADOR -> createBlabladorChatModel(modelName, seed);
             default -> throw new IllegalArgumentException("Unsupported platform: " + platform);
         };
     }
 
     private void initModelPlatform(ModuleConfiguration configuration) {
-        this.model = switch (platform) {
-            case OPENAI -> configuration.argumentAsString("model", "gpt-4o-mini");
-            case OLLAMA -> configuration.argumentAsString("model", "llama3:8b");
-            case BLABLADOR -> configuration.argumentAsString("model", "2 - Llama 3.3 70B instruct");
+        final String modelKey = "model";
+        this.modelName = switch (platform) {
+            case OPENAI -> configuration.argumentAsString(modelKey, "gpt-4o-mini");
+            case OLLAMA -> configuration.argumentAsString(modelKey, "llama3:8b");
+            case BLABLADOR -> configuration.argumentAsString(modelKey, "2 - Llama 3.3 70B instruct");
             default -> throw new IllegalArgumentException("Unsupported platform: " + platform);
         };
         this.seed = configuration.argumentAsInt("seed", DEFAULT_SEED);
     }
 
     public String modelName() {
-        return Objects.requireNonNull(model, "Model not initialized");
+        return modelName;
     }
 
     public int seed() {

@@ -96,7 +96,7 @@ seeds = ["133742243"]
 import os
 
 for seed in seeds:
-    os.makedirs(f"./configs/req2code", exist_ok=True)
+    os.makedirs("./configs/req2code", exist_ok=True)
     # Generate
     gpt_args = [("\"model\": \"<<CLASSIFIER_MODEL>>\", \"seed\": \""+seed+"\"").replace("<<CLASSIFIER_MODEL>>", model) for model in gpt_models]
     blablador_args = [("\"model\": \"<<CLASSIFIER_MODEL>>\", \"seed\": \""+seed+"\"").replace("<<CLASSIFIER_MODEL>>", model) for model in blablador_models]

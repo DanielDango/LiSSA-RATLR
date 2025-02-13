@@ -72,7 +72,7 @@ public class Evaluation {
         return configuration;
     }
 
-    public Set<TraceLink> run() throws IOException {
+    public Set<TraceLink> run() {
 
         // RUN
         logger.info("Loading artifacts");

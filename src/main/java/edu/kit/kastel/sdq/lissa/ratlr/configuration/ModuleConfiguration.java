@@ -12,6 +12,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public final class ModuleConfiguration {
+    public static final String ALREADY_FINALIZED_FOR_SERIALIZATION =
+            "Configuration already finalized for serialization";
+
     @JsonProperty("name")
     private final String name;
 
@@ -41,7 +44,7 @@ public final class ModuleConfiguration {
 
     public String argumentAsString(String key) {
         if (finalized) {
-            throw new IllegalStateException("Configuration already finalized for serialization");
+            throw new IllegalStateException(ALREADY_FINALIZED_FOR_SERIALIZATION);
         }
 
         String argument = arguments.get(key);
@@ -54,7 +57,7 @@ public final class ModuleConfiguration {
 
     public String argumentAsString(String key, String defaultValue) {
         if (finalized) {
-            throw new IllegalStateException("Configuration already finalized for serialization");
+            throw new IllegalStateException(ALREADY_FINALIZED_FOR_SERIALIZATION);
         }
 
         String argument = arguments.getOrDefault(key, defaultValue);
@@ -85,7 +88,7 @@ public final class ModuleConfiguration {
     public <E extends Enum<E>> String argumentAsStringByEnumIndex(
             String key, int defaultIndex, E[] values, Function<E, String> transform) {
         if (finalized) {
-            throw new IllegalStateException("Configuration already finalized for serialization");
+            throw new IllegalStateException(ALREADY_FINALIZED_FOR_SERIALIZATION);
         }
 
         String value = arguments.getOrDefault(key, String.valueOf(defaultIndex));

@@ -33,7 +33,7 @@ public class ReasoningClassifier extends Classifier {
         this.provider = new ChatLanguageModelProvider(configuration);
         this.cache = CacheManager.getDefaultInstance()
                 .getCache(this.getClass().getSimpleName() + "_" + provider.modelName());
-        this.prompt = configuration.argumentAsStringByEnumIndex("prompt", 0, Prompt.values(), it -> it.prompt);
+        this.prompt = configuration.argumentAsStringByEnumIndex("prompt", 0, Prompt.values(), it -> it.promptTemplate);
         this.useOriginalArtifacts = configuration.argumentAsBoolean("use_original_artifacts", false);
         this.useSystemMessage = configuration.argumentAsBoolean("use_system_message", true);
         this.llm = this.provider.createChatModel();
@@ -153,10 +153,10 @@ public class ReasoningClassifier extends Classifier {
         REASON_WITH_NAME_YES_IF_CERTAIN(
                 "Below are two artifacts from the same software system.\n Is there a traceability link between (1) and (2)? Give your reasoning and then answer with 'yes' or 'no' enclosed in <trace> </trace>. Only answer yes if you are absolutely certain.\n (1) {source_type}: '''{source_content}''' \n (2) {target_type}: '''{target_content}''' ");
 
-        private final String prompt;
+        private final String promptTemplate;
 
-        Prompt(String prompt) {
-            this.prompt = prompt;
+        Prompt(String promptTemplate) {
+            this.promptTemplate = promptTemplate;
         }
     }
 }

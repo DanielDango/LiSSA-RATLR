@@ -8,8 +8,6 @@ import java.nio.file.Path;
 import java.util.*;
 
 import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Artifact;
@@ -24,8 +22,6 @@ import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Knowledge;
  * </ul>
  */
 public class TextArtifactProvider extends ArtifactProvider {
-
-    private static final Logger logger = LoggerFactory.getLogger(TextArtifactProvider.class);
 
     protected final File path;
     protected final Artifact.ArtifactType artifactType;

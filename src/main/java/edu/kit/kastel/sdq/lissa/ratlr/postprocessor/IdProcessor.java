@@ -1,7 +1,7 @@
 /* Licensed under MIT 2025. */
 package edu.kit.kastel.sdq.lissa.ratlr.postprocessor;
 
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
 
@@ -14,10 +14,10 @@ enum IdProcessor {
     SAD2SAM(IdProcessor::processSAD, IdProcessor::processSAM),
     SAM2CODE(IdProcessor::processSAM, targetId -> targetId);
 
-    private final Function<String, String> sourceIdProcessor;
-    private final Function<String, String> targetIdProcessor;
+    private final UnaryOperator<String> sourceIdProcessor;
+    private final UnaryOperator<String> targetIdProcessor;
 
-    IdProcessor(Function<String, String> sourceIdProcessor, Function<String, String> targetIdProcessor) {
+    IdProcessor(UnaryOperator<String> sourceIdProcessor, UnaryOperator<String> targetIdProcessor) {
         this.sourceIdProcessor = sourceIdProcessor;
         this.targetIdProcessor = targetIdProcessor;
     }

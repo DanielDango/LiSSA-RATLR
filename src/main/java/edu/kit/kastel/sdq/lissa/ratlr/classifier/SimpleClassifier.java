@@ -61,10 +61,11 @@ public class SimpleClassifier extends Classifier {
         for (var target : targets) {
             String llmResponse = classify(source, target);
 
-            if (llmResponse.startsWith("<think>") && llmResponse.contains("</think>")) {
+            String thinkEnd = "</think>";
+            if (llmResponse.startsWith("<think>") && llmResponse.contains(thinkEnd)) {
                 // Omit the thinking of models like deepseek-r1
                 llmResponse = llmResponse
-                        .substring(llmResponse.indexOf("</think>") + "</think>".length())
+                        .substring(llmResponse.indexOf(thinkEnd) + thinkEnd.length())
                         .strip();
             }
 

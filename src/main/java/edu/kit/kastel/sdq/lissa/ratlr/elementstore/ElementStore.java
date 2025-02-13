@@ -27,13 +27,14 @@ public class ElementStore {
      */
     public ElementStore(ModuleConfiguration configuration, boolean similarityRetriever) {
         if (similarityRetriever) {
-            boolean isInfinity = configuration.hasArgument("max_results")
-                    && configuration.argumentAsString("max_results").equalsIgnoreCase(MAX_RESULTS_INFINITY_ARGUMENT);
+            final String maxResultsKey = "max_results";
+            boolean isInfinity = configuration.hasArgument(maxResultsKey)
+                    && configuration.argumentAsString(maxResultsKey).equalsIgnoreCase(MAX_RESULTS_INFINITY_ARGUMENT);
 
             if (isInfinity) {
                 this.maxResults = Integer.MAX_VALUE;
             } else {
-                this.maxResults = configuration.argumentAsInt("max_results", 10);
+                this.maxResults = configuration.argumentAsInt(maxResultsKey, 10);
                 if (maxResults < 1) {
                     throw new IllegalArgumentException("The maximum number of results must be greater than 0.");
                 }
