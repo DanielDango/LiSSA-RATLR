@@ -24,6 +24,7 @@ You can access the paper [here](https://ardoco.de/c/icse25).
   - [Requirements to code](https://ardoco.de/c/icse25)
   - [Documentation to code](https://ardoco.de/c/icse25)
   - [Architecture documentation to architecture models](https://ardoco.de/c/icse25)
+  - [Requirements to requirements](https://ardoco.de/c/refsq25)
 
 - **Retrieval-Augmented Generation**: By combining LLMs with RAG, LiSSA enhances the accuracy and relevance of the recovered traceability links.
 
@@ -94,11 +95,12 @@ Additionally, the LiSSA generate CSV files that contain the traceability links a
 
 ## Evaluation
 
-LiSSA has been empirically evaluated on three different TLR tasks:
+LiSSA has been empirically evaluated on four different TLR tasks:
 
 - Requirements to code
 - Documentation to code
 - Architecture documentation to architecture models
+- Requirements to requirements
 
 The results indicate that the RAG-based approach can significantly outperform state-of-the-art methods in code-related tasks.
 However, further research is needed to enhance its performance for broader applicability.
