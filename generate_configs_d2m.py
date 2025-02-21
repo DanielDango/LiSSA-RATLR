@@ -1,24 +1,24 @@
-TEMPLATE_MS = """
+TEMPLATE_D2M = """
 {
   "cache_dir": "./cache-d2m/mediastore-<<SEED>>",
   "gold_standard_configuration": {
-    "path": "./datasets/doc2model/mediastore/goldstandards/goldstandard-mediastore.csv",
+    "path": "<<GS_PATH>>",
     "hasHeader": "true",
-    "swap_columns": "true"
+    "swap_columns": "<<SWAP_COLUMNS>>"
   },
 
   "source_artifact_provider" : {
     "name" : "text",
     "args" : {
       "artifact_type" : "software architecture documentation",
-      "path" : "./datasets/doc2model/mediastore/text_2016/mediastore.txt"
+      "path" : "<<TEXT_PATH>>"
     }
   },
   "target_artifact_provider" : {
     "name" : "text",
     "args" : {
       "artifact_type" : "software architecture model",
-      "path" : "./datasets/doc2model/mediastore/model_2016/uml/ms.uml"
+      "path" : "<<UML_PATH>>"
     }
   },
   "source_preprocessor" : {
@@ -70,6 +70,19 @@ TEMPLATE_MS = """
 }
 """
 
+from typing import List, Tuple
+
+def swap(definition: str, pairs: List[Tuple[str, str]]):
+    for pair in pairs:
+        definition = definition.replace(pair[0], "~~TEMP~~").replace(pair[1], pair[0]).replace("~~TEMP~~", pair[1])
+    return definition
+
+TEMPLATE_M2D = swap(TEMPLATE_D2M, [("target_artifact_provider", "source_artifact_provider"), ("target_preprocessor", "source_preprocessor"), ("sad2sam", "sam2sad")])
+
+projects = ["mediastore"]
+uml_paths = ["model_2016/uml/ms.uml"]
+text_paths = ["text_2016/mediastore.txt"]
+goldstandard_paths = ["goldstandards/goldstandard-mediastore.csv"]
 
 # Configurations
 seeds = ["133742243"]
@@ -77,10 +90,20 @@ models = ["gpt-4o-mini-2024-07-18", "gpt-4o-2024-05-13"]
 
 
 import os
+for project, uml, text, gs in zip(projects, uml_paths, text_paths, goldstandard_paths):
+    gs_path = f"./datasets/doc2model/{project}/{gs}"
+    uml_path = f"./datasets/doc2model/{project}/{uml}"
+    text_path = f"./datasets/doc2model/{project}/{text}"
 
-for seed in seeds:
-    os.makedirs("./configs/doc2model/sad2sam", exist_ok=True)
-    # Generate
-    for model in models:
-        with open(f"./configs/doc2model/sad2sam/mediastore_{seed}_{model}.json", "w") as f:
-            f.write(TEMPLATE_MS.replace("<<SEED>>", seed).replace("<<MODEL>>", model))
+    template_d2m = TEMPLATE_D2M.replace("<<GS_PATH>>", gs_path).replace("<<UML_PATH>>", uml_path).replace("<<TEXT_PATH>>", text_path)
+    template_m2d = TEMPLATE_M2D.replace("<<GS_PATH>>", gs_path).replace("<<UML_PATH>>", uml_path).replace("<<TEXT_PATH>>", text_path)
+
+    for seed in seeds:
+        os.makedirs("./configs/doc2model", exist_ok=True)
+        os.makedirs("./configs/doc2model", exist_ok=True)
+        # Generate
+        for model in models:
+            with open(f"./configs/doc2model/{project}_d2m_{seed}_{model}.json", "w") as f:
+                f.write(template_d2m.replace("<<SEED>>", seed).replace("<<MODEL>>", model).replace("<<SWAP_COLUMNS>>", "true"))
+            with open(f"./configs/doc2model/{project}_m2d_{seed}_{model}.json", "w") as f:
+                f.write(template_m2d.replace("<<SEED>>", seed).replace("<<MODEL>>", model).replace("<<SWAP_COLUMNS>>", "false"))
