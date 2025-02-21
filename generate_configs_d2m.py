@@ -105,5 +105,12 @@ for project, uml, text, gs in zip(projects, uml_paths, text_paths, goldstandard_
         for model in models:
             with open(f"./configs/doc2model/{project}_d2m_{seed}_{model}.json", "w") as f:
                 f.write(template_d2m.replace("<<SEED>>", seed).replace("<<MODEL>>", model).replace("<<SWAP_COLUMNS>>", "true"))
+            # With Operations
+            with open(f"./configs/doc2model/{project}_d2m_{seed}_{model}_ops.json", "w") as f:
+                f.write(template_d2m.replace("<<SEED>>", seed).replace("<<MODEL>>", model).replace("<<SWAP_COLUMNS>>", "true").replace('"includeOperations" : false', '"includeOperations" : true'))
+
             with open(f"./configs/doc2model/{project}_m2d_{seed}_{model}.json", "w") as f:
                 f.write(template_m2d.replace("<<SEED>>", seed).replace("<<MODEL>>", model).replace("<<SWAP_COLUMNS>>", "false"))
+            # With Operations
+            with open(f"./configs/doc2model/{project}_m2d_{seed}_{model}_ops.json", "w") as f:
+                f.write(template_m2d.replace("<<SEED>>", seed).replace("<<MODEL>>", model).replace("<<SWAP_COLUMNS>>", "false").replace('"includeOperations" : false', '"includeOperations" : true'))
