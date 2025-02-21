@@ -79,14 +79,14 @@ TEMPLATE_MS = """
     "name" : "text",
     "args" : {
       "artifact_type" : "software architecture documentation",
-      "path" : "./datasets/doc2code/MediaStore/text_2016/mediastore.txt"
+      "path" : "./datasets/doc2code/mediastore/text_2016/mediastore.txt"
     }
   },
   "target_artifact_provider" : {
     "name" : "recursive_text",
     "args" : {
       "artifact_type" : "source code",
-      "path" : "./datasets/doc2code/MediaStore/model_2016/code",
+      "path" : "./datasets/doc2code/mediastore/model_2016/code",
       "extensions" : ".java,.sh"
     }
   },
@@ -147,14 +147,14 @@ TEMPLATE_TS = """
     "name" : "text",
     "args" : {
       "artifact_type" : "software architecture documentation",
-      "path" : "./datasets/doc2code/TeaStore/text_2020/teastore.txt"
+      "path" : "./datasets/doc2code/teastore/text_2020/teastore.txt"
     }
   },
   "target_artifact_provider" : {
     "name" : "recursive_text",
     "args" : {
       "artifact_type" : "source code",
-      "path" : "./datasets/doc2code/TeaStore/model_2022/code",
+      "path" : "./datasets/doc2code/teastore/model_2022/code",
       "extensions" : ".java,.sh"
     }
   },

@@ -107,7 +107,9 @@ public final class Statistics {
             validTraceLinks = Files.readAllLines(groundTruth.toPath()).stream()
                     .skip(header ? 1 : 0)
                     .map(l -> l.split(","))
-                    .map(it -> new TraceLink(it[0], it[1]))
+                    .map(it -> goldStandardConfiguration.swapColumns()
+                            ? new TraceLink(it[1], it[0])
+                            : new TraceLink(it[0], it[1]))
                     .collect(Collectors.toSet());
         } catch (IOException e) {
             throw new UncheckedIOException(e);

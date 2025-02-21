@@ -10,7 +10,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public record GoldStandardConfiguration(
-        @JsonProperty("path") String path, @JsonProperty(defaultValue = "false") boolean hasHeader) {
+        @JsonProperty("path") String path,
+        @JsonProperty(defaultValue = "false") boolean hasHeader,
+        @JsonProperty(value = "swap_columns", defaultValue = "false") boolean swapColumns) {
 
     public static GoldStandardConfiguration load(Path evaluationConfig) {
         if (evaluationConfig == null) return null;

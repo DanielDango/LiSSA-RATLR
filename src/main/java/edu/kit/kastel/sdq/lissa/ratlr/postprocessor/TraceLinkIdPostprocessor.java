@@ -26,8 +26,8 @@ public class TraceLinkIdPostprocessor {
             case "sam2sad" -> new TraceLinkIdPostprocessor(IdProcessor.SAM2SAD);
             case "sam2code" -> new TraceLinkIdPostprocessor(IdProcessor.SAM2CODE);
             case "req2req" -> new ReqReqPostprocessor();
-            case "identity" -> new IdentityPostprocessor(moduleConfiguration);
-            case null -> new IdentityPostprocessor(moduleConfiguration);
+            case "identity" -> new IdentityPostprocessor();
+            case null -> new IdentityPostprocessor();
             default -> throw new IllegalStateException("Unexpected value: " + moduleConfiguration.name());
         };
     }
