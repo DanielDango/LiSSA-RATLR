@@ -52,9 +52,21 @@ public abstract class Classifier {
         executor.close();
 
         return futureResults.stream()
-                .map(Future::resultNow)
+                .map(this::extractResults)
                 .flatMap(Collection::stream)
                 .toList();
+    }
+
+    private List<ClassificationResult> extractResults(Future<List<ClassificationResult>> futureResult) {
+        try {
+            return futureResult.get();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new IllegalStateException("Classification was interrupted.", e);
+        } catch (Exception e) {
+            logger.error("Error while classifying elements.", e);
+            return new ArrayList<>();
+        }
     }
 
     protected abstract List<ClassificationResult> classify(Element source, List<Element> targets);
