@@ -79,10 +79,10 @@ def swap(definition: str, pairs: List[Tuple[str, str]]):
 
 TEMPLATE_M2D = swap(TEMPLATE_D2M, [("target_artifact_provider", "source_artifact_provider"), ("target_preprocessor", "source_preprocessor"), ("sad2sam", "sam2sad")])
 
-projects = ["mediastore", "teastore"]
-uml_paths = ["model_2016/uml/ms.uml", "model_2020/uml/teastore.uml"]
-text_paths = ["text_2016/mediastore.txt", "text_2020/teastore.txt"]
-goldstandard_paths = ["goldstandards/goldstandard-mediastore.csv", "goldstandards/goldstandard-teastore.csv"]
+projects = ["mediastore", "teastore", "teammates", "jabref", "bigbluebutton"]
+uml_paths = ["model_2016/uml/ms.uml", "model_2020/uml/teastore.uml", "model_2021/uml/teammates.uml", "model_2021/uml/jabref.uml", "model_2021/uml/bbb.uml"]
+text_paths = ["text_2016/mediastore.txt", "text_2020/teastore.txt", "text_2021/teammates.txt", "text_2021/jabref.txt", "text_2021/bigbluebutton_1SentPerLine.txt"]
+goldstandard_paths = ["goldstandards/goldstandard-mediastore.csv", "goldstandards/goldstandard-teastore.csv", "goldstandards/goldstandard-teammates.csv", "goldstandards/goldstandard-jabref.csv", "goldstandards/goldstandard-bigbluebutton.csv"]
 
 # Configurations
 seeds = ["133742243"]
