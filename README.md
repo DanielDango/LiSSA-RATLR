@@ -6,6 +6,9 @@
 Welcome to the LiSSA project!
 This framework leverages Large Language Models (LLMs) enhanced through Retrieval-Augmented Generation (RAG) to establish traceability links across various software artifacts.
 
+> [!TIP]
+> If you have any questions, don't hesitate to [contact us](https://ardoco.de).
+
 ## Overview
 
 In software development and maintenance, numerous artifacts such as requirements, code, and architecture documentation are produced.
