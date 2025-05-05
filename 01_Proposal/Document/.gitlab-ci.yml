@@ -1,0 +1,11 @@
+stages:          # List of stages for jobs, and their order of execution
+  - build
+
+thesis:       # This job runs in the build stage, which runs first.
+  stage: build
+  tags: ["latex"]
+  script:
+    - latexmk -pdf thesis.tex
+  artifacts:
+    paths:
+        - thesis.pdf
