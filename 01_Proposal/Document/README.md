@@ -31,7 +31,7 @@ Optionen dieser Klasse verwendet werden.
 
 Optional: Globale Installation
 ------------------------------
-Die Dokumentenklasse kann im texmf-Baum der/des Nutzer:in installiert werden.
+Die Dokumentenklasse kann im texmf-Baum des Nutzer installiert werden.
 Dadurch müssen Dokumente, die die Klasse verwenden, nicht mehr in diesem Ordner liegen.
 Hierzu kann das `install`-Skript verwendet werden. Weitere Informationen gibt 
 `./install --help`. Je nach System werden root-Rechte zur Installation benötigt.
