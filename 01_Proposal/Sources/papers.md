@@ -2,6 +2,11 @@
 - Python library to simplify prompt optimization https://github.com/hinthornw/promptimizer
 - Python framework to define a composite structure for prompt enhancement https://github.com/stanfordnlp/dspy
 - LiSSA Java framework to enhance during the thesis https://github.com/ArDoCo/LiSSA-RATLR
+  - Goal: Write Classifiers in edu.kit.kastel.sqd.lissa.ratlr.classifier
+  - Base class Classifier.java can be used as a parent to include different prompting techniques
+  - Idea for manual prompting: Create enum with prompt strings that will be filled with content when the classifier is called
+    - This is the way for https://www.promptingguide.ai/techniques
+  - Automatic prompt optimization will require more implementation
 - Benchmark set to test TLR implementation https://github.com/ArDoCo/Benchmark/tree/ecsa22-msr4sa
 
 # Gray Literature:
@@ -37,3 +42,6 @@
 
 # Evaluation Techniques:
 - Benchmark Dataset for TLR between architecture models and documentation https://link.springer.com/chapter/10.1007/978-3-031-36889-9_30
+
+# Else:
+-  Fine-grained Traceability Link Recovery (FTLR) https://ieeexplore.ieee.org/abstract/document/9609109
