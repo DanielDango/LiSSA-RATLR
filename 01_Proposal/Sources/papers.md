@@ -7,13 +7,14 @@
   - Idea for manual prompting: Create enum with prompt strings that will be filled with content when the classifier is called
     - This is the way for https://www.promptingguide.ai/techniques
   - Automatic prompt optimization will require more implementation
+  - Simple Classifier (Question) and Reasoning Classifier (Question + Provide your reasoning) are already implemented  
 - Benchmark set to test TLR implementation https://github.com/ArDoCo/Benchmark/tree/ecsa22-msr4sa
 
 # Gray Literature:
 - neat overview of different simple prompting techniques with brief examples https://www.promptingguide.ai/techniques
 
 # Initial Literature:
-- Overview of APO techniques https://arxiv.org/pdf/2502.16923
+- Overview of Automatic Prompt Optimization (APO) techniques https://arxiv.org/pdf/2502.16923
   - provides a broad overview into the topic
   - splits prompt optimization into four steps with variable iteration depth
     - initialize seed prompts (generate prompt)
@@ -34,6 +35,11 @@
   - artifacts (source code, documentation, requirements, models) are preprocessed and embedded for usage with naturale language LLMs
   - for each source element similar target elements are determined
   - mapping determines which target element is actually linked to the source element (TLR)
+- Automatic Prompt Engineering (APE) for Requirement Engineering https://link.springer.com/chapter/10.1007/978-3-031-88531-0_15
+  - ![Zadenoori_APE_Process.png](Zadenoori_APE_Process.png)
+  - Iterative approach until the result is better than baseline + margin or an upper limit is reached (omitted from the graphic)
+  - Previous prompt is adjusted using a human designed optimization prompt
+  - Uses a stateless LLM -> results are more consistent but quality may be lower
 
 # Prompting Techniques:
 - Few Shot Learning https://arxiv.org/abs/2005.14165
@@ -45,3 +51,10 @@
 
 # Else:
 -  Fine-grained Traceability Link Recovery (FTLR) https://ieeexplore.ieee.org/abstract/document/9609109
+- What is Prompt Engineering? https://arxiv.org/abs/2211.01910
+- PE strategies for TLR https://ieeexplore.ieee.org/abstract/document/10260721
+- PE as an optimization problem https://arxiv.org/abs/2311.05661
+  - Small improvement over APO with gradient descent
+  - Formulating a optimization problem to describe APO / APE
+  - ![Ye_PromptEngineering_optimiziation_problem.png](Ye_PromptEngineering_optimiziation_problem.png)
+- Chain of Thought Prompting https://proceedings.neurips.cc/paper_files/paper/2022/file/9d5609613524ecf4f15af0f7b31abca4-Paper-Conference.pdf
