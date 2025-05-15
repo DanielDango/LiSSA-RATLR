@@ -22,7 +22,7 @@ class RedisCache implements Cache {
         this.localCache = localCache == null || !localCache.isReady() ? null : localCache;
         mapper = new ObjectMapper();
         createRedisConnection();
-        if (jedis == null && localCache == null) {
+        if (jedis == null && this.localCache == null) {
             throw new IllegalArgumentException("Could not create cache");
         }
     }

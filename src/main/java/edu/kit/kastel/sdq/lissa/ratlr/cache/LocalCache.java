@@ -3,6 +3,7 @@ package edu.kit.kastel.sdq.lissa.ratlr.cache;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
@@ -26,7 +27,11 @@ class LocalCache {
     }
 
     public boolean isReady() {
-        return cacheFile.exists() || cacheFile.canWrite();
+        try {
+            return cacheFile.exists() || cacheFile.createNewFile();
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 
     private void createLocalStore() {
