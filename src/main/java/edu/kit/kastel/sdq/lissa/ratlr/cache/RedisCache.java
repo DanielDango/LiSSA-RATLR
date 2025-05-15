@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.kit.kastel.sdq.lissa.ratlr.utils.Environment;
 import redis.clients.jedis.UnifiedJedis;
 
 class RedisCache implements Cache {
@@ -30,8 +31,8 @@ class RedisCache implements Cache {
     private void createRedisConnection() {
         try {
             String redisUrl = "redis://localhost:6379";
-            if (System.getenv("REDIS_URL") != null) {
-                redisUrl = System.getenv("REDIS_URL");
+            if (Environment.getenv("REDIS_URL") != null) {
+                redisUrl = Environment.getenv("REDIS_URL");
             }
             jedis = new UnifiedJedis(redisUrl);
             // Check if connection is working

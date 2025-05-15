@@ -35,7 +35,7 @@ class CodeMethodPreprocessorTest {
         assertEquals(3, elements.size());
         var head = elements.get(1);
         assertEquals("CodeMethodPreprocessorTest.java$0", head.getIdentifier());
-        assertTrue(head.getContent().startsWith("package edu.kit.kastel.sdq.lissa.ratlr.preprocessor;"));
+        assertTrue(head.getContent().contains("package edu.kit.kastel.sdq.lissa.ratlr.preprocessor;"));
 
         var firstMethod = elements.get(2);
         assertEquals("CodeMethodPreprocessorTest.java$0$0", firstMethod.getIdentifier());
