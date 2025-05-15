@@ -4,7 +4,7 @@ package edu.kit.kastel.sdq.lissa.ratlr.classifier;
 import java.util.ArrayList;
 import java.util.List;
 
-import dev.langchain4j.model.chat.ChatLanguageModel;
+import dev.langchain4j.model.chat.ChatModel;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.Cache;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheKey;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheManager;
@@ -29,7 +29,7 @@ public class SimpleClassifier extends Classifier {
     private final Cache cache;
     private final ChatLanguageModelProvider provider;
 
-    private final ChatLanguageModel llm;
+    private final ChatModel llm;
     private final String template;
 
     public SimpleClassifier(ModuleConfiguration configuration) {
@@ -96,7 +96,7 @@ public class SimpleClassifier extends Classifier {
                     provider.modelName(),
                     source.getIdentifier(),
                     target.getIdentifier());
-            String response = llm.generate(request);
+            String response = llm.chat(request);
             cache.put(cacheKey, response);
             return response;
         }

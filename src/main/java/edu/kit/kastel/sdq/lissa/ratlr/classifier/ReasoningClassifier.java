@@ -6,12 +6,11 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.data.message.UserMessage;
-import dev.langchain4j.model.chat.ChatLanguageModel;
-import dev.langchain4j.model.output.Response;
+import dev.langchain4j.model.chat.ChatModel;
+import dev.langchain4j.model.chat.response.ChatResponse;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.Cache;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheKey;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheManager;
@@ -23,7 +22,7 @@ public class ReasoningClassifier extends Classifier {
     private final Cache cache;
     private final ChatLanguageModelProvider provider;
 
-    private final ChatLanguageModel llm;
+    private final ChatModel llm;
     private final String prompt;
     private final boolean useOriginalArtifacts;
     private final boolean useSystemMessage;
@@ -137,8 +136,8 @@ public class ReasoningClassifier extends Classifier {
                     provider.modelName(),
                     source.getIdentifier(),
                     target.getIdentifier());
-            Response<AiMessage> response = llm.generate(messages);
-            String responseText = response.content().text();
+            ChatResponse response = llm.chat(messages);
+            String responseText = response.aiMessage().text();
             cache.put(cacheKey, responseText);
             return responseText;
         }

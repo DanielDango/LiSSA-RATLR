@@ -1,15 +1,16 @@
 /* Licensed under MIT 2025. */
 package edu.kit.kastel.sdq.lissa.ratlr.classifier;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.Base64;
 import java.util.Map;
 
-import dev.langchain4j.model.chat.ChatLanguageModel;
+import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.ollama.OllamaChatModel;
 import dev.langchain4j.model.openai.OpenAiChatModel;
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.Environment;
-import okhttp3.Credentials;
 
 public class ChatLanguageModelProvider {
     public static final String OPENAI = "openai";
@@ -32,7 +33,7 @@ public class ChatLanguageModelProvider {
         initModelPlatform(configuration);
     }
 
-    public ChatLanguageModel createChatModel() {
+    public ChatModel createChatModel() {
         return switch (platform) {
             case OPENAI -> createOpenAiChatModel(modelName, seed);
             case OLLAMA -> createOllamaChatModel(modelName, seed);
@@ -76,7 +77,9 @@ public class ChatLanguageModelProvider {
                 .temperature(0.0)
                 .seed(seed);
         if (user != null && password != null && !user.isEmpty() && !password.isEmpty()) {
-            ollama.customHeaders(Map.of("Authorization", Credentials.basic(user, password)));
+            ollama.customHeaders(Map.of(
+                    "Authorization",
+                    Base64.getEncoder().encodeToString((user + ":" + password).getBytes(StandardCharsets.UTF_8))));
         }
         return ollama.build();
     }
