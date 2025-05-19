@@ -57,4 +57,35 @@
   - Small improvement over APO with gradient descent
   - Formulating a optimization problem to describe APO / APE
   - ![Ye_PromptEngineering_optimiziation_problem.png](Ye_PromptEngineering_optimiziation_problem.png)
+    - No trend found whether the optimized prompt works with all LLMs
 - Chain of Thought Prompting https://proceedings.neurips.cc/paper_files/paper/2022/file/9d5609613524ecf4f15af0f7b31abca4-Paper-Conference.pdf
+- AutoPrompt https://arxiv.org/pdf/2010.15980
+  - Generate prompts to retrieve relational information
+  - Base Prompt consists simply of the relation to be found (and trigger tokens?)
+  - How are trigger tokens determined???
+    - Perform gradient search over initial tokens to find the most fitting ones for the broad prompt
+  - The expected output is masked in the query prompt to find the correct substitute using the trigger tokens
+  - Result not properly humane readable but provides better results than simple relational queries
+- Fact base to test LLMs for relational queries https://arxiv.org/pdf/1909.01066
+  - might be interesting to see how APO works with a different set of problems
+  - The LAMA (LAnguage Model Analysis) probe to test performance
+  - Composed of different corpi for facts providing relation triplets (X, relation, Y) -> eg (Paul, lives in, Karlsruhe)
+  - ranking based metric for likelihood of desired word compared to similar ones in a fixed vocabulary
+- Auto Question Generation https://dl.acm.org/doi/pdf/10.1145/3511808.3557246
+  - using the same triplets as Shin2020's Autoprompt
+  - optimized for few resources
+  - probably drifts to far from the actual topic
+
+# General Thesis Concept
+1. Research and Setup
+   - local setup of the lissa ratlr project
+   - get a feel for the framework and how to work within by implementing basic classifiers
+     - 0-Shot, n-Shot, Chain of Thought
+   - provides a benchmark to compare apo techniques
+2. Automatic Prompt Refinement
+   - Consists of initial prompt (test different prompts), optimization prompt and core loop to iterate until the result is good enough
+   - Base on gradient descent
+3. Benchmark results / algorithm with different LLMs and Trainingdata
+   - Compare against different dataset?
+     - Peroni fact retrieval
+4. Write thesis and buffer
