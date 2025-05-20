@@ -46,11 +46,16 @@
 - Instruction Following https://arxiv.org/abs/2203.02155
 - Zero Shot Reasoning https://arxiv.org/abs/2205.11916
 
+# Automatic Prompt Refinement
+- Madaan 2023 https://proceedings.neurips.cc/paper_files/paper/2023/file/91edff07232fb1b55a505a9e9f6c0ff3-Paper-Conference.pdf
+  - Use the model to generate feedback on the result to improve the prompt
+- Yang 2024 https://arxiv.org/pdf/2309.03409
+  - 
 # Evaluation Techniques:
 - Benchmark Dataset for TLR between architecture models and documentation https://link.springer.com/chapter/10.1007/978-3-031-36889-9_30
 
 # Else:
--  Fine-grained Traceability Link Recovery (FTLR) https://ieeexplore.ieee.org/abstract/document/9609109
+- Fine-grained Traceability Link Recovery (FTLR) https://ieeexplore.ieee.org/abstract/document/9609109
 - What is Prompt Engineering? https://arxiv.org/abs/2211.01910
 - PE strategies for TLR https://ieeexplore.ieee.org/abstract/document/10260721
 - PE as an optimization problem https://arxiv.org/abs/2311.05661
@@ -80,7 +85,8 @@
 1. Research and Setup
    - local setup of the lissa ratlr project
    - get a feel for the framework and how to work within by implementing basic classifiers
-     - 0-Shot, n-Shot, Chain of Thought
+     - 0-Shot, Chain of Thought
+     - basic iterative prompting -> get early working example
    - provides a benchmark to compare apo techniques
 2. Automatic Prompt Refinement
    - Consists of initial prompt (test different prompts), optimization prompt and core loop to iterate until the result is good enough
@@ -89,3 +95,10 @@
    - Compare against different dataset?
      - Peroni fact retrieval
 4. Write thesis and buffer
+ -> maybe push more towards tlr
+ -> be more percise 
+ -> look at repo of gradient desecent
+lama 405 b
+5. approach auch ganz wichtig im Propsoal
+6. Evaluation auch beschreiben
+7. 
