@@ -1,0 +1,25 @@
+\chapter{Concept}
+\label{conecpt}
+
+In order to explore prompt engineering
+
+\section{Initial Overview}
+To get familiar with the LiSSA Framework I will implement basic classifiers with simple popular prompting techniques.
+Currently a zero-shot and chain-of-thought classifier are implemented. In order to provide a broader baseline to compare later results against 
+
+\section{Naive Iterative Optimization}
+Next I plan to implement a naive iterative approach to prompt optimization. Many automatic prompt optimization algorithms depend on a iterative core loop witch will be repeated untill tthe optimized prompt performs better than some metric or a maximum amount of iterations has been reached.
+
+To improve the performance, an optimization prompt is used. The naive approach is to simply prompt the LLM to improve the prompt. The hopefully improved prompt will be taken into the next iteration.
+
+\section{Automatic Prompt Optimization Using Gradient Descent}
+Based on the work of TODO I will implement a more sophisticated prompt optimization algorithm into the LiSSA framework. 
+
+The authors have provided their source code in a publicly accessible repository under the MIT licensing. 
+
+\section{Evaluation}
+In order to evaluate the performance of different optimizied prompts the benchmark data from TODO Klein will be used.
+
+Depending on how long each phase will take, it is possible to generate a bunch of different data and perform comparissions.
+A simple but intersting apporach is to compare different LLMs for the task. Many variations can be achived by comparing for example how a prompt omptimized by one system performs on the others. We can also compare how well each system manages to optimized the initial prompt. 
+Another interesting thought is to take optimized promots from a different system as the initial prompt. 
