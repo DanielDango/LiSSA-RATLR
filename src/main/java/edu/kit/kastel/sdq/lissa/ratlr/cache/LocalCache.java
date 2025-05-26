@@ -37,8 +37,13 @@ class LocalCache {
     private void createLocalStore() {
         if (cacheFile.exists()) {
             try {
-                cache = mapper.readValue(cacheFile, new TypeReference<>() {});
+                if (Files.readString(cacheFile.toPath()).isBlank()) {
+                    cacheFile.delete();
+                } else {
+                    cache = mapper.readValue(cacheFile, new TypeReference<>() {});
+                }
             } catch (IOException e) {
+
                 throw new IllegalArgumentException("Could not read cache file (" + cacheFile.getName() + ")", e);
             }
         }

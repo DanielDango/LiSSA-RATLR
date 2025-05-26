@@ -30,7 +30,7 @@ public class OllamaEmbeddingCreator extends CachedEmbeddingCreator {
         if (user != null && password != null && !user.isEmpty() && !password.isEmpty()) {
             ollamaEmbedding.customHeaders(Map.of(
                     "Authorization",
-                    Base64.getEncoder().encodeToString((user + ":" + password).getBytes(StandardCharsets.UTF_8))));
+                    "Basic " + Base64.getEncoder().encodeToString((user + ":" + password).getBytes(StandardCharsets.UTF_8))));
         }
         return ollamaEmbedding.build();
     }
