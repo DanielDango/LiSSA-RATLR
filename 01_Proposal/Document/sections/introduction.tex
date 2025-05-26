@@ -13,83 +13,22 @@
 \chapter{Introduction}
 \label{ch:Introduction}
 
-%% -------------------
-%% | Example content |
-%% -------------------
-
-This is the template for Bachelor's and Master's theses at SDQ.
-For more information on the formatting of theses at SDQ, please refer to
-\url{https://sdq.kastel.kit.edu/wiki/Ausarbeitungshinweise} or to your advisor.
-
-\section{Spacing and indentation}
-To separate parts of text in \LaTeX, please use two line breaks in your source code.
-They will then be set with correct indentation.
-Do \emph{not} use:
-\begin{itemize}
-  \itemsep0em
-  \item \texttt{\textbackslash\textbackslash}
-  \item \texttt{\textbackslash parskip}
-  \item \texttt{\textbackslash vskip}
-\end{itemize} 
-or other commands to manually insert spaces, since they break the layout of this template.
-
-\section{Example: Citation}
-\label{sec:Introduction:Citation}
-This template is based on \texttt{biblatex} and \texttt{biber}, which is preferred over the
-outdated Bib\TeX{} software.
-Please adjust your build environment if necessary (see
-\url{https://sdq.kastel.kit.edu/wiki/BibTeX-Literaturlisten#biblatex.2Fbiber})
-
-A citation: \cite{becker2008a} 
-
-\section{Example: Figures}
-\label{sec:Introduction:Figures}
-\begin{figure}
-\centering
-\includegraphics[width=4cm]{logos/sdqlogo}
-\caption{SDQ logo}
-\label{fig:sdqlogo}
-\end{figure}
-
-A reference: The SDQ logo is displayed in \autoref{fig:sdqlogo}. 
-(Use \code{\textbackslash autoref\{\}} for easy referencing.) 
-
-\section{Example: Tables}
-The \texttt{booktabs} package offers nicely typeset tables, as in \autoref{tab:atable}.
-
-Please use \texttt{\textbackslash small} as the font size for tables.
-
-\label{sec:Introduction:Tables}
-\begin{table}
-\centering\small
-\begin{tabular}{r l}
-\toprule
-abc & def\\
-ghi & jkl\\
-\midrule
-123 & 456\\
-789 & 0AB\\
-\bottomrule
-\end{tabular}
-\caption{A table}
-\label{tab:atable}
-\end{table}
-
-\section{Example: Formula}
-One of the nice things about the Linux Libertine font is that it comes with
-a math mode package.
-\begin{displaymath}
-f(x)=\Omega(g(x))\ (x\rightarrow\infty)\;\Leftrightarrow\;
-\limsup_{x \to \infty} \left|\frac{f(x)}{g(x)}\right|> 0
-\end{displaymath}
-
-%% --------------------
-%% | /Example content |
-%% --------------------
-
 Artificial intelligence is rapidly changing many fields of study.
-During software development, many artifacts are created, ranging from the actual project code through documentation to a multitude of formal and informal diagrams. The task of trace link recovery is to find instances of the same element across different artifacts. 
-My goal is to improve the rate at which trace links are recovered using prompt engineering. Prompt engineering is the process of refining a prompt for the specific use case. This is usually done in a non systemaic way. In this work I will explore a systematic iterative approach to prompt engineering. 
+During software development, many artifacts are created, ranging from the actual project code through documentation to a multitude of formal and informal diagrams. My goal is to improve the rate at which trace links are recovered using prompt engineering.
 
-In previous work by Fuchss et al. %%Todo QUote%%
-simple handwritten prompts were used to recover trace links between software documentation and architectural diagrams. 
+\section{Definition of Trace Link Recovery}
+Traceability is the ability for something to be traced. Meaning, there is evidence of some past occurrence. %Do I need to quote a dictionary here?
+The task of trace link recovery (TLR) in software engineering is to find instances of the same element across different artifacts and link them for further processing. These traceability links help with tracking relationships between for example: code, requirements, diagrams, documentation, \dots
+
+This becomes especially important when inconsistencies are introduced into the project's artifacts. 
+
+As shown by \citeauthor{wohlrab2019improving} \cite{wohlrab2019improving} inconsistency in wording and language is quite common during different stages of development. For example, naming conventions for architectural components may not be followed during implementation. They find the impact of these inconsistencies to be quite insignificant. However, for trace link recovery, this means that simple string comparisons by name are insufficient.
+
+
+
+\section{Definition of Automated Prompt Engineering}
+Prompt engineering is the process of refining a prompt for the specific use case. This is usually done in a non-systematic way. In this work, I will explore a systematic iterative approach to prompt engineering.
+
+\section{Previous Work in TLR}
+In previous work by \citewithauthor{fuchss2025lissa}
+simple handwritten prompts were used to recover trace links between software documentation and architectural diagrams. They have made their work available to the public by hosting a repository, accessible under the MIT license. 

@@ -182,7 +182,7 @@
 {An der KIT-Fakultät für Informatik}\\
 \theinstitute\\[2em]
 \begin{tabular}{l l}
-  \ifcurrentbaselanguage{English}{First examiner}{1. Prüfer/Prüferin}: & \thereviewerone\\
+  \ifcurrentbaselanguage{English}{First examiner}{1. Prüfer}: & \thereviewerone\\
   \ifcurrentbaselanguage{English}{Second examiner}{2. Prüfer/Prüferin}: & \thereviewertwo\\[.5em]
   \ifcurrentbaselanguage{English}{First advisor}{1. Betreuer/Betreuerin}: &  \theadvisorone\\
   % if there is no second advisor, do not output this line
@@ -277,3 +277,7 @@
     \let\theauthor\@author
     \let\thetitle\@title
 }
+
+%custom commands
+\newcommand{\citewithauthor}[1]{\citeauthor{#1} \cite{#1}}
+\newcommand{\directQuote}[3][]{\guillemotleft#2\guillemotright~\cite[#1]{#3}}
