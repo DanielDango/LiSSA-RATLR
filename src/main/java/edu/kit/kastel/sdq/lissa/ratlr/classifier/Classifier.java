@@ -2,12 +2,8 @@
 package edu.kit.kastel.sdq.lissa.ratlr.classifier;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,9 +11,10 @@ import org.slf4j.LoggerFactory;
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
 import edu.kit.kastel.sdq.lissa.ratlr.elementstore.ElementStore;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
+import edu.kit.kastel.sdq.lissa.ratlr.utils.Pair;
 
 public abstract class Classifier {
-    protected static final int DEFAULT_THREAD_COUNT = 100;
+    protected static final int DEFAULT_THREAD_COUNT = 20;
 
     static final String CONFIG_NAME_SEPARATOR = "_";
 
@@ -29,47 +26,81 @@ public abstract class Classifier {
     }
 
     public List<ClassificationResult> classify(ElementStore sourceStore, ElementStore targetStore) {
-        List<Future<List<ClassificationResult>>> futureResults = new ArrayList<>();
-        ExecutorService executor = Executors.newFixedThreadPool(threads);
+        if (threads <= 1) {
+            return sequentialClassify(sourceStore, targetStore);
+        }
+
+        // Parallel classification requires a list of tasks
+        List<Pair<Element, Element>> tasks = new ArrayList<>();
         for (var query : sourceStore.getAllElements(true)) {
             var targetCandidates = targetStore.findSimilar(query.second());
-            var futureResult = executor.submit(() -> copyOf().classify(query.first(), targetCandidates));
-            futureResults.add(futureResult);
-        }
-
-        logger.info("Waiting for classification to finish. Elements in queue: {}", futureResults.size());
-
-        try {
-            executor.shutdown();
-            boolean success = executor.awaitTermination(1, TimeUnit.DAYS);
-            if (!success) {
-                logger.error("Classification did not finish in time.");
+            for (Element target : targetCandidates) {
+                tasks.add(new Pair<>(query.first(), target));
             }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
         }
-
-        executor.close();
-
-        return futureResults.stream()
-                .map(this::extractResults)
-                .flatMap(Collection::stream)
-                .toList();
+        return parallelClassify(tasks);
     }
 
-    private List<ClassificationResult> extractResults(Future<List<ClassificationResult>> futureResult) {
-        try {
-            return futureResult.get();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new IllegalStateException("Classification was interrupted.", e);
-        } catch (Exception e) {
-            logger.error("Error while classifying elements.", e);
-            return new ArrayList<>();
+    protected final List<ClassificationResult> parallelClassify(List<Pair<Element, Element>> tasks) {
+        ConcurrentLinkedQueue<ClassificationResult> results = new ConcurrentLinkedQueue<>();
+        ConcurrentLinkedQueue<Pair<Element, Element>> taskQueue = new ConcurrentLinkedQueue<>(tasks);
+
+        Thread[] workers = new Thread[threads];
+        for (int i = 0; i < threads; i++) {
+            workers[i] = Thread.ofVirtual().start(new Runnable() {
+                private final Classifier copy = copyOf();
+
+                @Override
+                public void run() {
+                    while (!taskQueue.isEmpty()) {
+                        Pair<Element, Element> pair = taskQueue.poll();
+                        if (pair == null) {
+                            return;
+                        }
+                        ClassificationResult result = copy.classify(pair.first(), pair.second());
+                        logger.debug(
+                                "Classified (P) {} with {}: {}",
+                                pair.first().getIdentifier(),
+                                pair.second().getIdentifier(),
+                                result);
+                        if (result != null) results.add(result);
+                    }
+                }
+            });
         }
+
+        logger.info("Waiting for classification to finish. Tasks in queue: {}", taskQueue.size());
+
+        for (Thread worker : workers) {
+            try {
+                worker.join();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                logger.error("Worker thread interrupted.", e);
+            }
+        }
+
+        List<ClassificationResult> resultList = new ArrayList<>(results);
+        logger.info("Finished parallel classification with {} results.", resultList.size());
+        return resultList;
     }
 
-    protected abstract List<ClassificationResult> classify(Element source, List<Element> targets);
+    private List<ClassificationResult> sequentialClassify(ElementStore sourceStore, ElementStore targetStore) {
+        List<ClassificationResult> results = new ArrayList<>();
+        for (var query : sourceStore.getAllElements(true)) {
+            var targetCandidates = targetStore.findSimilar(query.second());
+            for (Element target : targetCandidates) {
+                ClassificationResult result = classify(query.first(), target);
+                logger.debug(
+                        "Classified {} with {}: {}", query.first().getIdentifier(), target.getIdentifier(), result);
+                results.add(result);
+            }
+        }
+        logger.info("Finished sequential classification with {} results.", results.size());
+        return results;
+    }
+
+    protected abstract ClassificationResult classify(Element source, Element target);
 
     protected abstract Classifier copyOf();
 

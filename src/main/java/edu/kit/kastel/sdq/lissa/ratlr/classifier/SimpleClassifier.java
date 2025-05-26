@@ -1,9 +1,6 @@
 /* Licensed under MIT 2025. */
 package edu.kit.kastel.sdq.lissa.ratlr.classifier;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import dev.langchain4j.model.chat.ChatModel;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.Cache;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheKey;
@@ -55,31 +52,26 @@ public class SimpleClassifier extends Classifier {
     }
 
     @Override
-    protected final List<ClassificationResult> classify(Element source, List<Element> targets) {
-        List<Element> relatedTargets = new ArrayList<>();
+    protected final ClassificationResult classify(Element source, Element target) {
+        String llmResponse = classifyIntern(source, target);
 
-        for (var target : targets) {
-            String llmResponse = classify(source, target);
-
-            String thinkEnd = "</think>";
-            if (llmResponse.startsWith("<think>") && llmResponse.contains(thinkEnd)) {
-                // Omit the thinking of models like deepseek-r1
-                llmResponse = llmResponse
-                        .substring(llmResponse.indexOf(thinkEnd) + thinkEnd.length())
-                        .strip();
-            }
-
-            boolean isRelated = llmResponse.toLowerCase().contains("yes");
-            if (isRelated) {
-                relatedTargets.add(target);
-            }
+        String thinkEnd = "</think>";
+        if (llmResponse.startsWith("<think>") && llmResponse.contains(thinkEnd)) {
+            // Omit the thinking of models like deepseek-r1
+            llmResponse = llmResponse
+                    .substring(llmResponse.indexOf(thinkEnd) + thinkEnd.length())
+                    .strip();
         }
-        return relatedTargets.stream()
-                .map(relatedTarget -> ClassificationResult.of(source, relatedTarget))
-                .toList();
+
+        boolean isRelated = llmResponse.toLowerCase().contains("yes");
+        if (isRelated) {
+            return ClassificationResult.of(source, target);
+        }
+
+        return null;
     }
 
-    private String classify(Element source, Element target) {
+    private String classifyIntern(Element source, Element target) {
         String request = template.replace("{source_type}", source.getType())
                 .replace("{source_content}", source.getContent())
                 .replace("{target_type}", target.getType())

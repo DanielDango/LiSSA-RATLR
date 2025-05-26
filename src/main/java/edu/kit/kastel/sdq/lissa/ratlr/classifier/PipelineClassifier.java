@@ -5,7 +5,9 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
+import edu.kit.kastel.sdq.lissa.ratlr.elementstore.ElementStore;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
+import edu.kit.kastel.sdq.lissa.ratlr.utils.Pair;
 
 public class PipelineClassifier extends Classifier {
     private final List<List<Classifier>> classifiers;
@@ -23,32 +25,39 @@ public class PipelineClassifier extends Classifier {
     }
 
     @Override
-    protected List<ClassificationResult> classify(Element source, List<Element> targets) {
-        List<Element> remainingTargets = new ArrayList<>(targets);
+    public List<ClassificationResult> classify(ElementStore sourceStore, ElementStore targetStore) {
 
-        int layerNum = 0;
-        for (List<Classifier> layer : classifiers) {
-            logger.info("Invoking layer {} with {} classifiers", layerNum, layer.size());
-            layerNum++;
+        List<ClassificationResult> results = new ArrayList<>();
+        for (var source : sourceStore.getAllElements(true)) {
 
-            List<Element> layerResults = calculateRemainingTargets(source, remainingTargets, layer);
-            logger.info(
-                    "Reduced targets for {} @ layer {} from {} to {}",
-                    source.getIdentifier(),
-                    layerNum,
-                    remainingTargets.size(),
-                    layerResults.size());
+            List<Element> remainingTargets = new ArrayList<>(targetStore.findSimilar(source.second()));
 
-            remainingTargets = layerResults;
-            if (remainingTargets.isEmpty()) {
-                logger.info("No remaining targets after layer {}, stopping classification.", layerNum);
-                break;
+            int layerNum = 0;
+            for (List<Classifier> layer : classifiers) {
+                logger.info("Invoking layer {} with {} classifiers", layerNum, layer.size());
+                layerNum++;
+
+                List<Element> layerResults = calculateRemainingTargets(source.first(), remainingTargets, layer);
+                logger.info(
+                        "Reduced targets for {} @ layer {} from {} to {}",
+                        source.first().getIdentifier(),
+                        layerNum,
+                        remainingTargets.size(),
+                        layerResults.size());
+
+                remainingTargets = layerResults;
+                if (remainingTargets.isEmpty()) {
+                    logger.info("No remaining targets after layer {}, stopping classification.", layerNum);
+                    break;
+                }
+            }
+
+            for (Element target : remainingTargets) {
+                ClassificationResult result = ClassificationResult.of(source.first(), target, 1.0);
+                results.add(result);
             }
         }
-
-        return remainingTargets.stream()
-                .map(it -> ClassificationResult.of(source, it))
-                .toList();
+        return results;
     }
 
     private List<Element> calculateRemainingTargets(
@@ -60,9 +69,24 @@ public class PipelineClassifier extends Classifier {
 
         for (Classifier classifier : classifiers) {
             if (targets.isEmpty()) break;
-            var classificationResults = classifier.classify(source, targets);
+            List<Element> classificationResults;
+            if (classifier.threads <= 1) {
+                classificationResults = targets.stream()
+                        .map(t -> classifier.classify(source, t))
+                        .filter(Objects::nonNull)
+                        .map(ClassificationResult::target)
+                        .toList();
+            } else {
+                List<Pair<Element, Element>> tasks = targets.stream()
+                        .map(target -> new Pair<>(source, target))
+                        .toList();
+                classificationResults = classifier.parallelClassify(tasks).stream()
+                        .filter(Objects::nonNull)
+                        .map(ClassificationResult::target)
+                        .toList();
+            }
             for (var result : classificationResults) {
-                counter.get(result.target()).incrementAndGet();
+                counter.get(result).incrementAndGet();
             }
         }
 
@@ -80,5 +104,11 @@ public class PipelineClassifier extends Classifier {
     @Override
     protected Classifier copyOf() {
         return new PipelineClassifier(classifiers, this.threads);
+    }
+
+    @Override
+    protected ClassificationResult classify(Element source, Element targets) {
+        // Not implemented, as this classifier does not classify single pairs directly.
+        throw new UnsupportedOperationException("PipelineClassifier does not support single pair classification.");
     }
 }

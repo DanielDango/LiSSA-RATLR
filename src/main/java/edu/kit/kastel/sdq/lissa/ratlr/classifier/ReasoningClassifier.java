@@ -60,20 +60,13 @@ public class ReasoningClassifier extends Classifier {
     }
 
     @Override
-    protected final List<ClassificationResult> classify(Element source, List<Element> targets) {
+    protected final ClassificationResult classify(Element source, Element target) {
         List<Element> relatedTargets = new ArrayList<>();
 
-        var targetsToConsider = targets;
+        var targetToConsider = target;
         if (useOriginalArtifacts) {
-            targetsToConsider = new ArrayList<>();
-            for (var target : targets) {
-                Element artifact = target;
-                while (artifact.getParent() != null) {
-                    artifact = artifact.getParent();
-                }
-                // Now we have the artifact
-                targetsToConsider.add(new Element(
-                        artifact.getIdentifier(), artifact.getType(), artifact.getContent(), 0, null, true));
+            while (targetToConsider.getParent() != null) {
+                targetToConsider = targetToConsider.getParent();
             }
         }
 
@@ -86,16 +79,12 @@ public class ReasoningClassifier extends Classifier {
         }
         */
 
-        for (var target : targetsToConsider) {
-            String llmResponse = classify(sourceToConsider, target);
-            boolean isRelated = isRelated(llmResponse);
-            if (isRelated) {
-                relatedTargets.add(target);
-            }
+        String llmResponse = classifyIntern(sourceToConsider, targetToConsider);
+        boolean isRelated = isRelated(llmResponse);
+        if (isRelated) {
+            return ClassificationResult.of(source, targetToConsider);
         }
-        return relatedTargets.stream()
-                .map(relatedTarget -> ClassificationResult.of(source, relatedTarget))
-                .toList();
+        return null;
     }
 
     private boolean isRelated(String llmResponse) {
@@ -110,7 +99,7 @@ public class ReasoningClassifier extends Classifier {
         return related;
     }
 
-    private String classify(Element source, Element target) {
+    private String classifyIntern(Element source, Element target) {
         List<ChatMessage> messages = new ArrayList<>();
         if (useSystemMessage)
             messages.add(new SystemMessage(
