@@ -39,7 +39,7 @@ public class Main {
         ElementStore sourceStore = new ElementStore(configuration.sourceStore(), false);
         ElementStore targetStore = new ElementStore(configuration.targetStore(), true);
 
-        Classifier classifier = Classifier.createClassifier(configuration.classifier());
+        Classifier classifier = configuration.createClassifier();
         ResultAggregator aggregator = ResultAggregator.createResultAggregator(configuration.resultAggregator());
 
         TraceLinkIdPostprocessor traceLinkIdPostProcessor =

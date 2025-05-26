@@ -81,4 +81,8 @@ public abstract class Classifier {
             default -> throw new IllegalStateException("Unexpected value: " + configuration.name());
         };
     }
+
+    public static Classifier createMultiStageClassifier(List<List<ModuleConfiguration>> configs) {
+        return new PipelineClassifier(configs);
+    }
 }

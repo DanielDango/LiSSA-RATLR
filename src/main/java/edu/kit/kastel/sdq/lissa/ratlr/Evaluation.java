@@ -59,7 +59,7 @@ public class Evaluation {
         sourceStore = new ElementStore(configuration.sourceStore(), false);
         targetStore = new ElementStore(configuration.targetStore(), true);
 
-        classifier = Classifier.createClassifier(configuration.classifier());
+        classifier = configuration.createClassifier();
         aggregator = ResultAggregator.createResultAggregator(configuration.resultAggregator());
 
         traceLinkIdPostProcessor =

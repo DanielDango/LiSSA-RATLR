@@ -2,6 +2,7 @@
 package edu.kit.kastel.sdq.lissa.ratlr.configuration;
 
 import java.io.UncheckedIOException;
+import java.util.List;
 import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -9,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import edu.kit.kastel.sdq.lissa.ratlr.classifier.Classifier;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.KeyGenerator;
 import io.soabase.recordbuilder.core.RecordBuilder;
 
@@ -24,6 +26,7 @@ public record Configuration(
         @JsonProperty("source_store") ModuleConfiguration sourceStore,
         @JsonProperty("target_store") ModuleConfiguration targetStore,
         @JsonProperty("classifier") ModuleConfiguration classifier,
+        @JsonProperty("classifiers") List<List<ModuleConfiguration>> classifiers,
         @JsonProperty("result_aggregator") ModuleConfiguration resultAggregator,
         @JsonProperty("tracelinkid_postprocessor") ModuleConfiguration traceLinkIdPostprocessor)
         implements ConfigurationBuilder.With {
@@ -36,7 +39,16 @@ public record Configuration(
         embeddingCreator.finalizeForSerialization();
         sourceStore.finalizeForSerialization();
         targetStore.finalizeForSerialization();
-        classifier.finalizeForSerialization();
+        if (classifier != null) {
+            classifier.finalizeForSerialization();
+        }
+        if (classifiers != null) {
+            for (var group : classifiers) {
+                for (var classifier : group) {
+                    classifier.finalizeForSerialization();
+                }
+            }
+        }
         resultAggregator.finalizeForSerialization();
         if (traceLinkIdPostprocessor != null) {
             traceLinkIdPostprocessor.finalizeForSerialization();
@@ -63,5 +75,15 @@ public record Configuration(
 
     public String getConfigurationIdentifierForFile(String prefix) {
         return Objects.requireNonNull(prefix) + "_" + KeyGenerator.generateKey(this.toString());
+    }
+
+    public Classifier createClassifier() {
+        if ((classifier == null) == (classifiers == null)) {
+            throw new IllegalStateException("Either 'classifier' or 'classifiers' must be set, but not both.");
+        }
+
+        return classifier != null
+                ? Classifier.createClassifier(classifier)
+                : Classifier.createMultiStageClassifier(classifiers);
     }
 }

@@ -18,6 +18,7 @@ public abstract class EmbeddingCreator {
             case "ollama" -> new OllamaEmbeddingCreator(configuration);
             case "openai" -> new OpenAiEmbeddingCreator(configuration);
             case "onnx" -> new OnnxEmbeddingCreator(configuration);
+            case "mock" -> new MockEmbeddingCreator();
             default -> throw new IllegalStateException("Unexpected value: " + configuration.name());
         };
     }
