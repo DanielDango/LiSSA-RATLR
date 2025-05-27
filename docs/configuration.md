@@ -1,23 +1,23 @@
 # Configuration Guide
 
 ## Overview
+
 LiSSA uses JSON configuration files to define the behavior of the traceability link recovery process. This guide provides detailed information about available configuration options.
 
 ## Finding Configuration Options
+
 Configuration options in LiSSA are defined in the code through several mechanisms:
 
 1. **Component Classes**: Each component (e.g., `ArtifactProvider`, `Preprocessor`, `Classifier`) has a corresponding class that defines its configuration options. For example:
    - [`TextArtifactProvider`](src/main/java/edu/kit/kastel/sdq/lissa/ratlr/artifactprovider/TextArtifactProvider.java) defines options for text-based artifact loading
    - [`CodeTreePreprocessor`](src/main/java/edu/kit/kastel/sdq/lissa/ratlr/preprocessor/CodeTreePreprocessor.java) defines options for code tree processing
    - [`OpenAiEmbeddingCreator`](src/main/java/edu/kit/kastel/sdq/lissa/ratlr/embeddingcreator/OpenAiEmbeddingCreator.java) defines options for OpenAI embedding generation
-
 2. **Configuration Classes**: The [`Configuration`](src/main/java/edu/kit/kastel/sdq/lissa/ratlr/configuration/Configuration.java) class serves as the central configuration container, defining the structure of the configuration file.
-
 3. **Example Configurations**: You can find example configurations in the `example-configs` directory, which demonstrate different configuration setups for various use cases.
-
 4. **Configuration Template**: The `config-template.json` file provides a template with all available configuration options and their default values.
 
 ## Basic Configuration
+
 ```json
 {
   "cache_dir": "./cache/path",  // Directory for caching results
@@ -29,6 +29,7 @@ Configuration options in LiSSA are defined in the code through several mechanism
 ```
 
 ## Artifact Providers
+
 ```json
 {
   "source_artifact_provider": {
@@ -43,6 +44,7 @@ Configuration options in LiSSA are defined in the code through several mechanism
 ```
 
 ## Preprocessors
+
 ```json
 {
   "source_preprocessor": {
@@ -60,6 +62,7 @@ Configuration options in LiSSA are defined in the code through several mechanism
 ```
 
 ## Embedding and Classification
+
 ```json
 {
   "embedding_creator": {
@@ -79,6 +82,7 @@ Configuration options in LiSSA are defined in the code through several mechanism
 ```
 
 ## Stores and Aggregation
+
 ```json
 {
   "source_store": {
@@ -101,4 +105,4 @@ Configuration options in LiSSA are defined in the code through several mechanism
 }
 ```
 
-For more information about using the CLI to run configurations, see the [CLI documentation](cli.md). 
+For more information about using the CLI to run configurations, see the [CLI documentation](cli.md).

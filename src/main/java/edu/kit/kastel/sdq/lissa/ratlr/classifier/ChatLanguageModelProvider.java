@@ -6,11 +6,12 @@ import java.time.Duration;
 import java.util.Base64;
 import java.util.Map;
 
+import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
+import edu.kit.kastel.sdq.lissa.ratlr.utils.Environment;
+
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.ollama.OllamaChatModel;
 import dev.langchain4j.model.openai.OpenAiChatModel;
-import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
-import edu.kit.kastel.sdq.lissa.ratlr.utils.Environment;
 
 public class ChatLanguageModelProvider {
     public static final String OPENAI = "openai";

@@ -3,13 +3,14 @@ package edu.kit.kastel.sdq.lissa.ratlr.classifier;
 
 import java.util.Optional;
 
-import dev.langchain4j.model.chat.ChatModel;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.Cache;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheKey;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheManager;
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.KeyGenerator;
+
+import dev.langchain4j.model.chat.ChatModel;
 
 public class SimpleClassifier extends Classifier {
 

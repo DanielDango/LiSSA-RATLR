@@ -1,6 +1,5 @@
 # LiSSA: A Framework for Generic Traceability Link Recovery
 
-
 <img src=".github/images/approach.svg" alt="Approach Overview" style="width: 100%;" /><br/>
 
 Welcome to the LiSSA project!
@@ -28,7 +27,6 @@ You can access the paper [here](https://ardoco.de/c/icse25).
   - [Documentation to code](https://ardoco.de/c/icse25)
   - [Architecture documentation to architecture models](https://ardoco.de/c/icse25)
   - [Requirements to requirements](https://ardoco.de/c/refsq25)
-
 - **Retrieval-Augmented Generation**: By combining LLMs with RAG, LiSSA enhances the accuracy and relevance of the recovered traceability links.
 
 ## Documentation
@@ -46,19 +44,20 @@ The documentation is organized into several sections:
 To get started with LiSSA, follow these steps:
 
 1. **Clone the Repository**:
+
    ```bash
    git clone https://github.com/ArDoCo/LiSSA-RATLR
    cd LiSSA-RATLR
    ```
-
 2. **Install Dependencies**:
    Ensure you have Java JDK 21 or later installed. Then, build the project using Maven:
+
    ```bash
    mvn clean package
    ```
-
 3. **Run LiSSA**:
    Execute the main application:
+
    ```bash
    java -jar target/ratlr-*-jar-with-dependencies.jar eval -c config.json
    ```
@@ -72,6 +71,7 @@ To get started with LiSSA, follow these steps:
 5. The results will be printed to the console and saved to a file in the current directory. The name is also printed to the console.
 
 ### Results of Evaluation / Execution
+
 The results will be stored as markdown files.
 A result file can look like below.
 It contains the configuration and the results of the evaluation.
