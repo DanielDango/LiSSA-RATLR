@@ -34,7 +34,7 @@ public class SimpleClassifier extends Classifier {
         this.provider = new ChatLanguageModelProvider(configuration);
         this.template = configuration.argumentAsString("template", DEFAULT_TEMPLATE);
         this.cache = CacheManager.getDefaultInstance()
-                .getCache(this.getClass().getSimpleName() + "_" + provider.modelName());
+                .getCache(this.getClass().getSimpleName() + "_" + provider.modelName() + "_" + provider.seed());
         this.llm = provider.createChatModel();
     }
 

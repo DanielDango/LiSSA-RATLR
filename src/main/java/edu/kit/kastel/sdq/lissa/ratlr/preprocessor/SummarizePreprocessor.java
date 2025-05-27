@@ -40,7 +40,7 @@ Highlight any parts of the code that could enable or partially implement steps i
         this.provider = new ChatLanguageModelProvider(moduleConfiguration);
         this.threads = ChatLanguageModelProvider.threads(moduleConfiguration);
         this.cache = CacheManager.getDefaultInstance()
-                .getCache(this.getClass().getSimpleName() + "_" + provider.modelName());
+                .getCache(this.getClass().getSimpleName() + "_" + provider.modelName() + "_" + provider.seed());
     }
 
     @Override
