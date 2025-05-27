@@ -61,8 +61,8 @@ public class ChatLanguageModelProvider {
         return seed;
     }
 
-    public static boolean supportsThreads(ModuleConfiguration configuration) {
-        return configuration.name().contains(OPENAI) || configuration.name().contains(BLABLADOR);
+    public static int threads(ModuleConfiguration configuration) {
+        return configuration.name().contains(OPENAI) || configuration.name().contains(BLABLADOR) ? 100 : 1;
     }
 
     private static OllamaChatModel createOllamaChatModel(String model, int seed) {
@@ -79,7 +79,9 @@ public class ChatLanguageModelProvider {
         if (user != null && password != null && !user.isEmpty() && !password.isEmpty()) {
             ollama.customHeaders(Map.of(
                     "Authorization",
-                    "Basic " + Base64.getEncoder().encodeToString((user + ":" + password).getBytes(StandardCharsets.UTF_8))));
+                    "Basic "
+                            + Base64.getEncoder()
+                                    .encodeToString((user + ":" + password).getBytes(StandardCharsets.UTF_8))));
         }
         return ollama.build();
     }
