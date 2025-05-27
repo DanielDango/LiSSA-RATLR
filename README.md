@@ -31,6 +31,16 @@ You can access the paper [here](https://ardoco.de/c/icse25).
 
 - **Retrieval-Augmented Generation**: By combining LLMs with RAG, LiSSA enhances the accuracy and relevance of the recovered traceability links.
 
+## Documentation
+
+The documentation is organized into several sections:
+
+- [Architecture](docs/architecture.md): Detailed information about the project's architecture and components
+- [Configuration](docs/configuration.md): Guide for configuring LiSSA
+- [CLI Usage](docs/cli.md): Information about using the command line interface
+- [Caching](docs/caching.md): Information about the caching system and Redis setup
+- [Development](docs/development.md): Development setup and contribution guidelines
+
 ## Getting Started
 
 To get started with LiSSA, follow these steps:
@@ -110,7 +120,7 @@ However, further research is needed to enhance its performance for broader appli
 
 ## Contributing
 
-We welcome contributions from the community! If you're interested in contributing to LiSSA, please read our [Code of Conduct](CODE_OF_CONDUCT.md) to get started.
+We welcome contributions from the community! If you're interested in contributing to LiSSA, please read our [Code of Conduct](CODE_OF_CONDUCT.md) and [Development Guide](docs/development.md) to get started.
 
 ## License
 
@@ -124,4 +134,4 @@ For more information about the project and related research, visit our [website]
 
 ---
 
-*Note: This README provides a brief overview of the LiSSA project. For comprehensive details, please refer to [Development.md](Development.md).*
+*Note: This README provides a brief overview of the LiSSA project. For comprehensive details, please refer to our [documentation](docs/).*
