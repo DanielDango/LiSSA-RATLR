@@ -72,9 +72,9 @@ public final class Statistics {
                 .append(configurationSummary)
                 .append("\n```\n\n");
         result.append("## Stats\n");
-        result.append("* # TraceLinks (GS): ").append(validTraceLinks.size()).append("\n");
-        result.append("* # Source Artifacts: ").append(sourceArtifacts).append("\n");
-        result.append("* # Target Artifacts: ").append(targetArtifacts).append("\n");
+        result.append("* #TraceLinks (GS): ").append(validTraceLinks.size()).append("\n");
+        result.append("* #Source Artifacts: ").append(sourceArtifacts).append("\n");
+        result.append("* #Target Artifacts: ").append(targetArtifacts).append("\n");
         result.append("## Results\n");
         result.append("* True Positives: ")
                 .append(classification.getTruePositives().size())
