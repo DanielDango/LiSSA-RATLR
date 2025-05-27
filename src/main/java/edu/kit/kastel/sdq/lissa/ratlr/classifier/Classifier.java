@@ -14,7 +14,7 @@ import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.Pair;
 
 public abstract class Classifier {
-    protected static final int DEFAULT_THREAD_COUNT = 20;
+    protected static final int DEFAULT_THREAD_COUNT = 100;
 
     static final String CONFIG_NAME_SEPARATOR = "_";
 
