@@ -61,8 +61,6 @@ public class ReasoningClassifier extends Classifier {
 
     @Override
     protected final ClassificationResult classify(Element source, Element target) {
-        List<Element> relatedTargets = new ArrayList<>();
-
         var targetToConsider = target;
         if (useOriginalArtifacts) {
             while (targetToConsider.getParent() != null) {
