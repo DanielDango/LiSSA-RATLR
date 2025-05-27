@@ -9,10 +9,14 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import dev.langchain4j.model.chat.ChatModel;
+import edu.kit.kastel.sdq.lissa.ratlr.cache.Cache;
+import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheKey;
+import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheManager;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.ChatLanguageModelProvider;
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Artifact;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
+import edu.kit.kastel.sdq.lissa.ratlr.utils.KeyGenerator;
 
 public class SummarizePreprocessor extends Preprocessor {
 
@@ -27,13 +31,16 @@ Highlight any parts of the code that could enable or partially implement steps i
 """;
 
     private final String template;
-    private final ChatLanguageModelProvider llm;
+    private final ChatLanguageModelProvider provider;
     private final int threads;
+    private final Cache cache;
 
     public SummarizePreprocessor(ModuleConfiguration moduleConfiguration) {
         this.template = moduleConfiguration.argumentAsString("template", DEFAULT_TEMPLATE);
-        this.llm = new ChatLanguageModelProvider(moduleConfiguration);
-        threads = ChatLanguageModelProvider.threads(moduleConfiguration);
+        this.provider = new ChatLanguageModelProvider(moduleConfiguration);
+        this.threads = ChatLanguageModelProvider.threads(moduleConfiguration);
+        this.cache = CacheManager.getDefaultInstance()
+                .getCache(this.getClass().getSimpleName() + "_" + provider.modelName());
     }
 
     @Override
@@ -50,12 +57,23 @@ Highlight any parts of the code that could enable or partially implement steps i
         ExecutorService executorService =
                 threads > 1 ? Executors.newFixedThreadPool(threads) : Executors.newSingleThreadExecutor();
 
-        var llmInstance = llm.createChatModel();
+        var llmInstance = provider.createChatModel();
         List<Callable<String>> tasks = new ArrayList<>();
         for (String request : requests) {
             tasks.add(() -> {
-                ChatModel chatModel = threads > 1 ? llm.createChatModel() : llmInstance;
-                return chatModel.chat(request);
+                String key = KeyGenerator.generateKey(request);
+                CacheKey cacheKey =
+                        new CacheKey(provider.modelName(), provider.seed(), CacheKey.Mode.CHAT, request, key);
+
+                String cachedResponse = cache.get(cacheKey, String.class);
+                if (cachedResponse != null) {
+                    return cachedResponse;
+                }
+
+                ChatModel chatModel = threads > 1 ? provider.createChatModel() : llmInstance;
+                String response = chatModel.chat(request);
+                cache.put(cacheKey, response);
+                return response;
             });
         }
 
