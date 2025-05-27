@@ -3,6 +3,7 @@ package edu.kit.kastel.sdq.lissa.ratlr.classifier;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.*;
 
 import org.slf4j.Logger;
@@ -24,17 +25,16 @@ public abstract class Classifier {
     }
 
     public List<ClassificationResult> classify(ElementStore sourceStore, ElementStore targetStore) {
-        if (threads <= 1) {
-            return sequentialClassify(sourceStore, targetStore);
-        }
-
-        // Parallel classification requires a list of tasks
         List<Pair<Element, Element>> tasks = new ArrayList<>();
         for (var query : sourceStore.getAllElements(true)) {
             var targetCandidates = targetStore.findSimilar(query.second());
             for (Element target : targetCandidates) {
                 tasks.add(new Pair<>(query.first(), target));
             }
+        }
+
+        if (threads <= 1) {
+            return sequentialClassify(tasks);
         }
         return parallelClassify(tasks);
     }
@@ -55,13 +55,13 @@ public abstract class Classifier {
                         if (pair == null) {
                             return;
                         }
-                        ClassificationResult result = copy.classify(pair.first(), pair.second());
+                        var result = copy.classify(pair.first(), pair.second());
                         logger.debug(
                                 "Classified (P) {} with {}: {}",
                                 pair.first().getIdentifier(),
                                 pair.second().getIdentifier(),
                                 result);
-                        if (result != null) results.add(result);
+                        result.ifPresent(results::add);
                     }
                 }
             });
@@ -83,22 +83,29 @@ public abstract class Classifier {
         return resultList;
     }
 
-    private List<ClassificationResult> sequentialClassify(ElementStore sourceStore, ElementStore targetStore) {
+    private List<ClassificationResult> sequentialClassify(List<Pair<Element, Element>> tasks) {
         List<ClassificationResult> results = new ArrayList<>();
-        for (var query : sourceStore.getAllElements(true)) {
-            var targetCandidates = targetStore.findSimilar(query.second());
-            for (Element target : targetCandidates) {
-                ClassificationResult result = classify(query.first(), target);
-                logger.debug(
-                        "Classified {} with {}: {}", query.first().getIdentifier(), target.getIdentifier(), result);
-                results.add(result);
-            }
+        for (var task : tasks) {
+            var result = classify(task.first(), task.second());
+            logger.debug(
+                    "Classified {} with {}: {}",
+                    task.first().getIdentifier(),
+                    task.second().getIdentifier(),
+                    result);
+            result.ifPresent(results::add);
         }
         logger.info("Finished sequential classification with {} results.", results.size());
         return results;
     }
 
-    protected abstract ClassificationResult classify(Element source, Element target);
+    /**
+     * Classifies a pair of elements.
+     *
+     * @param source the source element
+     * @param target the target element
+     * @return a classification result, empty if classified as unrelated/no trace link
+     */
+    protected abstract Optional<ClassificationResult> classify(Element source, Element target);
 
     protected abstract Classifier copyOf();
 

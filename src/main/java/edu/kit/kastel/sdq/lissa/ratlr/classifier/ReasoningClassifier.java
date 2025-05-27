@@ -3,6 +3,7 @@ package edu.kit.kastel.sdq.lissa.ratlr.classifier;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -60,7 +61,7 @@ public class ReasoningClassifier extends Classifier {
     }
 
     @Override
-    protected final ClassificationResult classify(Element source, Element target) {
+    protected final Optional<ClassificationResult> classify(Element source, Element target) {
         var targetToConsider = target;
         if (useOriginalArtifacts) {
             while (targetToConsider.getParent() != null) {
@@ -80,9 +81,9 @@ public class ReasoningClassifier extends Classifier {
         String llmResponse = classifyIntern(sourceToConsider, targetToConsider);
         boolean isRelated = isRelated(llmResponse);
         if (isRelated) {
-            return ClassificationResult.of(source, targetToConsider);
+            return Optional.of(ClassificationResult.of(source, targetToConsider));
         }
-        return null;
+        return Optional.empty();
     }
 
     private boolean isRelated(String llmResponse) {

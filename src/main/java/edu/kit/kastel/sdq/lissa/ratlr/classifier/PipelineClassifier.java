@@ -75,7 +75,8 @@ public class PipelineClassifier extends Classifier {
             if (classifier.threads <= 1) {
                 classificationResults = tasks.stream()
                         .map(e -> classifier.classify(e.first(), e.second()))
-                        .filter(Objects::nonNull)
+                        .filter(Optional::isPresent)
+                        .map(Optional::get)
                         .toList();
             } else {
                 classificationResults = classifier.parallelClassify(tasks).stream()
@@ -104,7 +105,7 @@ public class PipelineClassifier extends Classifier {
     }
 
     @Override
-    protected ClassificationResult classify(Element source, Element targets) {
+    protected Optional<ClassificationResult> classify(Element source, Element targets) {
         // Not implemented, as this classifier does not classify single pairs directly.
         throw new UnsupportedOperationException("PipelineClassifier does not support single pair classification.");
     }

@@ -1,6 +1,8 @@
 /* Licensed under MIT 2025. */
 package edu.kit.kastel.sdq.lissa.ratlr.classifier;
 
+import java.util.Optional;
+
 import dev.langchain4j.model.chat.ChatModel;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.Cache;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheKey;
@@ -52,7 +54,7 @@ public class SimpleClassifier extends Classifier {
     }
 
     @Override
-    protected final ClassificationResult classify(Element source, Element target) {
+    protected final Optional<ClassificationResult> classify(Element source, Element target) {
         String llmResponse = classifyIntern(source, target);
 
         String thinkEnd = "</think>";
@@ -65,10 +67,10 @@ public class SimpleClassifier extends Classifier {
 
         boolean isRelated = llmResponse.toLowerCase().contains("yes");
         if (isRelated) {
-            return ClassificationResult.of(source, target);
+            return Optional.of(ClassificationResult.of(source, target));
         }
 
-        return null;
+        return Optional.empty();
     }
 
     private String classifyIntern(Element source, Element target) {

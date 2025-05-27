@@ -1,6 +1,8 @@
 /* Licensed under MIT 2025. */
 package edu.kit.kastel.sdq.lissa.ratlr.classifier;
 
+import java.util.Optional;
+
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 
 public class MockClassifier extends Classifier {
@@ -9,8 +11,8 @@ public class MockClassifier extends Classifier {
     }
 
     @Override
-    protected ClassificationResult classify(Element source, Element target) {
-        return ClassificationResult.of(source, target, 1.0);
+    protected Optional<ClassificationResult> classify(Element source, Element target) {
+        return Optional.of(ClassificationResult.of(source, target, 1.0));
     }
 
     @Override
