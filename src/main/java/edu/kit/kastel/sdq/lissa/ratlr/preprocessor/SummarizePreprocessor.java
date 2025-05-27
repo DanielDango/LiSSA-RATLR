@@ -83,7 +83,13 @@ Highlight any parts of the code that could enable or partially implement steps i
             for (int i = 0; i < artifacts.size(); i++) {
                 Artifact artifact = artifacts.get(i);
                 String summary = summaries.get(i).get();
-                Element element = new Element(artifact.getIdentifier(), artifact.getType(), summary, 0, null, true);
+                Element element = new Element(
+                        artifact.getIdentifier(),
+                        "Summary of '%s'".formatted(artifact.getType()),
+                        summary,
+                        0,
+                        null,
+                        true);
                 elements.add(element);
             }
         } catch (InterruptedException e) {
