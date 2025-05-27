@@ -29,14 +29,7 @@ public class PipelineClassifier extends Classifier {
 
         List<ClassificationResult> results = new ArrayList<>();
 
-        List<Pair<Element, Element>> tasks = new ArrayList<>();
-
-        for (var source : sourceStore.getAllElements(true)) {
-            var targetCandidates = targetStore.findSimilar(source.second());
-            for (Element target : targetCandidates) {
-                tasks.add(new Pair<>(source.first(), target));
-            }
-        }
+        List<Pair<Element, Element>> tasks = createClassificationTasks(sourceStore, targetStore);
 
         int layerNum = 0;
         for (List<Classifier> layer : classifiers) {
