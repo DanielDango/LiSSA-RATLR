@@ -68,6 +68,8 @@ public final class Statistics {
         StringBuilder result = new StringBuilder();
         result.append("## Configuration (")
                 .append(new SimpleDateFormat("yyyy-MM-dd_HH-mmZZZ").format(new Date()))
+                .append(" -- ")
+                .append(configurationIdentifier)
                 .append(")\n```json\n")
                 .append(configurationSummary)
                 .append("\n```\n\n");
