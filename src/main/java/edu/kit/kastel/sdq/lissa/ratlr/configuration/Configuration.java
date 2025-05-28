@@ -68,11 +68,18 @@ public record Configuration(
 
     @Override
     public String toString() {
-        return "Configuration{" + "sourceArtifactProvider=" + sourceArtifactProvider + ", targetArtifactProvider="
-                + targetArtifactProvider + ", sourcePreprocessor=" + sourcePreprocessor + ", targetPreprocessor="
-                + targetPreprocessor + ", embeddingCreator=" + embeddingCreator + ", sourceStore=" + sourceStore
-                + ", targetStore=" + targetStore + ", classifier=" + classifier + ", resultAggregator="
-                + resultAggregator + ", traceLinkIdPostprocessor=" + traceLinkIdPostprocessor + '}';
+        return "Configuration{" + "sourceArtifactProvider="
+                + sourceArtifactProvider + ", targetArtifactProvider="
+                + targetArtifactProvider + ", sourcePreprocessor="
+                + sourcePreprocessor + ", targetPreprocessor="
+                + targetPreprocessor + ", embeddingCreator="
+                + embeddingCreator + ", sourceStore="
+                + sourceStore + ", targetStore="
+                + targetStore + ", classifier="
+                + classifier + ", classifiers="
+                + classifiers + ", resultAggregator="
+                + resultAggregator + ", traceLinkIdPostprocessor="
+                + traceLinkIdPostprocessor + '}';
     }
 
     public String getConfigurationIdentifierForFile(String prefix) {
