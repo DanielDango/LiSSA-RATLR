@@ -63,6 +63,12 @@ Configuration options in LiSSA are defined in the code through several mechanism
 
 ## Embedding and Classification
 
+This section describes how to configure the embedding creation and classification steps. You must configure either a single `classifier` or a list of `classifiers` for multi-stage pipelines.
+
+### Single Classifier
+
+Use the `classifier` field to configure a single classifier.
+
 ```json
 {
   "embedding_creator": {
@@ -78,6 +84,50 @@ Configuration options in LiSSA are defined in the code through several mechanism
       ...  // Other classifier-specific arguments
     }
   }
+}
+```
+
+### Multi-Stage Classifiers
+
+Use the `classifiers` field to define a pipeline of classification stages. This field takes a list of lists of classifier configurations.
+
+Each inner list represents a stage in the pipeline. Classifiers within the same stage are executed in parallel, and their results are aggregated using majority voting. The results of one stage are passed as input to the next stage.
+
+```json
+{
+  "embedding_creator": {
+    "name": "openai",
+    "args": {
+      "model": "text-embedding-3-large"
+    }
+  },
+  "classifiers": [
+    // Stage 1
+    [
+      {
+        "name": "simple_openai",
+        "args": {
+          "model": "gpt-4o-mini-2024-07-18"
+        }
+      },
+      {
+        "name": "reasoning_openai",
+        "args": {
+          "model": "gpt-4o-mini-2024-07-18"
+        }
+      }
+    ],
+    // Stage 2
+    [
+      {
+        "name": "reasoning_openai",
+        "args": {
+          "model": "gpt-4o-2024-05-13",
+          // Additional arguments for the second stage
+        }
+      }
+    ]
+  ]
 }
 ```
 
