@@ -19,25 +19,23 @@ import edu.kit.kastel.sdq.lissa.ratlr.utils.KeyGenerator;
 
 import dev.langchain4j.model.chat.ChatModel;
 
+/**
+ * Preprocessor that summarizes artifacts using a language model.
+ * It takes a template for the summary and processes each artifact to generate a summary.
+ * The available keys in the template are:
+ * <ul>
+ *     <li>{type} - The type of the artifact (e.g., "source code", "requirement")</li>
+ *     <li>{content} - The content of the artifact</li>
+ * </ul>
+ */
 public class SummarizePreprocessor extends Preprocessor {
-
-    private static final String DEFAULT_TEMPLATE =
-            """
-Describe how the following {type} supports functionality that may be relevant to a use case.\s
-Focus on how it manages data, handles user inputs or system events, enforces validation or business rules, and interacts with other components.\s
-Highlight any parts of the code that could enable or partially implement steps in a user or system interaction flow, such as displaying information, processing changes, or handling errors.
-
-{type}
-{content}
-""";
-
     private final String template;
     private final ChatLanguageModelProvider provider;
     private final int threads;
     private final Cache cache;
 
     public SummarizePreprocessor(ModuleConfiguration moduleConfiguration) {
-        this.template = moduleConfiguration.argumentAsString("template", DEFAULT_TEMPLATE);
+        this.template = moduleConfiguration.argumentAsString("template");
         this.provider = new ChatLanguageModelProvider(moduleConfiguration);
         this.threads = ChatLanguageModelProvider.threads(moduleConfiguration);
         this.cache = CacheManager.getDefaultInstance()
