@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import edu.kit.kastel.sdq.lissa.ratlr.artifactprovider.ArtifactProvider;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheManager;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.Classifier;
@@ -59,7 +60,7 @@ public class Evaluation {
         sourceStore = new ElementStore(configuration.sourceStore(), false);
         targetStore = new ElementStore(configuration.targetStore(), true);
 
-        classifier = Classifier.createClassifier(configuration.classifier());
+        classifier = configuration.createClassifier();
         aggregator = ResultAggregator.createResultAggregator(configuration.resultAggregator());
 
         traceLinkIdPostProcessor =

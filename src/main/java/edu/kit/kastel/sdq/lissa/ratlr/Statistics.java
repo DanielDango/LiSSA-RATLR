@@ -6,10 +6,8 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.jetbrains.annotations.NotNull;
@@ -68,13 +66,17 @@ public final class Statistics {
         // Store information to one file (config and results)
         var resultFile = new File("results-" + configurationIdentifier + ".md");
         StringBuilder result = new StringBuilder();
-        result.append("## Configuration\n```json\n")
+        result.append("## Configuration (")
+                .append(new SimpleDateFormat("yyyy-MM-dd_HH-mmZZZ").format(new Date()))
+                .append(" -- ")
+                .append(configurationIdentifier)
+                .append(")\n```json\n")
                 .append(configurationSummary)
                 .append("\n```\n\n");
         result.append("## Stats\n");
-        result.append("* # TraceLinks (GS): ").append(validTraceLinks.size()).append("\n");
-        result.append("* # Source Artifacts: ").append(sourceArtifacts).append("\n");
-        result.append("* # Target Artifacts: ").append(targetArtifacts).append("\n");
+        result.append("* #TraceLinks (GS): ").append(validTraceLinks.size()).append("\n");
+        result.append("* #Source Artifacts: ").append(sourceArtifacts).append("\n");
+        result.append("* #Target Artifacts: ").append(targetArtifacts).append("\n");
         result.append("## Results\n");
         result.append("* True Positives: ")
                 .append(classification.getTruePositives().size())

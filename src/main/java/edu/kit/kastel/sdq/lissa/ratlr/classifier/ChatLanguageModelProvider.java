@@ -6,11 +6,12 @@ import java.time.Duration;
 import java.util.Base64;
 import java.util.Map;
 
+import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
+import edu.kit.kastel.sdq.lissa.ratlr.utils.Environment;
+
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.ollama.OllamaChatModel;
 import dev.langchain4j.model.openai.OpenAiChatModel;
-import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
-import edu.kit.kastel.sdq.lissa.ratlr.utils.Environment;
 
 public class ChatLanguageModelProvider {
     public static final String OPENAI = "openai";
@@ -61,8 +62,8 @@ public class ChatLanguageModelProvider {
         return seed;
     }
 
-    public static boolean supportsThreads(ModuleConfiguration configuration) {
-        return configuration.name().contains(OPENAI) || configuration.name().contains(BLABLADOR);
+    public static int threads(ModuleConfiguration configuration) {
+        return configuration.name().contains(OPENAI) || configuration.name().contains(BLABLADOR) ? 100 : 1;
     }
 
     private static OllamaChatModel createOllamaChatModel(String model, int seed) {
@@ -79,7 +80,9 @@ public class ChatLanguageModelProvider {
         if (user != null && password != null && !user.isEmpty() && !password.isEmpty()) {
             ollama.customHeaders(Map.of(
                     "Authorization",
-                    "Basic " + Base64.getEncoder().encodeToString((user + ":" + password).getBytes(StandardCharsets.UTF_8))));
+                    "Basic "
+                            + Base64.getEncoder()
+                                    .encodeToString((user + ":" + password).getBytes(StandardCharsets.UTF_8))));
         }
         return ollama.build();
     }

@@ -3,20 +3,22 @@ package edu.kit.kastel.sdq.lissa.ratlr.classifier;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import dev.langchain4j.data.message.ChatMessage;
-import dev.langchain4j.data.message.SystemMessage;
-import dev.langchain4j.data.message.UserMessage;
-import dev.langchain4j.model.chat.ChatModel;
-import dev.langchain4j.model.chat.response.ChatResponse;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.Cache;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheKey;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheManager;
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.KeyGenerator;
+
+import dev.langchain4j.data.message.ChatMessage;
+import dev.langchain4j.data.message.SystemMessage;
+import dev.langchain4j.data.message.UserMessage;
+import dev.langchain4j.model.chat.ChatModel;
+import dev.langchain4j.model.chat.response.ChatResponse;
 
 public class ReasoningClassifier extends Classifier {
     private final Cache cache;
@@ -28,10 +30,10 @@ public class ReasoningClassifier extends Classifier {
     private final boolean useSystemMessage;
 
     public ReasoningClassifier(ModuleConfiguration configuration) {
-        super(ChatLanguageModelProvider.supportsThreads(configuration) ? DEFAULT_THREAD_COUNT : 1);
+        super(ChatLanguageModelProvider.threads(configuration));
         this.provider = new ChatLanguageModelProvider(configuration);
         this.cache = CacheManager.getDefaultInstance()
-                .getCache(this.getClass().getSimpleName() + "_" + provider.modelName());
+                .getCache(this.getClass().getSimpleName() + "_" + provider.modelName() + "_" + provider.seed());
         this.prompt = configuration.argumentAsStringByEnumIndex("prompt", 0, Prompt.values(), it -> it.promptTemplate);
         this.useOriginalArtifacts = configuration.argumentAsBoolean("use_original_artifacts", false);
         this.useSystemMessage = configuration.argumentAsBoolean("use_system_message", true);
@@ -60,20 +62,11 @@ public class ReasoningClassifier extends Classifier {
     }
 
     @Override
-    protected final List<ClassificationResult> classify(Element source, List<Element> targets) {
-        List<Element> relatedTargets = new ArrayList<>();
-
-        var targetsToConsider = targets;
+    protected final Optional<ClassificationResult> classify(Element source, Element target) {
+        var targetToConsider = target;
         if (useOriginalArtifacts) {
-            targetsToConsider = new ArrayList<>();
-            for (var target : targets) {
-                Element artifact = target;
-                while (artifact.getParent() != null) {
-                    artifact = artifact.getParent();
-                }
-                // Now we have the artifact
-                targetsToConsider.add(new Element(
-                        artifact.getIdentifier(), artifact.getType(), artifact.getContent(), 0, null, true));
+            while (targetToConsider.getParent() != null) {
+                targetToConsider = targetToConsider.getParent();
             }
         }
 
@@ -86,16 +79,12 @@ public class ReasoningClassifier extends Classifier {
         }
         */
 
-        for (var target : targetsToConsider) {
-            String llmResponse = classify(sourceToConsider, target);
-            boolean isRelated = isRelated(llmResponse);
-            if (isRelated) {
-                relatedTargets.add(target);
-            }
+        String llmResponse = classifyIntern(sourceToConsider, targetToConsider);
+        boolean isRelated = isRelated(llmResponse);
+        if (isRelated) {
+            return Optional.of(ClassificationResult.of(source, targetToConsider));
         }
-        return relatedTargets.stream()
-                .map(relatedTarget -> ClassificationResult.of(source, relatedTarget))
-                .toList();
+        return Optional.empty();
     }
 
     private boolean isRelated(String llmResponse) {
@@ -110,7 +99,7 @@ public class ReasoningClassifier extends Classifier {
         return related;
     }
 
-    private String classify(Element source, Element target) {
+    private String classifyIntern(Element source, Element target) {
         List<ChatMessage> messages = new ArrayList<>();
         if (useSystemMessage)
             messages.add(new SystemMessage(

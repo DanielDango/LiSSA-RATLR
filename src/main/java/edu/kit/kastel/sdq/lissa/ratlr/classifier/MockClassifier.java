@@ -1,7 +1,7 @@
 /* Licensed under MIT 2025. */
 package edu.kit.kastel.sdq.lissa.ratlr.classifier;
 
-import java.util.List;
+import java.util.Optional;
 
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 
@@ -11,10 +11,8 @@ public class MockClassifier extends Classifier {
     }
 
     @Override
-    protected List<ClassificationResult> classify(Element source, List<Element> targets) {
-        return targets.stream()
-                .map(target -> ClassificationResult.of(source, target))
-                .toList();
+    protected Optional<ClassificationResult> classify(Element source, Element target) {
+        return Optional.of(ClassificationResult.of(source, target, 1.0));
     }
 
     @Override

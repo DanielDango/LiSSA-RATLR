@@ -157,6 +157,15 @@
             </licenseHeader>
             <removeUnusedImports />
           </java>
+          <markdown>
+            <includes>
+              <include>README.md</include>
+              <include>docs/**/*.md</include>
+            </includes>
+            <flexmark>
+              <version>0.64.8</version>
+            </flexmark>
+          </markdown>
           <pom>
             <sortPom>
               <encoding>UTF-8</encoding>

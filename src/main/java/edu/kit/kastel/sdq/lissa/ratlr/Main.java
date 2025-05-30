@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import edu.kit.kastel.sdq.lissa.ratlr.artifactprovider.ArtifactProvider;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheManager;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.Classifier;
@@ -39,7 +40,7 @@ public class Main {
         ElementStore sourceStore = new ElementStore(configuration.sourceStore(), false);
         ElementStore targetStore = new ElementStore(configuration.targetStore(), true);
 
-        Classifier classifier = Classifier.createClassifier(configuration.classifier());
+        Classifier classifier = configuration.createClassifier();
         ResultAggregator aggregator = ResultAggregator.createResultAggregator(configuration.resultAggregator());
 
         TraceLinkIdPostprocessor traceLinkIdPostProcessor =
