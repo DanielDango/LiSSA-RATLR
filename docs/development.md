@@ -39,5 +39,5 @@ Please ensure your code follows the project's coding standards and includes appr
 
 - [Project Website](https://ardoco.de/)
 - [Paper](https://ardoco.de/c/icse25)
-- [Code of Conduct](CODE_OF_CONDUCT.md)
+- [Code of Conduct](../CODE_OF_CONDUCT.md)
 

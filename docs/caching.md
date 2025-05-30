@@ -5,19 +5,19 @@
 LiSSA implements a sophisticated caching system to improve performance and ensure reproducibility of results. The caching system consists of the following components:
 
 1. **Cache Interface** (`cache` package)
-   - [`Cache`](src/main/java/edu/kit/kastel/sdq/lissa/ratlr/cache/Cache.java): Core interface defining cache operations
-   - [`CacheKey`](src/main/java/edu/kit/kastel/sdq/lissa/ratlr/cache/CacheKey.java): Represents a unique key for cached items, including model name, seed, mode (EMBEDDING/CHAT), and content
+   - [`Cache`](../src/main/java/edu/kit/kastel/sdq/lissa/ratlr/cache/Cache.java): Core interface defining cache operations
+   - [`CacheKey`](../src/main/java/edu/kit/kastel/sdq/lissa/ratlr/cache/CacheKey.java): Represents a unique key for cached items, including model name, seed, mode (EMBEDDING/CHAT), and content
 2. **Cache Implementations**
-   - [`LocalCache`](src/main/java/edu/kit/kastel/sdq/lissa/ratlr/cache/LocalCache.java): File-based cache implementation that stores data in JSON format
+   - [`LocalCache`](../src/main/java/edu/kit/kastel/sdq/lissa/ratlr/cache/LocalCache.java): File-based cache implementation that stores data in JSON format
      - Implements dirty tracking to optimize writes
      - Automatically saves changes on shutdown
      - Supports atomic writes using temporary files
-   - [`RedisCache`](src/main/java/edu/kit/kastel/sdq/lissa/ratlr/cache/RedisCache.java): Redis-based cache implementation with fallback to local cache
+   - [`RedisCache`](../src/main/java/edu/kit/kastel/sdq/lissa/ratlr/cache/RedisCache.java): Redis-based cache implementation with fallback to local cache
      - Uses Redis for high-performance caching
      - Falls back to local cache if Redis is unavailable
      - Supports both string and object serialization
 3. **Cache Management**
-   - [`CacheManager`](src/main/java/edu/kit/kastel/sdq/lissa/ratlr/cache/CacheManager.java): Central manager for cache instances
+   - [`CacheManager`](../src/main/java/edu/kit/kastel/sdq/lissa/ratlr/cache/CacheManager.java): Central manager for cache instances
      - Manages cache directory configuration
      - Provides singleton access to cache instances
      - Handles cache creation and retrieval
