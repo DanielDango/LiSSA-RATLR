@@ -9,7 +9,9 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import edu.kit.kastel.sdq.lissa.ratlr.utils.Environment;
+
 import redis.clients.jedis.UnifiedJedis;
 
 class RedisCache implements Cache {
@@ -25,6 +27,13 @@ class RedisCache implements Cache {
         createRedisConnection();
         if (jedis == null && this.localCache == null) {
             throw new IllegalArgumentException("Could not create cache");
+        }
+    }
+
+    @Override
+    public void flush() {
+        if (localCache != null) {
+            localCache.write();
         }
     }
 

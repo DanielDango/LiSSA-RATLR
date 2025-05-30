@@ -7,4 +7,6 @@ public interface Cache {
     void put(CacheKey key, String value);
 
     <T> void put(CacheKey key, T value);
+
+    void flush();
 }

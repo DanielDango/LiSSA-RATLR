@@ -77,4 +77,10 @@ public final class CacheManager {
         }
         return getCache(path.getFileName().toString(), false);
     }
+
+    public void flush() {
+        for (Cache cache : caches.values()) {
+            cache.flush();
+        }
+    }
 }

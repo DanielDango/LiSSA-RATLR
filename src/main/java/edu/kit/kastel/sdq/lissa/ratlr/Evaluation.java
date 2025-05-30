@@ -104,6 +104,8 @@ public class Evaluation {
                 traceLinks, configFile.toFile(), configuration, sourceArtifacts.size(), targetArtifacts.size());
         Statistics.saveTraceLinks(traceLinks, configFile.toFile(), configuration);
 
+        CacheManager.getDefaultInstance().flush();
+
         return traceLinks;
     }
 

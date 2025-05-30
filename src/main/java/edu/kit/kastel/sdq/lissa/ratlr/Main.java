@@ -76,5 +76,7 @@ public class Main {
         Statistics.generateStatistics(
                 traceLinks, configFile, configuration, sourceArtifacts.size(), targetArtifacts.size());
         Statistics.saveTraceLinks(traceLinks, configFile, configuration);
+
+        CacheManager.getDefaultInstance().flush();
     }
 }

@@ -43,19 +43,16 @@ class LocalCache {
                     cache = mapper.readValue(cacheFile, new TypeReference<>() {});
                 }
             } catch (IOException e) {
-
                 throw new IllegalArgumentException("Could not read cache file (" + cacheFile.getName() + ")", e);
             }
         }
-
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            if (dirty > 0) {
-                write();
-            }
-        }));
     }
 
     public synchronized void write() {
+        if (dirty == 0) {
+            return;
+        }
+
         try {
             File tempFile = new File(cacheFile.getAbsolutePath() + ".tmp.json");
             mapper.writeValue(tempFile, cache);
