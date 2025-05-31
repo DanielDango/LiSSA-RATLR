@@ -19,9 +19,48 @@ import edu.kit.kastel.sdq.lissa.ratlr.postprocessor.TraceLinkIdPostprocessor;
 import edu.kit.kastel.sdq.lissa.ratlr.preprocessor.Preprocessor;
 import edu.kit.kastel.sdq.lissa.ratlr.resultaggregator.ResultAggregator;
 
+/**
+ * Main entry point for the LiSSA framework's core functionality (only for testing purposes, use the CLI for production).
+ * This class orchestrates the trace link analysis pipeline, including:
+ * <ul>
+ *     <li>Loading and preprocessing artifacts</li>
+ *     <li>Calculating embeddings</li>
+ *     <li>Building element stores</li>
+ *     <li>Classifying trace links</li>
+ *     <li>Postprocessing results</li>
+ *     <li>Generating statistics</li>
+ * </ul>
+ *
+ * The pipeline follows these steps:
+ * <ol>
+ *     <li>Load configuration from file</li>
+ *     <li>Initialize components (providers, preprocessors, etc.)</li>
+ *     <li>Load artifacts from source and target providers</li>
+ *     <li>Preprocess artifacts into elements</li>
+ *     <li>Calculate embeddings for elements</li>
+ *     <li>Build element stores for efficient access</li>
+ *     <li>Classify potential trace links</li>
+ *     <li>Aggregate results into final trace links</li>
+ *     <li>Postprocess trace link IDs</li>
+ *     <li>Generate and save statistics</li>
+ * </ol>
+ */
 public class Main {
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
+    /**
+     * Main entry point for the LiSSA framework.
+     * This method:
+     * <ol>
+     *     <li>Loads configuration from file (defaults to "config.json" if no file specified)</li>
+     *     <li>Initializes all required components</li>
+     *     <li>Executes the complete trace link analysis pipeline</li>
+     *     <li>Generates and saves results</li>
+     * </ol>
+     *
+     * @param args Command line arguments. If no arguments are provided, uses "config.json" as the default configuration file.
+     * @throws IOException If there are issues reading the configuration file or processing artifacts
+     */
     public static void main(String[] args) throws IOException {
         var configFilePath = args.length == 0 ? "config.json" : args[0];
         var configFile = new File(configFilePath);

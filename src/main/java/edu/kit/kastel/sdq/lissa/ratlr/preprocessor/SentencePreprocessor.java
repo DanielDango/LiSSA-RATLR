@@ -4,17 +4,55 @@ package edu.kit.kastel.sdq.lissa.ratlr.preprocessor;
 import java.util.ArrayList;
 import java.util.List;
 
-import dev.langchain4j.data.document.splitter.DocumentBySentenceSplitter;
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Artifact;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 
+import dev.langchain4j.data.document.splitter.DocumentBySentenceSplitter;
+
 /**
- * This preprocessor splits a text into sentences.
+ * A preprocessor that splits text artifacts into sentences.
+ * This preprocessor creates a hierarchical structure of elements where:
+ * <ul>
+ *     <li>The root element represents the entire artifact (granularity level 0)</li>
+ *     <li>Child elements represent individual sentences (granularity level 1)</li>
+ * </ul>
+ *
+ * The preprocessor uses the {@link DocumentBySentenceSplitter} to split the text
+ * into sentences, creating a new element for each sentence. The original artifact
+ * is also preserved as an element with granularity level 0, and all sentence elements
+ * are linked to it as children.
+ *
+ * Each sentence element:
+ * <ul>
+ *     <li>Has a unique identifier combining the artifact ID and sentence index</li>
+ *     <li>Maintains the same type as the source artifact</li>
+ *     <li>Contains only the sentence text as its content</li>
+ *     <li>Has granularity level 1</li>
+ *     <li>Is marked for comparison (compare=true)</li>
+ * </ul>
  */
 public class SentencePreprocessor extends Preprocessor {
+    /**
+     * Creates a new sentence preprocessor with the specified configuration.
+     *
+     * @param configuration The module configuration (currently unused)
+     */
     public SentencePreprocessor(ModuleConfiguration configuration) {}
 
+    /**
+     * Preprocesses a list of artifacts by splitting each one into sentences.
+     * For each artifact, this method:
+     * <ol>
+     *     <li>Creates an element representing the entire artifact</li>
+     *     <li>Splits the artifact's content into sentences</li>
+     *     <li>Creates elements for each sentence</li>
+     *     <li>Links sentence elements to the artifact element</li>
+     * </ol>
+     *
+     * @param artifacts The list of artifacts to preprocess
+     * @return A list of elements containing both the original artifacts and their sentences
+     */
     @Override
     public List<Element> preprocess(List<Artifact> artifacts) {
         List<Element> elements = new ArrayList<>();
@@ -25,6 +63,19 @@ public class SentencePreprocessor extends Preprocessor {
         return elements;
     }
 
+    /**
+     * Preprocesses a single artifact by splitting it into sentences.
+     * This method:
+     * <ol>
+     *     <li>Creates an element for the entire artifact (granularity level 0)</li>
+     *     <li>Uses {@link DocumentBySentenceSplitter} to split the content into sentences</li>
+     *     <li>Creates elements for each sentence (granularity level 1)</li>
+     *     <li>Links sentence elements to the artifact element</li>
+     * </ol>
+     *
+     * @param artifact The artifact to preprocess
+     * @return A list of elements containing both the original artifact and its sentences
+     */
     private List<Element> preprocessIntern(Artifact artifact) {
         DocumentBySentenceSplitter splitter = new DocumentBySentenceSplitter(Integer.MAX_VALUE, 0);
         String[] sentences = splitter.split(artifact.getContent());

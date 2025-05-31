@@ -18,25 +18,70 @@ import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Artifact;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 
 /**
- * This preprocessor extracts information from a given UML model.
- * Configuration:
+ * A preprocessor that extracts information from UML model artifacts.
+ * This preprocessor creates a hierarchical structure of elements where:
  * <ul>
- * <li> includeUsages: whether to include the usages of components
- * <li> includeOperations: whether to include the operations of components and interfaces
- * <li> includeInterfaceRealizations: whether to include the interface realizations of components
+ *     <li>The root element represents the entire UML model (granularity level 0)</li>
+ *     <li>Child elements represent components and interfaces (granularity level 1)</li>
+ * </ul>
+ *
+ * The preprocessor can extract various types of information from UML models:
+ * <ul>
+ *     <li>Component and interface definitions</li>
+ *     <li>Component usages (dependencies on other components)</li>
+ *     <li>Component and interface operations</li>
+ *     <li>Interface realizations by components</li>
+ * </ul>
+ *
+ * Configuration options:
+ * <ul>
+ *     <li>includeUsages: Whether to include component usages in the extracted information (default: true)</li>
+ *     <li>includeOperations: Whether to include operations of components and interfaces (default: true)</li>
+ *     <li>includeInterfaceRealizations: Whether to include interface realizations by components (default: true)</li>
+ * </ul>
+ *
+ * Each element in the hierarchy:
+ * <ul>
+ *     <li>Has a unique identifier combining the model ID, element index, and UML element ID</li>
+ *     <li>Maintains the same type as the source artifact</li>
+ *     <li>Contains a structured representation of the UML element's properties</li>
+ *     <li>Has a granularity level based on its position in the hierarchy</li>
+ *     <li>Is marked for comparison only if it's a component element</li>
  * </ul>
  */
 public class ModelUMLPreprocessor extends Preprocessor {
+    /** Whether to include component usages in the extracted information */
     private final boolean includeUsages;
+    /** Whether to include operations of components and interfaces */
     private final boolean includeOperations;
+    /** Whether to include interface realizations by components */
     private final boolean includeInterfaceRealizations;
 
+    /**
+     * Creates a new UML model preprocessor with the specified configuration.
+     *
+     * @param configuration The module configuration containing extraction settings
+     */
     public ModelUMLPreprocessor(ModuleConfiguration configuration) {
         this.includeUsages = configuration.argumentAsBoolean("includeUsages", true);
         this.includeOperations = configuration.argumentAsBoolean("includeOperations", true);
         this.includeInterfaceRealizations = configuration.argumentAsBoolean("includeInterfaceRealizations", true);
     }
 
+    /**
+     * Preprocesses a list of UML model artifacts by extracting their components and interfaces.
+     * For each artifact, this method:
+     * <ol>
+     *     <li>Creates an element representing the entire UML model</li>
+     *     <li>Parses the XML content to create a UML model</li>
+     *     <li>Extracts components and their properties</li>
+     *     <li>Extracts interfaces and their properties</li>
+     *     <li>Creates elements for each component and interface</li>
+     * </ol>
+     *
+     * @param artifacts The list of UML model artifacts to preprocess
+     * @return A list of elements containing both the original models and their components/interfaces
+     */
     @Override
     public List<Element> preprocess(List<Artifact> artifacts) {
         List<Element> elements = new ArrayList<>();
@@ -61,6 +106,21 @@ public class ModelUMLPreprocessor extends Preprocessor {
         return elements;
     }
 
+    /**
+     * Adds an interface element to the list of elements.
+     * This method:
+     * <ol>
+     *     <li>Creates a structured representation of the interface's properties</li>
+     *     <li>Optionally includes the interface's operations</li>
+     *     <li>Creates a new element with the interface information</li>
+     *     <li>Links the element to the model element</li>
+     * </ol>
+     *
+     * @param counter A counter for generating unique element indices
+     * @param umlInterface The UML interface to process
+     * @param artifactAsElement The model element to link to
+     * @param elements The list to add the new element to
+     */
     private void addInterface(
             AtomicInteger counter, UmlInterface umlInterface, Element artifactAsElement, List<Element> elements) {
         Set<String> representation = new LinkedHashSet<>();
@@ -81,6 +141,23 @@ public class ModelUMLPreprocessor extends Preprocessor {
         elements.add(resultingElement);
     }
 
+    /**
+     * Adds a component element to the list of elements.
+     * This method:
+     * <ol>
+     *     <li>Creates a structured representation of the component's properties</li>
+     *     <li>Optionally includes interface realizations</li>
+     *     <li>Optionally includes operations from provided interfaces</li>
+     *     <li>Optionally includes component usages</li>
+     *     <li>Creates a new element with the component information</li>
+     *     <li>Links the element to the model element</li>
+     * </ol>
+     *
+     * @param counter A counter for generating unique element indices
+     * @param component The UML component to process
+     * @param artifactAsElement The model element to link to
+     * @param elements The list to add the new element to
+     */
     private void addComponent(
             AtomicInteger counter, UmlComponent component, Element artifactAsElement, List<Element> elements) {
         Set<String> representation = new LinkedHashSet<>();

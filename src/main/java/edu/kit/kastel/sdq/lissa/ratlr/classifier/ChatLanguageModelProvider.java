@@ -13,17 +13,75 @@ import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.ollama.OllamaChatModel;
 import dev.langchain4j.model.openai.OpenAiChatModel;
 
+/**
+ * Provides chat language model instances for different platforms.
+ * This class supports multiple language model platforms (OpenAI, Ollama, Blablador)
+ * and handles their configuration, including authentication and model settings.
+ *
+ * Required environment variables for each platform:
+ * <ul>
+ *   <li>OpenAI:
+ *     <ul>
+ *       <li>{@code OPENAI_ORGANIZATION_ID}: Your OpenAI organization ID</li>
+ *       <li>{@code OPENAI_API_KEY}: Your OpenAI API key</li>
+ *     </ul>
+ *   </li>
+ *   <li>Ollama:
+ *     <ul>
+ *       <li>{@code OLLAMA_HOST}: The host URL for the Ollama server (optional)</li>
+ *       <li>{@code OLLAMA_USER}: Username for Ollama authentication (optional)</li>
+ *       <li>{@code OLLAMA_PASSWORD}: Password for Ollama authentication (optional)</li>
+ *     </ul>
+ *   </li>
+ *   <li>Blablador:
+ *     <ul>
+ *       <li>{@code BLABLADOR_API_KEY}: Your Blablador API key</li>
+ *     </ul>
+ *   </li>
+ * </ul>
+ */
 public class ChatLanguageModelProvider {
+    /**
+     * Identifier for the OpenAI platform.
+     */
     public static final String OPENAI = "openai";
+
+    /**
+     * Identifier for the Ollama platform.
+     */
     public static final String OLLAMA = "ollama";
+
+    /**
+     * Identifier for the Blablador platform.
+     */
     public static final String BLABLADOR = "blablador";
 
+    /**
+     * Default seed value for model randomization.
+     */
     public static final int DEFAULT_SEED = 133742243;
 
+    /**
+     * The platform to use for the language model.
+     */
     private final String platform;
+
+    /**
+     * The name of the model to use.
+     */
     private String modelName;
+
+    /**
+     * The seed value for model randomization.
+     */
     private int seed;
 
+    /**
+     * Creates a new chat language model provider with the specified configuration.
+     * The configuration name should be in the format "mode_platform" (e.g., "simple_openai").
+     *
+     * @param configuration The module configuration containing model settings
+     */
     public ChatLanguageModelProvider(ModuleConfiguration configuration) {
         String[] modeXplatform = configuration.name().split(Classifier.CONFIG_NAME_SEPARATOR, 2);
         if (modeXplatform.length == 1) {
@@ -34,6 +92,12 @@ public class ChatLanguageModelProvider {
         initModelPlatform(configuration);
     }
 
+    /**
+     * Creates a chat model instance based on the configured platform.
+     *
+     * @return A chat model instance for the configured platform
+     * @throws IllegalArgumentException If the platform is not supported
+     */
     public ChatModel createChatModel() {
         return switch (platform) {
             case OPENAI -> createOpenAiChatModel(modelName, seed);
@@ -43,6 +107,13 @@ public class ChatLanguageModelProvider {
         };
     }
 
+    /**
+     * Initializes the model platform settings from the configuration.
+     * Sets the model name and seed value based on the platform.
+     *
+     * @param configuration The module configuration containing model settings
+     * @throws IllegalArgumentException If the platform is not supported
+     */
     private void initModelPlatform(ModuleConfiguration configuration) {
         final String modelKey = "model";
         this.modelName = switch (platform) {
@@ -54,18 +125,43 @@ public class ChatLanguageModelProvider {
         this.seed = configuration.argumentAsInt("seed", DEFAULT_SEED);
     }
 
+    /**
+     * Gets the name of the configured model.
+     *
+     * @return The model name
+     */
     public String modelName() {
         return modelName;
     }
 
+    /**
+     * Gets the seed value used for model randomization.
+     *
+     * @return The seed value
+     */
     public int seed() {
         return seed;
     }
 
+    /**
+     * Determines the number of threads to use based on the platform.
+     * OpenAI and Blablador platforms use 100 threads, while others use 1.
+     *
+     * @param configuration The module configuration
+     * @return The number of threads to use
+     */
     public static int threads(ModuleConfiguration configuration) {
         return configuration.name().contains(OPENAI) || configuration.name().contains(BLABLADOR) ? 100 : 1;
     }
 
+    /**
+     * Creates an Ollama chat model instance.
+     * The model is configured with authentication if credentials are provided.
+     *
+     * @param model The name of the model to use
+     * @param seed The seed value for randomization
+     * @return A configured Ollama chat model instance
+     */
     private static OllamaChatModel createOllamaChatModel(String model, int seed) {
         String host = Environment.getenv("OLLAMA_HOST");
         String user = Environment.getenv("OLLAMA_USER");
@@ -87,6 +183,15 @@ public class ChatLanguageModelProvider {
         return ollama.build();
     }
 
+    /**
+     * Creates an OpenAI chat model instance.
+     * Requires OpenAI organization ID and API key to be set in environment variables.
+     *
+     * @param model The name of the model to use
+     * @param seed The seed value for randomization
+     * @return A configured OpenAI chat model instance
+     * @throws IllegalStateException If required environment variables are not set
+     */
     private static OpenAiChatModel createOpenAiChatModel(String model, int seed) {
         String openAiOrganizationId = Environment.getenv("OPENAI_ORGANIZATION_ID");
         String openAiApiKey = Environment.getenv("OPENAI_API_KEY");
@@ -102,6 +207,15 @@ public class ChatLanguageModelProvider {
                 .build();
     }
 
+    /**
+     * Creates a Blablador chat model instance.
+     * Requires Blablador API key to be set in environment variables.
+     *
+     * @param model The name of the model to use
+     * @param seed The seed value for randomization
+     * @return A configured Blablador chat model instance
+     * @throws IllegalStateException If required environment variables are not set
+     */
     private static OpenAiChatModel createBlabladorChatModel(String model, int seed) {
         String blabladorApiKey = Environment.getenv("BLABLADOR_API_KEY");
         if (blabladorApiKey == null) {

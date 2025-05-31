@@ -14,19 +14,40 @@ import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Artifact;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Knowledge;
 
 /**
- * Provides text-based artifact for a configured path. The filename is used as identifier.
- * Configuration:
+ * Provides text-based artifacts from a configured file or directory.
+ * This provider reads text files and creates artifacts using the filename as the identifier.
+ * Artifacts represent the original documents that will be processed into elements by preprocessors.
+ * It supports both single files and directories containing multiple text files.
+ *
+ * Configuration parameters:
  * <ul>
- * <li> path: the path to the file
- * <li> artifact_type: the type of the artifact
+ * <li>path: The path to the file or directory containing text files</li>
+ * <li>artifact_type: The type of artifact to create (e.g., REQUIREMENT, SOURCE_CODE)</li>
  * </ul>
  */
 public class TextArtifactProvider extends ArtifactProvider {
 
+    /**
+     * The file or directory path from which artifacts are loaded.
+     */
     protected final File path;
+
+    /**
+     * The type of artifacts to be created.
+     */
     protected final Artifact.ArtifactType artifactType;
+
+    /**
+     * Cache of loaded artifacts.
+     */
     protected final List<Artifact> artifacts;
 
+    /**
+     * Creates a new text artifact provider with the specified configuration.
+     *
+     * @param configuration The configuration containing the path and artifact type
+     * @throws IllegalArgumentException If the specified path does not exist
+     */
     public TextArtifactProvider(ModuleConfiguration configuration) {
         this.path = new File(configuration.argumentAsString("path"));
         if (!path.exists()) {
@@ -36,6 +57,14 @@ public class TextArtifactProvider extends ArtifactProvider {
         this.artifacts = new ArrayList<>();
     }
 
+    /**
+     * Loads text files from the configured path and creates artifacts.
+     * If the path is a file, it creates a single artifact.
+     * If the path is a directory, it creates artifacts for all text files in the directory.
+     * These artifacts will later be processed into elements by preprocessors.
+     *
+     * @throws UncheckedIOException If there are issues reading the files
+     */
     protected void loadFiles() {
         List<File> files = new ArrayList<>();
         if (this.path.isFile()) {
@@ -59,6 +88,14 @@ public class TextArtifactProvider extends ArtifactProvider {
         }
     }
 
+    /**
+     * Retrieves all artifacts from the configured path.
+     * The artifacts are loaded if they haven't been loaded yet, and returned in alphabetical order
+     * by their identifiers. These artifacts represent the original documents that will be
+     * processed into elements by preprocessors.
+     *
+     * @return A sorted list of all artifacts
+     */
     @Override
     public List<Artifact> getArtifacts() {
         if (artifacts.isEmpty()) this.loadFiles();
@@ -67,6 +104,14 @@ public class TextArtifactProvider extends ArtifactProvider {
         return orderedArtifacts;
     }
 
+    /**
+     * Retrieves a specific artifact by its identifier.
+     * The artifacts are loaded if they haven't been loaded yet.
+     *
+     * @param identifier The filename of the artifact to retrieve
+     * @return The artifact with the specified identifier
+     * @throws IllegalArgumentException If no artifact with the given identifier exists
+     */
     @Override
     public Artifact getArtifact(String identifier) {
         if (artifacts.isEmpty()) this.loadFiles();

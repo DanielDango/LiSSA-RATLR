@@ -7,9 +7,29 @@ import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Artifact;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 
 /**
- * This preprocessor defines the artifact as element.
+ * A preprocessor that treats each artifact as a single element without any further processing.
+ * This preprocessor is the simplest implementation in the preprocessor hierarchy, as it:
+ * <ul>
+ *     <li>Does not break down artifacts into smaller pieces</li>
+ *     <li>Preserves the original artifact's content and type</li>
+ *     <li>Creates elements with granularity level 0</li>
+ *     <li>Marks all elements for comparison (compare=true)</li>
+ * </ul>
  */
 public class SingleArtifactPreprocessor extends Preprocessor {
+    /**
+     * Preprocesses a list of artifacts by converting each one into a single element.
+     * This method:
+     * <ol>
+     *     <li>Takes each artifact as is</li>
+     *     <li>Creates a new element with the same identifier, type, and content</li>
+     *     <li>Sets granularity level to 0 (no hierarchy)</li>
+     *     <li>Marks the element for comparison</li>
+     * </ol>
+     *
+     * @param artifacts The list of artifacts to preprocess
+     * @return A list of elements, one for each input artifact
+     */
     @Override
     public List<Element> preprocess(List<Artifact> artifacts) {
         return artifacts.stream()

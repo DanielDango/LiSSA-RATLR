@@ -12,8 +12,18 @@ import edu.kit.kastel.sdq.lissa.ratlr.utils.KeyGenerator;
 
 import dev.langchain4j.model.chat.ChatModel;
 
+/**
+ * A simple classifier that uses a language model to determine trace links between elements.
+ * This classifier uses a straightforward yes/no approach, asking the language model
+ * directly whether elements are related. It includes caching to improve performance
+ * and supports custom templates for the classification request.
+ */
 public class SimpleClassifier extends Classifier {
 
+    /**
+     * The default template for classification requests.
+     * This template presents two artifacts and asks if they are related.
+     */
     private static final String DEFAULT_TEMPLATE =
             """
             Question: Here are two parts of software development artifacts.
@@ -27,11 +37,27 @@ public class SimpleClassifier extends Classifier {
             """;
 
     private final Cache cache;
+
+    /**
+     * Provider for the language model used in classification.
+     */
     private final ChatLanguageModelProvider provider;
 
+    /**
+     * The language model instance used for classification.
+     */
     private final ChatModel llm;
+
+    /**
+     * The template used for classification requests.
+     */
     private final String template;
 
+    /**
+     * Creates a new simple classifier with the specified configuration.
+     *
+     * @param configuration The module configuration containing classifier settings
+     */
     public SimpleClassifier(ModuleConfiguration configuration) {
         super(ChatLanguageModelProvider.threads(configuration));
         this.provider = new ChatLanguageModelProvider(configuration);
@@ -41,6 +67,15 @@ public class SimpleClassifier extends Classifier {
         this.llm = provider.createChatModel();
     }
 
+    /**
+     * Creates a new simple classifier with the specified parameters.
+     * This constructor is used internally for creating thread-local copies.
+     *
+     * @param threads The number of threads to use for parallel processing
+     * @param cache The cache to use for storing classification results
+     * @param provider The language model provider
+     * @param template The template to use for classification requests
+     */
     private SimpleClassifier(int threads, Cache cache, ChatLanguageModelProvider provider, String template) {
         super(threads);
         this.cache = cache;
@@ -49,11 +84,25 @@ public class SimpleClassifier extends Classifier {
         this.llm = provider.createChatModel();
     }
 
+    /**
+     * Creates a copy of this simple classifier.
+     * This method is used for parallel processing.
+     *
+     * @return A new simple classifier instance with the same configuration
+     */
     @Override
     protected final Classifier copyOf() {
         return new SimpleClassifier(threads, cache, provider, template);
     }
 
+    /**
+     * Classifies a pair of elements by using the language model to determine if they are related.
+     * The classification result is cached to avoid redundant LLM calls.
+     *
+     * @param source The source element
+     * @param target The target element
+     * @return A classification result if the elements are related, empty otherwise
+     */
     @Override
     protected final Optional<ClassificationResult> classify(Element source, Element target) {
         String llmResponse = classifyIntern(source, target);
@@ -74,6 +123,14 @@ public class SimpleClassifier extends Classifier {
         return Optional.empty();
     }
 
+    /**
+     * Performs the actual classification using the language model.
+     * The result is cached to avoid redundant LLM calls.
+     *
+     * @param source The source element
+     * @param target The target element
+     * @return The language model's response
+     */
     private String classifyIntern(Element source, Element target) {
         String request = template.replace("{source_type}", source.getType())
                 .replace("{source_content}", source.getContent())

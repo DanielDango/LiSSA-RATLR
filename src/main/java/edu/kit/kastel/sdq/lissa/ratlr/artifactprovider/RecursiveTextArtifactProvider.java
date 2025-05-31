@@ -12,27 +12,48 @@ import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Artifact;
 
 /**
- * Provides text-based and other artifacts for a configured path. The relative path is used as identifier.
- * Configuration:
+ * Provides text-based artifacts from a directory structure recursively.
+ * This provider reads text files from a directory and its subdirectories, using the relative path
+ * as the artifact identifier. Artifacts represent the original documents that will be processed
+ * into elements by preprocessors. It supports filtering files by their extensions.
+ *
+ * Configuration parameters:
  * <ul>
- * <li> path: the path to the directory containing the artifacts
- * <li> artifact_type: the type of the artifact
- * <li> extensions: the file extensions to consider
+ * <li>path: The path to the root directory containing the artifacts</li>
+ * <li>artifact_type: The type of artifact to create (e.g., REQUIREMENT, SOURCE_CODE)</li>
+ * <li>extensions: Comma-separated list of file extensions to consider (e.g., "txt,java,md")</li>
  * </ul>
  */
 public class RecursiveTextArtifactProvider extends TextArtifactProvider {
 
+    /**
+     * Array of file extensions to consider when loading artifacts.
+     * Extensions are stored in lowercase for case-insensitive matching.
+     */
     private final String[] extensions;
 
+    /**
+     * Creates a new recursive text artifact provider with the specified configuration.
+     *
+     * @param configuration The configuration containing the path, artifact type, and file extensions
+     * @throws IllegalArgumentException If the specified path does not exist
+     */
     public RecursiveTextArtifactProvider(ModuleConfiguration configuration) {
         super(configuration);
         this.extensions =
                 configuration.argumentAsString("extensions").toLowerCase().split(",");
     }
 
+    /**
+     * Recursively loads text files from the configured directory and its subdirectories.
+     * Only files with the specified extensions are processed. The relative path of each file
+     * is used as the artifact identifier. These artifacts will later be processed into elements
+     * by preprocessors.
+     *
+     * @throws UncheckedIOException If there are issues reading the files
+     */
     @Override
     protected void loadFiles() {
-
         try (Stream<Path> fileStream = Files.walk(this.path.toPath())) {
             for (Path file : fileStream.toList()) {
                 if (Files.isRegularFile(file) && hasCorrectExtension(file)) {
@@ -44,6 +65,15 @@ public class RecursiveTextArtifactProvider extends TextArtifactProvider {
         }
     }
 
+    /**
+     * Reads a single file and creates an artifact from its contents.
+     * The artifact's identifier is set to the relative path of the file,
+     * with path separators normalized to forward slashes. This artifact will later
+     * be processed into elements by preprocessors.
+     *
+     * @param file The path to the file to read
+     * @throws UncheckedIOException If there are issues reading the file
+     */
     private void readFile(Path file) {
         try (Scanner scan = new Scanner(file.toFile()).useDelimiter("\\A")) {
             if (scan.hasNext()) {
@@ -57,6 +87,13 @@ public class RecursiveTextArtifactProvider extends TextArtifactProvider {
         }
     }
 
+    /**
+     * Checks if a file has one of the configured extensions.
+     * The check is case-insensitive.
+     *
+     * @param file The path to the file to check
+     * @return true if the file has a matching extension, false otherwise
+     */
     private boolean hasCorrectExtension(Path file) {
         String fileName = file.getFileName().toString().toLowerCase();
         for (String extension : extensions) {

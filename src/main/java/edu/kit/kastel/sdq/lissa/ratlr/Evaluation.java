@@ -22,6 +22,31 @@ import edu.kit.kastel.sdq.lissa.ratlr.postprocessor.TraceLinkIdPostprocessor;
 import edu.kit.kastel.sdq.lissa.ratlr.preprocessor.Preprocessor;
 import edu.kit.kastel.sdq.lissa.ratlr.resultaggregator.ResultAggregator;
 
+/**
+ * Represents a single evaluation run of the LiSSA framework.
+ * This class manages the complete trace link analysis pipeline for a given configuration,
+ * including:
+ * <ul>
+ *     <li>Artifact loading from source and target providers</li>
+ *     <li>Preprocessing of artifacts into elements</li>
+ *     <li>Embedding calculation for elements</li>
+ *     <li>Classification of potential trace links</li>
+ *     <li>Result aggregation and postprocessing</li>
+ *     <li>Statistics generation and result storage</li>
+ * </ul>
+ *
+ * The pipeline follows these steps:
+ * <ol>
+ *     <li>Load artifacts from configured providers</li>
+ *     <li>Preprocess artifacts into elements</li>
+ *     <li>Calculate embeddings for elements</li>
+ *     <li>Build element stores for efficient access</li>
+ *     <li>Classify potential trace links</li>
+ *     <li>Aggregate results into final trace links</li>
+ *     <li>Postprocess trace link IDs</li>
+ *     <li>Generate and save statistics</li>
+ * </ol>
+ */
 public class Evaluation {
 
     private static final Logger logger = LoggerFactory.getLogger(Evaluation.class);
@@ -29,24 +54,63 @@ public class Evaluation {
 
     private Configuration configuration;
 
+    /** Provider for source artifacts */
     private ArtifactProvider sourceArtifactProvider;
+    /** Provider for target artifacts */
     private ArtifactProvider targetArtifactProvider;
+    /** Preprocessor for source artifacts */
     private Preprocessor sourcePreprocessor;
+    /** Preprocessor for target artifacts */
     private Preprocessor targetPreprocessor;
+    /** Creator for element embeddings */
     private EmbeddingCreator embeddingCreator;
+    /** Store for source elements */
     private ElementStore sourceStore;
+    /** Store for target elements */
     private ElementStore targetStore;
+    /** Classifier for trace link analysis */
     private Classifier classifier;
+    /** Aggregator for classification results */
     private ResultAggregator aggregator;
+    /** Postprocessor for trace link IDs */
     private TraceLinkIdPostprocessor traceLinkIdPostProcessor;
 
+    /**
+     * Creates a new evaluation instance with the specified configuration file.
+     * This constructor:
+     * <ol>
+     *     <li>Validates the configuration file path</li>
+     *     <li>Loads and initializes the configuration</li>
+     *     <li>Sets up all required components for the pipeline</li>
+     * </ol>
+     *
+     * @param configFile Path to the configuration file
+     * @throws IOException If there are issues reading the configuration file
+     * @throws NullPointerException If configFile is null
+     */
     public Evaluation(Path configFile) throws IOException {
         this.configFile = Objects.requireNonNull(configFile);
         setup();
     }
 
+    /**
+     * Sets up the evaluation pipeline components.
+     * This method:
+     * <ol>
+     *     <li>Loads the configuration from file</li>
+     *     <li>Initializes the cache manager</li>
+     *     <li>Creates artifact providers</li>
+     *     <li>Creates preprocessors</li>
+     *     <li>Creates embedding creator</li>
+     *     <li>Creates element stores</li>
+     *     <li>Creates classifier</li>
+     *     <li>Creates result aggregator</li>
+     *     <li>Creates trace link ID postprocessor</li>
+     * </ol>
+     *
+     * @throws IOException If there are issues reading the configuration
+     */
     private void setup() throws IOException {
-
         configuration = new ObjectMapper().readValue(configFile.toFile(), Configuration.class);
         CacheManager.setCacheDir(configuration.cacheDir());
 
@@ -69,12 +133,32 @@ public class Evaluation {
         configuration.serializeAndDestroyConfiguration();
     }
 
+    /**
+     * Gets the configuration used for this evaluation.
+     *
+     * @return The configuration object
+     */
     public Configuration getConfiguration() {
         return configuration;
     }
 
+    /**
+     * Runs the complete trace link analysis pipeline.
+     * This method:
+     * <ol>
+     *     <li>Loads artifacts from providers</li>
+     *     <li>Preprocesses artifacts into elements</li>
+     *     <li>Calculates embeddings for elements</li>
+     *     <li>Builds element stores</li>
+     *     <li>Classifies potential trace links</li>
+     *     <li>Aggregates results</li>
+     *     <li>Postprocesses trace link IDs</li>
+     *     <li>Generates and saves statistics</li>
+     * </ol>
+     *
+     * @return Set of identified trace links
+     */
     public Set<TraceLink> run() {
-
         // RUN
         logger.info("Loading artifacts");
         var sourceArtifacts = sourceArtifactProvider.getArtifacts();
@@ -109,10 +193,20 @@ public class Evaluation {
         return traceLinks;
     }
 
+    /**
+     * Gets the number of source artifacts in this evaluation.
+     *
+     * @return Number of source artifacts
+     */
     public int getSourceArtifactCount() {
         return sourceArtifactProvider.getArtifacts().size();
     }
 
+    /**
+     * Gets the number of target artifacts in this evaluation.
+     *
+     * @return Number of target artifacts
+     */
     public int getTargetArtifactCount() {
         return targetArtifactProvider.getArtifacts().size();
     }

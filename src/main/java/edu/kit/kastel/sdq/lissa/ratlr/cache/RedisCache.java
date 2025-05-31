@@ -14,13 +14,37 @@ import edu.kit.kastel.sdq.lissa.ratlr.utils.Environment;
 
 import redis.clients.jedis.UnifiedJedis;
 
+/**
+ * Implements a Redis-based cache with local file backup.
+ * This class provides a caching mechanism that primarily uses Redis for storage,
+ * with a local file cache as a fallback. It supports storing and retrieving both
+ * string values and serialized objects.
+ *
+ * The cache can operate in three modes:
+ * 1. Redis-only: When Redis is available and local cache is not configured
+ * 2. Local-only: When Redis is unavailable and local cache is configured
+ * 3. Hybrid: When both Redis and local cache are available (default)
+ */
 class RedisCache implements Cache {
     private static final Logger logger = LoggerFactory.getLogger(RedisCache.class);
     private final ObjectMapper mapper;
 
+    /**
+     * Local file-based cache used as a backup.
+     */
     private final LocalCache localCache;
+
+    /**
+     * Redis client instance.
+     */
     private UnifiedJedis jedis;
 
+    /**
+     * Creates a new Redis cache instance with an optional local cache backup.
+     *
+     * @param localCache The local cache to use as backup, or null if no backup is needed
+     * @throws IllegalArgumentException If neither Redis nor local cache can be initialized
+     */
     RedisCache(LocalCache localCache) {
         this.localCache = localCache == null || !localCache.isReady() ? null : localCache;
         mapper = new ObjectMapper();
@@ -37,6 +61,11 @@ class RedisCache implements Cache {
         }
     }
 
+    /**
+     * Establishes a connection to the Redis server.
+     * The Redis URL can be configured through the REDIS_URL environment variable.
+     * If the connection fails, the cache will fall back to using only the local cache.
+     */
     private void createRedisConnection() {
         try {
             String redisUrl = "redis://localhost:6379";
@@ -52,6 +81,17 @@ class RedisCache implements Cache {
         }
     }
 
+    /**
+     * Retrieves a value from the cache and deserializes it to the specified type.
+     * The method first attempts to retrieve the value from Redis, and if not found,
+     * falls back to the local cache. If the value is found in the local cache and
+     * Redis is available, it will be synchronized to Redis.
+     *
+     * @param <T> The type to deserialize the value to
+     * @param key The cache key to look up
+     * @param clazz The class of the type to deserialize to
+     * @return The deserialized value, or null if not found
+     */
     @Override
     public synchronized <T> T get(CacheKey key, Class<T> clazz) {
         var jsonData = jedis == null ? null : jedis.hget(key.toRawKey(), "data");
@@ -65,6 +105,16 @@ class RedisCache implements Cache {
         return convert(jsonData, clazz);
     }
 
+    /**
+     * Converts a JSON string to an object of the specified type.
+     * If the target type is String, the JSON string is returned as is.
+     *
+     * @param <T> The type to convert to
+     * @param jsonData The JSON string to convert
+     * @param clazz The class of the target type
+     * @return The converted object, or null if jsonData is null
+     * @throws IllegalArgumentException If the JSON cannot be deserialized to the target type
+     */
     @SuppressWarnings("unchecked")
     private <T> T convert(String jsonData, Class<T> clazz) {
         if (jsonData == null) {
@@ -81,6 +131,14 @@ class RedisCache implements Cache {
         }
     }
 
+    /**
+     * Stores a string value in the cache.
+     * The value is stored in both Redis (if available) and the local cache (if configured).
+     * When storing in Redis, a timestamp is also recorded.
+     *
+     * @param key The cache key to store the value under
+     * @param value The string value to store
+     */
     @Override
     public synchronized void put(CacheKey key, String value) {
         if (jedis != null) {
@@ -93,6 +151,16 @@ class RedisCache implements Cache {
         }
     }
 
+    /**
+     * Stores an object value in the cache.
+     * The object is serialized to JSON before storage.
+     *
+     * @param <T> The type of the value to store
+     * @param key The cache key to store the value under
+     * @param value The object value to store
+     * @throws IllegalArgumentException If the object cannot be serialized to JSON
+     * @throws NullPointerException If value is null
+     */
     @Override
     public synchronized <T> void put(CacheKey key, T value) {
         try {
