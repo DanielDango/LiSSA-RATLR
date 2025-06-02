@@ -1,51 +1,456 @@
-@inproceedings{wohlrab2019improving,
-  title={Improving the consistency and usefulness of architecture descriptions: Guidelines for architects},
-  author={Wohlrab, Rebekka and Eliasson, Ulf and Pelliccione, Patrizio and Heldal, Rogardt},
-  booktitle={2019 IEEE International Conference on Software Architecture (ICSA)},
-  pages={151--160},
-  year={2019},
-  organization={IEEE}
+@software{2024ArDoCoBenchmark,
+  title = {{{ArDoCo}}/{{Benchmark}}},
+  date = {2024-11-10T01:18:19Z},
+  origdate = {2022-02-18T13:57:51Z},
+  url = {https://github.com/ArDoCo/Benchmark},
+  urldate = {2025-05-20},
+  organization = {ArDoCo},
+  keywords = {architecture,benchmark,models,nlp,text-analysis,text-processing,traceability,traceability-recovery}
 }
-@inproceedings{fuchss2022establishing,
-  title={Establishing a benchmark dataset for traceability link recovery between software architecture documentation and models},
-  author={Fuch{\ss}, Dominik and Corallo, Sophie and Keim, Jan and Speit, Janek and Koziolek, Anne},
-  booktitle={European Conference on Software Architecture},
-  pages={455--464},
-  year={2022},
-  organization={Springer}
+
+@software{2025ArDoCoLiSSARATLR,
+  title = {{{ArDoCo}}/{{LiSSA-RATLR}}},
+  date = {2025-05-15T19:40:07Z},
+  origdate = {2024-05-21T07:38:20Z},
+  url = {https://github.com/ArDoCo/LiSSA-RATLR},
+  urldate = {2025-05-20},
+  organization = {ArDoCo},
+  keywords = {framework,llm,rag,retrieval-augmented-generation,tlr,traceability-recovery}
 }
-@article{pryzant2023automatic,
-  title={Automatic prompt optimization with" gradient descent" and beam search},
-  author={Pryzant, Reid and Iter, Dan and Li, Jerry and Lee, Yin Tat and Zhu, Chenguang and Zeng, Michael},
-  journal={arXiv preprint arXiv:2305.03495},
-  year={2023}
+
+@online{2025PromptEngineering,
+  title = {Prompt {{Engineering Guide}}},
+  date = {2025-04-24},
+  url = {https://www.promptingguide.ai/},
+  urldate = {2025-05-13},
+  langid = {english}
 }
-@inproceedings{fuchss2025lissa,
-  title={LiSSA: Toward Generic Traceability Link Recovery through Retrieval-Augmented Generation},
-  author={Fuch{\ss}, Dominik and Hey, Tobias and Keim, Jan and Liu, Haoyu and Ewald, Niklas and Thirolf, Tobias and Koziolek, Anne},
-  booktitle={Proceedings of the IEEE/ACM 47th International Conference on Software Engineering. ICSE},
-  volume={25},
-  year={2025}
+
+@software{2025StanfordnlpDspy,
+  title = {Stanfordnlp/Dspy},
+  date = {2025-05-20T08:36:09Z},
+  origdate = {2023-01-09T21:01:51Z},
+  url = {https://github.com/stanfordnlp/dspy},
+  urldate = {2025-05-20},
+  organization = {Stanford NLP}
 }
-@article{hayes2006advancing,
-  title={Advancing candidate link generation for requirements tracing: The study of methods},
-  author={Hayes, Jane Huffman and Dekhtyar, Alex and Sundaram, Senthil Karthikeyan},
-  journal={IEEE Transactions on Software Engineering},
-  volume={32},
-  number={1},
-  pages={4--19},
-  year={2006},
-  publisher={IEEE}
+
+@inproceedings{audibert2010BestArm,
+  title = {Best {{Arm Identification}} in {{Multi-Armed Bandits}}},
+  author = {Audibert, Jean-Yves and Bubeck, Sébastien},
+  date = {2010-06-27},
+  pages = {13 p.},
+  url = {https://enpc.hal.science/hal-00654404},
+  urldate = {2025-05-20},
+  eventtitle = {{{COLT}} - 23th {{Conference}} on {{Learning Theory}} - 2010},
+  langid = {english}
 }
-@online{ewald2024retrieval,
+
+@online{chen2023TeachingLarge,
+  title = {Teaching {{Large Language Models}} to {{Self-Debug}}},
+  author = {Chen, Xinyun and Lin, Maxwell and Schärli, Nathanael and Zhou, Denny},
+  date = {2023-10-05},
+  eprint = {2304.05128},
+  eprinttype = {arXiv},
+  eprintclass = {cs},
+  doi = {10.48550/arXiv.2304.05128},
+  url = {http://arxiv.org/abs/2304.05128},
+  urldate = {2025-05-20},
+  pubstate = {prepublished},
+  keywords = {Computer Science - Artificial Intelligence,Computer Science - Computation and Language}
+}
+
+@online{ewald2024RetrievalAugmentedLarge,
   title = {Retrieval-Augmented Large Language Models for Traceability Link Recovery},
   author = {Ewald, Niklas},
   date = {2024},
   doi = {10.5445/IR/1000178218},
   url = {https://publikationen.bibliothek.kit.edu/1000178218},
   urldate = {2025-05-20},
-  abstract = {Während der Entwicklung von Software werden viele Artefakte erstellt. Rückvervolgbarkeitsinformation zwischen ihnen sind wichtig für Aufgaben wie die Einhaltung von Anforderungen, Auswirkungsanalysen von Änderungen und das Auffinden von Dokumentationsinkonsistenzen. Das manuelle Erstellen von Rückverfolgbarkeitsverbindungen ist fehleranfällig und kostspielig. Eine Herausforderung besteht in den unterschiedlichen Abstraktionsebenen von Artefakten. Diese Arbeit verwendet Retrieval-Augmented Large Language Models, um diese semantische Lücke zu überbrücken, und bewertet diesen Ansatz in drei verschiedenen Aufgaben zur Wiederherstellung von Rückverfolgbarkeitsverbindungen. Kosten und Verarbeitungszeit werden niedrig gehalten, indem das Sprachmodell nur zur Klassifizierung von Artefaktpaaren verwendet wird, die Artefakte enthalten, die ähnlich zueinander sind. Für die Wiederherstellung von Rückverfolgbarkeitsverbindungen zwischen Anforderungen und Quellcode erzielt der Ansatz vergleichbare Ergebnisse zu dem Stand der Technik mit F1-Werten von 0.388 auf SMOS, 0.478 auf eTour und 0.313 auf iTrust. Für die Aufgaben der Rückverfolgbarkeitsverbindungen von Softwarearchitekturdokumentation zu Softwarearchitekturmodellen und von Softwarearchitekturdokumentation zu Quellcode erreicht der Ansatz nicht den Stand der Technik.},
   isbn = {9781000178210},
-  langid = {ngerman},
-  file = {C:\Users\clash\Zotero\storage\BXUQUDLA\Ewald - 2024 - Retrieval-Augmented Large Language Models for Traceability Link Recovery.pdf}
+  langid = {ngerman}
+}
+
+@software{fh2025HinthornwPromptimizer,
+  title = {Hinthornw/Promptimizer},
+  author = {FH, William},
+  date = {2025-05-20T04:41:14Z},
+  origdate = {2024-10-30T23:09:28Z},
+  url = {https://github.com/hinthornw/promptimizer},
+  urldate = {2025-05-20}
+}
+
+@dataset{fuchss2022ArDoCoBenchmark,
+  title = {{{ArDoCo}}/{{Benchmark}}},
+  author = {Fuchß, Dominik and Keim, Jan and Corallo, Sophie and Koziolek, Anne},
+  date = {2022-08-05},
+  publisher = {Zenodo},
+  doi = {10.5281/zenodo.6966832},
+  url = {https://zenodo.org/records/6966832},
+  urldate = {2025-05-20},
+  version = {ecsa22-msr4sa}
+}
+
+@inproceedings{fuchss2025LiSSAGeneric,
+  title = {LiSSA: Toward Generic Traceability Link Recovery through Retrieval-Augmented Generation},
+  shorttitle = {LiSSA},
+  booktitle = {2025 IEEE/ACM 47th International Conference on Software Engineering (ICSE)},
+  author = {Fuchß, Dominik and Hey, Tobias and Keim, Jan and Liu, Haoyu and Ewald, Niklas and Thirolf, Tobias and Koziolek, Anne},
+  date = {2025},
+  pages = {723},
+  doi = {10.1109/ICSE55347.2025.00186},
+  url = {https://publikationen.bibliothek.kit.edu/1000179816},
+  urldate = {2025-05-20},
+  eventtitle = {International Conference on Software Engineering (ICSE 2025), Ottawa, Kanada, 27.04.2025 – 03.05.2025},
+  langid = {ngerman}
+}
+
+@online{GitHubArDoCoBenchmark,
+  title = {{{GitHub}} - {{ArDoCo}}/{{Benchmark}} at Ecsa22-Msr4sa},
+  url = {https://github.com/ArDoCo/Benchmark/tree/ecsa22-msr4sa},
+  urldate = {2025-05-20}
+}
+
+@online{GitHubArDoCoBenchmarka,
+  title = {{{GitHub}} - {{ArDoCo}}/{{Benchmark}} at Ecsa22-Msr4sa},
+  url = {https://github.com/ArDoCo/Benchmark},
+  urldate = {2025-05-20},
+  langid = {english},
+  organization = {GitHub}
+}
+
+@article{hayes2006AdvancingCandidate,
+  title = {Advancing Candidate Link Generation for Requirements Tracing: The Study of Methods},
+  shorttitle = {Advancing Candidate Link Generation for Requirements Tracing},
+  author = {Hayes, J.H. and Dekhtyar, A. and Sundaram, S.K.},
+  date = {2006-01},
+  journaltitle = {IEEE Transactions on Software Engineering},
+  volume = {32},
+  number = {1},
+  pages = {4--19},
+  issn = {1939-3520},
+  doi = {10.1109/TSE.2006.3},
+  url = {https://ieeexplore.ieee.org/abstract/document/1583599},
+  urldate = {2025-05-26},
+  keywords = {Computer aided software engineering,Computer Society,dynamic link generation,Feedback,Independent Validation and Verification (IV&V),information retrieval,Information retrieval,Large scale integration,LSI,precision.,Prototypes,recall,Requirements tracing,Risk analysis,Spine,System testing,TF-IDF,Verification and Validation (V&V)}
+}
+
+@software{hulbert2023UsingTreeofThought,
+  title = {Using {{Tree-of-Thought Prompting}} to Boost {{ChatGPT}}'s Reasoning},
+  author = {Hulbert, Dave},
+  date = {2023-05},
+  origdate = {2023-05-22T19:03:27Z},
+  url = {https://github.com/dave1010/tree-of-thought-prompting},
+  urldate = {2025-06-02},
+  version = {0.1}
+}
+
+@inproceedings{keim2021TraceLink,
+  title = {Trace {{Link Recovery}} for {{Software Architecture Documentation}}},
+  booktitle = {Software {{Architecture}}},
+  author = {Keim, Jan and Schulz, Sophie and Fuchß, Dominik and Kocher, Claudius and Speit, Janek and Koziolek, Anne},
+  editor = {Biffl, Stefan and Navarro, Elena and Löwe, Welf and Sirjani, Marjan and Mirandola, Raffaela and Weyns, Danny},
+  date = {2021},
+  pages = {101--116},
+  publisher = {Springer International Publishing},
+  location = {Cham},
+  doi = {10.1007/978-3-030-86044-8_7},
+  isbn = {978-3-030-86044-8},
+  langid = {english},
+  keywords = {Information retrieval,Modeling,Natural language processing,Software Architecture Documentation,Trace link recovery}
+}
+
+@online{kojima2023LargeLanguage,
+  title = {Large {{Language Models}} Are {{Zero-Shot Reasoners}}},
+  author = {Kojima, Takeshi and Gu, Shixiang Shane and Reid, Machel and Matsuo, Yutaka and Iwasawa, Yusuke},
+  date = {2023-01-29},
+  eprint = {2205.11916},
+  eprinttype = {arXiv},
+  eprintclass = {cs},
+  doi = {10.48550/arXiv.2205.11916},
+  url = {http://arxiv.org/abs/2205.11916},
+  urldate = {2025-05-20},
+  pubstate = {prepublished},
+  keywords = {Computer Science - Artificial Intelligence,Computer Science - Computation and Language,Computer Science - Machine Learning}
+}
+
+@online{lester2021PowerScale,
+  title = {The {{Power}} of {{Scale}} for {{Parameter-Efficient Prompt Tuning}}},
+  author = {Lester, Brian and Al-Rfou, Rami and Constant, Noah},
+  date = {2021-09-02},
+  eprint = {2104.08691},
+  eprinttype = {arXiv},
+  eprintclass = {cs},
+  doi = {10.48550/arXiv.2104.08691},
+  url = {http://arxiv.org/abs/2104.08691},
+  urldate = {2025-05-20},
+  pubstate = {prepublished},
+  keywords = {Computer Science - Computation and Language}
+}
+
+@online{li2021PrefixTuningOptimizing,
+  title = {Prefix-{{Tuning}}: {{Optimizing Continuous Prompts}} for {{Generation}}},
+  shorttitle = {Prefix-{{Tuning}}},
+  author = {Li, Xiang Lisa and Liang, Percy},
+  date = {2021-01-01},
+  eprint = {2101.00190},
+  eprinttype = {arXiv},
+  eprintclass = {cs},
+  doi = {10.48550/arXiv.2101.00190},
+  url = {http://arxiv.org/abs/2101.00190},
+  urldate = {2025-05-20},
+  pubstate = {prepublished},
+  keywords = {Computer Science - Computation and Language}
+}
+
+@online{LMOpsPrompt_optimization,
+  title = {{{LMOps}}/Prompt\_optimization at Main · Microsoft/{{LMOps}}},
+  url = {https://github.com/microsoft/LMOps/tree/main/prompt_optimization},
+  urldate = {2025-05-20},
+  langid = {english},
+  organization = {GitHub}
+}
+
+@article{madaan2023SelfRefineIterative,
+  title = {Self-{{Refine}}: {{Iterative Refinement}} with {{Self-Feedback}}},
+  shorttitle = {Self-{{Refine}}},
+  author = {Madaan, Aman and Tandon, Niket and Gupta, Prakhar and Hallinan, Skyler and Gao, Luyu and Wiegreffe, Sarah and Alon, Uri and Dziri, Nouha and Prabhumoye, Shrimai and Yang, Yiming and Gupta, Shashank and Majumder, Bodhisattwa Prasad and Hermann, Katherine and Welleck, Sean and Yazdanbakhsh, Amir and Clark, Peter},
+  date = {2023-12-15},
+  journaltitle = {Advances in Neural Information Processing Systems},
+  volume = {36},
+  pages = {46534--46594},
+  url = {https://proceedings.neurips.cc/paper_files/paper/2023/hash/91edff07232fb1b55a505a9e9f6c0ff3-Abstract-Conference.html},
+  urldate = {2025-05-20},
+  langid = {english}
+}
+
+@online{petroni2019LanguageModels,
+  title = {Language {{Models}} as {{Knowledge Bases}}?},
+  author = {Petroni, Fabio and Rocktäschel, Tim and Lewis, Patrick and Bakhtin, Anton and Wu, Yuxiang and Miller, Alexander H. and Riedel, Sebastian},
+  date = {2019-09-04},
+  eprint = {1909.01066},
+  eprinttype = {arXiv},
+  eprintclass = {cs},
+  doi = {10.48550/arXiv.1909.01066},
+  url = {http://arxiv.org/abs/1909.01066},
+  urldate = {2025-05-19},
+  pubstate = {prepublished},
+  keywords = {Computer Science - Computation and Language}
+}
+
+@online{pryzant2023AutomaticPrompt,
+  title = {Automatic {{Prompt Optimization}} with "{{Gradient Descent}}" and {{Beam Search}}},
+  author = {Pryzant, Reid and Iter, Dan and Li, Jerry and Lee, Yin Tat and Zhu, Chenguang and Zeng, Michael},
+  date = {2023-10-19},
+  eprint = {2305.03495},
+  eprinttype = {arXiv},
+  eprintclass = {cs},
+  doi = {10.48550/arXiv.2305.03495},
+  url = {http://arxiv.org/abs/2305.03495},
+  urldate = {2025-05-13},
+  pubstate = {prepublished},
+  keywords = {Computer Science - Artificial Intelligence,Computer Science - Computation and Language,Computer Science - Machine Learning}
+}
+
+@inproceedings{rodriguez2023PromptsMatter,
+  title = {Prompts {{Matter}}: {{Insights}} and {{Strategies}} for {{Prompt Engineering}} in {{Automated Software Traceability}}},
+  shorttitle = {Prompts {{Matter}}},
+  booktitle = {2023 {{IEEE}} 31st {{International Requirements Engineering Conference Workshops}} ({{REW}})},
+  author = {Rodriguez, Alberto D. and Dearstyne, Katherine R. and Cleland-Huang, Jane},
+  date = {2023-09},
+  pages = {455--464},
+  issn = {2770-6834},
+  doi = {10.1109/REW57809.2023.00087},
+  url = {https://ieeexplore.ieee.org/abstract/document/10260721},
+  urldate = {2025-05-13},
+  eventtitle = {2023 {{IEEE}} 31st {{International Requirements Engineering Conference Workshops}} ({{REW}})},
+  keywords = {automated software traceability,Conferences,large language models,prompt engineering,Requirements engineering,Software}
+}
+
+@online{shin2020AutoPromptEliciting,
+  title = {{{AutoPrompt}}: {{Eliciting Knowledge}} from {{Language Models}} with {{Automatically Generated Prompts}}},
+  shorttitle = {{{AutoPrompt}}},
+  author = {Shin, Taylor and Razeghi, Yasaman and IV, Robert L. Logan and Wallace, Eric and Singh, Sameer},
+  date = {2020-11-07},
+  eprint = {2010.15980},
+  eprinttype = {arXiv},
+  eprintclass = {cs},
+  doi = {10.48550/arXiv.2010.15980},
+  url = {http://arxiv.org/abs/2010.15980},
+  urldate = {2025-05-19},
+  pubstate = {prepublished},
+  keywords = {Computer Science - Computation and Language,Computer Science - Machine Learning}
+}
+
+@software{significantgravitas2025AutoGPT,
+  title = {{{AutoGPT}}},
+  author = {{Significant Gravitas}},
+  date = {2025-05-20T08:19:04Z},
+  origdate = {2023-03-16T09:21:07Z},
+  url = {https://github.com/Significant-Gravitas/AutoGPT},
+  urldate = {2025-05-20}
+}
+
+@online{sun2024QueryDependentPrompt,
+  title = {Query-{{Dependent Prompt Evaluation}} and {{Optimization}} with {{Offline Inverse RL}}},
+  author = {Sun, Hao and Hüyük, Alihan and family=Schaar, given=Mihaela, prefix=van der, useprefix=false},
+  date = {2024-03-07},
+  eprint = {2309.06553},
+  eprinttype = {arXiv},
+  eprintclass = {cs},
+  doi = {10.48550/arXiv.2309.06553},
+  url = {http://arxiv.org/abs/2309.06553},
+  urldate = {2025-05-20},
+  pubstate = {prepublished},
+  keywords = {Computer Science - Artificial Intelligence,Computer Science - Computation and Language,Computer Science - Machine Learning}
+}
+
+@online{wang2023SelfConsistencyImproves,
+  title = {Self-{{Consistency Improves Chain}} of {{Thought Reasoning}} in {{Language Models}}},
+  author = {Wang, Xuezhi and Wei, Jason and Schuurmans, Dale and Le, Quoc and Chi, Ed and Narang, Sharan and Chowdhery, Aakanksha and Zhou, Denny},
+  date = {2023-03-07},
+  eprint = {2203.11171},
+  eprinttype = {arXiv},
+  eprintclass = {cs},
+  doi = {10.48550/arXiv.2203.11171},
+  url = {http://arxiv.org/abs/2203.11171},
+  urldate = {2025-05-20},
+  pubstate = {prepublished},
+  keywords = {Computer Science - Artificial Intelligence,Computer Science - Computation and Language}
+}
+
+@article{weiChainofThoughtPrompting,
+  title = {Chain-of-{{Thought Prompting Elicits Reasoning}} in {{Large Language Models}}},
+  author = {Wei, Jason and Wang, Xuezhi and Schuurmans, Dale and Bosma, Maarten and Ichter, Brian and Xia, Fei and Chi, Ed H and Le, Quoc V and Zhou, Denny},
+  langid = {english}
+}
+
+@inproceedings{wohlrab2019ImprovingConsistency,
+  title = {Improving the {{Consistency}} and {{Usefulness}} of {{Architecture Descriptions}}: {{Guidelines}} for {{Architects}}},
+  shorttitle = {Improving the {{Consistency}} and {{Usefulness}} of {{Architecture Descriptions}}},
+  booktitle = {2019 {{IEEE International Conference}} on {{Software Architecture}} ({{ICSA}})},
+  author = {Wohlrab, Rebekka and Eliasson, Ulf and Pelliccione, Patrizio and Heldal, Rogardt},
+  date = {2019-03},
+  pages = {151--160},
+  doi = {10.1109/ICSA.2019.00024},
+  url = {https://ieeexplore.ieee.org/abstract/document/8703919},
+  urldate = {2025-05-26},
+  eventtitle = {2019 {{IEEE International Conference}} on {{Software Architecture}} ({{ICSA}})},
+  keywords = {agile architecture,architectural conformance,architectural inconsistencies,boundary objects,Companies,Computer architecture,Conferences,empirical software engineering,Guidelines,questionnaire,Software,Software architecture,Stakeholders,survey}
+}
+
+@inproceedings{xiong2022AutoQGSAutoPrompt,
+  title = {{{AutoQGS}}: {{Auto-Prompt}} for {{Low-Resource Knowledge-based Question Generation}} from {{SPARQL}}},
+  shorttitle = {{{AutoQGS}}},
+  booktitle = {Proceedings of the 31st {{ACM International Conference}} on {{Information}} \& {{Knowledge Management}}},
+  author = {Xiong, Guanming and Bao, Junwei and Zhao, Wen and Wu, Youzheng and He, Xiaodong},
+  date = {2022-10-17},
+  pages = {2250--2259},
+  publisher = {ACM},
+  location = {Atlanta GA USA},
+  doi = {10.1145/3511808.3557246},
+  url = {https://dl.acm.org/doi/10.1145/3511808.3557246},
+  urldate = {2025-05-19},
+  eventtitle = {{{CIKM}} '22: {{The}} 31st {{ACM International Conference}} on {{Information}} and {{Knowledge Management}}},
+  isbn = {978-1-4503-9236-5},
+  langid = {english}
+}
+
+@online{yang2024LargeLanguage,
+  title = {Large {{Language Models}} as {{Optimizers}}},
+  author = {Yang, Chengrun and Wang, Xuezhi and Lu, Yifeng and Liu, Hanxiao and Le, Quoc V. and Zhou, Denny and Chen, Xinyun},
+  date = {2024-04-15},
+  eprint = {2309.03409},
+  eprinttype = {arXiv},
+  eprintclass = {cs},
+  doi = {10.48550/arXiv.2309.03409},
+  url = {http://arxiv.org/abs/2309.03409},
+  urldate = {2025-05-20},
+  pubstate = {prepublished},
+  keywords = {Computer Science - Artificial Intelligence,Computer Science - Computation and Language,Computer Science - Machine Learning}
+}
+
+@online{ye2024PromptEngineering,
+  title = {Prompt {{Engineering}} a {{Prompt Engineer}}},
+  author = {Ye, Qinyuan and Axmed, Maxamed and Pryzant, Reid and Khani, Fereshte},
+  date = {2024-07-03},
+  eprint = {2311.05661},
+  eprinttype = {arXiv},
+  eprintclass = {cs},
+  doi = {10.48550/arXiv.2311.05661},
+  url = {http://arxiv.org/abs/2311.05661},
+  urldate = {2025-05-13},
+  pubstate = {prepublished},
+  keywords = {Computer Science - Artificial Intelligence,Computer Science - Computation and Language,Computer Science - Machine Learning}
+}
+
+@inproceedings{zadenoori2025AutomaticPrompt,
+  title = {Automatic {{Prompt Engineering}}: {{The~Case}} of~{{Requirements Classification}}},
+  shorttitle = {Automatic {{Prompt Engineering}}},
+  booktitle = {Requirements {{Engineering}}: {{Foundation}} for {{Software Quality}}},
+  author = {Zadenoori, Mohammad Amin and Zhao, Liping and Alhoshan, Waad and Ferrari, Alessio},
+  editor = {Hess, Anne and Susi, Angelo},
+  date = {2025},
+  pages = {217--225},
+  publisher = {Springer Nature Switzerland},
+  location = {Cham},
+  doi = {10.1007/978-3-031-88531-0_15},
+  isbn = {978-3-031-88531-0},
+  langid = {english},
+  keywords = {large language models,LLM,natural language processing,NLP,prompt engineering,requirements engineering}
+}
+
+@inproceedings{zaidmanNoTitleFound2018,
+  title = {[{{No}} Title Found]},
+  booktitle = {Proceedings of the 15th {{International Conference}} on {{Mining Software Repositories}}},
+  author = {Zaidman, Andy and Kamei, Yasutaka and Hill, Emily},
+  date = {2018-05-28},
+  publisher = {ACM},
+  location = {Gothenburg Sweden},
+  eventtitle = {{{ICSE}} '18: 40th {{International Conference}} on {{Software Engineering}}},
+  isbn = {978-1-4503-5716-6},
+  langid = {english}
+}
+
+@online{zeng2022SocraticModels,
+  title = {Socratic {{Models}}: {{Composing Zero-Shot Multimodal Reasoning}} with {{Language}}},
+  shorttitle = {Socratic {{Models}}},
+  author = {Zeng, Andy and Attarian, Maria and Ichter, Brian and Choromanski, Krzysztof and Wong, Adrian and Welker, Stefan and Tombari, Federico and Purohit, Aveek and Ryoo, Michael and Sindhwani, Vikas and Lee, Johnny and Vanhoucke, Vincent and Florence, Pete},
+  date = {2022-05-27},
+  eprint = {2204.00598},
+  eprinttype = {arXiv},
+  eprintclass = {cs},
+  doi = {10.48550/arXiv.2204.00598},
+  url = {http://arxiv.org/abs/2204.00598},
+  urldate = {2025-05-13},
+  pubstate = {prepublished},
+  keywords = {Computer Science - Artificial Intelligence,Computer Science - Computation and Language,Computer Science - Computer Vision and Pattern Recognition,Computer Science - Machine Learning}
+}
+
+@online{zhou2023LargeLanguage,
+  title = {Large {{Language Models Are Human-Level Prompt Engineers}}},
+  author = {Zhou, Yongchao and Muresanu, Andrei Ioan and Han, Ziwen and Paster, Keiran and Pitis, Silviu and Chan, Harris and Ba, Jimmy},
+  date = {2023-03-10},
+  eprint = {2211.01910},
+  eprinttype = {arXiv},
+  eprintclass = {cs},
+  doi = {10.48550/arXiv.2211.01910},
+  url = {http://arxiv.org/abs/2211.01910},
+  urldate = {2025-05-13},
+  pubstate = {prepublished},
+  keywords = {Computer Science - Artificial Intelligence,Computer Science - Computation and Language,Computer Science - Machine Learning}
+}
+
+@online{zhou2023LeasttoMostPrompting,
+  title = {Least-to-{{Most Prompting Enables Complex Reasoning}} in {{Large Language Models}}},
+  author = {Zhou, Denny and Schärli, Nathanael and Hou, Le and Wei, Jason and Scales, Nathan and Wang, Xuezhi and Schuurmans, Dale and Cui, Claire and Bousquet, Olivier and Le, Quoc and Chi, Ed},
+  date = {2023-04-16},
+  eprint = {2205.10625},
+  eprinttype = {arXiv},
+  eprintclass = {cs},
+  doi = {10.48550/arXiv.2205.10625},
+  url = {http://arxiv.org/abs/2205.10625},
+  urldate = {2025-05-20},
+  pubstate = {prepublished},
+  keywords = {Computer Science - Artificial Intelligence,Computer Science - Computation and Language}
 }
