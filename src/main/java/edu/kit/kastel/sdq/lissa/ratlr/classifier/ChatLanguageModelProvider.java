@@ -57,6 +57,11 @@ public class ChatLanguageModelProvider {
     public static final String BLABLADOR = "blablador";
 
     /**
+     * Identifier for the DeepSeek platform.
+     */
+    public static final String DEEPSEEK = "deepseek";
+
+    /**
      * Default seed value for model randomization.
      */
     public static final int DEFAULT_SEED = 133742243;
@@ -103,6 +108,7 @@ public class ChatLanguageModelProvider {
             case OPENAI -> createOpenAiChatModel(modelName, seed);
             case OLLAMA -> createOllamaChatModel(modelName, seed);
             case BLABLADOR -> createBlabladorChatModel(modelName, seed);
+            case DEEPSEEK -> createDeepSeekChatModel(modelName, seed);
             default -> throw new IllegalArgumentException("Unsupported platform: " + platform);
         };
     }
@@ -225,6 +231,29 @@ public class ChatLanguageModelProvider {
                 .baseUrl("https://api.helmholtz-blablador.fz-juelich.de/v1")
                 .modelName(model)
                 .apiKey(blabladorApiKey)
+                .temperature(0.0)
+                .seed(seed)
+                .build();
+    }
+
+    /**
+     * Creates a DeepSeek chat model instance.
+     * Requires DeepSeek API key to be set in environment variables.
+     *
+     * @param model The name of the model to use
+     * @param seed The seed value for randomization
+     * @return A configured DeepSeek chat model instance
+     * @throws IllegalStateException If required environment variables are not set
+     */
+    private static OpenAiChatModel createDeepSeekChatModel(String model, int seed) {
+        String deepseekApiKey = Environment.getenv("DEEPSEEK_API_KEY");
+        if (deepseekApiKey == null) {
+            throw new IllegalStateException("DEEPSEEK_API_KEY environment variable not set");
+        }
+        return new OpenAiChatModel.OpenAiChatModelBuilder()
+                .baseUrl("https://api.deepseek.com/v1")
+                .modelName(model)
+                .apiKey(deepseekApiKey)
                 .temperature(0.0)
                 .seed(seed)
                 .build();
