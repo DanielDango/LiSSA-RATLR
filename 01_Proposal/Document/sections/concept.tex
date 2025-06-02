@@ -4,9 +4,9 @@
 In order to explore prompt engineering
 
 \section{Automatic Prompt Optimization Using Gradient Descent}
-Based on the work of \citewithauthor{pryzant2023automatic} I will implement a more sophisticated prompt optimization algorithm into the LiSSA framework. The authors have provided their source code in a publicly accessible repository \footnote{https://github.com/microsoft/LMOps/tree/main/prompt\_optimization} under the MIT licensing. They propose the Prompt Optimization with Textual Gradients (ProTeGi) algorithm. This entire section is based on their work.
+Based on the work of \citewithauthor{pryzant2023AutomaticPrompt} I will implement a more sophisticated prompt optimization algorithm into the LiSSA framework. They propose the Prompt Optimization with Textual Gradients (ProTeGi) algorithm. This entire section is based on their work.
 
-The ProTeGi algorithm takes an initial prompt $p$ and training data $\{(x_1, y_1), \dots, (x_n, y_n)\}$ consisting of input and output. They \directQuote[sec. 2]{assume access to a black box LLM API [...] which returns a likely text continuation y of the prompt formed by concatenating p and x}{pryzant2023automatic}. They then iteratively optimize the initial prompt p to produce an approximation of the most optimized prompt for the given task. In order to optimize the prompt, a function is required, to compute deviance between the actual output $y$ and expected output $y_i$ as a numeric value.
+The ProTeGi algorithm takes an initial prompt $p$ and training data $\{(x_1, y_1), \dots, (x_n, y_n)\}$ consisting of input and output. They \directQuote[sec. 2]{assume access to a black box LLM API [...] which returns a likely text continuation y of the prompt formed by concatenating p and x}{pryzant2023AutomaticPrompt}. They then iteratively optimize the initial prompt p to produce an approximation of the most optimized prompt for the given task. In order to optimize the prompt, a function is required, to compute deviance between the actual output $y$ and expected output $y_i$ as a numeric value.
 
 \begin{figure}[h]
 \centering
