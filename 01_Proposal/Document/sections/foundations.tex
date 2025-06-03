@@ -1,0 +1,35 @@
+\chapter{Foundations}
+
+\section{Definition of Trace Link Recovery}
+Traceability is the ability for something to be traced. Meaning, there is evidence of some past occurrence. %Do I need to quote a dictionary here?
+The task of trace link recovery (TLR) in software engineering is to find instances of the same element across different artifacts and link them for further processing. These traceability links help with tracking relationships between for example: code, requirements, diagrams, documentation, \dots
+
+This becomes especially important when inconsistencies are introduced into the project's artifacts. 
+
+As shown by \citewithauthor{wohlrab2019ImprovingConsistency} inconsistency in wording and language is quite common during different stages of development. For example, naming conventions for architectural components may not be followed during implementation. They find the impact of these inconsistencies to be quite insignificant. However, for trace link recovery, this means that simple string comparisons by name are insufficient.
+
+
+
+\section{Definition of Automated Prompt Engineering}
+Prompt engineering is the process of refining a prompt for the specific use case. This is usually done in a non-systematic way. In this work, I will explore a systematic iterative approach to prompt engineering.
+
+\section{Automatic Prompt Optimization Using Gradient Descent}
+\label{sec:gradient_descent}
+Based on the work of \citewithauthor{pryzant2023AutomaticPrompt} I will implement a more sophisticated prompt optimization algorithm into the LiSSA framework. They propose the Prompt Optimization with Textual Gradients (ProTeGi) algorithm. This entire section is based on their work.
+
+The ProTeGi algorithm takes an initial prompt $p$ and training data $\{(x_1, y_1), \dots, (x_n, y_n)\}$ consisting of input and output. They \directQuote[sec. 2]{assume access to a black box LLM API [...] which returns a likely text continuation y of the prompt formed by concatenating p and x}{pryzant2023AutomaticPrompt}. They then iteratively optimize the initial prompt p to produce an approximation of the most optimized prompt for the given task. In order to optimize the prompt, a function is required, to compute deviance between the actual output $y$ and expected output $y_i$ as a numeric value.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=12cm]{logos/sdqlogo}
+\caption{TODO: Overview of the iterative optimization loop}
+\label{fig:sdqlogo}
+\end{figure}
+
+\textit{TODO: Continue explanation of APO with gradient descent}
+APO with gradient descent works in three steps to improve the current prompt $p_0$:
+\begin{itemize}
+    \item evaluating the result when calling $p_0$ with training data
+    \item creating a gradient $g$ that signals what's still wrong with $p_0$
+    \item adjusting the $p_0$ attempting to solve the issues indicated by $g$
+\end{itemize}

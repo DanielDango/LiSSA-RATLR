@@ -67,6 +67,11 @@
 %% For example texts -- please remove in the final version
 \usepackage{blindtext}
 
+\usepackage{enumitem}
+\newlist{risks}{enumerate}{2}
+\setlist[risks,1]{label=\textbf{Risk \arabic*.},ref=Risk \arabic*}
+\setlist[risks,2]{label=(\alph*),ref=\therisksi(\alph*)}
+
 %% ====================================
 %% ====================================
 %% ||                                ||
@@ -119,10 +124,10 @@
 \mainmatter
 
 \input{sections/introduction}
-\input{sections/concept}
+\input{sections/foundations}
+\input{sections/related_work}
 \input{sections/work_plan}
 
-\input{sections/conclusion}
 
 %% --------------------
 %% |   Bibliography   |
