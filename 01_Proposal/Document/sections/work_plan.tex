@@ -22,7 +22,7 @@ The benchmark data to compare tree-of-thought prompting with the existing zero s
 
 \subsection{Naive iterative Optimization}
 \label{phase_naive_iterative}
-\textbf{What:} I plan to implement a naive iterative approach to prompt optimization. Many automatic prompt optimization algorithms \cite{pryzant2023AutomaticPrompt} \textit{to-do: quote more papers using iterative algorithms} depend on an iterative core loop which will be repeated until the optimized prompt performs good enough.
+\textbf{What:} I plan to implement a naive iterative approach to prompt optimization. Many automatic prompt optimization algorithms \citeiterative \textit{to-do: quote more papers using iterative algorithms} depend on an iterative core loop which will be repeated until the optimized prompt performs good enough.
 
 \textbf{How:} Another quick classifier implementation will be the simplest automatic iterative prompt optimization algorithm. The same existing abstract \verb|classifier| class can be used as in \ref{phase_initial_overview} to provide basic functionality for the iteratively optimized classifier.
 
@@ -90,8 +90,10 @@ This work will yield code to be merged into the LiSSA repository\footnote{https:
 
 A written report will be created to document, summarize and evaluate the results of my (automatic) prompt optimization work to retrieve trace links.
 
-
 \section{Schedule}
+\textit{Probably exclude proposal phase}
+
+
     \begin{ganttchart}[today=7,today label=Current Week]{1}{25}
       \gantttitle{2025}{25} \\
       %todo: unfortunately not all months have four calendar weeks :)
@@ -111,6 +113,7 @@ A written report will be created to document, summarize and evaluate the results
 
       \ganttgroup{APO gradient descent}{17}{21} \\
       \ganttbar{Implementation}{17}{19}\\
+      \ganttmilestone{Code review}{18} \\ 
       \ganttbar{Thesis writing}{19}{23} \\
       
       \ganttgroup{\nameref{phase_evaluation}}{15}{25} \\
@@ -123,9 +126,9 @@ A written report will be created to document, summarize and evaluate the results
 
       \ganttmilestone{Thesis hand-in}{25}
 
-      \ganttlink{elem9}{elem14}
-      \ganttlink{elem11}{elem15}
-      \ganttlink{elem7}{elem14}
+      \ganttlink{elem9}{elem15}
+      \ganttlink{elem11}{elem16}
+      \ganttlink{elem7}{elem15}
       \ganttlink{elem3}{elem4}
     \end{ganttchart}
 
