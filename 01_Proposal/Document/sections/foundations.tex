@@ -31,10 +31,17 @@ The ProTeGi algorithm takes an initial prompt $p_0$ and training data $\{(x_1, y
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=12cm]{logos/sdqlogo}
-\caption{TODO: Overview of the iterative optimization loop}
-\label{fig:sdqlogo}
+\includegraphics[width=9cm]{graphics/gradient_descent.png}
+\caption{Overview of the iterative optimization loop in \cite{pryzant2023AutomaticPrompt}}
+\label{fig:gradient_descent}
+TODO: 
+\begin{itemize}
+    \item improve resolution
+    \item add legend
+    \item symbolise core loop
+\end{itemize}
 \end{figure}
+
 
 \subsectoion{Evaluation and Expansion}
 To evaluate the output of the current prompt $p_i$, they use a loss signal prompt $\triangledown$. In addition to the prompt errors that were not correctly classified when testing $p_i$ are also provided. The result summarizes the flaws of $p_i$ in natural language. This summary is called the textual gradient $g$.
