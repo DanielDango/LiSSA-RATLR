@@ -287,4 +287,4 @@
 \newcommand{\citewithauthor}[1]{\citeauthor{#1} \cite{#1}}
 \newcommand{\directQuote}[3][]{\guillemotleft#2\guillemotright~\cite[#1]{#3}}
 
-\newcommand{\citeiterative}[0]{\cite{pryzant2023AutomaticPrompt, zadenoori2025AutomaticPrompt}}
+\newcommand{\citeiterative}[0]{\cite{pryzant2023AutomaticPrompt, zadenoori2025AutomaticPrompt, zhou2023LargeLanguage, madaan2023SelfRefineIterative}}

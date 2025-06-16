@@ -5,79 +5,26 @@
 \label{phase_initial_overview}
 
 \textbf{What}: To get familiar with the LiSSA framework, I will implement another basic classifier with simple the simple prompting technique tree-of-thought (ToT) \cite{long2023LargeLanguage}. 
-Currently, a zero-shot and chain-of-thought classifier are implemented. However, as \citeauthor{long2023LargeLanguage} have shown, tree-of-though style prompts can improve performance compared to chain-of-though approaches in solving logic puzzles. They have tested their approach to ToT prompting with different sized Sudoku puzzles and compared their results against zero-shot prompting as well as chain-of-thought styled one- and few-shot prompting. 
-
-
-\textbf{How}: The LiSSA framework is publicly accessible in a repository \footnote{https://github.com/ArDoCo/LiSSA-RATLR/} using the MIT license. This way, existing classifiers can be used as an inspiration for development. 
-
-The existing class \verb|classifier| is an abstraction of all classifiers and provides basic functionality to include further classifiers. Integration for different LLM providers, such as Chat-GPT, Ollama and Blablador already exists in the framework. The new classifier can be plugged in directly with little more effort than writing the request prompt and implementing the \verb|classify| function to extract the classification result out of the LLM output.
-
-The prompts by \citewithauthor{hulbert2023UsingTreeofThought} aim to simplify tree-of-thought prompting into a singular request, instead of chaining multiple calls. I will use one of their prompts
-
-The benchmark data to compare tree-of-thought prompting with the existing zero shot and chain-of-thought classifiers also exists in a public repository \footnote{https://github.com/ArDoCo/Benchmark} \cite{fuchss2022ArDoCoBenchmark}. 
-
-
-\textbf{Why}: This work package has two major goals. Foremost, to get confident and setup with the general project structure and benchmark data. This will be a prerequisite for all future work in the LiSSA framework. Second, this will broaden the baseline to compare later results and possible improvements against.
+Currently, a zero-shot and chain-of-thought classifier are implemented. However, as \citeauthor{long2023LargeLanguage} has shown, tree-of-though style prompts can improve performance compared to chain-of-though approaches in solving logic puzzles. They have tested their approach to ToT prompting with different sized Sudoku puzzles and compared their results against zero-shot prompting as well as chain-of-thought styled one- and few-shot prompting. 
 
 
 \subsection{Naive iterative Optimization}
 \label{phase_naive_iterative}
 \textbf{What:} I plan to implement a naive iterative approach to prompt optimization. Many automatic prompt optimization algorithms \citeiterative \textit{to-do: quote more papers using iterative algorithms} depend on an iterative core loop which will be repeated until the optimized prompt performs good enough.
 
-\textbf{How:} Another quick classifier implementation will be the simplest automatic iterative prompt optimization algorithm. The same existing abstract \verb|classifier| class can be used as in \ref{phase_initial_overview} to provide basic functionality for the iteratively optimized classifier.
-
-Next, a function $f$ will be required to quantify the result of the current prompt $p$ iteration, called to a large language model $llm$. The simple approach here is to use the successful retrieval rate, by dividing the amount of correctly classified trace links by the total amount of recoverable trace links.
-The function $f$ will need to have the same range for any set of training data to ensure the threshold value $t$ will always be viable.
-
-
-\begin{align*} 
-f: llm(p) \rightarrow [0, 1] \\
-t \in [0, 1]
-\end{align*}
-The benchmark data by \citewithauthor{fuchss2022ArDoCoBenchmark} also provides the gold standard for each given problem. The total amount of recoverable trace links thus is already available. \textit{to-do: how can the task set be divided into training and testing data? Use one entire TLR problem for training, the remaining for testing?}
-
-To improve the performance, an optimization prompt is used. The naive approach is to simply ask the LLM to improve the prompt without providing further direction or information about why the prompt did not meet the requirements yet. The hopefully improved prompt will be taken into the next iteration. The act of evaluation and improving will be repeated until a threshold value is passed, meaning the prompt is considered good enough. To limit resource usage, a hard limit will also be included to put an upper bound on the optimization attempts.
-
-
-\textbf{Why:} Implementing this naive iteratively optimized classifier will yield fast results to evaluate later, even if more complicated implementations might fail. The core concepts also apply for \ref{phase_gradient_descent} and can be reused. 
-
-
 \subsection{Automatic Prompt Optimization Based on Gradient Descent}
 \label{phase_gradient_descent}
 \textbf{What:} The major implementation of this thesis will be an adaption of the gradient descent based automatic prompt optimization (APO) algorithm by \citewithauthor{pryzant2023AutomaticPrompt}. 
 The APO algorithm will be trained and tested on the LiSSA benchmark data \cite{fuchss2022ArDoCoBenchmark}. The optimized prompt will be compared against previous prompts used by \citeauthor{fuchss2025LiSSAGeneric} in the LiSSA project.
 
-\textbf{How:} The authors have provided their python source code in a publicly accessible repository\footnote{https://github.com/microsoft/LMOps/tree/main/prompt\_optimization} under the MIT licensing. The project code can be of great help when adapting their algorithm to the LiSSA java framework.
 
-The existing iterative optimization implementation from \ref{phase_naive_iterative} can be used as foundations for the implementation as the core concepts remain the same. Refer to \ref{sec:gradient_descent} for details of the gradient descent based optimization algorithm. The actual implementation of gradient descent will be the main focus here, in order to steer optimized prompts in the right direction.
-
-
-\textbf{Why:} The primary idea of this thesis is to explore automated optimization. The naive approach may yield good results already. Feeding more information and processing logic into the optimization system is expected to present better results. Especially suitable results may be reached faster by doing more processing on the machine instead of expensive API calls to the large language model.
 
 
 \subsection{Evaluation and Buffer}
 \label{phase_evaluation}
 \textbf{What:} As this work can be seen as an expansion on the recent work of \citewithauthor{fuchss2025LiSSAGeneric} the same metrics will be used to evaluate the different prompts used and optimized in this work. These are the precision, recall, $F_1$-Score and $F_2$-Score. This enables an easy comparison, especially with the manual prompts designed by \citewithauthor{ewald2024RetrievalAugmentedLarge} included in the work of \citeauthor{fuchss2025LiSSAGeneric}.
 
-\textbf{How:} Precision and recall are key measures for information retrieval tasks \cite{hayes2006AdvancingCandidate}. 
 
-\textit{TODO: Explain these metricize and how they are calculated instead of direct quoting and format formulas} 
-\directQuote[sec. 7.1]{Precision measures the ratio of correctly predicted links and all predicted links. Recall measures the ratio of correctly predicted links and all relevant documents. It shows an approach’s ability to provide correct trace links. The F1 score is the harmonic mean of precision and recall. The Metrics are calculated in the following way, where TP is true positives, FP is false positives, and FN is false negatives.}{ewald2024RetrievalAugmentedLarge}
-
-\begin{align*} 
-    Precision = \frac{TP}{TP + FP} &\\
-    Recall = \frac{TP}{TP + FN} &\\
-    f_1 = 2 \cdot \frac{Precision \cdot Recall}{Precision + Recall} = \frac{TP}{TP + \frac{1}{2}(FP + FN)} &
-\end{align*}
-
-
-
-Depending on how long each phase will take, it is possible to generate a bunch of different data and perform comparisons.
-A simple but interesting approach is to compare different LLMs for the task. Many variations can be achieved by comparing for example how a prompt optimized by one system performs on the others. We can also compare how well each system manages to optimize the initial prompt. 
-Another interesting thought is to take optimized prompts from a different system as the initial prompt. 
-
-
-\textbf{Why:} Evaluating the experimental results of prompt optimization is key to making them accessible and comparable. 
 
 
 

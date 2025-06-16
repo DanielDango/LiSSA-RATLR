@@ -27,6 +27,7 @@ The initial prompt will be the origin for the refinement process. It needs to be
 \label{sec:gradient_descent}
 Based on the work of \citewithauthor{pryzant2023AutomaticPrompt} I will implement a more sophisticated prompt optimization algorithm into the LiSSA framework. They propose the Prompt Optimization with Textual Gradients (ProTeGi) algorithm. This entire section is based on their work.
 
+\subsection{Initial Prompt}
 The ProTeGi algorithm takes an initial prompt $p_0$ and training data $\{(x_1, y_1), \dots, (x_n, y_n)\}$ consisting of input and output. They \directQuote[sec. 2]{assume access to a black box LLM API [...] which returns a likely text continuation y of the prompt formed by concatenating p and x}{pryzant2023AutomaticPrompt}. They then iteratively optimize the initial prompt $p_0$ to produce an approximation of the most optimized prompt for the given task. In order to optimize the prompt, a function is required, to compute deviance between the actual output $y$ and expected output $y_i$ as a numeric value.
 
 \begin{figure}[h]
@@ -43,7 +44,7 @@ TODO:
 \end{figure}
 
 
-\subsectoion{Evaluation and Expansion}
+\subsection{Evaluation and Expansion}
 To evaluate the output of the current prompt $p_i$, they use a loss signal prompt $\triangledown$. In addition to the prompt errors that were not correctly classified when testing $p_i$ are also provided. The result summarizes the flaws of $p_i$ in natural language. This summary is called the textual gradient $g$.
 
 The second prompt $\delta$ they use, is required to adjust $p_i$ in the opposite direction of $g$ to minimize the loss signal. They differ from other implementations by generating multiple gradients and refinements that might improve $p_i$ and select good candidates to optimize further in the next iterative step.
@@ -79,6 +80,3 @@ The remaining candidates will be used as initial prompts for the next expansion 
     \State \Return Best prompt $p^* \in S_{n-1}$
 \end{algorithmic}
 \end{algorithm}
-
-
-\textit{Three Pages}
