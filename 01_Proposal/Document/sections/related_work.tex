@@ -1,5 +1,43 @@
 \chapter{Related Work}
-In previous work by \citewithauthor{fuchss2025LiSSAGeneric}
-simple handwritten prompts were used to recover trace links between software documentation and architectural diagrams. They have made their work available to the public by hosting a repository, accessible under the MIT license.
+Trace link recovery through large language models is an active field of work to apply rapid advancements in LLM performance.
+
+\section{Trace Link Recovery}
+\citewithauthor{keim2021TraceLink} have first proposed cross domain trace link recovery using agent like algorithms. \textit{Todo: Maybe read the paper?}
+
+In previous work by \citewithauthor{fuchss2025LiSSAGeneric} simple handwritten prompts by \citewithauthor{ewald2024RetrievalAugmentedLarge} were used to recover trace links between software documentation and architectural diagrams. They have proven, that they can outperform other state-of-the-art for code tasks. 
+
+\citewithauthor{hey_requirements_2025} have adapted these prompts into trace link recovery in the domain of requirements to requirements. While they were also able to outperform state-of-the-art approaches, the recall rate for larger data sets still has room for improvement.
+
+\citewithauthor{rodriguez2023PromptsMatter} have also evaluated LLM usage for trace link recovery. Their main takeaway was, that even minor adjustments, \directQuote[sec. VI]{such as pluralizing words,interchanging prepositions,or reordering phrases}{rodriguez2023PromptsMatter} lead to major differences in the outcome. They were unable to find a singular generalized optimal prompt to cover all TLR tasks. They manually adjusted prompts for each single task instead to greatly improve recovery rates.
+
+\section{Automatic Prompt Engineering}
+Many prompt optimization \textit{todo find fitting word: papers} require an initial prompt to start the refinement process by using training data consisting of input / output pairs \cite{ramnath_systematic_2025}.
+
+The Automatic Promot Engineer by \citewithauthor{zhou2023LargeLanguage} can generate prompts for tasks which are specified only by input / output pairs. This eliminates the need for the initial prompt to seed the optimization process.
+
+Self-Refine by \citewithauthor{madaan2023SelfRefineIterative} uses feedback from the same large language model that generated the prompt, to improve the prompt further. This imitates human behavior, when initial drafts are adjusted rapidly. 
+
+ProTeGi by \citewithauthor{pryzant2023AutomaticPrompt} utilizes a gradient descent algorithm to find the minimal deviance between an optimized prompt and the expected outputs. More details about their work can be found in \ref{sec:gradient_descent}.
+
+\citewithauthor{yang2024LargeLanguage} have taken a slightly different approach in their OPRO optimizer. Instead of adjusting the current iteration of prompts to steer them in an improved direction like \citeauthor{pryzant2023AutomaticPrompt}, they generate new independent prompts instead.
+
+In order to reduce uncertainty and improve reproducibility, the Declarative Self-Improving Python (DSPy) Framework by \citewithauthor{khattab_dspy_2023} proposes a composite like structure in python to program prompts. They are also generated and refined the prompts in a pipeline like structure, not unlike other LLM based prompt optimization algorithms. 
+
+\section{Training Data}
+Trace Link Recovery tasks can be applied across many domains. Often authors will focus on one or few domains instead of attempting to cover everything. Domain training data includes the artifacts and ideally also a gold standard to compare results to.
+
+Software architecture documentation to software architecture models for BigBlueButton
+BigBlueButton, MediaStore, Teammates, Teastore are publicly available by \citewithauthor{fuchss2022ArDoCoBenchmark} on GitHub \footnote{https://github.com/ArDoCo/Benchmark}.
+
+For the domain of requirements to requirements, which my work will also focus on, a compilation of training data can be found in the replication package\cite{hey2025ReplicationPackage} for recent work of \citeauthor{hey2025RequirementsTraceability}.
+
+
+
+
+
+\cite{madaan2023SelfRefineIterative}
+
+
+
 
 \textit{Two Pages}
