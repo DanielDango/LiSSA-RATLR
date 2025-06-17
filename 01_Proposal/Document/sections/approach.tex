@@ -1,5 +1,4 @@
 \chapter{Approach}
-\textit{TODO: Wording}
 \section{Simple Tree of Thought Classifier}
 \textbf{How}: The LiSSA framework is publicly accessible in a repository \footnote{https://github.com/ArDoCo/LiSSA-RATLR/} using the MIT license. This way, existing classifiers can be used as an inspiration for development. 
 
@@ -11,6 +10,13 @@ The benchmark data to compare tree-of-thought prompting with the existing zero s
 
 
 \textbf{Why}: This work package has two major goals. Foremost, to get confident and setup with the general project structure and benchmark data. This will be a prerequisite for all future work in the LiSSA framework. Second, this will broaden the baseline to compare later results and possible improvements against.
+
+\begin{figure}[h!tb]
+    \centering
+    \includegraphics[width=\linewidth]{graphics/ToT_Yao.png}
+    \caption{Tree of Thought visualization by \citewithauthor{yao2023TreeThoughts}}
+    \label{fig:enter-label}
+\end{figure}
 
 \section{Naive Iterative Optimizing Classifier}
 \textbf{How:} Another quick classifier implementation will be the simplest automatic iterative prompt optimization algorithm. The same existing abstract \verb|classifier| class can be used as in \ref{phase_initial_overview} to provide basic functionality for the iteratively optimized classifier.
@@ -27,6 +33,12 @@ The benchmark data by \citewithauthor{fuchss2022ArDoCoBenchmark} also provides t
 
 To improve the performance, an optimization prompt is used. The naive approach is to simply ask the LLM to improve the prompt without providing further direction or information about why the prompt did not meet the requirements yet. The hopefully improved prompt will be taken into the next iteration. The act of evaluation and improving will be repeated until a threshold value is passed, meaning the prompt is considered good enough. To limit resource usage, a hard limit will also be included to put an upper bound on the optimization attempts.
 
+\begin{figure}[h!tb]
+    \centering
+    \includesvg[width=0.7\linewidth]{graphics/iterative_core_loop.drawio}
+    \caption{Visualization of a simple iterative optimization algorithm}
+    \label{fig:enter-label}
+\end{figure}
 
 \textbf{Why:} Implementing this naive iteratively optimized classifier will yield fast results to evaluate later, even if more complicated implementations might fail. The core concepts also apply for \ref{phase_gradient_descent} and can be reused. 
 
