@@ -1,5 +1,7 @@
 \chapter{Foundations}
 
+In order to understand the application of automated prompt engineering for trace link recovery, some key concepts are quite important. They will be explained in the following subsections.
+
 \section{Definition of Trace Link Recovery}
 Traceability is the ability for something to be traced. Meaning, there is evidence of some past occurrence. %Do I need to quote a dictionary here?
 The task of trace link recovery (TLR) in software engineering is to find instances of the same element across different artifacts and link them for further processing. These traceability links help with tracking relationships between for example: code, requirements, diagrams, documentation, \dots
@@ -29,7 +31,7 @@ Based on the work of \citewithauthor{pryzant2023AutomaticPrompt} I will implemen
 \subsection{Initial Prompt}
 The ProTeGi algorithm takes an initial prompt $p_0$ and training data $\{(x_1, y_1), \dots, (x_n, y_n)\}$ consisting of input and output. They \directQuote[sec. 2]{assume access to a black box LLM API [...] which returns a likely text continuation y of the prompt formed by concatenating p and x}{pryzant2023AutomaticPrompt}. They then iteratively optimize the initial prompt $p_0$ to produce an approximation of the most optimized prompt for the given task. In order to optimize the prompt, a function is required, to compute deviance between the actual output $y$ and expected output $y_i$ as a numeric value.
 
-\begin{figure}[h]
+\begin{figure}
 \centering
 \includesvg[width=0.7\linewidth]{graphics/gradient_descent.drawio}
 \caption{Overview of the iterative optimization loop in \cite{pryzant2023AutomaticPrompt}}
@@ -70,10 +72,10 @@ The remaining candidates will be used as initial prompts for the next expansion 
 \caption{\directQuote[Algorithm 4, p. 4]{$Select(\cdot)$ with Successive Rejects}{pryzant2023AutomaticPrompt}}
 \begin{algorithmic}[1]
     \State Initialize: $S_0 \gets \{p_1, \dots , p_n\}$
-    \For{$k = 1, \dots , {n − 1}$}
+    \For{$k = 1, \dots , {n  - 1}$}
         \State Sample $D_{sample} \subset D_{tr}, |D_{sample}| = n_k$
-        \State Evaluate $p_i \in S_{k−1}$ with $m(p_i, D_{sample})$
-        \State $S_k \gets S_{k−1}$, excluding the prompt with the lowest score from the previous step
+        \State Evaluate $p_i \in S_{k-1}$ with $m(p_i, D_{sample})$
+        \State $S_k \gets S_{k-1}$, excluding the prompt with the lowest score from the previous step
     \EndFor
     \State \Return Best prompt $p^* \in S_{n-1}$
 \end{algorithmic}
