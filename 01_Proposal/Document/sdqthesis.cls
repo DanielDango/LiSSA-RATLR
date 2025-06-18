@@ -285,7 +285,26 @@
 \RequirePackage{algorithm}
 \RequirePackage{algpseudocode}
 \RequirePackage{svg}
-\newcommand{\citewithauthor}[1]{\citeauthor{#1} \cite{#1}}
-\newcommand{\directQuote}[3][]{\guillemotleft#2\guillemotright~\cite[#1]{#3}}
+\RequirePackage{cleveref}
+\RequirePackage{acro}
+\RequirePackage{xspace}
 
-\newcommand{\citeiterative}[0]{\cite{pryzant2023AutomaticPrompt, zadenoori2025AutomaticPrompt, zhou2023LargeLanguage, madaan2023SelfRefineIterative}}
+
+\newcommand{\citewithauthor}[1]{\citeauthor{#1} \cite{#1}\xspace}
+\newcommand{\directQuote}[3][]{\guillemotleft#2\guillemotright~\cite[#1]{#3}\xspace}
+\newcommand{\citeiterative}[0]{\cite{pryzant2023AutomaticPrompt, zadenoori2025AutomaticPrompt, zhou2023LargeLanguage, madaan2023SelfRefineIterative}\xspace}
+
+\DeclareAcronym{ToT}{short=ToT, long=tree-of-thought}
+\DeclareAcronym{CoT}{short=CoT, long=chain-of-thought}
+\DeclareAcronym{APO}{short=APO, long=automatic prompt optimization}
+\DeclareAcronym{APE}{short=APE, long=automatic prompt engineering}
+\DeclareAcronym{LLM}{short=LLM, long=large language model}
+
+
+
+\newcommand{\ToT}[0]{\ac{ToT}\xspace}
+\newcommand{\CoT}[0]{\ac{CoT}\xspace}
+\newcommand{\APO}[0]{\ac{APO}\xspace}
+\newcommand{\APE}[0]{\ac{APE}\xspace}
+\newcommand{\LLM}[0]{\ac{LLM}\xspace}
+\newcommand{\LLMs}[0]{\acp{LLM}\xspace}
