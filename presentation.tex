@@ -16,8 +16,8 @@
 
 % Beginn der Präsentation
 
-\title[Automated Prompt Engineering for Traceability Link Recovery]{Proposal Presentation: Automated Prompt Engineering for Traceability Link Recovery}
-\subtitle{Institute of Information Security and Dependability (KASTEL), Prof. Anne Koziolek} 
+\title[Automated Prompt Engineering for Traceability Link Recovery]{BT: Automated Prompt Engineering for Traceability Link Recovery}
+\subtitle{Institute of Information Security and Dependability (KASTEL), Prof. Anne Koziolek \newline Modelling for Continuous Software Engineering, Supervisor:  M.Sc. Dominik Fuchß} 
 \author{Daniel Schwab}
 
 \date[23.\,06.\,2025]{23. June 2025}
@@ -30,6 +30,10 @@
 
 \usepackage{lipsum}
 \usepackage{svg}
+\usepackage{multirow}
+\usepackage{tikz}
+\usepackage{verbatim}
+\usepackage{pgfgantt}
 
 \begin{document}
 
@@ -48,16 +52,18 @@
 
 
 \begin{frame}[picture 50 vertical, picture=images/artifact_overview_Fuchß.png]
-\frametitle{What is Traceability Link Recovery}
+\frametitle{What is Traceability Link Recovery (TLR)}
 	\begin{itemize}
 		\item Many artifacts are created during software development
             \item Often, inconsistencies will be present, such as naming
             \item Goal: Link elements across multiple domains or versions to ensure consistency and validation
+            \item Image: Overview of possible artifacts for TLR by \cite{fuchss2025LiSSAGeneric}
 	\end{itemize}
 \end{frame}
 
+
 \begin{frame}
-\frametitle{What is Automated Prompt Engineering}
+\frametitle{What is Automated Prompt Engineering (APE)}
     \begin{columns}
         \column{0.4\textwidth}
             \begin{itemize}
@@ -69,19 +75,20 @@
             \begin{figure}
             \centering
             \includesvg{images/iterative_core_loop.drawio}
-            \caption{Caption}
+            \caption{Visualization of a general iterative core loop for APE}
             \label{fig:enter-label}
             \end{figure}
     \end{columns}
     
 \end{frame}
 
+\begin{comment}
 \begin{frame}
 \frametitle{The LiSSA Framework}
     \begin{figure}
         \centering
         \includegraphics[width=0.9\linewidth]{images/LiSSA_pipeline_Fuchß.png}
-        \caption{Caption}
+        \caption{LiSSA pipeline by \cite{fuchss2025LiSSAGeneric}}
         \label{fig:enter-label}
     \end{figure}
     \begin{itemize}
@@ -89,194 +96,163 @@
     \end{itemize}
     
 \end{frame}
+\end{comment}
 
-\section{Implementation}
+\begin{frame}{Related Work}
+    
+    \begin{figure}
+        \centering
+        \begin{tikzpicture}
+            \begin{scope} [fill opacity = .4, text opacity=1]
+            \draw[fill=green, draw = black] (-5,0) ellipse (9 and 6);
+            \draw[fill=blue, draw = black] (5,0) ellipse (9 and 6);
+            \draw[fill=red, draw = black] (4,-3) ellipse (5 and 3);
+            \node at (-5,4) {\LARGE\textbf{TLR}};
+            \node at (5,4) {\LARGE\textbf{LLM}};
+            \node at (4,-5.25) {\LARGE\textbf{APE}};
+            \node[align=center] at (-5,-4) {\textbf{\cite{keim2021TraceLink}} TLR\\with agent like algorithms};
 
-\begin{frame}[picture 50 vertical, picture=images/artifact_overview_Fuchß.png]
-\frametitle{Automated Prompt Engineering with Gradient Descent}
+            %TLR with LLMs
+            \node[align=center] at (0,0.5) {\textbf{\cite{hey2025RequirementsTraceability}} RE2RE\\TLR with LLMs};
+            \node[align=center] at (0,2) {\textbf{\cite{fuchss2025LiSSAGeneric}} LiSSA\\framework for TLR};
+
+            %LLM Work
+            \node[align=center] at (11,-1) {\textbf{\cite{long2023LargeLanguage}} \\ToT prompting};
+
+            %APE Work
+            \node[align=center] at (4.75,-2.5) {\textbf{\cite{khattab2023DSPyCompiling}} \\DSPy composite prompt structure};
+            \node[align=center] at (3.75,-4) {\textbf{\cite{pryzant2023AutomaticPrompt}}  ProTeGi\\gradient descent based APE};
+
+            %Crosssection
+            \node[align=center] at (1.75, -1.35) {\textbf{my work}};
+            \end{scope}
+        %% And now you have a venn diagram. Yay!
+        \draw[help lines](-14,6) grid (14,-6);    
+        \end{tikzpicture}
+        \caption{Caption}
+        \label{fig:enter-label}
+    \end{figure}
     
 \end{frame}
 
 
+\section{Implementation}
 
-
-
-
-\begin{frame}{Beispielinhalt: Literatur}
-    Literaturzitat: \cite{klare2021jss}
+\begin{frame}[picture 50 vertical, picture=images/gradient_descent.png]
+\frametitle{Automated Prompt Engineering with Gradient Descent}
+    \begin{itemize}
+        \item Improved APE algorithm by \cite{pryzant2023AutomaticPrompt}
+        \item Generate many new prompt candidates on each layer
+        \item Steer them against the error direction using gradients
+        \item Select the most promising candidates cheaply using a well-studied multiple-armed bandit algorithm
+    \end{itemize}
+    
 \end{frame}
+
+
+\section{Evaluation}
+
+\begin{frame}{Evaluation}
+    \begin{columns}
+        \column{0.4\textwidth}{
+            \begin{itemize}
+                \item Compare performance (precision, recall, F1-score, F2-score) against current manually designed zero-shot and chain-of-thought prompt
+                \item Apply variations of different initial prompts and different LLMs to the optimization problem and compare outputs
+            \end{itemize}
+        }
+        \column{0.6\textwidth}{
+            \begin{table}[]
+                \centering
+                \def\arraystretch{1.1}
+                \begin{tabular}{c c | c c c}
+                    \textbf{Dataset} & \textbf{Metric} & \textbf{IR only} & \textbf{KISS GPT-4o} & \textbf{CoT GPT-4o} \\
+                    
+                    \multirow{4}{*}{CCHIT} & P. & .198 & .234 & .367 \\
+                    &  R. & .157 & .157 & .138 \\
+                    & F1 & .175 & .188 & .200 \\
+                    & F2 & .164 & .168 & .158 \\
+                    \hline
+    
+                    \multirow{4}{*}{Dronology} & P. & .386 & .394 & .512 \\
+                    & R. & .695 & .695 & .655 \\
+                    & F1 & .497 & .503 & .575 \\
+                    & F2 & .600 & .603 & .620 \\
+                    \hline
+                    \multirow{4}{*}{\parbox{4cm}{Average including datasets that are omitted in this table}} &  P. & .329 & .340 & .497 \\
+                    & R. & .500 & .500 & .458 \\
+                    & F1 & .387 & .401 & .451 \\
+                    & F2 & .445 & .452 & .452 
+                \end{tabular}
+                \caption{Reduced results by \cite[Table 2]{hey2025RequirementsTraceability}}
+                \label{tab:my_label}
+            \end{table}
+            
+        }
+    \end{columns}
+    
+\end{frame}
+
+\section{Thesis Shedule}
+\begin{frame}{Thesis Schedule}
+    \ganttset{%
+        calendar week text={%
+            \currentweek
+        }%
+    }
+    \begin{figure}
+    \begin{center}
+    \begin{ganttchart}[
+    vgrid={*{6}{draw=none}, dotted},
+    x unit=.14cm,
+    y unit title=.8cm,
+    y unit chart=.8cm,
+    milestone left shift =-1,
+    milestone right shift =1,
+    time slot format=isodate,
+    time slot format/start date=2025-06-23]{2025-06-23}{2025-10-26}
+    \ganttset{bar height=.7}
+        \gantttitlecalendar{year, month=name, week=26} \\
+        \ganttgroup{Initial Overview}{2025-06-23}{2025-07-27} \\
+        \ganttbar{LiSSA setup}{2025-06-23}{2025-07-06} \\
+        \ganttbar{Tree of Thought implementation}{2025-07-07}{2025-07-13} \\
+        \ganttbar[name=impl1]{Benchmark setup}{2025-07-21}{2025-08-03} \\
+        \ganttgroup{Naive optimization}{2025-07-28}{2025-08-18} \\
+        \ganttbar[name=impl2]{Iterative classifier}{2025-07-28}{2025-08-03} \\
+        \ganttgroup{APE gradient descent}{2025-08-25}{2025-09-21} \\
+        \ganttbar[name=impl3]{Implementation}{2025-08-25}{2025-09-10}\\
+
+        
+        \ganttgroup{Evaluation and Buffer}{2025-08-11}{2025-10-23} \\
+        \ganttbar{Thesis writing}{2025-08-18}{2025-09-14} 
+        \ganttbar{}{2025-09-29}{2025-10-11}
+        \\
+        
+        \ganttbar[name=eval1]{Evaluation}{2025-08-11}{2025-08-24}
+        \ganttbar[name=eval2]{}{2025-09-15}{2025-09-28}
+    
+        
+    
+
+        \ganttlink{impl1}{eval1}
+        \ganttlink{impl2}{eval1}
+        \ganttlink{impl3}{eval2}
+      
+    \end{ganttchart}
+    %\caption{Gantt chart for thesis schedule}
+    \end{center}
+    \label{fig:gantt}
+\end{figure}
+\end{frame}
+
 
 \appendix
 \beginbackup
 
-\begin{frame}{Literatur}
-\begin{exampleblock}{Backup-Teil}
-    Folien, die nach \texttt{\textbackslash beginbackup} eingefügt werden, zählen nicht in die Gesamtzahl der Folien.
-\end{exampleblock}
+\begin{frame}[allowframebreaks]{Literatur}
 
 \printbibliography
 \end{frame}
 
-\section{Farben}
-%% ----------------------------------------
-%% | Test-Folie mit definierten Farben |
-%% ----------------------------------------
-\begin{frame}{Farbpalette}
-\newcommand{\csq}{\strut\hskip1.2em}
-\begin{tabular}{rccccccccccccc}
-	& 100 & 90 & 80 & 70 & 60 & 50 & 40 & 30 & 25 & 20 & 15 & 10 & 5\\
-% GREEN
-	kit-green
-	& \colorbox{kit-green100}{\csq}
-	& \colorbox{kit-green90}{\csq}
-	& \colorbox{kit-green80}{\csq}
-	& \colorbox{kit-green70}{\csq}
-	& \colorbox{kit-green60}{\csq}
-	& \colorbox{kit-green50}{\csq}
-	& \colorbox{kit-green40}{\csq}
-	& \colorbox{kit-green30}{\csq}
-	& \colorbox{kit-green25}{\csq}
-	& \colorbox{kit-green20}{\csq}
-	& \colorbox{kit-green15}{\csq}
-	& \colorbox{kit-green10}{\csq}
-	& \colorbox{kit-green5}{\csq}\\[.5em]
-% BLUE
-	kit-royalblue
-	& \colorbox{kit-royalblue100}{\csq}
-	& \colorbox{kit-royalblue90}{\csq}
-	& \colorbox{kit-royalblue80}{\csq}
-	& \colorbox{kit-royalblue70}{\csq}
-	& \colorbox{kit-royalblue60}{\csq}
-	& \colorbox{kit-royalblue50}{\csq}
-	& \colorbox{kit-royalblue40}{\csq}
-	& \colorbox{kit-royalblue30}{\csq}
-	& \colorbox{kit-royalblue25}{\csq}
-	& \colorbox{kit-royalblue20}{\csq}
-	& \colorbox{kit-royalblue15}{\csq}
-	& \colorbox{kit-royalblue10}{\csq}
-	& \colorbox{kit-royalblue5}{\csq}\\[.5em]
-% BLUE
-	kit-blue
-	& \colorbox{kit-blue100}{\csq}
-	& \colorbox{kit-blue90}{\csq}
-	& \colorbox{kit-blue80}{\csq}
-	& \colorbox{kit-blue70}{\csq}
-	& \colorbox{kit-blue60}{\csq}
-	& \colorbox{kit-blue50}{\csq}
-	& \colorbox{kit-blue40}{\csq}
-	& \colorbox{kit-blue30}{\csq}
-	& \colorbox{kit-blue25}{\csq}
-	& \colorbox{kit-blue20}{\csq}
-	& \colorbox{kit-blue15}{\csq}
-	& \colorbox{kit-blue10}{\csq}
-	& \colorbox{kit-blue5}{\csq}\\[.5em]
-% RED
-	kit-red
-	& \colorbox{kit-red100}{\csq}
-	& \colorbox{kit-red90}{\csq}
-	& \colorbox{kit-red80}{\csq}
-	& \colorbox{kit-red70}{\csq}
-	& \colorbox{kit-red60}{\csq}
-	& \colorbox{kit-red50}{\csq}
-	& \colorbox{kit-red40}{\csq}
-	& \colorbox{kit-red30}{\csq}
-	& \colorbox{kit-red25}{\csq}
-	& \colorbox{kit-red20}{\csq}
-	& \colorbox{kit-red15}{\csq}
-	& \colorbox{kit-red10}{\csq}
-	& \colorbox{kit-red5}{\csq}\\[.5em]
-% GREY
-	kit-gray	
-	& \colorbox{kit-gray100}{\csq}
-	& \colorbox{kit-gray90}{\csq}
-	& \colorbox{kit-gray80}{\csq}
-	& \colorbox{kit-gray70}{\csq}
-	& \colorbox{kit-gray60}{\csq}
-	& \colorbox{kit-gray50}{\csq}
-	& \colorbox{kit-gray40}{\csq}
-	& \colorbox{kit-gray30}{\csq}
-	& \colorbox{kit-gray25}{\csq}
-	& \colorbox{kit-gray20}{\csq}
-	& \colorbox{kit-gray15}{\csq}
-	& \colorbox{kit-gray10}{\csq}
-	& \colorbox{kit-gray5}{\csq}\\[.5em]
-% Orange
-	kit-orange
-	& \colorbox{kit-orange100}{\csq}
-	& \colorbox{kit-orange90}{\csq}
-	& \colorbox{kit-orange80}{\csq}
-	& \colorbox{kit-orange70}{\csq}
-	& \colorbox{kit-orange60}{\csq}
-	& \colorbox{kit-orange50}{\csq}
-	& \colorbox{kit-orange40}{\csq}
-	& \colorbox{kit-orange30}{\csq}
-	& \colorbox{kit-orange25}{\csq}
-	& \colorbox{kit-orange20}{\csq}
-	& \colorbox{kit-orange15}{\csq}
-	& \colorbox{kit-orange10}{\csq}
-	& \colorbox{kit-orange5}{\csq}\\[.5em]
-% lightgreen
-	kit-lightgreen
-	& \colorbox{kit-lightgreen100}{\csq}
-	& \colorbox{kit-lightgreen90}{\csq}
-	& \colorbox{kit-lightgreen80}{\csq}
-	& \colorbox{kit-lightgreen70}{\csq}
-	& \colorbox{kit-lightgreen60}{\csq}
-	& \colorbox{kit-lightgreen50}{\csq}
-	& \colorbox{kit-lightgreen40}{\csq}
-	& \colorbox{kit-lightgreen30}{\csq}
-	& \colorbox{kit-lightgreen25}{\csq}
-	& \colorbox{kit-lightgreen20}{\csq}
-	& \colorbox{kit-lightgreen15}{\csq}
-	& \colorbox{kit-lightgreen10}{\csq}
-	& \colorbox{kit-lightgreen5}{\csq}\\[.5em]
-% Brown
-	kit-brown
-	& \colorbox{kit-brown100}{\csq}
-	& \colorbox{kit-brown90}{\csq}
-	& \colorbox{kit-brown80}{\csq}
-	& \colorbox{kit-brown70}{\csq}
-	& \colorbox{kit-brown60}{\csq}
-	& \colorbox{kit-brown50}{\csq}
-	& \colorbox{kit-brown40}{\csq}
-	& \colorbox{kit-brown30}{\csq}
-	& \colorbox{kit-brown25}{\csq}
-	& \colorbox{kit-brown20}{\csq}
-	& \colorbox{kit-brown15}{\csq}
-	& \colorbox{kit-brown10}{\csq}
-	& \colorbox{kit-brown5}{\csq}\\[.5em]
-% Purple
-	kit-purple
-	& \colorbox{kit-purple100}{\csq}
-	& \colorbox{kit-purple90}{\csq}
-	& \colorbox{kit-purple80}{\csq}
-	& \colorbox{kit-purple70}{\csq}
-	& \colorbox{kit-purple60}{\csq}
-	& \colorbox{kit-purple50}{\csq}
-	& \colorbox{kit-purple40}{\csq}
-	& \colorbox{kit-purple30}{\csq}
-	& \colorbox{kit-purple25}{\csq}
-	& \colorbox{kit-purple20}{\csq}
-	& \colorbox{kit-purple15}{\csq}
-	& \colorbox{kit-purple10}{\csq}
-	& \colorbox{kit-purple5}{\csq}\\[.5em]
-% Cyan
-	kit-cyan
-	& \colorbox{kit-cyan100}{\csq}
-	& \colorbox{kit-cyan90}{\csq}
-	& \colorbox{kit-cyan80}{\csq}
-	& \colorbox{kit-cyan70}{\csq}
-	& \colorbox{kit-cyan60}{\csq}
-	& \colorbox{kit-cyan50}{\csq}
-	& \colorbox{kit-cyan40}{\csq}
-	& \colorbox{kit-cyan30}{\csq}
-	& \colorbox{kit-cyan25}{\csq}
-	& \colorbox{kit-cyan20}{\csq}
-	& \colorbox{kit-cyan15}{\csq}
-	& \colorbox{kit-cyan10}{\csq}
-	& \colorbox{kit-cyan5}{\csq}\\[.5em]
-\end{tabular}
-\end{frame}
 %% ----------------------------------------
 %% | /Test-Folie mit definierten Farben |
 %% ----------------------------------------
