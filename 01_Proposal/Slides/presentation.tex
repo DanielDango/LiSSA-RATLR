@@ -62,24 +62,13 @@
 \end{frame}
 
 
-\begin{frame}
+\begin{frame}[picture 66 vertical, picture=images/iterative_core_loop.drawio.pdf]
 \frametitle{What is Automated Prompt Engineering (APE)}
-    \begin{columns}
-        \column{0.4\textwidth}
-            \begin{itemize}
-		\item Use the LLM to refine prompts instead of manually formulating them
-            \item Improve initial prompt by training with a subset of the actual data
-            \item Optimization prompt to fix previous shortcomings
-	   \end{itemize} 
-        \column{0.6\textwidth}
-            \begin{figure}
-            \centering
-            \includesvg{images/iterative_core_loop.drawio}
-            \caption{Visualization of a general iterative core loop for APE}
-            \label{fig:enter-label}
-            \end{figure}
-    \end{columns}
-    
+    \begin{itemize}
+        \item Use the LLM to refine prompts instead of manually formulating them
+        \item Improve initial prompt by training with a subset of the actual data
+        \item Optimization prompt to fix previous shortcomings
+    \end{itemize} 
 \end{frame}
 
 \begin{comment}
@@ -138,7 +127,7 @@
 
 \section{Implementation}
 
-\begin{frame}[picture 50 vertical, picture=images/gradient_descent.png]
+\begin{frame}[picture 50 vertical, picture=images/gradient_descent.drawio.pdf]
 \frametitle{Automated Prompt Engineering with Gradient Descent}
     \begin{itemize}
         \item Improved APE algorithm by \cite{pryzant2023AutomaticPrompt}
