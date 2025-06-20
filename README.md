@@ -2,7 +2,7 @@
 
 * Student: [Daniel Schwab](mailto:uvlbm@student.kit.edu)
 * Supervisor: [Dominik Fuchß](mailto:dominik.fuchss@kit.edu)
-* 2nd Supervisor: [](mailto:)
+* 2nd Supervisor: [Tobias Hey](mailto:hey@kit.edu)
 * Reviewer: Anne Koziolek
 
 
