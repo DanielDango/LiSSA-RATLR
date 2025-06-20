@@ -1,0 +1,285 @@
+%% Beispiel-Präsentation mit LaTeX Beamer im KIT-Design
+%% entsprechend den Gestaltungsrichtlinien vom Februar 2025
+%%
+%% Siehe https://sdq.kastel.kit.edu/wiki/Dokumentvorlagen
+
+%% Beispiel-Präsentation
+\documentclass{sdqbeamer} 
+ 
+%% Gruppenlogo, muss im Verzeichnis logos/ liegen
+%% falls kein Gruppenlogo gewünscht, bitte \grouplogo{} aufrufen
+\grouplogo{} 
+
+%% Gruppenname und Breite (Standard: 89 mm)
+\groupname{Modelling for Continuous Software Engineering}
+%\groupnamewidth{89mm}
+
+% Beginn der Präsentation
+
+\title[Automated Prompt Engineering for Traceability Link Recovery]{Proposal Presentation: Automated Prompt Engineering for Traceability Link Recovery}
+\subtitle{Institute of Information Security and Dependability (KASTEL), Prof. Anne Koziolek} 
+\author{Daniel Schwab}
+
+\date[23.\,06.\,2025]{23. June 2025}
+
+% Literatur 
+ 
+\usepackage[citestyle=authoryear,bibstyle=numeric,hyperref,backend=biber]{biblatex}
+\addbibresource{presentation.bib}
+\bibhang1em
+
+\usepackage{lipsum}
+\usepackage{svg}
+
+\begin{document}
+
+%Titelseite
+\begin{frame}[title white horizontal, picture=images/palladio_bauplan, kitlogo=white]
+\titlepage
+\end{frame}
+
+%Inhaltsverzeichnis
+%\begin{frame}[tableofcontents=green]{Inhaltsverzeichnis}
+%	\tableofcontents
+%\end{frame}
+
+
+\section{Foundations}
+
+
+\begin{frame}[picture 50 vertical, picture=images/artifact_overview_Fuchß.png]
+\frametitle{What is Traceability Link Recovery}
+	\begin{itemize}
+		\item Many artifacts are created during software development
+            \item Often, inconsistencies will be present, such as naming
+            \item Goal: Link elements across multiple domains or versions to ensure consistency and validation
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{What is Automated Prompt Engineering}
+    \begin{columns}
+        \column{0.4\textwidth}
+            \begin{itemize}
+		\item Use the LLM to refine prompts instead of manually formulating them
+            \item Improve initial prompt by training with a subset of the actual data
+            \item Optimization prompt to fix previous shortcomings
+	   \end{itemize} 
+        \column{0.6\textwidth}
+            \begin{figure}
+            \centering
+            \includesvg{images/iterative_core_loop.drawio}
+            \caption{Caption}
+            \label{fig:enter-label}
+            \end{figure}
+    \end{columns}
+    
+\end{frame}
+
+\begin{frame}
+\frametitle{The LiSSA Framework}
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.9\linewidth]{images/LiSSA_pipeline_Fuchß.png}
+        \caption{Caption}
+        \label{fig:enter-label}
+    \end{figure}
+    \begin{itemize}
+        \item This work will add to the prompting step of the LiSSA framework
+    \end{itemize}
+    
+\end{frame}
+
+\section{Implementation}
+
+\begin{frame}[picture 50 vertical, picture=images/artifact_overview_Fuchß.png]
+\frametitle{Automated Prompt Engineering with Gradient Descent}
+    
+\end{frame}
+
+
+
+
+
+
+\begin{frame}{Beispielinhalt: Literatur}
+    Literaturzitat: \cite{klare2021jss}
+\end{frame}
+
+\appendix
+\beginbackup
+
+\begin{frame}{Literatur}
+\begin{exampleblock}{Backup-Teil}
+    Folien, die nach \texttt{\textbackslash beginbackup} eingefügt werden, zählen nicht in die Gesamtzahl der Folien.
+\end{exampleblock}
+
+\printbibliography
+\end{frame}
+
+\section{Farben}
+%% ----------------------------------------
+%% | Test-Folie mit definierten Farben |
+%% ----------------------------------------
+\begin{frame}{Farbpalette}
+\newcommand{\csq}{\strut\hskip1.2em}
+\begin{tabular}{rccccccccccccc}
+	& 100 & 90 & 80 & 70 & 60 & 50 & 40 & 30 & 25 & 20 & 15 & 10 & 5\\
+% GREEN
+	kit-green
+	& \colorbox{kit-green100}{\csq}
+	& \colorbox{kit-green90}{\csq}
+	& \colorbox{kit-green80}{\csq}
+	& \colorbox{kit-green70}{\csq}
+	& \colorbox{kit-green60}{\csq}
+	& \colorbox{kit-green50}{\csq}
+	& \colorbox{kit-green40}{\csq}
+	& \colorbox{kit-green30}{\csq}
+	& \colorbox{kit-green25}{\csq}
+	& \colorbox{kit-green20}{\csq}
+	& \colorbox{kit-green15}{\csq}
+	& \colorbox{kit-green10}{\csq}
+	& \colorbox{kit-green5}{\csq}\\[.5em]
+% BLUE
+	kit-royalblue
+	& \colorbox{kit-royalblue100}{\csq}
+	& \colorbox{kit-royalblue90}{\csq}
+	& \colorbox{kit-royalblue80}{\csq}
+	& \colorbox{kit-royalblue70}{\csq}
+	& \colorbox{kit-royalblue60}{\csq}
+	& \colorbox{kit-royalblue50}{\csq}
+	& \colorbox{kit-royalblue40}{\csq}
+	& \colorbox{kit-royalblue30}{\csq}
+	& \colorbox{kit-royalblue25}{\csq}
+	& \colorbox{kit-royalblue20}{\csq}
+	& \colorbox{kit-royalblue15}{\csq}
+	& \colorbox{kit-royalblue10}{\csq}
+	& \colorbox{kit-royalblue5}{\csq}\\[.5em]
+% BLUE
+	kit-blue
+	& \colorbox{kit-blue100}{\csq}
+	& \colorbox{kit-blue90}{\csq}
+	& \colorbox{kit-blue80}{\csq}
+	& \colorbox{kit-blue70}{\csq}
+	& \colorbox{kit-blue60}{\csq}
+	& \colorbox{kit-blue50}{\csq}
+	& \colorbox{kit-blue40}{\csq}
+	& \colorbox{kit-blue30}{\csq}
+	& \colorbox{kit-blue25}{\csq}
+	& \colorbox{kit-blue20}{\csq}
+	& \colorbox{kit-blue15}{\csq}
+	& \colorbox{kit-blue10}{\csq}
+	& \colorbox{kit-blue5}{\csq}\\[.5em]
+% RED
+	kit-red
+	& \colorbox{kit-red100}{\csq}
+	& \colorbox{kit-red90}{\csq}
+	& \colorbox{kit-red80}{\csq}
+	& \colorbox{kit-red70}{\csq}
+	& \colorbox{kit-red60}{\csq}
+	& \colorbox{kit-red50}{\csq}
+	& \colorbox{kit-red40}{\csq}
+	& \colorbox{kit-red30}{\csq}
+	& \colorbox{kit-red25}{\csq}
+	& \colorbox{kit-red20}{\csq}
+	& \colorbox{kit-red15}{\csq}
+	& \colorbox{kit-red10}{\csq}
+	& \colorbox{kit-red5}{\csq}\\[.5em]
+% GREY
+	kit-gray	
+	& \colorbox{kit-gray100}{\csq}
+	& \colorbox{kit-gray90}{\csq}
+	& \colorbox{kit-gray80}{\csq}
+	& \colorbox{kit-gray70}{\csq}
+	& \colorbox{kit-gray60}{\csq}
+	& \colorbox{kit-gray50}{\csq}
+	& \colorbox{kit-gray40}{\csq}
+	& \colorbox{kit-gray30}{\csq}
+	& \colorbox{kit-gray25}{\csq}
+	& \colorbox{kit-gray20}{\csq}
+	& \colorbox{kit-gray15}{\csq}
+	& \colorbox{kit-gray10}{\csq}
+	& \colorbox{kit-gray5}{\csq}\\[.5em]
+% Orange
+	kit-orange
+	& \colorbox{kit-orange100}{\csq}
+	& \colorbox{kit-orange90}{\csq}
+	& \colorbox{kit-orange80}{\csq}
+	& \colorbox{kit-orange70}{\csq}
+	& \colorbox{kit-orange60}{\csq}
+	& \colorbox{kit-orange50}{\csq}
+	& \colorbox{kit-orange40}{\csq}
+	& \colorbox{kit-orange30}{\csq}
+	& \colorbox{kit-orange25}{\csq}
+	& \colorbox{kit-orange20}{\csq}
+	& \colorbox{kit-orange15}{\csq}
+	& \colorbox{kit-orange10}{\csq}
+	& \colorbox{kit-orange5}{\csq}\\[.5em]
+% lightgreen
+	kit-lightgreen
+	& \colorbox{kit-lightgreen100}{\csq}
+	& \colorbox{kit-lightgreen90}{\csq}
+	& \colorbox{kit-lightgreen80}{\csq}
+	& \colorbox{kit-lightgreen70}{\csq}
+	& \colorbox{kit-lightgreen60}{\csq}
+	& \colorbox{kit-lightgreen50}{\csq}
+	& \colorbox{kit-lightgreen40}{\csq}
+	& \colorbox{kit-lightgreen30}{\csq}
+	& \colorbox{kit-lightgreen25}{\csq}
+	& \colorbox{kit-lightgreen20}{\csq}
+	& \colorbox{kit-lightgreen15}{\csq}
+	& \colorbox{kit-lightgreen10}{\csq}
+	& \colorbox{kit-lightgreen5}{\csq}\\[.5em]
+% Brown
+	kit-brown
+	& \colorbox{kit-brown100}{\csq}
+	& \colorbox{kit-brown90}{\csq}
+	& \colorbox{kit-brown80}{\csq}
+	& \colorbox{kit-brown70}{\csq}
+	& \colorbox{kit-brown60}{\csq}
+	& \colorbox{kit-brown50}{\csq}
+	& \colorbox{kit-brown40}{\csq}
+	& \colorbox{kit-brown30}{\csq}
+	& \colorbox{kit-brown25}{\csq}
+	& \colorbox{kit-brown20}{\csq}
+	& \colorbox{kit-brown15}{\csq}
+	& \colorbox{kit-brown10}{\csq}
+	& \colorbox{kit-brown5}{\csq}\\[.5em]
+% Purple
+	kit-purple
+	& \colorbox{kit-purple100}{\csq}
+	& \colorbox{kit-purple90}{\csq}
+	& \colorbox{kit-purple80}{\csq}
+	& \colorbox{kit-purple70}{\csq}
+	& \colorbox{kit-purple60}{\csq}
+	& \colorbox{kit-purple50}{\csq}
+	& \colorbox{kit-purple40}{\csq}
+	& \colorbox{kit-purple30}{\csq}
+	& \colorbox{kit-purple25}{\csq}
+	& \colorbox{kit-purple20}{\csq}
+	& \colorbox{kit-purple15}{\csq}
+	& \colorbox{kit-purple10}{\csq}
+	& \colorbox{kit-purple5}{\csq}\\[.5em]
+% Cyan
+	kit-cyan
+	& \colorbox{kit-cyan100}{\csq}
+	& \colorbox{kit-cyan90}{\csq}
+	& \colorbox{kit-cyan80}{\csq}
+	& \colorbox{kit-cyan70}{\csq}
+	& \colorbox{kit-cyan60}{\csq}
+	& \colorbox{kit-cyan50}{\csq}
+	& \colorbox{kit-cyan40}{\csq}
+	& \colorbox{kit-cyan30}{\csq}
+	& \colorbox{kit-cyan25}{\csq}
+	& \colorbox{kit-cyan20}{\csq}
+	& \colorbox{kit-cyan15}{\csq}
+	& \colorbox{kit-cyan10}{\csq}
+	& \colorbox{kit-cyan5}{\csq}\\[.5em]
+\end{tabular}
+\end{frame}
+%% ----------------------------------------
+%% | /Test-Folie mit definierten Farben |
+%% ----------------------------------------
+\backupend
+
+\end{document}
