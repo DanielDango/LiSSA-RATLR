@@ -53,8 +53,7 @@ Modelling for Continuous Software Engineering (MCSE), Supervisor:  M.Sc. Dominik
 \section{Foundations}
 
 
-\begin{frame}[picture 50 vertical, picture=images/artifact_overview_Fuchß.png]
-\frametitle{What is Traceability Link Recovery (TLR)}
+\begin{frame}[picture 50 vertical, picture=images/artifact_overview_Fuchß.png]{What is Traceability Link Recovery (TLR)}
 	\begin{itemize}
 		\item Many artifacts are created during software development
             \item Often, inconsistencies will be present, such as naming
@@ -64,8 +63,7 @@ Modelling for Continuous Software Engineering (MCSE), Supervisor:  M.Sc. Dominik
 \end{frame}
 
 
-\begin{frame}[picture 66 vertical, picture=images/iterative_core_loop.pdf]
-\frametitle{What is Automated Prompt Engineering}
+\begin{frame}[picture 66 vertical, picture=images/iterative_core_loop.pdf]{What is Automated Prompt Engineering}
     \begin{itemize}
         \item Use the LLM to refine prompts instead of manually formulating them
         \item Improve initial prompt by training with a subset of the actual data
@@ -106,13 +104,16 @@ Modelling for Continuous Software Engineering (MCSE), Supervisor:  M.Sc. Dominik
             %TLR with LLMs
             \node[align=center] at (0,0.5) {\textbf{\cite{hey2025RequirementsTraceability}} RE2RE\\TLR with LLMs};
             \node[align=center] at (0,2) {\textbf{\cite{fuchss2025LiSSAGeneric}} LiSSA\\framework for TLR};
+            %\node[align=center] at (0,3.5) {\textbf{\cite{rodriguez2023PromptsMatter}} \\Influence of prompts for TLR}; %Their names are to long
 
             %LLM Work
             \node[align=center] at (11,-1) {\textbf{\cite{long2023LargeLanguage}} \\ToT prompting};
+            
 
             %APE Work
             \node[align=center] at (4.75,-2.5) {\textbf{\cite{khattab2023DSPyCompiling}} \\DSPy composite prompt structure};
             \node[align=center] at (3.75,-4) {\textbf{\cite{pryzant2023AutomaticPrompt}}  ProTeGi\\gradient descent based APE};
+            
 
             %Crosssection
             \node[align=center] at (1.75, -1.35) {\textbf{my work}};
@@ -129,8 +130,7 @@ Modelling for Continuous Software Engineering (MCSE), Supervisor:  M.Sc. Dominik
 
 \section{Implementation}
 
-\begin{frame}[picture 50 vertical, picture=images/gradient_descent.pdf]
-\frametitle{Automated Prompt Engineering with Gradient Descent}
+\begin{frame}[picture 50 vertical, picture=images/gradient_descent.pdf]{Automated Prompt Engineering with Gradient Descent}
     \begin{itemize}
         \item Improved APE algorithm by \cite{pryzant2023AutomaticPrompt}
         \item Generate many new prompt candidates on each layer
