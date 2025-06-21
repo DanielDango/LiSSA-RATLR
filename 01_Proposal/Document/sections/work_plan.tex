@@ -1,7 +1,7 @@
 \chapter{Work Plan}
 \label{chap:work_plan}
 
-In this chapter, I will elaborate on my plan to realize the thesis topic and mitigate risks. This includes the individual work packages outlined in \autoref{sec:work_phases}. Different artifacts that will be produced through the thesis are mentioned in \autoref{sec:work_artifacts}. Expected risks during the project and their mitigation will be addressed in \autoref{sec:work_risks}. Lastly, a giant chart will be provided to visualize the temporal planning for my thesis project in \autoref{sec:work_gant}.
+In this chapter, I will elaborate on my plan to realize the thesis topic and mitigate risks. This includes the individual work packages outlined in \autoref{sec:work_phases}. Different artifacts that will be produced through the thesis are mentioned in \autoref{sec:work_artifacts}. Expected risks during the project, along with their mitigation, will be addressed in \autoref{sec:work_risks}. Lastly, a giant chart will be provided to visualize the temporal planning for my thesis project in \autoref{sec:work_gant}.
 
 \section{Phases}
 \label{sec:work_phases}
@@ -38,16 +38,16 @@ For further evaluation, aside from the performance of the optimized prompt, diff
 
 \section{Artifacts}
 \label{sec:work_artifacts}
-This work will yield code to be merged into the LiSSA repository\footnote{https://github.com/ArDoCo/LiSSA-RATLR/}. The implementation of \ref{phase_naive_iterative} and \ref{phase_gradient_descent} will provide a base to implement further automatic prompt optimization techniques with similar building blocks.
+This work will yield code to be merged into the LiSSA repository\footnote{https://github.com/ArDoCo/LiSSA-RATLR/}. The implementation during the work packages \nameref{phase_naive_iterative} and \nameref{phase_gradient_descent} in \autoref{sec:work_phases} will provide a base to implement further automatic prompt optimization techniques with similar building blocks.
 
 A written report will be created to document, summarize, and evaluate the results of my (automatic) prompt optimization work to retrieve trace links.
 
 
 \section{Risk Management}
 \label{sec:work_risks}
-The moajor risk of my work would be failing to implement the automatic prompt optimization in \ref{phase_gradient_descent}. By choosing an optimization algorithm that has Python ode publicly available, this risk is already greatly reduced. Furthermore, all three work packages with implementation content will yield a classifier that can be tested and evaluated independently against the existing classifiers in the LiSSA Framework. Thus, early working examples will be available throughout the thesis. 
+The major risk of my work would be failing to implement the \nameref{phase_gradient_descent} in \autoref{phase_gradient_descent}. By choosing an optimization algorithm that has Python ode publicly available, this risk is already greatly reduced. Furthermore, all three work packages with implementation content will yield a classifier that can be tested and evaluated independently against the existing classifiers in the LiSSA Framework. Thus, early working examples will be available throughout the thesis. 
 
-It is hard to accurately estimate the required time for each phase. Frequent buffer slots are planned in order to dynamically allocate more time if needed.
+It is hard to estimate the required time for each phase accurately. Frequent buffer slots are planned to allocate more time dynamically as needed.
 
 
 
@@ -63,7 +63,6 @@ The Gantt chart in \autoref{fig:gantt} illustrates how I plan to allocate my tim
 
 
 \begin{figure}
-    \label{fig:gantt}
     \begin{center}
     \begin{ganttchart}[
     vgrid={*{6}{draw=none}, dotted},
@@ -113,4 +112,5 @@ The Gantt chart in \autoref{fig:gantt} illustrates how I plan to allocate my tim
     \end{ganttchart}
     \end{center}
     \caption{Gantt chart for thesis plan}
+    \label{fig:gantt}
 \end{figure}

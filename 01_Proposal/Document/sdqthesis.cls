@@ -281,25 +281,37 @@
 %custom commands
 \RequirePackage{pgfgantt}
 \RequirePackage{nameref}
-\RequirePackage{pdflscape}
 \RequirePackage{algorithm}
 \RequirePackage{algpseudocode}
 \RequirePackage{svg}
-\RequirePackage{cleveref}
 \RequirePackage{acro}
 \RequirePackage{xspace}
-
+\RequirePackage{mfirstuc}
+\RequirePackage{etoolbox}
 
 \newcommand{\citewithauthor}[1]{\citeauthor{#1} \cite{#1}\xspace}
 \newcommand{\directQuote}[3][]{\guillemotleft#2\guillemotright~\cite[#1]{#3}\xspace}
 \newcommand{\citeiterative}[0]{\cite{pryzant2023AutomaticPrompt, zadenoori2025AutomaticPrompt, zhou2023LargeLanguage, madaan2023SelfRefineIterative}\xspace}
+\newcommand{\eq}[0]{=}
+\newcommand{\algorithmautorefname}{Algorithm}
+
+\acsetup{
+    single = true,
+    barriers / use = true,
+    barriers / reset = true,
+    barriers / single = true
+}
+
+\preto\chapter\acbarrier
+\preto\section\acbarrier
 
 \DeclareAcronym{ToT}{short=ToT, long=tree-of-thought}
 \DeclareAcronym{CoT}{short=CoT, long=chain-of-thought}
 \DeclareAcronym{APO}{short=APO, long=automatic prompt optimization}
 \DeclareAcronym{APE}{short=APE, long=automatic prompt engineering}
 \DeclareAcronym{LLM}{short=LLM, long=large language model}
-
+\DeclareAcronym{TLR}{short=TLR, long = traceability link recovery}
+\DeclareAcronym{ProTeGi}{short=ProTeGi, long = Prompt Optimization with Textual Gradients}
 
 
 \newcommand{\ToT}[0]{\ac{ToT}\xspace}
@@ -308,3 +320,5 @@
 \newcommand{\APE}[0]{\ac{APE}\xspace}
 \newcommand{\LLM}[0]{\ac{LLM}\xspace}
 \newcommand{\LLMs}[0]{\acp{LLM}\xspace}
+\newcommand{\TLR}[0]{\ac{TLR}\xspace}
+\newcommand{\ProTeGi}[0]{\ac{ProTeGi}\xspace}

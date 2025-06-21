@@ -1,16 +1,21 @@
 \chapter{Related Work}
 Trace link recovery through large language models is an active field of work to apply rapid advancements in LLM performance.
+This work rests at the intersection of two different fields of study. On the one hand side the field of \TLR does not always rely on \LLMs as shown in \autoref{related:sec:tlr}. On the other hand \APE has a much broader application and research than simply being focused on \TLR as expanded in \autoref{related:sec:ape}.
+
 
 \section{Trace Link Recovery}
-\citewithauthor{keim2021TraceLink} have first proposed cross domain trace link recovery using agent like algorithms. \textit{Todo: Maybe read the paper?}
+\label{related:sec:tlr}
+\citewithauthor{keim2021TraceLink} have proposed cross domain trace link recovery using agent like algorithms. \textit{Todo: Maybe read the paper?}
 
-In previous work by \citewithauthor{fuchss2025LiSSAGeneric} simple handwritten prompts by \citewithauthor{ewald2024RetrievalAugmentedLarge} were used to recover trace links between software documentation and architectural diagrams. They have proven, that they can outperform other state-of-the-art for code tasks. 
+In previous work by \citewithauthor{fuchss2025LiSSAGeneric}, simple handwritten prompts by \citewithauthor{ewald2024RetrievalAugmentedLarge} were used to recover trace links between software documentation and architectural diagrams. They have proven, that they can outperform other state-of-the-art for code tasks. 
 
-\citewithauthor{hey2025RequirementsTraceability} have adapted these prompts into trace link recovery in the domain of requirements to requirements. While they were also able to outperform state-of-the-art approaches, the recall rate for larger data sets still has room for improvement.
+\citewithauthor{hey2025RequirementsTraceability} have used these same prompts for \TLR in the domain of requirements to requirements. While they were also able to outperform state-of-the-art approaches, the recall rate for larger data sets still has room for improvement.
 
-\citewithauthor{rodriguez2023PromptsMatter} have also evaluated LLM usage for trace link recovery. Their main takeaway was, that even minor adjustments, \directQuote[sec. VI]{such as pluralizing words,interchanging prepositions,or reordering phrases}{rodriguez2023PromptsMatter} lead to major differences in the outcome. They were unable to find a singular generalized optimal prompt to cover all TLR tasks. They manually adjusted prompts for each single task instead to greatly improve recovery rates.
+\citewithauthor{rodriguez2023PromptsMatter} have also evaluated LLM usage for trace link recovery. Their main takeaway was that even minor adjustments, \directQuote[sec. VI]{such as pluralizing words, interchanging prepositions, or reordering phrases}{rodriguez2023PromptsMatter} lead to major differences in the outcome. They were unable to find a singular generalized optimal prompt to cover all TLR tasks. They manually adjusted prompts for each task to greatly improve recovery rates.
+
 
 \section{Automatic Prompt Engineering}
+\label{related:sec:ape}
 Many prompt optimization \textit{todo find fitting word: papers} require an initial prompt to start the refinement process by using training data consisting of input / output pairs \cite{ramnath2025SystematicSurvey}.
 
 The Automatic Promot Engineer by \citewithauthor{zhou2023LargeLanguage} can generate prompts for tasks which are specified only by input / output pairs. This eliminates the need for the initial prompt to seed the optimization process.

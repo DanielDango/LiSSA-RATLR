@@ -1,35 +1,37 @@
 \chapter{Foundations}
 
-In order to understand the application of automated prompt engineering for trace link recovery, some key concepts are quite important. They will be explained in the following subsections.
+To understand the application of automated prompt engineering for \TLR, some key concepts are quite important. They will be explained in the following subsections.
 
-\section{Definition of Trace Link Recovery}
-Traceability is the ability for something to be traced. Meaning, there is evidence of some past occurrence. %Do I need to quote a dictionary here?
-The task of trace link recovery (TLR) in software engineering is to find instances of the same element across different artifacts and link them for further processing. These traceability links help with tracking relationships between for example: code, requirements, diagrams, documentation, \dots
 
-This becomes especially important when inconsistencies are introduced into the project's artifacts. 
+\section{Definition of Traceability Link Recovery}
+Traceability is \directQuote[]{the ability to find or follow something}{2025Traceability}, according to the Cambridge Dictionary. Meaning, there is evidence of some past occurrence. 
+The task of \TLR in software engineering is to find instances of the same element across different software artifacts and link them for further processing. What these elements might look like is visualized in \autoref{fig:artifact_overview}. These traceability links help track relationships between, for example, code, requirements, diagrams, documentation, and other elements.
 
-As shown by \citewithauthor{wohlrab2019ImprovingConsistency} inconsistency in wording and language is quite common during different stages of development. For example, naming conventions for architectural components may not be followed during implementation. They find the impact of these inconsistencies to be quite insignificant. However, for trace link recovery, this means that simple string comparisons by name are insufficient.
+This becomes especially important when inconsistencies are introduced into the project's artifacts. As shown by \citewithauthor{wohlrab2019ImprovingConsistency}, inconsistencies in wording and language are quite common during different stages of development. For example, naming conventions for architectural components might not be followed during implementation. They find the impact of these naming inconsistencies to be quite insignificant. In this case, typically, there will be different naming conventions on each layer, which are followed correspondingly. However, for trace link recovery, this means that simple string comparisons by name are insufficient.
 
+While \LLMs can overcome these inconsistencies, finding suitable prompts might be challenging or include tedious manual work in prompt engineering. 
 
 
 \section{Definition of Automated Prompt Engineering}
-Prompt engineering is the process of refining a prompt for the specific use case. This is usually done in a non-systematic manual way. Automated Prompt Engineering (APE) enables Large Language Models to refine the initial prompt in order to optimize its performance \cite{zadenoori2025AutomaticPrompt}. 
+\label{foundations:sec:automated_prompt_engineering}
+Prompt engineering is the process of refining a prompt for a specific use case. This is typically done in a non-systematic, manual manner. \APE enables \LLMs to refine the initial prompt to optimize their performance \cite{zadenoori2025AutomaticPrompt}. 
 
-Typically, automatic prompt engineering processes are iterated to improve previous results further\citeiterative . The performance of prompts can be measured using a set of training data, which includes input/output pairs. 
+Typically, \APE processes are iterated to improve previous results further \citeiterative. An illustration of the core concept and how it can be implemented will be shown in \autoref{approach:sec:naive_iterative} and  \autoref{fig:iterative_core_loop}.
 
-The initial prompt will be the origin for the refinement process. It needs to be selected firstly before any optimization can occur. This prompt can be chosen manually. This approach is very intuitive, however manual human interaction is still required to design this initial prompt. 
+In general, the refinement process will start with some initial prompt. It needs to be selected first before any optimization can occur. This prompt can be chosen manually. This approach is very intuitive. However, human interaction is still required to choose this first prompt. 
+\citewithauthor{zhou2023LargeLanguage} propose using \LLMs to automate this process and generate the initial prompt. They prompt the model to generate a likely set of instructions, also called candidates. The instructions will achieve good results when prompted with a batch of input/output pairs. These pairs of input/output data will be processed as text by the \LLM, pre- and or post-processing may be required.
 
-\citewithauthor{zhou2023LargeLanguage} propose using the LLM to generate the initial prompt. They prompt the model to generate a likely set of instructions, also called candidates, that will achieve good results with a batch of input/output pairs.
+The performance of prompts can be estimated using a set of training data, which includes input/output pairs. A prompt performs better the more inputs are correctly mapped onto their expected outputs.
 
-
+While this is a very simple and general attempt to \APE, algorithms can of course be more complex as well.
 
 
 \section{Automatic Prompt Optimization Using Gradient Descent}
 \label{sec:gradient_descent}
-Based on the work of \citewithauthor{pryzant2023AutomaticPrompt} I will implement a more sophisticated prompt optimization algorithm into the LiSSA framework. They propose the Prompt Optimization with Textual Gradients (ProTeGi) algorithm. This entire section is based on their work.
+\citewithauthor{pryzant2023AutomaticPrompt} propose the \ProTeGi algorithm. This entire section is based on their work.
 
-\subsection{Initial Prompt}
-The ProTeGi algorithm takes an initial prompt $p_0$ and training data $\{(x_1, y_1), \dots, (x_n, y_n)\}$ consisting of input and output. They \directQuote[sec. 2]{assume access to a black box LLM API [...] which returns a likely text continuation y of the prompt formed by concatenating p and x}{pryzant2023AutomaticPrompt}. They then iteratively optimize the initial prompt $p_0$ to produce an approximation of the most optimized prompt for the given task. In order to optimize the prompt, a function is required, to compute deviance between the actual output $y$ and expected output $y_i$ as a numeric value.
+In contrast to the general iterative \APE in \autoref{foundations:sec:automated_prompt_engineering}, they create multiple improved prompts after each step of the optimization during a single iteration. This is also illustrated in \autoref{fig:gradient_descent}. The set of candidates for optimization, the set of improved candidates that corrected previous shortcomings, as well as a set of paraphrased improved candidates, are taken into consideration when selecting the candidates that are carried to the next iteration. 
+Once any candidate performs better than some threshold value or a maximum number of iterations has been reached, the best performing candidate will be returned as the output of the \ProTeGi algorithm.
 
 \begin{figure}
 \centering
@@ -43,33 +45,40 @@ TODO:
 \end{itemize}
 \end{figure}
 
+The following subsections will explain each step of the \ProTeGi optimization in more detail. The \ProTeGi algorithm takes an initial prompt $p_0$ and training data $\{(x_1, y_1), \dots, (x_n, y_n)\}$ consisting of inputs and outputs. They \directQuote[sec. 2]{assume access to a black box LLM API [...] which returns a likely text continuation y of the prompt formed by concatenating p and x}{pryzant2023AutomaticPrompt}. They then iteratively optimize the initial prompt $p_0$ to produce an approximation of the most optimized prompt for the given task. In order to optimize the prompt, a function is required that computes deviance between the actual output $y$ and the expected output $y_i$ as a numeric value.
+
 
 \subsection{Evaluation and Expansion}
-To evaluate the output of the current prompt $p_i$, they use a loss signal prompt $\triangledown$. In addition to the prompt errors that were not correctly classified when testing $p_i$ are also provided. The result summarizes the flaws of $p_i$ in natural language. This summary is called the textual gradient $g$.
+To evaluate the output of the current prompt $p_i$, \citeauthor{pryzant2023AutomaticPrompt} use a loss signal prompt $\triangledown$, the gradient prompt. In addition to the prompt, inputs that were not correctly classified when testing $p_i$ are also provided as context for $\triangledown$. The result summarizes the flaws of $p_i$ in natural language. This summary is called the textual gradient $g$.
 
-The second prompt $\delta$ they use, is required to adjust $p_i$ in the opposite direction of $g$ to minimize the loss signal. They differ from other implementations by generating multiple gradients and refinements that might improve $p_i$ and select good candidates to optimize further in the next iterative step.
+The second prompt $\delta$, the optimization prompt, is required to adjust $p_i$ in the opposite direction of $g$ to minimize the loss signal. They differ from other implementations by generating multiple gradients and refinements that might improve $p_i$ and select good candidates to optimize further in the next iterative step.
 
-In addition, they broaden their candidates further by paraphrasing them into semantically similar prompts, which are worded different. Generating new prompts with $g$ and broadening them is considered candidate expansion.
+In addition, they broaden their candidates further by paraphrasing them into semantically similar prompts, which are worded differently. Generating new prompts with $g$ and broadening them is considered candidate expansion.
+
 
 \subsection{Candidate Selection}
-In order to select candidates for the next iteration, they apply a beam search algorithm. Beam search is a heuristic best first graph search algorithm to select a fixed number of promising paths. The remaining paths will be discarded to allocate resources on more promising paths instead. \cite{BeamSearch}
+To select candidates for the next iteration, \citeauthor{pryzant2023AutomaticPrompt} apply a beam search algorithm. Beam search is a heuristic best-first graph search algorithm to select a fixed number of promising paths. The remaining paths will be discarded to allocate resources to more promising paths instead. \cite{BeamSearch} A heuristic algorithm finds a good result efficiently, with the trade-off that it is not guaranteed to be optimal. The selection of the most promising candidates is quite resource-intensive for the entire data set, since many calls to preferably larger \LLMs are required. As the problem is quite similar to the best arm identification in multi-armed bandit optimization by \citewithauthor{audibert2010BestArm}, they rely on this well-studied problem instead.
 
-The selection of the most promising candidates is quite expensive on the training set. As the problem is quite similar to the best arm identification in bandit optimization by \citewithauthor{audibert2010BestArm}, they rely on this well studied problem instead.
+The multi-armed bandit problem consists of $N$ stochastically independent probability distributions $\{ D_1, \dots, D_N\}$ with corresponding expected values and variances. These distributions are unknown to the user initially. The goal is to maximize the sum of rewards for each pull from the set of probability distributions, utilizing the knowledge gained through previous pulls \cite{kuleshov2014AlgorithmsMultiarmeda}. 
+It is an analogy to multiple one-armed bandit slot machines. Pulling a lever on one of these slot machines does not affect the others but costs noticeable resources. The optimization aims to find the best-performing arms with as few pulls as possible. 
 
-The problem consists of $N$ stochastically independent probability distributions $\{ D_1, \dots, D_N\}$ with corresponding expected values and variances. These distributions are unknown to the user initially. The goal is to maximize the sum of rewards for each pull from the set of probability distributions, utilizing the knowledge gained through previous pulls. \cite{kuleshov2014AlgorithmsMultiarmeda}
+\citeauthor{pryzant2023AutomaticPrompt} have used the successive rejects algorithm by \citewithauthor{audibert2010BestArm} to select the best prompt candidates for the next iteration step. The set of current candidates $S$ is therefore initialized with all $k$ candidate prompts in the iteration step. Depending on the budget for sampling, candidates and remaining candidates in $S$ will be prompted with $n_k$ pairs of the training data. The results are evaluated with a metric function $m$ to quantify the performance. For example, $m$ can be a simple binary function as seen in \autoref{eq:sample_binary_metric}. If the prompt $p$ provides the expected output $y$ for a given input $x$, one is returned. Otherwise, zero will be returned.
 
-It is an analogy to multiple one-armed bandit slot machines. Pulling a lever on one of these slot machines does not affect the others but costs noticeable resources. The optimization aims to find the best performing arms with as few pulls as possible. 
+\begin{equation}
+\label{eq:sample_binary_metric}
+    m(llm(p, x), y) = 
+    \begin{cases}
+        0, \text{if $llm(p, x) \neq y$}\\
+        1, \text{if $llm(p, x) \eq y$}
+    \end{cases}
+\end{equation}
 
-\citeauthor{pryzant2023AutomaticPrompt} have used the successive rejects algorithm by \citewithauthor{audibert2010BestArm} to select the best prompt candidates for the next iteration step.
+The lowest scoring prompt is then discarded from $S$ and sampling is repeated with the remainder until the set $S$ only contains the desired amount of candidates. The remaining candidates will be used as initial prompts for the next expansion step. This process is called successive rejects. A pseudocode implementation of this candidate selection algorithm can be seen in \autoref{alg:gradient_descent_select}.
 
-The set of current candidates $S$ is therefore initialized with all $k$ candidate prompts in the iteration step. Depending on the budget for sampling candidates and remaining candidates in $S$ will be prompted with $n_k$ pairs of the training data. The results are evaluated with a metric function $m$ to quantify the performance. The lowest scoring prompt is discarded from $S$ and sampling repeated with the remainder until the set $S$ only contains the desired amount of candidates.
-
-The remaining candidates will be used as initial prompts for the next expansion step.
-
-\textit{TODO: Explain successive rejects}
 
 \begin{algorithm}
-\caption{\directQuote[Algorithm 4, p. 4]{$Select(\cdot)$ with Successive Rejects}{pryzant2023AutomaticPrompt}}
+\caption{\directQuote[Modified from Algorithm 4, p. 4]{$Select(\cdot)$ with Successive Rejects}{pryzant2023AutomaticPrompt}}
+\label{alg:gradient_descent_select}
 \begin{algorithmic}[1]
     \State Initialize: $S_0 \gets \{p_1, \dots , p_n\}$
     \For{$k = 1, \dots , {n  - 1}$}
