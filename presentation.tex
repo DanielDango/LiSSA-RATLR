@@ -93,36 +93,40 @@ Modelling for Continuous Software Engineering (MCSE), Supervisor:  M.Sc. Dominik
         \centering
         \begin{tikzpicture}
             \begin{scope} [fill opacity = .4, text opacity=1]
-            \draw[fill=green, draw = black] (-5,0) ellipse (9 and 6);
-            \draw[fill=blue, draw = black] (5,0) ellipse (9 and 6);
-            \draw[fill=red, draw = black] (4,-3) ellipse (5 and 3);
+
+            %TLR
             \node at (-5,4) {\LARGE\textbf{TLR}};
-            \node at (5,4) {\LARGE\textbf{LLM}};
-            \node at (4,-5.25) {\LARGE\textbf{APE}};
+            \draw[fill=green, draw = black] (-5,0) ellipse (9 and 6);
             \node[align=center] at (-5,-4) {\textbf{\cite{keim2021TraceLink}} TLR\\with agent like algorithms};
+            \node[align=center] at (-8.5,-2) {\textbf{\cite{hey2021ImprovingTraceability}} FTLR\\word embedding based algorithm};
+            \node[align=center] at (-9,2) {\textbf{\cite{delucia2012InformationRetrieval}} \\information retrieval TLR};
 
             %TLR with LLMs
             \node[align=center] at (0,0.5) {\textbf{\cite{hey2025RequirementsTraceability}} RE2RE\\TLR with LLMs};
             \node[align=center] at (0,2) {\textbf{\cite{fuchss2025LiSSAGeneric}} LiSSA\\framework for TLR};
-            %\node[align=center] at (0,3.5) {\textbf{\cite{rodriguez2023PromptsMatter}} \\Influence of prompts for TLR}; %Their names are to long
+            %\node[align=center] at (0,3.5) {\textbf{\cite{rodriguez2023PromptsMatter}} \\Influence of prompts for TLR}; %Their names are to long 
 
             %LLM Work
+            \node at (5,4) {\LARGE\textbf{LLM}};
+            \draw[fill=blue, draw = black] (5,0) ellipse (9 and 6);
             \node[align=center] at (11,-1) {\textbf{\cite{long2023LargeLanguage}} \\ToT prompting};
-            
+            \node[align=center] at (8.5,0.5) {\textbf{\cite{deepseek-ai2025DeepSeekR1Incentivizing}} \\Deepseek-r1};
+            \node[align=center] at (9.5,2.5) {\textbf{\cite{openai2024GPT4oSystem}} \\Chat GPT-4o};
 
             %APE Work
+            \node at (4,-5.25) {\LARGE\textbf{APE}};
+            \draw[fill=red, draw = black] (4,-3) ellipse (5 and 3);
             \node[align=center] at (4.75,-2.5) {\textbf{\cite{khattab2023DSPyCompiling}} \\DSPy composite prompt structure};
             \node[align=center] at (3.75,-4) {\textbf{\cite{pryzant2023AutomaticPrompt}}  ProTeGi\\gradient descent based APE};
             
 
             %Crosssection
-            \node[align=center] at (1.75, -1.35) {\textbf{my work}};
+            \node[draw, align=center] at (1.75, -1.35) {\textbf{my work}};
             \end{scope}
-        %% And now you have a venn diagram. Yay!
-        \draw[help lines](-14,6) grid (14,-6);    
+            
+        %\draw[help lines](-14,6) grid (14,-6);    
         \end{tikzpicture}
-        \caption{Caption}
-        \label{fig:enter-label}
+        \label{fig:venn-diagramm}
     \end{figure}
     
 \end{frame}
