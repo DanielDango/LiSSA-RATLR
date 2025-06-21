@@ -312,6 +312,7 @@
 \DeclareAcronym{LLM}{short=LLM, long=large language model}
 \DeclareAcronym{TLR}{short=TLR, long = traceability link recovery}
 \DeclareAcronym{ProTeGi}{short=ProTeGi, long = Prompt Optimization with Textual Gradients}
+\DeclareAcronym{IR}{short=IR, long = information retrieval}
 
 
 \newcommand{\ToT}[0]{\ac{ToT}\xspace}
@@ -322,3 +323,5 @@
 \newcommand{\LLMs}[0]{\acp{LLM}\xspace}
 \newcommand{\TLR}[0]{\ac{TLR}\xspace}
 \newcommand{\ProTeGi}[0]{\ac{ProTeGi}\xspace}
+\newcommand{\IR}[0]{\ac{IR}\xspace}
+
