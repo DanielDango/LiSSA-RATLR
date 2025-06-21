@@ -19,7 +19,7 @@
 \title[Automated Prompt Engineering for Traceability Link Recovery]{Automated Prompt Engineering for Traceability Link Recovery}
 \subtitle{Bachelor's Thesis Proposal Presentation \\
 Institute of Information Security and Dependability (KASTEL), Prof. Anne Koziolek \\
-Modelling for Continuous Software Engineering (MCSE), Supervisor:  M.Sc. Dominik Fuchß} 
+Modelling for Continuous Software Engineering (MCSE), Supervisor:  M.Sc. Dominik Fuchß}
 \author{Daniel Schwab}
 
 \date[23.\,06.\,2025]{23. June 2025}
@@ -68,7 +68,7 @@ Modelling for Continuous Software Engineering (MCSE), Supervisor:  M.Sc. Dominik
         \item Use the LLM to refine prompts instead of manually formulating them
         \item Improve initial prompt by training with a subset of the actual data
         \item Optimization prompt to fix previous shortcomings
-    \end{itemize} 
+    \end{itemize}
 \end{frame}
 
 \begin{comment}
@@ -88,18 +88,18 @@ Modelling for Continuous Software Engineering (MCSE), Supervisor:  M.Sc. Dominik
 \end{comment}
 
 \begin{frame}{Related Work}
-    
+
     \begin{figure}
         \centering
         \begin{tikzpicture}
             \begin{scope} [fill opacity = .4, text opacity=1]
-            \draw[fill=green, draw = black] (-5,0) ellipse (9 and 6);
-            \draw[fill=blue, draw = black] (5,0) ellipse (9 and 6);
-            \draw[fill=red, draw = black] (4,-3) ellipse (5 and 3);
+
+            %TLR
             \node at (-5,4) {\LARGE\textbf{TLR}};
-            \node at (5,4) {\LARGE\textbf{LLM}};
-            \node at (4,-5.25) {\LARGE\textbf{APE}};
+            \draw[fill=green, draw = black] (-5,0) ellipse (9 and 6);
             \node[align=center] at (-5,-4) {\textbf{\cite{keim2021TraceLink}} TLR\\with agent like algorithms};
+            \node[align=center] at (-8.5,-2) {\textbf{\cite{hey2021ImprovingTraceability}} FTLR\\word embedding based algorithm};
+            \node[align=center] at (-9,2) {\textbf{\cite{delucia2012InformationRetrieval}} \\information retrieval TLR};
 
             %TLR with LLMs
             \node[align=center] at (0,0.5) {\textbf{\cite{hey2025RequirementsTraceability}} RE2RE\\TLR with LLMs};
@@ -107,24 +107,28 @@ Modelling for Continuous Software Engineering (MCSE), Supervisor:  M.Sc. Dominik
             %\node[align=center] at (0,3.5) {\textbf{\cite{rodriguez2023PromptsMatter}} \\Influence of prompts for TLR}; %Their names are to long
 
             %LLM Work
+            \node at (5,4) {\LARGE\textbf{LLM}};
+            \draw[fill=blue, draw = black] (5,0) ellipse (9 and 6);
             \node[align=center] at (11,-1) {\textbf{\cite{long2023LargeLanguage}} \\ToT prompting};
-            
+            \node[align=center] at (8.5,0.5) {\textbf{\cite{deepseek-ai2025DeepSeekR1Incentivizing}} \\Deepseek-r1};
+            \node[align=center] at (9.5,2.5) {\textbf{\cite{openai2024GPT4oSystem}} \\Chat GPT-4o};
 
             %APE Work
+            \node at (4,-5.25) {\LARGE\textbf{APE}};
+            \draw[fill=red, draw = black] (4,-3) ellipse (5 and 3);
             \node[align=center] at (4.75,-2.5) {\textbf{\cite{khattab2023DSPyCompiling}} \\DSPy composite prompt structure};
             \node[align=center] at (3.75,-4) {\textbf{\cite{pryzant2023AutomaticPrompt}}  ProTeGi\\gradient descent based APE};
-            
+
 
             %Crosssection
-            \node[align=center] at (1.75, -1.35) {\textbf{my work}};
+            \node[draw, align=center] at (1.75, -1.35) {\textbf{my work}};
             \end{scope}
-        %% And now you have a venn diagram. Yay!
-        \draw[help lines](-14,6) grid (14,-6);    
+
+        %\draw[help lines](-14,6) grid (14,-6);
         \end{tikzpicture}
-        \caption{Caption}
-        \label{fig:enter-label}
+        \label{fig:venn-diagramm}
     \end{figure}
-    
+
 \end{frame}
 
 
@@ -137,7 +141,7 @@ Modelling for Continuous Software Engineering (MCSE), Supervisor:  M.Sc. Dominik
         \item Steer them against the error direction using gradients
         \item Select the most promising candidates cheaply using a well-studied multiple-armed bandit algorithm
     \end{itemize}
-    
+
 \end{frame}
 
 
@@ -157,13 +161,13 @@ Modelling for Continuous Software Engineering (MCSE), Supervisor:  M.Sc. Dominik
                 \def\arraystretch{1.1}
                 \begin{tabular}{c c | c c c}
                     \textbf{Dataset} & \textbf{Metric} & \textbf{IR only} & \textbf{KISS GPT-4o} & \textbf{CoT GPT-4o} \\
-                    
+
                     \multirow{4}{*}{CCHIT} & P. & .198 & .234 & .367 \\
                     &  R. & .157 & .157 & .138 \\
                     & F1 & .175 & .188 & .200 \\
                     & F2 & .164 & .168 & .158 \\
                     \hline
-    
+
                     \multirow{4}{*}{Dronology} & P. & .386 & .394 & .512 \\
                     & R. & .695 & .695 & .655 \\
                     & F1 & .497 & .503 & .575 \\
@@ -172,12 +176,12 @@ Modelling for Continuous Software Engineering (MCSE), Supervisor:  M.Sc. Dominik
                     \multirow{4}{*}{\parbox{4cm}{Average including datasets that are omitted in this table}} &  P. & .329 & .340 & .497 \\
                     & R. & .500 & .500 & .458 \\
                     & F1 & .387 & .401 & .451 \\
-                    & F2 & .445 & .452 & .452 
+                    & F2 & .445 & .452 & .452
                 \end{tabular}
                 \caption{Reduced results by \cite[Table 2]{hey2025RequirementsTraceability}}
                 \label{tab:my_label}
             \end{table}
-            
+
         }
     \end{columns}
     
@@ -212,22 +216,22 @@ Modelling for Continuous Software Engineering (MCSE), Supervisor:  M.Sc. Dominik
         \ganttgroup{APE gradient descent}{2025-08-25}{2025-09-21} \\
         \ganttbar[name=impl3]{Implementation}{2025-08-25}{2025-09-10}\\
 
-        
+
         \ganttgroup{Evaluation and Buffer}{2025-08-11}{2025-10-23} \\
-        \ganttbar{Thesis writing}{2025-08-18}{2025-09-14} 
+        \ganttbar{Thesis writing}{2025-08-18}{2025-09-14}
         \ganttbar{}{2025-09-29}{2025-10-11}
         \\
-        
+
         \ganttbar[name=eval1]{Evaluation}{2025-08-11}{2025-08-24}
         \ganttbar[name=eval2]{}{2025-09-15}{2025-09-28}
-    
-        
-    
+
+
+
 
         \ganttlink{impl1}{eval1}
         \ganttlink{impl2}{eval1}
         \ganttlink{impl3}{eval2}
-      
+
     \end{ganttchart}
     %\caption{Gantt chart for thesis schedule}
     \end{center}
