@@ -5,9 +5,17 @@ This work rests at the intersection of two different fields of study. On the one
 
 \section{Trace Link Recovery}
 \label{related:sec:tlr}
+
+Before the emergence of machine learning and \LLMs \textit{todo expand}
+
+\citewithauthor{delucia2012InformationRetrieval} have written about different \IR methods and their performance. \textit{Todo: Maybe write about the paper?}
+
+
 \citewithauthor{keim2021TraceLink} have proposed cross domain trace link recovery using agent like algorithms. \textit{Todo: Maybe read the paper?}
 
-In previous work by \citewithauthor{fuchss2025LiSSAGeneric}, simple handwritten prompts by \citewithauthor{ewald2024RetrievalAugmentedLarge} were used to recover trace links between software documentation and architectural diagrams. They have proven, that they can outperform other state-of-the-art for code tasks. 
+
+
+In previous work by \citewithauthor{fuchss2025LiSSAGeneric}, simple handwritten prompts by \citewithauthor{ewald2024RetrievalAugmentedLarge} were used to recover trace links between software documentation and architectural diagrams. They have proven that they can outperform other state-of-the-art for code tasks. 
 
 \citewithauthor{hey2025RequirementsTraceability} have used these same prompts for \TLR in the domain of requirements to requirements. While they were also able to outperform state-of-the-art approaches, the recall rate for larger data sets still has room for improvement.
 
@@ -16,13 +24,13 @@ In previous work by \citewithauthor{fuchss2025LiSSAGeneric}, simple handwritten 
 
 \section{Automatic Prompt Engineering}
 \label{related:sec:ape}
-Many prompt optimization \textit{todo find fitting word: papers} require an initial prompt to start the refinement process by using training data consisting of input / output pairs \cite{ramnath2025SystematicSurvey}.
+Many prompt optimization \textit{todo find fitting word: papers} require an initial prompt to start the refinement process by using training data consisting of input / output pairs~\cite{ramnath2025SystematicSurvey}.
 
 The Automatic Promot Engineer by \citewithauthor{zhou2023LargeLanguage} can generate prompts for tasks which are specified only by input / output pairs. This eliminates the need for the initial prompt to seed the optimization process.
 
 Self-Refine by \citewithauthor{madaan2023SelfRefineIterative} uses feedback from the same large language model that generated the prompt, to improve the prompt further. This imitates human behavior, when initial drafts are adjusted rapidly. 
 
-ProTeGi by \citewithauthor{pryzant2023AutomaticPrompt} utilizes a gradient descent algorithm to find the minimal deviance between an optimized prompt and the expected outputs. More details about their work can be found in \ref{sec:gradient_descent}.
+ProTeGi by \citewithauthor{pryzant2023AutomaticPrompt} utilizes a gradient descent algorithm to find the minimal deviance between an optimized prompt and the expected outputs. More details about their work can be found in~\ref{sec:gradient_descent}.
 
 \citewithauthor{yang2024LargeLanguage} have taken a slightly different approach in their OPRO optimizer. Instead of adjusting the current iteration of prompts to steer them in an improved direction like \citeauthor{pryzant2023AutomaticPrompt}, they generate new independent prompts instead.
 
