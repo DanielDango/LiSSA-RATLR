@@ -53,11 +53,12 @@ The function $f$ will need to have the same range for any set of training data t
 \end{align}
 
 The benchmark data by \citewithauthor{hey2025ReplicationPackage} also provides the gold standard for each given problem.
-The total amount of recoverable trace links thus is already available. 
+The total amount of recoverable trace links is thus already available. 
 %\textit{to-do: how can the task set be divided into training and testing data? Use one entire TLR problem for training, the remaining for testing?}
 
 To improve the performance, an optimization prompt is used.
-The naive approach is to simply ask the LLM to improve the prompt without providing further direction or information about why the prompt did not meet the requirements yet.
+As visualized in \autoref{fig:iterative_core_loop} the expected outputs for training data may also be used to improve the prompt.
+The most naive approach is to simply ask the LLM to improve the prompt without providing further direction or information about why the prompt did not meet the requirements.
 The hopefully improved prompt will be taken into the next iteration.
 The act of evaluation and improving will be repeated until a threshold value is passed, meaning the prompt is considered good enough.
 To limit resource usage, a hard limit will also be included to put an upper bound on the optimization attempts.
@@ -69,21 +70,20 @@ To limit resource usage, a hard limit will also be included to put an upper boun
     \label{fig:iterative_core_loop}
 \end{figure}
 
-\textbf{Why:} Implementing this naive iteratively optimized classifier will yield fast results to evaluate later, even if more complicated implementations might fail.
-The core concepts also apply for~\ref{phase_gradient_descent} and can be reused.
+Implementing this naive, iteratively optimized classifier will yield fast results to evaluate later, even if more complicated implementations might fail.
+The core concepts also apply to \autoref{phase_gradient_descent} and can be reused.
 
 
 \section{Automatic Prompt Optimization with Gradient Descent}
 \label{approach:sec:gradient_descent}
-\textbf{How:} The authors have provided their python source code in a publicly accessible repository\footnote{https://github.com/microsoft/LMOps/tree/main/prompt\_optimization} under the MIT licensing.
-The project code can be of great help when adapting their algorithm to the LiSSA java framework.
+The existing iterative optimization implementation from~\autoref{phase_naive_iterative} can be used as a foundation for the implementation, as the core concepts remain the same.
+Refer to~\autoref{sec:gradient_descent} for details of the gradient-descent-based optimization algorithm.
 
-The existing iterative optimization implementation from~\ref{phase_naive_iterative} can be used as foundations for the implementation, as the core concepts remain the same.
-Refer to~\ref{sec:gradient_descent} for details of the gradient descent based optimization algorithm.
-The actual implementation of gradient descent will be the main focus here, in order to steer optimized prompts in the right direction.
+The authors have provided their Python source code in a publicly accessible repository\footnote{https://github.com/microsoft/LMOps/tree/main/prompt\_optimization} under the MIT license.
+The project code can be of great help when adapting their algorithm to the LiSSA Java framework.
+The actual implementation of gradient descent will be the main focus, in order to steer optimized prompts in the right direction.
 
-
-\textbf{Why:} The primary idea of this thesis is to explore automated optimization.
+The primary idea of this thesis is to explore automated optimization.
 The naive approach may yield good results already.
 Feeding more information and processing logic into the optimization system is expected to present better results.
 Especially suitable results may be reached faster by doing more processing on the machine instead of expensive API calls to the large language model.
@@ -91,9 +91,9 @@ Especially suitable results may be reached faster by doing more processing on th
 
 \section{Evaluation}
 \label{approach:sec:evaluation}
-\textbf{How:} Precision and recall are key measures for information retrieval tasks~\cite{hayes2006AdvancingCandidate}.
+ Precision and recall are key measures for information retrieval tasks~\cite{hayes2006AdvancingCandidate}.
 
-\textit{TODO: Explain these metricize and how they are calculated instead of direct quoting and format formulas}
+%\textit{TODO: Explain these metricize and how they are calculated instead of direct quoting and formatting formulas}
 \directQuote[sec. 7.1]{Precision measures the ratio of correctly predicted links and all predicted links. Recall measures the ratio of correctly predicted links and all relevant documents. It shows an approach’s ability to provide correct trace links. The F1 score is the harmonic mean of precision and recall. The Metrics are calculated in the following way, where TP is true positives, FP is false positives, and FN is false negatives.}{ewald2024RetrievalAugmentedLarge}
 
 \begin{align*}
