@@ -312,6 +312,7 @@
 \DeclareAcronym{APE}{short=APE, long=automatic prompt engineering}
 \DeclareAcronym{LLM}{short=LLM, long=large language model}
 \DeclareAcronym{TLR}{short=TLR, long = traceability link recovery}
+\DeclareAcronym{TL}{short=TL, long = traceability link}
 \DeclareAcronym{ProTeGi}{short=ProTeGi, long = Prompt Optimization with Textual Gradients}
 \DeclareAcronym{IR}{short=IR, long = information retrieval}
 
@@ -323,6 +324,7 @@
 \newcommand{\LLM}[0]{\ac{LLM}\xspace}
 \newcommand{\LLMs}[0]{\acp{LLM}\xspace}
 \newcommand{\TLR}[0]{\ac{TLR}\xspace}
+\newcommand{\TLs}[0]{\acp{TL}\xspace}
 \newcommand{\ProTeGi}[0]{\ac{ProTeGi}\xspace}
 \newcommand{\IR}[0]{\ac{IR}\xspace}
 

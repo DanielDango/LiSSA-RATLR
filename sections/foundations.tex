@@ -10,22 +10,23 @@ Meaning, there is evidence of some past occurrence.
 The task of \TLR in software engineering is to find instances of the same element across different software artifacts and link them for further processing.
 What these elements might look like was visualized in \autoref{fig:artifact_overview}.
 These traceability links help track relationships between, for example, code, requirements, diagrams, documentation, and other elements.
-This information 
+This information can be used to ensure consistency between different artifacts and versions.
+To find all or most \TLs in a larger project can be quite a time-consuming task if done manually.
 
-This becomes especially important when inconsistencies are introduced into the project's artifacts.
+This becomes especially apparent when inconsistencies are introduced into the project's artifacts.
 As shown by \citewithauthor{wohlrab2019ImprovingConsistency}, inconsistencies in wording and language are quite common during different stages of development.
 For example, naming conventions for architectural components might not be followed during implementation.
 They find the impact of these naming inconsistencies to be quite insignificant.
 In this case, typically, there will be different naming conventions on each layer, which are followed correspondingly.
-However, for trace link recovery, this means that simple string comparisons by name are insufficient.
-
+This might thus not be much of a hurdle when a human is looking for \TLs.
+However, for automated trace link recovery, this means that simple string comparisons by name are insufficient.
 While \LLMs can overcome these inconsistencies, finding suitable prompts might be challenging or include tedious manual work in prompt engineering. 
 
 
 \section{Definition of Automated Prompt Engineering}
 \label{foundations:sec:automated_prompt_engineering}
 Prompt engineering is the process of refining a prompt for a specific use case.
-This is typically done in a non-systematic, manual manner. \APE enables \LLMs to refine the initial prompt to optimize their performance~\cite{zadenoori2025AutomaticPrompt}.
+This is typically done in a non-systematic, manual manner. \Acl{APE} enables \LLMs to refine the initial prompt to optimize their performance~\cite{zadenoori2025AutomaticPrompt}.
 
 Typically, \APE processes are iterated to improve previous results further \citeiterative.
 An illustration of the core concept and how it can be implemented will be shown in \autoref{approach:sec:naive_iterative} and  \autoref{fig:iterative_core_loop}.
@@ -40,7 +41,9 @@ They prompt the model to generate a likely set of instructions, also called cand
 The instructions will achieve good results when prompted with a batch of input/output pairs.
 These pairs of input/output data will be processed as text by the \LLM, pre- and or post-processing may be required.
 
-The performance of prompts can be estimated using a set of training data, which includes input/output pairs.
+The performance of prompts can be estimated using a set of training data, which consists of textual input/output pairs for the \LLM.
+The exact content of these pairs depends on the context of the problem for which the prompts are optimized. 
+For example, sentiment analysis training data might provide pairs consisting of sentences and their correctly identified sentiment.
 A prompt performs better the more inputs are correctly mapped onto their expected outputs.
 
 While this is a very simple and general attempt to \APE, algorithms can of course be more complex as well.
@@ -72,7 +75,7 @@ TODO:
 \end{comment}
 
 The following subsections will explain each step of the \ProTeGi optimization in more detail.
-The \ProTeGi algorithm takes an initial prompt $p_0$ and training data $\{(x_1, y_1), \dots, (x_n, y_n)\}$ consisting of inputs and outputs.
+The \ProTeGi algorithm also takes an initial prompt $p_0$ and training data $\{(x_1, y_1), \dots, (x_n, y_n)\}$ consisting of inputs and outputs.
 They \directQuote[sec. 2]{assume access to a black box LLM API [...] which returns a likely text continuation y of the prompt formed by concatenating p and x}{pryzant2023AutomaticPrompt}.
 They then iteratively optimize the initial prompt $p_0$ to produce an approximation of the most optimized prompt for the given task.
 In order to optimize the prompt, a function is required that computes deviance between the actual output $y$ and the expected output $y_i$ as a numeric value.
@@ -83,15 +86,14 @@ To evaluate the output of the current prompt $p_i$, \citeauthor{pryzant2023Autom
 In addition to the prompt, inputs that were not correctly classified when testing $p_i$ are also provided as context for $\triangledown$.
 The result summarizes the flaws of $p_i$ in natural language.
 This summary is called the textual gradient $g$.
-
 The second prompt $\delta$, the optimization prompt, is required to adjust $p_i$ in the opposite direction of $g$ to minimize the loss signal.
-They differ from other implementations by generating multiple gradients and refinements that might improve $p_i$ and select good candidates to optimize further in the next iterative step.
 
-In addition, they broaden their candidates further by paraphrasing them into semantically similar prompts, which are worded differently.
+They differ from other iterative implementations by generating multiple gradients and refinements that might improve the classification rate of $p_i$.
+In addition, they broaden their candidate prompts further by paraphrasing them into semantically similar prompts, which are worded differently.
 Generating new prompts with $g$ and broadening them is considered candidate expansion.
 
 
-\subsection{Candidate Selection}
+\subsection{Candidate Selection with  Multi-Armed Bandit}
 To select candidates for the next iteration, \citeauthor{pryzant2023AutomaticPrompt} apply a beam search algorithm.
 Beam search is a heuristic best-first graph search algorithm to select a fixed number of promising paths.
 The remaining paths will be discarded to allocate resources to more promising paths instead~\cite{BeamSearch}.
