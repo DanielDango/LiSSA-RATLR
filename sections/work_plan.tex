@@ -4,8 +4,8 @@
 In this chapter, I will elaborate on my plan to realize the thesis topic and mitigate risks.
 This includes the individual work packages outlined in \autoref{sec:work_phases}.
 Different artifacts that will be produced through the thesis are mentioned in \autoref{sec:work_artifacts}.
-Expected risks during the project, along with their mitigation, will be addressed in \autoref{sec:work_risks}.
-Lastly, a giant chart will be provided to visualize the temporal planning for my thesis project in \autoref{sec:work_gant}.
+Some expected risks during the project, along with their mitigation, will be addressed in \autoref{sec:work_risks}.
+Lastly, a Gantt chart will be provided to visualize the temporal planning for my thesis project in \autoref{sec:work_gant}.
 
 \section{Phases}
 \label{sec:work_phases}
@@ -19,11 +19,12 @@ Even though~\nameref{phase_evaluation} is placed as the last phase, some progres
 \subsection{Initial Overview}
 \label{phase_initial_overview}
 
-To become familiar with the LiSSA framework~\cite{fuchss2025LiSSAGeneric}, I will implement another basic classifier with a singular request variation of the simple prompting technique \ToT~\cite{long2023LargeLanguage} explained in \autoref{approach:sec:tot}.
+To become familiar with the LiSSA framework~\cite{fuchss2025LiSSAGeneric}, I will implement another basic classifier with a singular request variation of the simple prompting technique \ToT~\cite{long2023LargeLanguage} explained in the section \nameref{approach:sec:tot}.
 
 Currently, a zero-shot and \CoT-style reasoning classifier is implemented.
-However, as \citeauthor{long2023LargeLanguage} has shown, \ToT-style prompts can improve performance compared to \CoT approaches in solving logic puzzles.
+However, as \citeauthor{long2023LargeLanguage} has shown, \ToT-style prompts can improve performance compared to \CoT approaches when solving logic puzzles.
 They have tested their approach to \ToT prompting with different-sized Sudoku puzzles and compared their results against zero-shot prompting as well as \CoT styled one- and few-shot prompting.
+This will provide an additional baseline on the possibilities without automatic prompt optimization.
 
 
 \subsection{Naive iterative Optimization}
@@ -31,10 +32,12 @@ They have tested their approach to \ToT prompting with different-sized Sudoku pu
 
 Next, I plan to implement a naive iterative approach to prompt optimization.
 Many automatic prompt optimization algorithms \citeiterative depend on an iterative core loop (see \autoref{fig:iterative_core_loop}). This loop will be repeated until the optimized prompt performs sufficiently good or a maximum number of iterations has been reached.
-My plan to realize this is explained in \autoref{approach:sec:naive_iterative}.
+My plan to realize this is explained in the section \nameref{approach:sec:naive_iterative}.
+
 
 \subsection{Automatic Prompt Optimization Based on Gradient Descent}
 \label{phase_gradient_descent}
+
 The major implementation of this thesis will be an adaptation of the gradient-descent-based \APO algorithm by \citewithauthor{pryzant2023AutomaticPrompt}.
 Refer to \autoref{approach:sec:gradient_descent} for details about the implementation.
 The \APO algorithm will be trained and tested on the requirements-to-requirements benchmark data by \citeauthor{hey2025RequirementsTraceability}.
@@ -45,10 +48,9 @@ The optimized prompt will be compared against previous prompts used by \citeauth
 \subsection{Evaluation and Buffer}
 \label{phase_evaluation}
 As this work can be seen as an expansion on the recent work of \citewithauthor{hey2025RequirementsTraceability}, the same metrics will be used to evaluate the different prompts used and optimized in this work.
-These are the precision, recall, $F_1$-Score, and $F_2$-Score.
+These are the precision, recall, $f_1-score$, and $f_2-score$.
 This enables an easy comparison, especially with the manual prompts designed by \citewithauthor{ewald2024RetrievalAugmentedLarge} included in the work of \citeauthor{hey2025RequirementsTraceability}.
-
-For further evaluation, aside from the performance of the optimized prompt, different \LLMs will be used, as explained in \autoref{approach:sec:evaluation}.
+For further evaluation, aside from the performance of the optimized prompts, different \LLMs will be used, as explained in \autoref{approach:sec:evaluation}.
 
 
 
@@ -58,12 +60,12 @@ For further evaluation, aside from the performance of the optimized prompt, diff
 This work will yield code to be merged into the LiSSA repository\footnote{https://github.com/ArDoCo/LiSSA-RATLR/}.
 The implementation during the work packages~\nameref{phase_naive_iterative} and~\nameref{phase_gradient_descent} in \autoref{sec:work_phases} will provide a base to implement further automatic prompt optimization techniques with similar building blocks.
 
-A written report will be created to document, summarize, and evaluate the results of my (automatic) prompt optimization work to retrieve trace links.
+A written report, my bachelor's thesis, will be created to document, summarize, and evaluate the results of this automatic prompt optimization work to retrieve trace links.
 
 
 \section{Risk Management}
 \label{sec:work_risks}
-The major risk of my work would be failing to implement the~\nameref{phase_gradient_descent} in \autoref{phase_gradient_descent}.
+The major risk of my work would be failing to implement the \nameref{phase_gradient_descent} in \autoref{phase_gradient_descent}.
 By choosing an optimization algorithm that has Python ode publicly available, this risk is already greatly reduced.
 Furthermore, all three work packages with implementation content will yield a classifier that can be tested and evaluated independently against the existing classifiers in the LiSSA Framework.
 Thus, early working examples will be available throughout the thesis.
