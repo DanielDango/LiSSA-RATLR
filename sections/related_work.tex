@@ -24,21 +24,21 @@ In previous work by \citewithauthor{fuchss2025LiSSAGeneric}, simple prompts by \
 
 \section{Automatic Prompt Engineering}
 \label{related:sec:ape}
-Many prompt optimization \textit{todo find fitting word: papers} require an initial prompt to start the refinement process by using training data consisting of input / output pairs \cite{ramnath2025SystematicSurvey}.
+Many prompt optimization algorithms require an initial prompt to start the refinement process by using training data consisting of input/output pairs \cite{ramnath2025SystematicSurvey}.
 
-The Automatic Promot Engineer by \citewithauthor{zhou2023LargeLanguage} can generate prompts for tasks which are specified only by input / output pairs. This eliminates the need for the initial prompt to seed the optimization process.
+The Automatic Prompt Engineer by \citewithauthor{zhou2023LargeLanguage} can generate prompts for tasks that are specified only by input/output pairs. This eliminates the need for the initial prompt to seed the optimization process.
 
-Self-Refine by \citewithauthor{madaan2023SelfRefineIterative} uses feedback from the same large language model that generated the prompt, to improve the prompt further. This imitates human behavior, when initial drafts are adjusted rapidly. 
+Self-Refine by \citewithauthor{madaan2023SelfRefineIterative} uses feedback from the same large language model that generated the prompt, to improve the prompt further. This imitates human behavior when initial drafts are adjusted rapidly. 
 
 ProTeGi by \citewithauthor{pryzant2023AutomaticPrompt} utilizes a gradient descent algorithm to find the minimal deviance between an optimized prompt and the expected outputs. More details about their work can be found in \ref{sec:gradient_descent}.
 
-\citewithauthor{yang2024LargeLanguage} have taken a slightly different approach in their OPRO optimizer. Instead of adjusting the current iteration of prompts to steer them in an improved direction like \citeauthor{pryzant2023AutomaticPrompt}, they generate new independent prompts instead.
+\citewithauthor{yang2024LargeLanguage} have taken a slightly different approach in their OPRO optimizer. Instead of adjusting the current iteration of prompts to steer them in an improved direction, like \citeauthor{pryzant2023AutomaticPrompt}, they generate new independent prompts instead.
 
-In order to reduce uncertainty and improve reproducibility, the Declarative Self-Improving Python (DSPy) Framework by \citewithauthor{khattab2023DSPyCompiling} proposes a composite like structure in python to program prompts. They are also generated and refined the prompts in a pipeline like structure, not unlike other LLM based prompt optimization algorithms. 
+In order to reduce uncertainty and improve reproducibility, the Declarative Self-Improving Python (DSPy) Framework by \citewithauthor{khattab2023DSPyCompiling} proposes a composite like structure in python to program prompts. They are also generating and refining the prompts in a pipeline-like structure, not unlike other LLM-based prompt optimization algorithms. 
 
 \section{Training Data}
-Trace Link Recovery tasks can be applied across many domains. Often authors will focus on one or few domains instead of attempting to cover everything. Domain training data includes the artifacts and ideally also a gold standard to compare results to.
+Trace Link Recovery tasks can be applied across many domains. Often, authors will focus on one or few domains instead of attempting to cover everything. Domain training data includes the artifacts and, ideally, also a gold standard to compare results to.
 
-Software architecture documentation to software architecture models for BigBlueButton, MediaStore, Teammates, Teastore are publicly available by \citewithauthor{fuchss2022ArDoCoBenchmark} on GitHub \footnote{https://github.com/ArDoCo/Benchmark}.
+Software architecture documentation to software architecture models for BigBlueButton, MediaStore, Teammates, and Teastore are publicly available by \citewithauthor{fuchss2022ArDoCoBenchmark} GitHub.
 
-For the domain of requirements to requirements, which my work will also focus on, a compilation of training data can be found in the replication package\cite{hey2025ReplicationPackage} for recent work of \citeauthor{hey2025RequirementsTraceability}.
+For the domain of requirements to requirements, which my work will also focus on, a compilation of training data can be found in the replication package~\cite{hey2025ReplicationPackage} for recent work of \citeauthor{hey2025RequirementsTraceability}.

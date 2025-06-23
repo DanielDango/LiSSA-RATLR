@@ -38,11 +38,13 @@ Once any candidate performs better than some threshold value or a maximum number
 \includesvg[width=0.7\linewidth]{graphics/gradient_descent.drawio}
 \caption{Overview of the iterative optimization loop in \cite{pryzant2023AutomaticPrompt}}
 \label{fig:gradient_descent}
+\begin{comment}
 TODO: 
 \begin{itemize}
     \item add legend
     \item symbolise core loop
 \end{itemize}
+\end{comment}
 \end{figure}
 
 The following subsections will explain each step of the \ProTeGi optimization in more detail. The \ProTeGi algorithm takes an initial prompt $p_0$ and training data $\{(x_1, y_1), \dots, (x_n, y_n)\}$ consisting of inputs and outputs. They \directQuote[sec. 2]{assume access to a black box LLM API [...] which returns a likely text continuation y of the prompt formed by concatenating p and x}{pryzant2023AutomaticPrompt}. They then iteratively optimize the initial prompt $p_0$ to produce an approximation of the most optimized prompt for the given task. In order to optimize the prompt, a function is required that computes deviance between the actual output $y$ and the expected output $y_i$ as a numeric value.
