@@ -12,18 +12,23 @@
 
 \chapter{Introduction}
 \label{ch:Introduction}
-During software development, numerous artifacts are created, ranging from the actual project code to documentation and a multitude of formal and informal diagrams. \TLR aims to link these artifacts across different domains or versions. Challenges such as inconsistent naming are frequent issues in software projects \cite{wohlrab2019ImprovingConsistency}. \TLR approaches need to be able to deal with such hardships. \autoref{fig:artifact_overview} provides an overview of what these artifacts might look like for example.
+During software development, numerous artifacts are created, ranging from the actual project code to documentation and a multitude of formal and informal diagrams. \TLR aims to link these artifacts across different domains or versions.
+Challenges such as inconsistent naming are frequent issues in software projects~\cite{wohlrab2019ImprovingConsistency}. \TLR approaches need to be able to deal with such hardships. \autoref{fig:artifact_overview} provides an overview of what these artifacts might look like for example.
 
 \begin{figure}
     \centering
-    \includegraphics[width=0.6\linewidth]{graphics/artifact_overview_Fuchß.png}
+    \includegraphics[width=0.6\linewidth]{graphics/artifact_overview_Fuchß}
     \caption{Overview of different artifacts during software development by \citewithauthor{fuchss2025LiSSAGeneric}}
     \label{fig:artifact_overview}
 \end{figure}
 
-\LLMs have made rapid advancements in recent years. They are becoming increasingly popular for dealing with \TLR tasks and have shown auspicious results so far. As they are still unable to reason and think on their own \cite{shojaee2025IllusionThinking}, prompt engineering is required to extract good results. However, manually determining prompts suited for each specific problem is quite a tedious, time- and labor-intensive task.
+\LLMs have made rapid advancements in recent years.
+They are becoming increasingly popular for dealing with \TLR tasks and have shown auspicious results so far.
+As they are still unable to reason and think on their own~\cite{shojaee2025IllusionThinking}, prompt engineering is required to extract good results.
+However, manually determining prompts suited for each specific problem is quite a tedious, time- and labor-intensive task.
 
-To address this shortcoming, automated prompt engineering tools can be used. They will typically use the LLM itself to determine suitable adjustments or generate new prompts based on a description or training data of the problem \cite{ramnath2025SystematicSurvey}.
+To address this shortcoming, automated prompt engineering tools can be used.
+They will typically use the LLM itself to determine suitable adjustments or generate new prompts based on a description or training data of the problem~\cite{ramnath2025SystematicSurvey}.
 
-The LiSSA framework \cite{fuchss2025LiSSAGeneric} proposes an environment for \TLR tasks, including multiple pipeline steps for preprocessing of input data. 
+The LiSSA framework~\cite{fuchss2025LiSSAGeneric} proposes an environment for \TLR tasks, including multiple pipeline steps for preprocessing of input data.
 I will contribute an automatic prompt refinement algorithm, hoping to improve trace recovery, especially for larger projects in the requirements to requirements domain.

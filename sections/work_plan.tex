@@ -1,35 +1,52 @@
 \chapter{Work Plan}
 \label{chap:work_plan}
 
-In this chapter, I will elaborate on my plan to realize the thesis topic and mitigate risks. This includes the individual work packages outlined in \autoref{sec:work_phases}. Different artifacts that will be produced through the thesis are mentioned in \autoref{sec:work_artifacts}. Expected risks during the project, along with their mitigation, will be addressed in \autoref{sec:work_risks}. Lastly, a giant chart will be provided to visualize the temporal planning for my thesis project in \autoref{sec:work_gant}.
+In this chapter, I will elaborate on my plan to realize the thesis topic and mitigate risks.
+This includes the individual work packages outlined in \autoref{sec:work_phases}.
+Different artifacts that will be produced through the thesis are mentioned in \autoref{sec:work_artifacts}.
+Expected risks during the project, along with their mitigation, will be addressed in \autoref{sec:work_risks}.
+Lastly, a giant chart will be provided to visualize the temporal planning for my thesis project in \autoref{sec:work_gant}.
 
 \section{Phases}
 \label{sec:work_phases}
 
-My work will be split into four distinct phases, with only a few dependencies in between. Each of the first three implementation packages can be evaluated separately. However, each phase provides building blocks used by the next with increasing complexity. Even though \nameref{phase_evaluation} is placed as the last phase, some progress will already be made after the first implementation in \autoref{phase_initial_overview} is finished.
+My work will be split into four distinct phases, with only a few dependencies in between.
+Each of the first three implementation packages can be evaluated separately.
+However, each phase provides building blocks used by the next with increasing complexity.
+Even though~\nameref{phase_evaluation} is placed as the last phase, some progress will already be made after the first implementation in \autoref{phase_initial_overview} is finished.
 
 
 \subsection{Initial Overview}
 \label{phase_initial_overview}
 
-To become familiar with the LiSSA framework \cite{fuchss2025LiSSAGeneric}, I will implement another basic classifier with a singular request variation of the simple prompting technique \ToT  \cite{long2023LargeLanguage} explained in \autoref{approach:sec:tot}. 
-Currently, a zero-shot and \CoT-style reasoning classifier is implemented. However, as \citeauthor{long2023LargeLanguage} has shown, \ToT-style prompts can improve performance compared to \CoT approaches in solving logic puzzles. They have tested their approach to \ToT prompting with different-sized Sudoku puzzles and compared their results against zero-shot prompting as well as \CoT styled one- and few-shot prompting. 
+To become familiar with the LiSSA framework~\cite{fuchss2025LiSSAGeneric}, I will implement another basic classifier with a singular request variation of the simple prompting technique \ToT~\cite{long2023LargeLanguage} explained in \autoref{approach:sec:tot}.
+
+Currently, a zero-shot and \CoT-style reasoning classifier is implemented.
+However, as \citeauthor{long2023LargeLanguage} has shown, \ToT-style prompts can improve performance compared to \CoT approaches in solving logic puzzles.
+They have tested their approach to \ToT prompting with different-sized Sudoku puzzles and compared their results against zero-shot prompting as well as \CoT styled one- and few-shot prompting.
 
 
 \subsection{Naive iterative Optimization}
 \label{phase_naive_iterative}
 
-Next, I plan to implement a naive iterative approach to prompt optimization. Many automatic prompt optimization algorithms \citeiterative depend on an iterative core loop (see \autoref{fig:iterative_core_loop}). This loop will be repeated until the optimized prompt performs sufficiently good or a maximum number of iterations has been reached. My plan to realize this is explained in \autoref{approach:sec:naive_iterative}.
+Next, I plan to implement a naive iterative approach to prompt optimization.
+Many automatic prompt optimization algorithms \citeiterative depend on an iterative core loop (see \autoref{fig:iterative_core_loop}). This loop will be repeated until the optimized prompt performs sufficiently good or a maximum number of iterations has been reached.
+My plan to realize this is explained in \autoref{approach:sec:naive_iterative}.
 
 \subsection{Automatic Prompt Optimization Based on Gradient Descent}
 \label{phase_gradient_descent}
-The major implementation of this thesis will be an adaptation of the gradient-descent-based \APO algorithm by \citewithauthor{pryzant2023AutomaticPrompt}. Refer to \autoref{approach:sec:gradient_descent} for details about the implementation.
-The \APO algorithm will be trained and tested on the requirements-to-requirements benchmark data by \citeauthor{hey2025RequirementsTraceability}. It is available in their replication package \cite{hey2025ReplicationPackage}. The optimized prompt will be compared against previous prompts used by \citeauthor{fuchss2025LiSSAGeneric} and \citeauthor{hey2025RequirementsTraceability} in the greater LiSSA framework.
+The major implementation of this thesis will be an adaptation of the gradient-descent-based \APO algorithm by \citewithauthor{pryzant2023AutomaticPrompt}.
+Refer to \autoref{approach:sec:gradient_descent} for details about the implementation.
+The \APO algorithm will be trained and tested on the requirements-to-requirements benchmark data by \citeauthor{hey2025RequirementsTraceability}.
+It is available in their replication package~\cite{hey2025ReplicationPackage}.
+The optimized prompt will be compared against previous prompts used by \citeauthor{fuchss2025LiSSAGeneric} and \citeauthor{hey2025RequirementsTraceability} in the greater LiSSA framework.
 
 
 \subsection{Evaluation and Buffer}
 \label{phase_evaluation}
-As this work can be seen as an expansion on the recent work of \citewithauthor{hey2025RequirementsTraceability}, the same metrics will be used to evaluate the different prompts used and optimized in this work. These are the precision, recall, $F_1$-Score, and $F_2$-Score. This enables an easy comparison, especially with the manual prompts designed by \citewithauthor{ewald2024RetrievalAugmentedLarge} included in the work of \citeauthor{hey2025RequirementsTraceability}.
+As this work can be seen as an expansion on the recent work of \citewithauthor{hey2025RequirementsTraceability}, the same metrics will be used to evaluate the different prompts used and optimized in this work.
+These are the precision, recall, $F_1$-Score, and $F_2$-Score.
+This enables an easy comparison, especially with the manual prompts designed by \citewithauthor{ewald2024RetrievalAugmentedLarge} included in the work of \citeauthor{hey2025RequirementsTraceability}.
 
 For further evaluation, aside from the performance of the optimized prompt, different \LLMs will be used, as explained in \autoref{approach:sec:evaluation}.
 
@@ -38,16 +55,21 @@ For further evaluation, aside from the performance of the optimized prompt, diff
 
 \section{Artifacts}
 \label{sec:work_artifacts}
-This work will yield code to be merged into the LiSSA repository\footnote{https://github.com/ArDoCo/LiSSA-RATLR/}. The implementation during the work packages \nameref{phase_naive_iterative} and \nameref{phase_gradient_descent} in \autoref{sec:work_phases} will provide a base to implement further automatic prompt optimization techniques with similar building blocks.
+This work will yield code to be merged into the LiSSA repository\footnote{https://github.com/ArDoCo/LiSSA-RATLR/}.
+The implementation during the work packages~\nameref{phase_naive_iterative} and~\nameref{phase_gradient_descent} in \autoref{sec:work_phases} will provide a base to implement further automatic prompt optimization techniques with similar building blocks.
 
 A written report will be created to document, summarize, and evaluate the results of my (automatic) prompt optimization work to retrieve trace links.
 
 
 \section{Risk Management}
 \label{sec:work_risks}
-The major risk of my work would be failing to implement the \nameref{phase_gradient_descent} in \autoref{phase_gradient_descent}. By choosing an optimization algorithm that has Python ode publicly available, this risk is already greatly reduced. Furthermore, all three work packages with implementation content will yield a classifier that can be tested and evaluated independently against the existing classifiers in the LiSSA Framework. Thus, early working examples will be available throughout the thesis. 
+The major risk of my work would be failing to implement the~\nameref{phase_gradient_descent} in \autoref{phase_gradient_descent}.
+By choosing an optimization algorithm that has Python ode publicly available, this risk is already greatly reduced.
+Furthermore, all three work packages with implementation content will yield a classifier that can be tested and evaluated independently against the existing classifiers in the LiSSA Framework.
+Thus, early working examples will be available throughout the thesis.
 
-It is hard to estimate the required time for each phase accurately. Frequent buffer slots are planned to allocate more time dynamically as needed.
+It is hard to estimate the required time for each phase accurately.
+Frequent buffer slots are planned to allocate more time dynamically as needed.
 
 
 
@@ -59,7 +81,8 @@ It is hard to estimate the required time for each phase accurately. Frequent buf
 
 \section{Schedule}
 \label{sec:work_gant}
-The Gantt chart in \autoref{fig:gantt} illustrates how I plan to allocate my time. The early months will probably take up less time than planned, which can be used to reduce congestion in later phases.
+The Gantt chart in \autoref{fig:gantt} illustrates how I plan to allocate my time.
+The early months will probably take up less time than planned, which can be used to reduce congestion in later phases.
 
 
 \begin{figure}
@@ -74,8 +97,7 @@ The Gantt chart in \autoref{fig:gantt} illustrates how I plan to allocate my tim
     time slot format=isodate,
     time slot format/start date=2025-06-23]{2025-06-23}{2025-10-26}
     \ganttset{bar height=.7}
-        \gantttitlecalendar{year, month=name, week=26} \\
-        \ganttgroup{\nameref{phase_initial_overview}}{2025-06-23}{2025-07-27} \\
+        \gantttitlecalendar{year, month=name, week=26} \\~\ganttgroup{\nameref{phase_initial_overview}}{2025-06-23}{2025-07-27} \\
         \ganttbar{LiSSA setup}{2025-06-23}{2025-07-06} \\
         \ganttbar{ToT implementation}{2025-07-07}{2025-07-13} \\
         \ganttbar[name=impl1]{Benchmark setup}{2025-07-21}{2025-08-03} \\
@@ -83,10 +105,7 @@ The Gantt chart in \autoref{fig:gantt} illustrates how I plan to allocate my tim
         \ganttbar[name=impl2]{Iterative classifier}{2025-07-28}{2025-08-03} \\
         \ganttgroup{APO gradient descent}{2025-08-25}{2025-09-21} \\
         \ganttbar[name=impl3]{Implementation}{2025-08-25}{2025-09-10}\\
-        \ganttmilestone{Code review}{2025-09-07} \\ 
-
-        
-        \ganttgroup{\nameref{phase_evaluation}}{2025-08-11}{2025-10-23} \\
+        \ganttmilestone{Code review}{2025-09-07} \\~\ganttgroup{\nameref{phase_evaluation}}{2025-08-11}{2025-10-23} \\
         \ganttbar{Thesis writing}{2025-08-18}{2025-09-14} 
         \ganttbar{}{2025-09-29}{2025-10-11}
         \\
