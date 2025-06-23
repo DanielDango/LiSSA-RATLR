@@ -1,53 +1,60 @@
 \chapter{Approach}
 In this chapter, I will outline how my thesis will be realized and provide source code that can be merged into the LiSSA project.
-
+My work aims to implement three different classifiers into the framework.
+First, I plan to implement a simple \ToT classifier in \autoref{approach:sec:tot} to broaden the baseline to compare later optimized prompts against.
+Next, I expect to work on a reduced iterative optimizer in \autoref{approach:sec:naive_iterative} using a naive approach to optimization.
+After this already provides basic components and data to evaluate the more sophisticated algorithm by \citewithauthor{pryzant2023AutomaticPrompt} will be implemented in \autoref{approach:sec:gradient_descent}.
+Last but not least, I will explain how I plan to evaluate and compare my findings in \autoref{approach:sec:evaluation}.
 
 \section{Simple Tree-of-Thought Classifier}
 \label{approach:sec:tot}
-The LiSSA framework is publicly accessible in a repository using the MIT license.
-Existing classifiers can be used as an inspiration for development.
-
-The class \verb|classifier| is an abstraction of all classifiers.
-It provides basic functionality to include further classifiers.
-Integration for different \LLM providers, such as Chat-GPT, Ollama, and Blablador, already exists in the framework.
-The new classifier can be plugged in directly with little more effort than writing the request prompt and implementing the \verb|classify| function to extract the classification result out of the \LLM output.
-
-\ToT is a prompting technique exploring more different branches of thoughts than typical \CoT prompts.
-As illustrated in \autoref{fig:ToT_visualization}
-
-The prompts by \citewithauthor{hulbert2023UsingTreeofThought} aim to simplify \ToT prompting into a singular request, instead of chaining multiple calls.
-I will use one of their prompts.
-The benchmark data to compare \ToT prompting with the existing zero-shot and \CoT classifiers also exists in a public repository~\cite{fuchss2022ArDoCoBenchmark}.
-
-This work package has two major goals.
-Foremost, to get confident and set up with the general project structure and benchmark data.
-This will be a prerequisite for all future work in the LiSSA framework.
-Second, this will broaden the baseline to compare later results and possible improvements against.
 
 \begin{figure}
+    %TODO: replicate this figure!
     \centering
     \includegraphics[width=\linewidth]{graphics/ToT_Yao}
     \caption{Tree of Thought visualization by \citewithauthor{yao2023TreeThoughts}}
     \label{fig:ToT_visualization}
 \end{figure}
 
+\Ac{ToT} is a prompting technique exploring more different branches of thoughts than typical \CoT prompts.
+As illustrated in \autoref{fig:ToT_visualization}, many branches are explored concurrently instead of following a single strain of thoughts like \CoT prompting.
+The prompts by \citewithauthor{hulbert2023UsingTreeofThought} aim to simplify \ToT prompting into a singular request, instead of chaining multiple calls.
+I will use one of their prompts.
+The benchmark data to compare \ToT prompting with the existing zero-shot and \CoT classifiers also exists in public repositories~\cite{fuchss2022ArDoCoBenchmark, hey2025ReplicationPackage}.
+
+The LiSSA framework is publicly accessible in a repository using the MIT license. Various classifiers are already included there.
+They can be used as an inspiration for development.
+The class \verb|classifier| is an abstraction of all classifiers.
+It provides basic functionality to include further classifiers.
+Integration for different \LLM providers, such as Chat-GPT, Ollama, and Blablador, already exists in the framework.
+The new classifier can be plugged in directly with little more effort than writing the request prompt and implementing the \verb|classify| function to extract the classification result out of the \LLM output.
+
+This work package has two major goals.
+Foremost, to get confident and set up with the general project structure and benchmark data.
+This will be a prerequisite for all future work in the LiSSA framework.
+Second, this will broaden the baseline to compare later results and possible improvements against.
+
+
+
 
 \section{Naive Iterative Optimizing Classifier}
 \label{approach:sec:naive_iterative}
-\textbf{How:} Another quick classifier implementation will be the simplest automatic iterative prompt optimization algorithm.
-The same existing abstract \verb|classifier| class can be used as in~\ref{phase_initial_overview} to provide basic functionality for the iteratively optimized classifier.
+Another classifier implementation will be the simplest automatic iterative prompt optimization algorithm.
+The same existing abstract \verb|classifier| class can be used as in \autoref{phase_initial_overview} to provide basic functionality for the iteratively optimized classifier.
 
-Next, a function $f$ will be required to quantify the result of the current prompt $p$ iteration, called to a large language model $llm$.
-The simple approach here is to use the successful retrieval rate, by dividing the amount of correctly classified trace links by the total amount of recoverable trace links.
+Next, a function $f$ will be required to quantify the result, also referred to as performance, of the current prompt $p$ iteration, called to a large language model $llm$ using a set of training data $X$.
+The simple approach here is to use the successful retrieval rate by dividing the number of correctly classified trace links by the total number of recoverable trace links.
 The function $f$ will need to have the same range for any set of training data to ensure the threshold value $t$ will always be viable.
 
+\begin{align}
+        f: llm(p, X) \rightarrow [0, 1] \\
+        t \in [0, 1]
+\end{align}
 
-\begin{align*}
-    f: llm(p) \rightarrow [0, 1] \\
-    t \in [0, 1]
-\end{align*}
-The benchmark data by \citewithauthor{fuchss2022ArDoCoBenchmark} also provides the gold standard for each given problem.
-The total amount of recoverable trace links thus is already available. \textit{to-do: how can the task set be divided into training and testing data? Use one entire TLR problem for training, the remaining for testing?}
+The benchmark data by \citewithauthor{hey2025ReplicationPackage} also provides the gold standard for each given problem.
+The total amount of recoverable trace links thus is already available. 
+%\textit{to-do: how can the task set be divided into training and testing data? Use one entire TLR problem for training, the remaining for testing?}
 
 To improve the performance, an optimization prompt is used.
 The naive approach is to simply ask the LLM to improve the prompt without providing further direction or information about why the prompt did not meet the requirements yet.
