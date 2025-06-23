@@ -91,24 +91,34 @@ Especially suitable results may be reached faster by doing more processing on th
 
 \section{Evaluation}
 \label{approach:sec:evaluation}
- Precision and recall are key measures for information retrieval tasks~\cite{hayes2006AdvancingCandidate}.
+ Evaluating the experimental results of prompt optimization is central to making them accessible and comparable. 
+ Precision~(\autoref{eq:precision}) and recall~(\autoref{eq:recall}) are key measures for information retrieval tasks~\cite{hayes2006AdvancingCandidate}.
+ They are commonly used by many authors to compare different approaches to \TLR. 
+ Further the $f1-score$ and $f2-score$, using a fixed $\beta$ in \autoref{eq:f_beta}, are used often.
+I will use these four measures.
+\citewithauthor{hey2025RequirementsTraceability} and \citewithauthor{fuchss2025LiSSAGeneric} have used these when evaluating their results on the same data sets I intend to use.
+This way comparrision will be very simple.
+ 
 
 %\textit{TODO: Explain these metricize and how they are calculated instead of direct quoting and formatting formulas}
 \directQuote[sec. 7.1]{Precision measures the ratio of correctly predicted links and all predicted links. Recall measures the ratio of correctly predicted links and all relevant documents. It shows an approach’s ability to provide correct trace links. The F1 score is the harmonic mean of precision and recall. The Metrics are calculated in the following way, where TP is true positives, FP is false positives, and FN is false negatives.}{ewald2024RetrievalAugmentedLarge}
 
-\begin{align*}
+\begin{align}
+    \label{eq:precision}
     Precision = \frac{TP}{TP + FP} &\\
+    \label{eq:recall}
     Recall = \frac{TP}{TP + FN} &\\
-    f_1 = 2 \cdot \frac{Precision \cdot Recall}{Precision + Recall} = \frac{TP}{TP + \frac{1}{2}(FP + FN)} &
-\end{align*}
+    \label{eq:f_beta}
+    f_{\beta} = (1 + \beta^2) \cdot \frac{Precision \cdot Recall}{(\beta^2 \cdot Precision) + Recall}
+\end{align}
 
 
 
-Depending on how long each phase will take, it is possible to generate a bunch of different data and perform comparisons.
-A simple but interesting approach is to compare different LLMs for the task.
-Many variations can be achieved by comparing for example how a prompt optimized by one system performs on the others.
+Depending on how long each implementation phase will take, it is possible to generate a bunch of different data and performance comparisons.
+A simple yet interesting approach is to compare different LLMs for the task.
+Many variations can be achieved by comparing, for example, how a prompt optimized by one system performs on the others.
 We can also compare how well each system manages to optimize the initial prompt.
 Another interesting thought is to take optimized prompts from a different system as the initial prompt.
 
-
-\textbf{Why:} Evaluating the experimental results of prompt optimization is key to making them accessible and comparable. 
+Varying testing data is also plausible.
+Including artifacts and their links from different projects into a singular data set might have the potential to yield more general but less optimized prompts.
