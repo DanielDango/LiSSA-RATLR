@@ -36,6 +36,8 @@ I aim to improve recovery rates further by using automatically optimized prompts
 \section{Automatic Prompt Engineering}
 \label{related:sec:ape}
 Many prompt optimization algorithms require an initial prompt to start the refinement process by using training data consisting of input/output pairs~\cite{ramnath2025SystematicSurvey}. 
+Data sets of these pairs, describing the problem to be solved using \LLMs, vary greatly depending on the actual task.
+For example, sentiment analysis training data might provide pairs consisting of sentences and their correctly identified sentiment.
 The Automatic Prompt Engineer by \citewithauthor{zhou2023LargeLanguage} can generate prompts for tasks that are specified only by input/output pairs.
 This eliminates the need for the initial prompt to seed the optimization process.
 
@@ -46,15 +48,21 @@ ProTeGi by \citewithauthor{pryzant2023AutomaticPrompt} utilizes a gradient desce
 More details about their work can be found in~\ref{sec:gradient_descent}.
 
 \citewithauthor{yang2024LargeLanguage} have taken a slightly different approach in their OPRO optimizer.
-Instead of adjusting the current iteration of prompts to steer them in an improved direction, like \citeauthor{pryzant2023AutomaticPrompt}, they generate new independent prompts instead.
+Instead of adjusting the current iteration of prompts, they generate fully new, independent prompts instead. This aims to reduce the bias of modifying existing prompts and encourages further exploration.
 
 In order to reduce uncertainty and improve reproducibility, the Declarative Self-Improving Python (DSPy) Framework by \citewithauthor{khattab2023DSPyCompiling} proposes a composite like structure in python to program prompts.
 They are also generating and refining the prompts in a pipeline-like structure, not unlike other LLM-based prompt optimization algorithms.
 
-\section{Training Data}
+My work will focus on the optimization algorithm by \citeauthor{pryzant2023AutomaticPrompt}. 
+While my work will not expand the field of \APE directly, I will adapt it into the domain of \TLR. 
+Existing training sets can be used to optimize the prompts.
+
+\section{Training Data for different Domains}
 Trace Link Recovery tasks can be applied across many domains.
-Often, authors will focus on one or few domains instead of attempting to cover everything.
-Domain training data includes the artifacts and, ideally, also a gold standard to compare results to.
+Often, authors will focus on one or a few domains instead of attempting to cover everything.
+Domain specific training data includes the artifacts and, ideally, also a gold standard to compare results to.
+
+
 
 Software architecture documentation to software architecture models for BigBlueButton, MediaStore, Teammates, and Teastore are publicly available by \citewithauthor{fuchss2022ArDoCoBenchmark} GitHub.
 
