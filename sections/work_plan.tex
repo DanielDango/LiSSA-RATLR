@@ -39,7 +39,7 @@ My plan to realize this is explained in the section \nameref{approach:sec:naive_
 \label{phase_gradient_descent}
 
 The major implementation of this thesis will be an adaptation of the gradient-descent-based \APO algorithm by \citewithauthor{pryzant2023AutomaticPrompt}.
-Refer to \autoref{approach:sec:gradient_descent} for details about the implementation.
+Refer to \autoref{approach:sec:gradient_descent} for details about my implementation or \autoref{sec:gradient_descent} for a more general overview of their algorithm.
 The \APO algorithm will be trained and tested on the requirements-to-requirements benchmark data by \citeauthor{hey2025RequirementsTraceability}.
 It is available in their replication package~\cite{hey2025ReplicationPackage}.
 The optimized prompt will be compared against previous prompts used by \citeauthor{fuchss2025LiSSAGeneric} and \citeauthor{hey2025RequirementsTraceability} in the greater LiSSA framework.
@@ -85,6 +85,10 @@ Frequent buffer slots are planned to allocate more time dynamically as needed.
 \label{sec:work_gant}
 The Gantt chart in \autoref{fig:gantt} illustrates how I plan to allocate my time.
 The early months will probably take up less time than planned, which can be used to reduce congestion in later phases.
+As mentioned in \autoref{sec:work_risks}, the work packages are designed with early working prototypes in mind.
+The major dependencies, as visualized, are that evaluation requires implementation. 
+Even though there are multiple packages with a planned implementation, they can all be evaluated separately and independently.
+There is also a code review scheduled during the likely longest implementation section in the \nameref{phase_gradient_descent} phase.
 
 
 \begin{figure}
@@ -101,7 +105,7 @@ The early months will probably take up less time than planned, which can be used
     \ganttset{bar height=.7}
         \gantttitlecalendar{year, month=name, week=26} \\~\ganttgroup{\nameref{phase_initial_overview}}{2025-06-23}{2025-07-27} \\
         \ganttbar{LiSSA setup}{2025-06-23}{2025-07-06} \\
-        \ganttbar{ToT implementation}{2025-07-07}{2025-07-13} \\
+        \ganttbar{\acs{ToT} implementation}{2025-07-07}{2025-07-13} \\
         \ganttbar[name=impl1]{Benchmark setup}{2025-07-21}{2025-08-03} \\
         \ganttgroup{Naive optimization}{2025-07-28}{2025-08-18} \\
         \ganttbar[name=impl2]{Iterative classifier}{2025-07-28}{2025-08-03} \\

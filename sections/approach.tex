@@ -79,9 +79,9 @@ The core concepts also apply to \autoref{phase_gradient_descent} and can be reus
 The existing iterative optimization implementation from~\autoref{phase_naive_iterative} can be used as a foundation for the implementation, as the core concepts remain the same.
 Refer to~\autoref{sec:gradient_descent} for details of the gradient-descent-based optimization algorithm.
 
-The authors have provided their Python source code in a publicly accessible repository\footnote{https://github.com/microsoft/LMOps/tree/main/prompt\_optimization} under the MIT license.
+\citewithauthor{pryzant2023AutomaticPrompt} have provided their Python source code in a publicly accessible repository\footnote{https://github.com/microsoft/LMOps/tree/main/prompt\_optimization} under the MIT license.
 The project code can be of great help when adapting their algorithm to the LiSSA Java framework.
-The actual implementation of gradient descent will be the main focus, in order to steer optimized prompts in the right direction.
+The actual implementation of gradient descent and the bandit-selection algorithm will be the main focus, in order to steer optimized prompts in the right direction.
 
 The primary idea of this thesis is to explore automated optimization.
 The naive approach may yield good results already.
@@ -121,4 +121,6 @@ We can also compare how well each system manages to optimize the initial prompt.
 Another interesting thought is to take optimized prompts from a different system as the initial prompt.
 
 Varying testing data is also plausible.
-Including artifacts and their links from different projects into a singular data set might have the potential to yield more general but less optimized prompts.
+Including artifacts and their links from different projects into a singular data set might have the potential to yield more general but less optimized prompts. 
+The exact scope of the evaluation remains to be seen.
+It will be dynamically adjusted when actual implementations exist and are ready to test.
