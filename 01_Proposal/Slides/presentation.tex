@@ -208,13 +208,14 @@ Modelling for Continuous Software Engineering (MCSE), Supervisor:  M.Sc. Dominik
     \ganttset{bar height=.7}
         \gantttitlecalendar{year, month=name, week=26} \\
         \ganttgroup{Initial Overview}{2025-06-23}{2025-07-27} \\
-        \ganttbar{LiSSA setup}{2025-06-23}{2025-07-06} \\
+        \ganttbar{LiSSA \& Benchmark setup}{2025-06-23}{2025-07-06}
+        \ganttbar[name=impl1]{}{2025-07-21}{2025-08-03} \\
         \ganttbar{Tree of Thought implementation}{2025-07-07}{2025-07-13} \\
-        \ganttbar[name=impl1]{Benchmark setup}{2025-07-21}{2025-08-03} \\
         \ganttgroup{Naive optimization}{2025-07-28}{2025-08-18} \\
-        \ganttbar[name=impl2]{Iterative classifier}{2025-07-28}{2025-08-03} \\
+        \ganttbar[name=impl2]{Iterative classifier implementation}{2025-07-28}{2025-08-03} \\
         \ganttgroup{APE gradient descent}{2025-08-25}{2025-09-21} \\
         \ganttbar[name=impl3]{Implementation}{2025-08-25}{2025-09-10}\\
+        \ganttmilestone{Code review}{2025-09-07} \\ 
 
 
         \ganttgroup{Evaluation and Buffer}{2025-08-11}{2025-10-23} \\
@@ -224,7 +225,13 @@ Modelling for Continuous Software Engineering (MCSE), Supervisor:  M.Sc. Dominik
 
         \ganttbar[name=eval1]{Evaluation}{2025-08-11}{2025-08-24}
         \ganttbar[name=eval2]{}{2025-09-15}{2025-09-28}
-
+        
+        \\
+    
+        \ganttbar{Buffer}{2025-07-14}{2025-07-20}
+        \ganttbar{}{2025-08-04}{2025-08-10}
+        \ganttbar{}{2025-09-15}{2025-09-21}
+        \ganttbar{}{2025-10-05}{2025-10-23}
 
 
 
