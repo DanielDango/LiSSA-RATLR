@@ -288,6 +288,7 @@
 \RequirePackage{xspace}
 \RequirePackage{mfirstuc}
 \RequirePackage{etoolbox}
+\RequirePackage{comment}
 
 \newcommand{\citewithauthor}[1]{\citeauthor{#1} \cite{#1}\xspace}
 \newcommand{\directQuote}[3][]{\guillemotleft#2\guillemotright~\cite[#1]{#3}\xspace}
