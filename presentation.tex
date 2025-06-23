@@ -49,8 +49,24 @@ Modelling for Continuous Software Engineering (MCSE), Supervisor:  M.Sc. Dominik
 %	\tableofcontents
 %\end{frame}
 
-
 \section{Foundations}
+
+\begin{frame}{PIBA}
+    \begin{itemize}
+        \item \textbf{Problem}: Traceability Link Recovery with LiSSA does not perform well enough in larger RE2RE projects  
+        \item \textbf{Idea}: Improve recovery using automatically optimized prompts
+        \item \textbf{Benefit}: Less manual labor required to find suitable prompts and increased recovery rates
+        \item \textbf{Actions}: Implement automatic prompt engineering algorithm into the LiSSA framework and evaluate performance
+    \end{itemize}
+    
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.75\linewidth]{images/LiSSA_pipeline_Fuchß.png}
+        \caption{LiSSA pipeline by \cite{fuchss2025LiSSAGeneric}}
+        \label{fig:enter-label}
+    \end{figure}
+\end{frame}
+
 
 
 \begin{frame}[picture 50 vertical, picture=images/artifact_overview_Fuchß.png]{What is Traceability Link Recovery (TLR)}
@@ -86,6 +102,8 @@ Modelling for Continuous Software Engineering (MCSE), Supervisor:  M.Sc. Dominik
     
 \end{frame}
 \end{comment}
+
+\section{Related Work}
 
 \begin{frame}{Related Work}
 
@@ -130,6 +148,8 @@ Modelling for Continuous Software Engineering (MCSE), Supervisor:  M.Sc. Dominik
     \end{figure}
 
 \end{frame}
+
+
 
 
 \section{Implementation}
@@ -187,7 +207,7 @@ Modelling for Continuous Software Engineering (MCSE), Supervisor:  M.Sc. Dominik
     
 \end{frame}
 
-\section{Thesis Shedule}
+\section{Thesis Schedule}
 \begin{frame}{Thesis Schedule}
     \ganttset{%
         calendar week text={%
@@ -249,6 +269,23 @@ Modelling for Continuous Software Engineering (MCSE), Supervisor:  M.Sc. Dominik
 
 \appendix
 \beginbackup
+
+\begin{frame}{Acronyms}
+    \begin{itemize}
+        \item TLR: Traceability Link Recovery
+        \item LLM: Large Language Model
+        \item APE: Automatic Prompt Engineering
+        \item RE2RE: Requirements-to-Requirements
+        \item FTLR: Fine-grained Traceability Link Recovery
+        \item LiSSA: Linking Software System Artifacts
+        \item DSPy: Declarative Self-improving Python
+        \item ProTeGi: Prompt Optimization with Textual Gradients
+        \item ToT: Tree-of-Thought
+        \item IR: information retrieval
+        \item KISS: keep it short and simple
+        \item CoT: Chain-of-Thought
+    \end{itemize}
+\end{frame}
 
 \begin{frame}[allowframebreaks]{Literatur}
 
