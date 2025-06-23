@@ -1,44 +1,69 @@
 \chapter{Related Work}
-Trace link recovery through large language models is an active field of work to apply rapid advancements in LLM performance.
-This work rests at the intersection of two different fields of study. On the one hand side the field of \TLR does not always rely on \LLMs as shown in \autoref{related:sec:tlr}. On the other hand \APE has a much broader application and research than simply being focused on \TLR as expanded in \autoref{related:sec:ape}.
+\Acl{TLR} through large language models is an active field of work to apply rapid advancements in \LLM performance.
+This work rests at the intersection of two different fields of study.
+On the one hand side the field of \TLR does not always rely on \LLMs as shown in \autoref{related:sec:tlr}.
+On the other hand, \APE has a much broader application and research than simply being focused on \TLR as expanded in \autoref{related:sec:ape}.
 
 
 \section{Trace Link Recovery}
 \label{related:sec:tlr}
 
-Before the emergence of machine learning and \LLMs \textit{todo expand}
+Before the emergence of \LLMs \IR methods were used to recover \TLs.
+\citewithauthor{delucia2012InformationRetrieval} have provided an overview about different \IR methods and their performance. 
 
-\citewithauthor{delucia2012InformationRetrieval} have written about different \IR methods and their performance. \textit{Todo: Maybe write about the paper?}
-
-
-\citewithauthor{keim2021TraceLink} have proposed cross domain trace link recovery using agent like algorithms. \textit{Todo: Maybe read the paper?}
-
+More recently, in work by \citewithauthor{hey2021ImprovingTraceability} they tried to overcome the semantic gap, when two instances of the same artifact are described using differing semantics, by exploring word embedding.
+\citewithauthor{keim2021TraceLink} have proposed cross-domain trace link recovery using agent-like machine learning algorithms. 
 
 
-In previous work by \citewithauthor{fuchss2025LiSSAGeneric}, simple prompts by \citewithauthor{ewald2024RetrievalAugmentedLarge} were used to recover trace links between software documentation and architectural diagrams. These prompts were manually designed and formulated. They have proven that they can already outperform other state-of-the-art approaches for source code related \TLR domains. 
 
-\citewithauthor{hey2025RequirementsTraceability} have used these same prompts for \TLR in the domain of requirements to requirements. While they were also able to outperform state-of-the-art approaches, the recall rate for larger data sets still has room for improvement.
+In previous work by \citewithauthor{fuchss2025LiSSAGeneric}, simple prompts by \citewithauthor{ewald2024RetrievalAugmentedLarge} were used to recover trace links between software documentation and architectural diagrams.
+The work of \citeauthor{ewald2024RetrievalAugmentedLarge} adapts prompts studied by \citewithauthor{rodriguez2023PromptsMatter}.
+These prompts were manually designed and formulated.
+They have proven that they can already outperform other state-of-the-art approaches for source code related \TLR domains.
 
-\citewithauthor{rodriguez2023PromptsMatter} have also evaluated LLM usage for trace link recovery. Their main takeaway was that even minor adjustments, \directQuote[sec. VI]{such as pluralizing words, interchanging prepositions, or reordering phrases}{rodriguez2023PromptsMatter} lead to major differences in the outcome. They were unable to find a singular generalized optimal prompt to cover all TLR tasks. They manually adjusted prompts for each task to greatly improve recovery rates.
+\citewithauthor{hey2025RequirementsTraceability} have used these same prompts for \TLR in the domain of requirements to requirements.
+While they were also able to outperform state-of-the-art approaches, the recall rate, especially for larger data sets, still has room for improvement.
+
+\citewithauthor{rodriguez2023PromptsMatter} have also evaluated LLM usage for trace link recovery.
+Their main takeaway was that even minor adjustments, \directQuote[sec. VI]{such as pluralizing words, interchanging prepositions, or reordering phrases}{rodriguez2023PromptsMatter} lead to major differences in the outcome.
+They were unable to find a singular generalized optimal prompt to cover all TLR tasks.
+They manually adjusted prompts for each task to greatly improve recovery rates.
+
+My work will build on these previous developments. 
+I aim to improve recovery rates further by using automatically optimized prompts.
 
 
 \section{Automatic Prompt Engineering}
 \label{related:sec:ape}
-Many prompt optimization \textit{todo find fitting word: papers} require an initial prompt to start the refinement process by using training data consisting of input / output pairs~\cite{ramnath2025SystematicSurvey}.
+Many prompt optimization algorithms require an initial prompt to start the refinement process by using training data consisting of input/output pairs~\cite{ramnath2025SystematicSurvey}. 
+Data sets of these pairs, describing the problem to be solved using \LLMs, vary greatly depending on the actual task.
+For example, sentiment analysis training data might provide pairs consisting of sentences and their correctly identified sentiment.
+The Automatic Prompt Engineer by \citewithauthor{zhou2023LargeLanguage} can generate prompts for tasks that are specified only by input/output pairs.
+This eliminates the need for the initial prompt to seed the optimization process.
 
-The Automatic Promot Engineer by \citewithauthor{zhou2023LargeLanguage} can generate prompts for tasks which are specified only by input / output pairs. This eliminates the need for the initial prompt to seed the optimization process.
+Self-Refine by \citewithauthor{madaan2023SelfRefineIterative} takes feedback from the same large language model that generated the prompt, to improve it further.
+This imitates human behavior when initial drafts are adjusted rapidly.
 
-Self-Refine by \citewithauthor{madaan2023SelfRefineIterative} uses feedback from the same large language model that generated the prompt, to improve the prompt further. This imitates human behavior, when initial drafts are adjusted rapidly. 
+ProTeGi by \citewithauthor{pryzant2023AutomaticPrompt} utilizes a gradient descent algorithm to find the minimal deviance between an optimized prompt and the expected outputs.
+More details about their work can be found in~\ref{sec:gradient_descent}.
 
-ProTeGi by \citewithauthor{pryzant2023AutomaticPrompt} utilizes a gradient descent algorithm to find the minimal deviance between an optimized prompt and the expected outputs. More details about their work can be found in~\ref{sec:gradient_descent}.
+\citewithauthor{yang2024LargeLanguage} have taken a slightly different approach in their OPRO optimizer.
+Instead of adjusting the current iteration of prompts, they generate fully new, independent prompts instead. This aims to reduce the bias of modifying existing prompts and encourages further exploration.
 
-\citewithauthor{yang2024LargeLanguage} have taken a slightly different approach in their OPRO optimizer. Instead of adjusting the current iteration of prompts to steer them in an improved direction like \citeauthor{pryzant2023AutomaticPrompt}, they generate new independent prompts instead.
+In order to reduce uncertainty and improve reproducibility, the Declarative Self-Improving Python (DSPy) Framework by \citewithauthor{khattab2023DSPyCompiling} proposes a composite like structure in python to program prompts.
+They are also generating and refining the prompts in a pipeline-like structure, not unlike other LLM-based prompt optimization algorithms.
 
-In order to reduce uncertainty and improve reproducibility, the Declarative Self-Improving Python (DSPy) Framework by \citewithauthor{khattab2023DSPyCompiling} proposes a composite like structure in python to program prompts. They are also generated and refined the prompts in a pipeline like structure, not unlike other LLM based prompt optimization algorithms. 
+My work will focus on the optimization algorithm by \citeauthor{pryzant2023AutomaticPrompt}. 
+While my work will not expand the field of \APE directly, I will adapt it into the domain of \TLR. 
+Existing training sets can be used to optimize the prompts.
 
-\section{Training Data}
-Trace Link Recovery tasks can be applied across many domains. Often authors will focus on one or few domains instead of attempting to cover everything. Domain training data includes the artifacts and ideally also a gold standard to compare results to.
+\section{Training Data for different Domains}
+%TODO: could include one or two more domains
+Trace Link Recovery tasks can be applied across many domains.
+Often, authors will focus on one or a few domains instead of attempting to cover everything.
+Domain specific training data includes the artifacts and, ideally, also a gold standard to compare results to.
 
-Software architecture documentation to software architecture models for BigBlueButton, MediaStore, Teammates, Teastore are publicly available by \citewithauthor{fuchss2022ArDoCoBenchmark} on GitHub \footnote{https://github.com/ArDoCo/Benchmark}.
 
-For the domain of requirements to requirements, which my work will also focus on, a compilation of training data can be found in the replication package\cite{hey2025ReplicationPackage} for recent work of \citeauthor{hey2025RequirementsTraceability}.
+Software architecture documentation to software architecture models for BigBlueButton, MediaStore, Teammates, and Teastore are publicly available by \citewithauthor{fuchss2022ArDoCoBenchmark} GitHub.
+
+For the domain of requirements to requirements, which my work will also focus on, a compilation of training data can be found in the replication package~\cite{hey2025ReplicationPackage} for recent work of \citeauthor{hey2025RequirementsTraceability}.
