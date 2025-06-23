@@ -110,7 +110,9 @@ The optimization aims to find the best-performing arms with as few pulls as poss
 
 \citeauthor{pryzant2023AutomaticPrompt} have used the successive rejects algorithm by \citewithauthor{audibert2010BestArm} to select the best prompt candidates for the next iteration step.
 The set of current candidates $S$ is therefore initialized with all $k$ candidate prompts in the iteration step.
-Depending on the budget for sampling, candidates and remaining candidates in $S$ will be prompted with $n_k$ pairs of the training data.
+Depending on the budget for sampling, candidates and remaining candidates in the set $S$ will be prompted with $n(k)$ pairs of the training data.
+The value $n(k)$ depends on the number of remaining candidate prompts.
+Other factors, such as a budget to account for pull costs, can also be included.
 The results are evaluated with a metric function $m$ to quantify the performance.
 For example, $m$ can be a simple binary function as seen in \autoref{eq:sample_binary_metric}.
 If the prompt $p$ provides the expected output $y$ for a given input $x$, one is returned.
@@ -137,7 +139,7 @@ A pseudocode implementation of this candidate selection algorithm can be seen in
 \begin{algorithmic}[1]
     \State Initialize: $S_0 \gets \{p_1, \dots , p_n\}$
     \For{$k = 1, \dots , {n  - 1}$}
-        \State Sample $D_{sample} \subset D_{tr}, |D_{sample}| = n_k$
+        \State Sample $D_{sample} \subset D_{tr}, |D_{sample}| = n(k)$
         \State Evaluate $p_i \in S_{k-1}$ with $m(p_i, D_{sample})$
         \State $S_k \gets S_{k-1}$, excluding the prompt with the lowest score from the previous step
     \EndFor
