@@ -2,6 +2,7 @@
 package edu.kit.kastel.sdq.lissa.ratlr.resultaggregator;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.ClassificationResult;
@@ -19,8 +20,9 @@ import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
  *     <li>Creating trace links between source and target elements</li>
  * </ul>
  * <p>
- * Result aggregators can access shared context via a {@link edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore},
- * which is passed to their factory method.
+ * All result aggregators have access to a shared {@link edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore} via the protected {@code contextStore} field,
+ * which is initialized in the constructor and available to all subclasses.
+ * Subclasses should not duplicate context handling or Javadoc for the context parameter.
  * </p>
  * The class supports various types of aggregators:
  * <ul>
@@ -31,6 +33,21 @@ import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
  * and creating trace links between source and target elements.
  */
 public abstract class ResultAggregator {
+    /**
+     * The shared context store for pipeline components.
+     * Available to all subclasses for accessing shared context.
+     */
+    protected final ContextStore contextStore;
+
+    /**
+     * Creates a new result aggregator with the specified context store.
+     *
+     * @param contextStore The shared context store for pipeline components
+     */
+    protected ResultAggregator(ContextStore contextStore) {
+        this.contextStore = Objects.requireNonNull(contextStore);
+    }
+
     /**
      * Aggregates classification results into a set of trace links.
      * This method:
@@ -63,7 +80,7 @@ public abstract class ResultAggregator {
     public static ResultAggregator createResultAggregator(
             ModuleConfiguration configuration, ContextStore contextStore) {
         return switch (configuration.name()) {
-            case "any_connection" -> new AnyResultAggregator(configuration);
+            case "any_connection" -> new AnyResultAggregator(configuration, contextStore);
             default -> throw new IllegalStateException("Unexpected value: " + configuration.name());
         };
     }

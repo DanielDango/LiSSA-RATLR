@@ -7,6 +7,7 @@ import edu.kit.kastel.sdq.lissa.ratlr.cache.Cache;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheKey;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheManager;
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
+import edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.KeyGenerator;
 
@@ -57,9 +58,10 @@ public class SimpleClassifier extends Classifier {
      * Creates a new simple classifier with the specified configuration.
      *
      * @param configuration The module configuration containing classifier settings
+     * @param contextStore The shared context store for pipeline components
      */
-    public SimpleClassifier(ModuleConfiguration configuration) {
-        super(ChatLanguageModelProvider.threads(configuration));
+    public SimpleClassifier(ModuleConfiguration configuration, ContextStore contextStore) {
+        super(ChatLanguageModelProvider.threads(configuration), contextStore);
         this.provider = new ChatLanguageModelProvider(configuration);
         this.template = configuration.argumentAsString("template", DEFAULT_TEMPLATE);
         this.cache = CacheManager.getDefaultInstance()
@@ -76,8 +78,9 @@ public class SimpleClassifier extends Classifier {
      * @param provider The language model provider
      * @param template The template to use for classification requests
      */
-    private SimpleClassifier(int threads, Cache cache, ChatLanguageModelProvider provider, String template) {
-        super(threads);
+    private SimpleClassifier(
+            int threads, Cache cache, ChatLanguageModelProvider provider, String template, ContextStore contextStore) {
+        super(threads, contextStore);
         this.cache = cache;
         this.provider = provider;
         this.template = template;
@@ -92,7 +95,7 @@ public class SimpleClassifier extends Classifier {
      */
     @Override
     protected final Classifier copyOf() {
-        return new SimpleClassifier(threads, cache, provider, template);
+        return new SimpleClassifier(threads, cache, provider, template, contextStore);
     }
 
     /**

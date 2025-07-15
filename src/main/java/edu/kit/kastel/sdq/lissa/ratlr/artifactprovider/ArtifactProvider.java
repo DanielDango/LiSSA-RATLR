@@ -2,6 +2,7 @@
 package edu.kit.kastel.sdq.lissa.ratlr.artifactprovider;
 
 import java.util.List;
+import java.util.Objects;
 
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
 import edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore;
@@ -13,13 +14,29 @@ import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Artifact;
  * for trace link analysis. Artifacts are the original documents (like requirements or source code files)
  * that are later processed into elements by preprocessors.
  * <p>
- * Artifact providers can access shared context via a {@link edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore},
- * which is passed to their factory method.
+ * All artifact providers have access to a shared {@link edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore} via the protected {@code contextStore} field,
+ * which is initialized in the constructor and available to all subclasses.
+ * Subclasses should not duplicate context handling.
  * </p>
  * Different implementations can provide artifacts from various sources such as text files,
  * directories, or other data sources.
  */
 public abstract class ArtifactProvider {
+
+    /**
+     * The shared context store for pipeline components.
+     * Available to all subclasses for accessing shared context.
+     */
+    protected final ContextStore contextStore;
+
+    /**
+     * Creates a new artifact provider with the specified context store.
+     *
+     * @param contextStore The shared context store for pipeline components
+     */
+    protected ArtifactProvider(ContextStore contextStore) {
+        this.contextStore = Objects.requireNonNull(contextStore);
+    }
 
     /**
      * Retrieves all artifacts provided by this provider.
@@ -54,8 +71,8 @@ public abstract class ArtifactProvider {
     public static ArtifactProvider createArtifactProvider(
             ModuleConfiguration configuration, ContextStore contextStore) {
         return switch (configuration.name()) {
-            case "text" -> new TextArtifactProvider(configuration);
-            case "recursive_text" -> new RecursiveTextArtifactProvider(configuration);
+            case "text" -> new TextArtifactProvider(configuration, contextStore);
+            case "recursive_text" -> new RecursiveTextArtifactProvider(configuration, contextStore);
             default -> throw new IllegalStateException("Unexpected value: " + configuration.name());
         };
     }

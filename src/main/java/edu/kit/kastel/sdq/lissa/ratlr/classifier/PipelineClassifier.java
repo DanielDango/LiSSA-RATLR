@@ -35,7 +35,7 @@ public class PipelineClassifier extends Classifier {
      * @param contextStore The shared context store for pipeline components
      */
     public PipelineClassifier(List<List<ModuleConfiguration>> configs, ContextStore contextStore) {
-        super(1);
+        super(1, contextStore);
         this.classifiers = configs.stream()
                 .map(it -> it.stream()
                         .map(config -> Classifier.createClassifier(config, contextStore))
@@ -50,8 +50,8 @@ public class PipelineClassifier extends Classifier {
      * @param classifiers The list of classifier stages
      * @param threads The number of threads to use for parallel processing
      */
-    private PipelineClassifier(List<List<Classifier>> classifiers, int threads) {
-        super(threads);
+    private PipelineClassifier(List<List<Classifier>> classifiers, int threads, ContextStore contextStore) {
+        super(threads, contextStore);
         this.classifiers = classifiers.stream().map(List::copyOf).toList();
     }
 
@@ -141,7 +141,7 @@ public class PipelineClassifier extends Classifier {
 
     @Override
     protected Classifier copyOf() {
-        return new PipelineClassifier(classifiers, this.threads);
+        return new PipelineClassifier(classifiers, this.threads, this.contextStore);
     }
 
     /**

@@ -13,6 +13,7 @@ import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheKey;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheManager;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.ChatLanguageModelProvider;
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
+import edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Artifact;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.KeyGenerator;
@@ -56,12 +57,14 @@ public class SummarizePreprocessor extends Preprocessor {
     private final Cache cache;
 
     /**
-     * Creates a new summarize preprocessor with the specified configuration.
+     * Creates a new summarize preprocessor with the specified configuration and context store.
      *
      * @param moduleConfiguration The module configuration containing template and model settings
+     * @param contextStore The shared context store for pipeline components
      */
-    public SummarizePreprocessor(ModuleConfiguration moduleConfiguration) {
-        this.template = moduleConfiguration.argumentAsString("template");
+    public SummarizePreprocessor(ModuleConfiguration moduleConfiguration, ContextStore contextStore) {
+        super(contextStore);
+        this.template = moduleConfiguration.argumentAsString("template", "Summarize the following {type}: {content}");
         this.provider = new ChatLanguageModelProvider(moduleConfiguration);
         this.threads = ChatLanguageModelProvider.threads(moduleConfiguration);
         this.cache = CacheManager.getDefaultInstance()

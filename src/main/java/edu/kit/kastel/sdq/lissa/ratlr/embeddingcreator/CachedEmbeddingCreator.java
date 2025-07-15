@@ -17,6 +17,7 @@ import com.knuddels.jtokkit.api.EncodingRegistry;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.Cache;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheKey;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheManager;
+import edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.KeyGenerator;
 
@@ -50,11 +51,13 @@ abstract class CachedEmbeddingCreator extends EmbeddingCreator {
     /**
      * Creates a new cached embedding creator with the specified model and thread count.
      *
+     * @param contextStore The shared context store for pipeline components
      * @param model The name of the embedding model to use
      * @param threads The number of threads to use for parallel embedding generation
      * @param params Additional parameters for the embedding model
      */
-    protected CachedEmbeddingCreator(String model, int threads, String... params) {
+    protected CachedEmbeddingCreator(ContextStore contextStore, String model, int threads, String... params) {
+        super(contextStore);
         this.cache = CacheManager.getDefaultInstance()
                 .getCache(this.getClass().getSimpleName() + "_" + Objects.requireNonNull(model));
         this.embeddingModel = Objects.requireNonNull(createEmbeddingModel(model, params));

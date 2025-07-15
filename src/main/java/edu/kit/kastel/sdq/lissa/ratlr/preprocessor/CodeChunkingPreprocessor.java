@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
+import edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Artifact;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 
@@ -37,6 +38,8 @@ import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
  *     <li>Has granularity level 1</li>
  *     <li>Is marked for comparison (compare=true)</li>
  * </ul>
+ *
+ * <p>Context handling is managed by the {@link Preprocessor} superclass. Subclasses should not duplicate context parameter documentation.</p>
  */
 public class CodeChunkingPreprocessor extends Preprocessor {
 
@@ -49,8 +52,10 @@ public class CodeChunkingPreprocessor extends Preprocessor {
      * Creates a new code chunking preprocessor with the specified configuration.
      *
      * @param configuration The module configuration containing language and chunk size settings
+     * @param contextStore The shared context store for pipeline components
      */
-    public CodeChunkingPreprocessor(ModuleConfiguration configuration) {
+    public CodeChunkingPreprocessor(ModuleConfiguration configuration, ContextStore contextStore) {
+        super(contextStore);
         this.languages = Arrays.stream(
                         configuration.argumentAsString("language").split(","))
                 .map(RecursiveSplitter.Language::valueOf)

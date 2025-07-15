@@ -3,6 +3,7 @@ package edu.kit.kastel.sdq.lissa.ratlr.classifier;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.*;
 
@@ -21,8 +22,9 @@ import edu.kit.kastel.sdq.lissa.ratlr.utils.Pair;
  * for identifying trace links between source and target elements. It supports both
  * sequential and parallel processing of classification tasks.
  * <p>
- * Classifiers can access shared context via a {@link edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore},
- * which is passed to factory methods and pipeline components.
+ * All classifiers have access to a shared {@link edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore} via the protected {@code contextStore} field,
+ * which is initialized in the constructor and available to all subclasses.
+ * Subclasses should not duplicate context handling.
  * </p>
  */
 public abstract class Classifier {
@@ -33,14 +35,21 @@ public abstract class Classifier {
 
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
     protected final int threads;
+    /**
+     * The shared context store for pipeline components.
+     * Available to all subclasses for accessing shared context.
+     */
+    protected final ContextStore contextStore;
 
     /**
-     * Creates a new classifier with the specified number of threads.
+     * Creates a new classifier with the specified number of threads and context store.
      *
      * @param threads The number of threads to use for parallel processing
+     * @param contextStore The shared context store for pipeline components
      */
-    protected Classifier(int threads) {
+    protected Classifier(int threads, ContextStore contextStore) {
         this.threads = Math.max(1, threads);
+        this.contextStore = Objects.requireNonNull(contextStore);
     }
 
     /**
@@ -185,9 +194,9 @@ public abstract class Classifier {
      */
     public static Classifier createClassifier(ModuleConfiguration configuration, ContextStore contextStore) {
         return switch (configuration.name().split(CONFIG_NAME_SEPARATOR)[0]) {
-            case "mock" -> new MockClassifier();
-            case "simple" -> new SimpleClassifier(configuration);
-            case "reasoning" -> new ReasoningClassifier(configuration);
+            case "mock" -> new MockClassifier(contextStore);
+            case "simple" -> new SimpleClassifier(configuration, contextStore);
+            case "reasoning" -> new ReasoningClassifier(configuration, contextStore);
             default -> throw new IllegalStateException("Unexpected value: " + configuration.name());
         };
     }

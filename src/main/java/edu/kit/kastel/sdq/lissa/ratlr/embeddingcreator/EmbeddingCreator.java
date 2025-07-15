@@ -2,6 +2,7 @@
 package edu.kit.kastel.sdq.lissa.ratlr.embeddingcreator;
 
 import java.util.List;
+import java.util.Objects;
 
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
 import edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore;
@@ -12,8 +13,9 @@ import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
  * This class provides the interface for different embedding creation strategies,
  * which convert text elements into vector representations for similarity matching.
  * <p>
- * Embedding creators can access shared context via a {@link edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore},
- * which is passed to their factory method.
+ * All embedding creators have access to a shared {@link edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore} via the protected {@code contextStore} field,
+ * which is initialized in the constructor and available to all subclasses.
+ * Subclasses should not duplicate context handling.
  * </p>
  * The framework supports multiple embedding creation backends:
  * <ul>
@@ -57,6 +59,21 @@ import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
  */
 public abstract class EmbeddingCreator {
     /**
+     * The shared context store for pipeline components.
+     * Available to all subclasses for accessing shared context.
+     */
+    protected final ContextStore contextStore;
+
+    /**
+     * Creates a new embedding creator with the specified context store.
+     *
+     * @param contextStore The shared context store for pipeline components
+     */
+    protected EmbeddingCreator(ContextStore contextStore) {
+        this.contextStore = Objects.requireNonNull(contextStore);
+    }
+
+    /**
      * Calculates the embedding for a single element.
      * This is a convenience method that delegates to {@link #calculateEmbeddings(List)}.
      *
@@ -89,10 +106,10 @@ public abstract class EmbeddingCreator {
     public static EmbeddingCreator createEmbeddingCreator(
             ModuleConfiguration configuration, ContextStore contextStore) {
         return switch (configuration.name()) {
-            case "ollama" -> new OllamaEmbeddingCreator(configuration);
-            case "openai" -> new OpenAiEmbeddingCreator(configuration);
-            case "onnx" -> new OnnxEmbeddingCreator(configuration);
-            case "mock" -> new MockEmbeddingCreator();
+            case "ollama" -> new OllamaEmbeddingCreator(configuration, contextStore);
+            case "openai" -> new OpenAiEmbeddingCreator(configuration, contextStore);
+            case "onnx" -> new OnnxEmbeddingCreator(configuration, contextStore);
+            case "mock" -> new MockEmbeddingCreator(contextStore);
             default -> throw new IllegalStateException("Unexpected value: " + configuration.name());
         };
     }

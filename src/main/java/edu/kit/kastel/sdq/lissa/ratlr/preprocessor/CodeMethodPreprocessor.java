@@ -5,7 +5,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 import org.treesitter.TSNode;
 import org.treesitter.TSParser;
@@ -13,6 +12,7 @@ import org.treesitter.TSTree;
 import org.treesitter.TreeSitterJava;
 
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
+import edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Artifact;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 
@@ -41,6 +41,8 @@ import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
  *     <li>Has a granularity level based on its position in the hierarchy</li>
  *     <li>Is marked for comparison only if it's a method element</li>
  * </ul>
+ *
+ * <p>Context handling is managed by the {@link Preprocessor} superclass. Subclasses should not duplicate context parameter documentation.</p>
  */
 public class CodeMethodPreprocessor extends Preprocessor {
 
@@ -48,13 +50,14 @@ public class CodeMethodPreprocessor extends Preprocessor {
     private final Language language;
 
     /**
-     * Creates a new code method preprocessor with the specified configuration.
+     * Creates a new code method preprocessor with the specified configuration and context store.
      *
      * @param configuration The module configuration containing the language setting
-     * @throws NullPointerException if the language configuration is missing
+     * @param contextStore The shared context store for pipeline components
      */
-    public CodeMethodPreprocessor(ModuleConfiguration configuration) {
-        this.language = Objects.requireNonNull(Language.valueOf(configuration.argumentAsString("language")));
+    public CodeMethodPreprocessor(ModuleConfiguration configuration, ContextStore contextStore) {
+        super(contextStore);
+        this.language = Language.valueOf(configuration.argumentAsString("language", "JAVA"));
     }
 
     /**

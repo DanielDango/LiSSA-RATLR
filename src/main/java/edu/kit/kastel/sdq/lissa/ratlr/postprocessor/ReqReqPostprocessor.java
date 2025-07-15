@@ -4,6 +4,7 @@ package edu.kit.kastel.sdq.lissa.ratlr.postprocessor;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
 
 /**
@@ -21,6 +22,11 @@ import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
  * processor type, indicating that the trace links are between requirement artifacts.
  */
 public class ReqReqPostprocessor extends TraceLinkIdPostprocessor {
+
+    public ReqReqPostprocessor(ContextStore contextStore) {
+        super(contextStore);
+    }
+
     /**
      * Transforms a set of requirement-to-requirement trace links by removing file extensions
      * from both source and target identifiers. The transformation is applied to each trace link

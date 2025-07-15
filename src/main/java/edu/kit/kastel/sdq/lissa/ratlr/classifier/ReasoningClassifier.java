@@ -11,6 +11,7 @@ import edu.kit.kastel.sdq.lissa.ratlr.cache.Cache;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheKey;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheManager;
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
+import edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.KeyGenerator;
 
@@ -57,9 +58,10 @@ public class ReasoningClassifier extends Classifier {
      * Creates a new reasoning classifier with the specified configuration.
      *
      * @param configuration The module configuration containing classifier settings
+     * @param contextStore The shared context store for pipeline components
      */
-    public ReasoningClassifier(ModuleConfiguration configuration) {
-        super(ChatLanguageModelProvider.threads(configuration));
+    public ReasoningClassifier(ModuleConfiguration configuration, ContextStore contextStore) {
+        super(ChatLanguageModelProvider.threads(configuration), contextStore);
         this.provider = new ChatLanguageModelProvider(configuration);
         this.cache = CacheManager.getDefaultInstance()
                 .getCache(this.getClass().getSimpleName() + "_" + provider.modelName() + "_" + provider.seed());
@@ -86,8 +88,9 @@ public class ReasoningClassifier extends Classifier {
             ChatLanguageModelProvider provider,
             String prompt,
             boolean useOriginalArtifacts,
-            boolean useSystemMessage) {
-        super(threads);
+            boolean useSystemMessage,
+            ContextStore contextStore) {
+        super(threads, contextStore);
         this.cache = cache;
         this.provider = provider;
         this.prompt = prompt;
@@ -98,7 +101,8 @@ public class ReasoningClassifier extends Classifier {
 
     @Override
     protected final Classifier copyOf() {
-        return new ReasoningClassifier(threads, cache, provider, prompt, useOriginalArtifacts, useSystemMessage);
+        return new ReasoningClassifier(
+                threads, cache, provider, prompt, useOriginalArtifacts, useSystemMessage, contextStore);
     }
 
     /**

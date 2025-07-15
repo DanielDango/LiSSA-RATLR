@@ -4,6 +4,7 @@ package edu.kit.kastel.sdq.lissa.ratlr.preprocessor;
 import static edu.kit.kastel.sdq.lissa.ratlr.classifier.Classifier.CONFIG_NAME_SEPARATOR;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,8 +19,9 @@ import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
  * Preprocessors are responsible for breaking down artifacts into smaller, more
  * manageable elements that can be used for trace link analysis.
  * <p>
- * Preprocessors can access shared context via a {@link edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore},
- * which is passed to their factory method.
+ * All preprocessors have access to a shared {@link edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore} via the protected {@code contextStore} field,
+ * which is initialized in the constructor and available to all subclasses.
+ * Subclasses should not duplicate context handling or Javadoc for the context parameter.
  * </p>
  * The class supports various types of preprocessors:
  * <ul>
@@ -51,6 +53,21 @@ public abstract class Preprocessor {
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     /**
+     * The shared context store for pipeline components.
+     * Available to all subclasses for accessing shared context.
+     */
+    protected final ContextStore contextStore;
+
+    /**
+     * Creates a new preprocessor with the specified context store.
+     *
+     * @param contextStore The shared context store for pipeline components
+     */
+    protected Preprocessor(ContextStore contextStore) {
+        this.contextStore = Objects.requireNonNull(contextStore);
+    }
+
+    /**
      * Preprocesses a list of artifacts to extract elements.
      * The specific extraction strategy is implemented by each preprocessor subclass.
      *
@@ -72,23 +89,23 @@ public abstract class Preprocessor {
      */
     public static Preprocessor createPreprocessor(ModuleConfiguration configuration, ContextStore contextStore) {
         return switch (configuration.name().split(CONFIG_NAME_SEPARATOR)[0]) {
-            case "sentence" -> new SentencePreprocessor(configuration);
+            case "sentence" -> new SentencePreprocessor(configuration, contextStore);
             case "code" ->
                 switch (configuration.name()) {
-                    case "code_chunking" -> new CodeChunkingPreprocessor(configuration);
-                    case "code_method" -> new CodeMethodPreprocessor(configuration);
-                    case "code_tree" -> new CodeTreePreprocessor(configuration);
+                    case "code_chunking" -> new CodeChunkingPreprocessor(configuration, contextStore);
+                    case "code_method" -> new CodeMethodPreprocessor(configuration, contextStore);
+                    case "code_tree" -> new CodeTreePreprocessor(configuration, contextStore);
                     default ->
                         throw new IllegalArgumentException("Unsupported preprocessor name: " + configuration.name());
                 };
             case "model" ->
                 switch (configuration.name()) {
-                    case "model_uml" -> new ModelUMLPreprocessor(configuration);
+                    case "model_uml" -> new ModelUMLPreprocessor(configuration, contextStore);
                     default ->
                         throw new IllegalArgumentException("Unsupported preprocessor name: " + configuration.name());
                 };
-            case "summarize" -> new SummarizePreprocessor(configuration);
-            case "artifact" -> new SingleArtifactPreprocessor();
+            case "summarize" -> new SummarizePreprocessor(configuration, contextStore);
+            case "artifact" -> new SingleArtifactPreprocessor(contextStore);
             default -> throw new IllegalStateException("Unexpected value: " + configuration.name());
         };
     }

@@ -50,6 +50,9 @@ The project follows a modular architecture with the following main components:
      - [`AnyResultAggregator`](../src/main/java/edu/kit/kastel/sdq/lissa/ratlr/resultaggregator/AnyResultAggregator.java): Aggregates classification results based on configurable granularity levels, allowing for flexible relationship mapping between different levels of abstraction.
 7. **Postprocessors** (`postprocessor` package)
    - [`TraceLinkIdPostprocessor`](../src/main/java/edu/kit/kastel/sdq/lissa/ratlr/postprocessor/TraceLinkIdPostprocessor.java): Post-processes trace link IDs to ensure consistency and correctness in the final output, with specialized processors for different artifact types.
+8. **Context** (`context` package)
+   - [`Context`](../src/main/java/edu/kit/kastel/sdq/lissa/ratlr/context/Context.java): Interface for context objects that can be registered and retrieved by ID.
+   - [`ContextStore`](../src/main/java/edu/kit/kastel/sdq/lissa/ratlr/context/ContextStore.java): Central registry for context objects, passed to all major pipeline components. Enables components to share state, configuration, or intermediate results, and supports advanced scenarios such as cross-component coordination and caching.
 
 ### Knowledge Model
 
@@ -64,5 +67,7 @@ The pipeline uses a shared context mechanism to allow components to exchange add
 
 - [`Context`](../src/main/java/edu/kit/kastel/sdq/lissa/ratlr/context/Context.java): Interface for context objects that can be registered and retrieved by ID.
 - [`ContextStore`](../src/main/java/edu/kit/kastel/sdq/lissa/ratlr/context/ContextStore.java): Central registry for context objects, passed to all major pipeline components (artifact providers, preprocessors, embedding creators, classifiers, aggregators, and postprocessors). This enables components to share state or configuration as needed.
+
+**Context handling is now managed in the superclasses of all pipeline components.** The `ContextStore` is a protected field in each superclass (e.g., `ArtifactProvider`, `Preprocessor`, `EmbeddingCreator`, `Classifier`, `ResultAggregator`, `TraceLinkIdPostprocessor`), and is automatically passed to all subclasses via their constructors. Subclasses should not duplicate context parameter documentation or handle context manually; instead, they inherit context access and documentation from their superclass.
 
 The `ContextStore` is instantiated at the start of the pipeline and passed to all component factory methods. Components can register and retrieve context objects by unique ID, enabling advanced scenarios such as cross-component coordination, caching, or sharing of intermediate results.

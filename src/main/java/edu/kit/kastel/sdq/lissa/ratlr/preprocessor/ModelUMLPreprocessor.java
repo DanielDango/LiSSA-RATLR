@@ -14,6 +14,7 @@ import edu.kit.kastel.mcse.ardoco.tlr.models.connectors.generators.architecture.
 import edu.kit.kastel.mcse.ardoco.tlr.models.connectors.generators.architecture.uml.parser.UmlModelRoot;
 import edu.kit.kastel.mcse.ardoco.tlr.models.connectors.generators.architecture.uml.parser.xmlelements.OwnedOperation;
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
+import edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Artifact;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 
@@ -48,6 +49,8 @@ import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
  *     <li>Has a granularity level based on its position in the hierarchy</li>
  *     <li>Is marked for comparison only if it's a component element</li>
  * </ul>
+ *
+ * <p>Context handling is managed by the {@link Preprocessor} superclass. Subclasses should not duplicate context parameter documentation.</p>
  */
 public class ModelUMLPreprocessor extends Preprocessor {
     /** Whether to include component usages in the extracted information */
@@ -58,11 +61,13 @@ public class ModelUMLPreprocessor extends Preprocessor {
     private final boolean includeInterfaceRealizations;
 
     /**
-     * Creates a new UML model preprocessor with the specified configuration.
+     * Creates a new UML model preprocessor with the specified configuration and context store.
      *
      * @param configuration The module configuration containing extraction settings
+     * @param contextStore The shared context store for pipeline components
      */
-    public ModelUMLPreprocessor(ModuleConfiguration configuration) {
+    public ModelUMLPreprocessor(ModuleConfiguration configuration, ContextStore contextStore) {
+        super(contextStore);
         this.includeUsages = configuration.argumentAsBoolean("includeUsages", true);
         this.includeOperations = configuration.argumentAsBoolean("includeOperations", true);
         this.includeInterfaceRealizations = configuration.argumentAsBoolean("includeInterfaceRealizations", true);
