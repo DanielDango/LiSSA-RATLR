@@ -21,7 +21,7 @@ class Requirement2RequirementE2ETest {
     @BeforeEach
     void setUp() throws IOException {
         File envFile = new File(".env");
-        if (!envFile.exists()) {
+        if (!envFile.exists() && System.getenv("CI") != null) {
             Files.writeString(
                     envFile.toPath(),
                     """

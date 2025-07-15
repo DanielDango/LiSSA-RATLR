@@ -44,6 +44,8 @@ class ArchitectureTest {
     static final ArchRule no_getenv = noClasses()
             .that()
             .haveNameNotMatching(Environment.class.getName())
+            .and()
+            .resideOutsideOfPackage("..e2e..")
             .should()
             .callMethod(System.class, "getenv")
             .orShould()
