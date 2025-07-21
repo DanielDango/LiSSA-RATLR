@@ -66,7 +66,7 @@ public class ChatLanguageModelProvider {
      */
     public static final int DEFAULT_SEED = 133742243;
 
-    //TODO: Refactor as Module Parameter?
+    // TODO: Refactor as Module Parameter?
     /**
      * Models that do not support temperature settings. Lower temperature values mean less creativity and variation
      * in the model's responses.
@@ -156,6 +156,15 @@ public class ChatLanguageModelProvider {
     }
 
     /**
+     * Gets the platform for which the language model is configured.
+     *
+     * @return The platform name
+     */
+    public String platform() {
+        return platform;
+    }
+
+    /**
      * Determines the number of threads to use based on the platform.
      * OpenAI and Blablador platforms use 100 threads, while others use 1.
      *
@@ -213,7 +222,7 @@ public class ChatLanguageModelProvider {
         // Ideal temperature for most deterministic results
         double temperature = 0.0;
         // Set temperature based on the model type as some do not support temperature values
-        for(String modelWithoutTemperature : MODELS_WITHOUT_TEMPERATURE) {
+        for (String modelWithoutTemperature : MODELS_WITHOUT_TEMPERATURE) {
             if (model.equals(modelWithoutTemperature)) {
                 temperature = 1.0;
                 break;

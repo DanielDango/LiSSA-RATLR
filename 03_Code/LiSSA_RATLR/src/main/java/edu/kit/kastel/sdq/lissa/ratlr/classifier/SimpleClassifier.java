@@ -20,6 +20,8 @@ import dev.langchain4j.model.chat.ChatModel;
  */
 public class SimpleClassifier extends Classifier {
 
+    public static final String PROMPT_TEMPLATE_KEY = "template";
+
     /**
      * The default template for classification requests.
      * This template presents two artifacts and asks if they are related.
@@ -61,7 +63,7 @@ public class SimpleClassifier extends Classifier {
     public SimpleClassifier(ModuleConfiguration configuration) {
         super(ChatLanguageModelProvider.threads(configuration));
         this.provider = new ChatLanguageModelProvider(configuration);
-        this.template = configuration.argumentAsString("template", DEFAULT_TEMPLATE);
+        this.template = configuration.argumentAsString(PROMPT_TEMPLATE_KEY, DEFAULT_TEMPLATE);
         this.cache = CacheManager.getDefaultInstance()
                 .getCache(this.getClass().getSimpleName() + "_" + provider.modelName() + "_" + provider.seed());
         this.llm = provider.createChatModel();
