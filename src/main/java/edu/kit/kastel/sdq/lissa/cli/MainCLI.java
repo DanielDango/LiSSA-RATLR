@@ -4,6 +4,7 @@ package edu.kit.kastel.sdq.lissa.cli;
 import java.nio.file.Path;
 
 import edu.kit.kastel.sdq.lissa.cli.command.EvaluateCommand;
+import edu.kit.kastel.sdq.lissa.cli.command.OptimizeCommand;
 import edu.kit.kastel.sdq.lissa.cli.command.TransitiveTraceCommand;
 
 import picocli.CommandLine;
@@ -20,7 +21,7 @@ import picocli.CommandLine;
  * The CLI supports various command-line options and provides help information
  * through the standard help options (--help, -h).
  */
-@CommandLine.Command(subcommands = {EvaluateCommand.class, TransitiveTraceCommand.class})
+@CommandLine.Command(subcommands = {EvaluateCommand.class, TransitiveTraceCommand.class, OptimizeCommand.class})
 public final class MainCLI {
 
     /**
