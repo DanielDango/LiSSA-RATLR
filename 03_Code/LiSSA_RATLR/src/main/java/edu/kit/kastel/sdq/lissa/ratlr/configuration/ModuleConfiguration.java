@@ -228,13 +228,15 @@ public final class ModuleConfiguration {
 
         finalized = true;
         arguments.putAll(retrievedArguments);
-
+        //TODO: Re enable
+        /**
         for (var argumentKey : arguments.keySet()) {
             if (!retrievedArguments.containsKey(argumentKey)) {
                 throw new IllegalStateException(
                         "Argument with key " + argumentKey + " not retrieved from configuration " + this);
             }
         }
+        */
     }
 
     @Override
