@@ -1,6 +1,6 @@
+/* Licensed under MIT 2025. */
 package edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer;
 
-import dev.langchain4j.model.chat.ChatModel;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.Cache;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheKey;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheManager;
@@ -9,6 +9,8 @@ import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
 import edu.kit.kastel.sdq.lissa.ratlr.elementstore.ElementStore;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.KeyGenerator;
+
+import dev.langchain4j.model.chat.ChatModel;
 
 public class SimpleOptimizer extends AbstractPromptOptimizer {
 
@@ -67,10 +69,11 @@ public class SimpleOptimizer extends AbstractPromptOptimizer {
 
     @Override
     public String optimize(ElementStore sourceStore, ElementStore targetStore, String prompt) {
-        Element source = sourceStore.getAllElements(true).get(0).first();
-        Element target = targetStore.findSimilar(sourceStore.getAllElements(true).get(0).second()).get(0);
-        String request = template
-                .replace("{source_type}", source.getType())
+        Element source = sourceStore.getAllElements(true).getFirst().first();
+        Element target = targetStore
+                .findSimilar(sourceStore.getAllElements(true).getFirst().second())
+                .getFirst();
+        String request = template.replace("{source_type}", source.getType())
                 .replace("{target_type}", target.getType())
                 .replace("{original_prompt}", prompt);
 
@@ -79,11 +82,8 @@ public class SimpleOptimizer extends AbstractPromptOptimizer {
         String cachedResponse = cache.get(cacheKey, String.class);
         if (cachedResponse != null) {
             return cachedResponse;
-        }
-        else {
-            logger.info("Optiming ({}): {}",
-                    provider.modelName(),
-                    prompt);
+        } else {
+            logger.info("Optimizing ({}): {}", provider.modelName(), request);
             String response = llm.chat(request);
             cache.put(cacheKey, response);
             return response;
