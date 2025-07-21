@@ -66,6 +66,12 @@ public class ChatLanguageModelProvider {
      */
     public static final int DEFAULT_SEED = 133742243;
 
+    //TODO: Refactor as Module Parameter?
+    /**
+     * Models that do not support temperature settings. Lower temperature values mean less creativity and variation
+     * in the model's responses.
+     */
+    private static final String[] MODELS_WITHOUT_TEMPERATURE = {"o4-mini-2025-04-16"};
     /**
      * The platform to use for the language model.
      */
@@ -204,11 +210,20 @@ public class ChatLanguageModelProvider {
         if (openAiOrganizationId == null || openAiApiKey == null) {
             throw new IllegalStateException("OPENAI_ORGANIZATION_ID or OPENAI_API_KEY environment variable not set");
         }
+        // Ideal temperature for most deterministic results
+        double temperature = 0.0;
+        // Set temperature based on the model type as some do not support temperature values
+        for(String modelWithoutTemperature : MODELS_WITHOUT_TEMPERATURE) {
+            if (model.equals(modelWithoutTemperature)) {
+                temperature = 1.0;
+                break;
+            }
+        }
         return new OpenAiChatModel.OpenAiChatModelBuilder()
                 .modelName(model)
                 .organizationId(openAiOrganizationId)
                 .apiKey(openAiApiKey)
-                .temperature(0.0)
+                .temperature(temperature)
                 .seed(seed)
                 .build();
     }
