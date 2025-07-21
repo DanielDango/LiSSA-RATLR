@@ -18,7 +18,7 @@ public class SimpleOptimizer extends AbstractPromptOptimizer {
      * The default template for classification requests.
      * This template presents two artifacts and asks if they are related.
      */
-    private static final String DEFAULT_TEMPLATE =
+    public static final String DEFAULT_OPTIMIZATION_TEMPLATE =
             """
                     Optimize the following prompt to achieve better classification results for traceability link recovery.
                     Traceability links are to be found in the domain of {source_type} to {target_type}.
@@ -27,6 +27,10 @@ public class SimpleOptimizer extends AbstractPromptOptimizer {
                     The original prompt is provided below:
                     '''{original_prompt}'''
                     """;
+
+    public static final String PROMPT_START = "<prompt>";
+    public static final String PROMPT_END = "</prompt>";
+    public static final String ORIGINAL_PROMPT_KEY = "{original_prompt}";
 
     private final Cache cache;
 
@@ -53,7 +57,7 @@ public class SimpleOptimizer extends AbstractPromptOptimizer {
     public SimpleOptimizer(ModuleConfiguration configuration) {
         super(ChatLanguageModelProvider.threads(configuration));
         this.provider = new ChatLanguageModelProvider(configuration);
-        this.template = configuration.argumentAsString("optimization_template", DEFAULT_TEMPLATE);
+        this.template = configuration.argumentAsString("optimization_template", DEFAULT_OPTIMIZATION_TEMPLATE);
         this.cache = CacheManager.getDefaultInstance()
                 .getCache(this.getClass().getSimpleName() + "_" + provider.modelName() + "_" + provider.seed());
         this.llm = provider.createChatModel();
@@ -75,19 +79,21 @@ public class SimpleOptimizer extends AbstractPromptOptimizer {
                 .getFirst();
         String request = template.replace("{source_type}", source.getType())
                 .replace("{target_type}", target.getType())
-                .replace("{original_prompt}", prompt);
+                .replace(ORIGINAL_PROMPT_KEY, prompt);
 
         String key = KeyGenerator.generateKey(request);
         CacheKey cacheKey = new CacheKey(provider.modelName(), provider.seed(), CacheKey.Mode.CHAT, request, key);
-        String cachedResponse = cache.get(cacheKey, String.class);
-        if (cachedResponse != null) {
-            return cachedResponse;
-        } else {
+        String response = cache.get(cacheKey, String.class);
+        if (response == null) {
             logger.info("Optimizing ({}): {}", provider.modelName(), request);
-            String response = llm.chat(request);
+            response = llm.chat(request);
             cache.put(cacheKey, response);
-            return response;
         }
+        if (response.contains(PROMPT_END)) {
+            response = response.substring(response.indexOf(PROMPT_END) + PROMPT_END.length())
+                    .strip();
+        }
+        return response;
     }
 
     @Override

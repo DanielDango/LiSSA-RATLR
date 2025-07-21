@@ -96,6 +96,36 @@ public class ElementStore {
     }
 
     /**
+     * Creates a new element store with the provided content.
+     * This constructor is used for initializing the store with existing elements and their embeddings.
+     *
+     * @param content List of pairs containing elements and their embeddings
+     * @param maxResults The maximum number of results to return in similarity search
+     *                   -1 indicates source store mode (no similarity search).
+     *                   Positive values indicate target store mode with a limit on results.
+     * @throws IllegalArgumentException If maxResults is less than -1 or equals 0
+     */
+    public ElementStore(List<Pair<Element, float[]>> content, int maxResults) {
+        if (maxResults < -1 || maxResults == 0) {
+            throw new IllegalArgumentException(
+                    "The maximum number of results must be -1 to indicate a source store or greater than 0 to indicate a target store.");
+        }
+        this.maxResults = maxResults;
+
+        elementsWithEmbedding = new ArrayList<>();
+        idToElementWithEmbedding = new HashMap<>();
+        List<Element> elements = new ArrayList<>();
+        List<float[]> embeddings = new ArrayList<>();
+        for (var pair : content) {
+            var element = pair.first();
+            var embedding = pair.second();
+            elements.add(element);
+            embeddings.add(Arrays.copyOf(embedding, embedding.length));
+        }
+        setup(elements, embeddings);
+    }
+
+    /**
      * Initializes the element store with elements and their embeddings for LiSSA's processing.
      *
      * @param elements List of elements to store
@@ -223,6 +253,10 @@ public class ElementStore {
             throw new IllegalStateException("You should set retriever to false to activate this feature.");
         }
         return getAllElementsIntern(onlyCompare);
+    }
+
+    public List<Element> getAllElements() {
+        return getAllElementsIntern(false).stream().map(Pair::first).toList();
     }
 
     /**
