@@ -1,9 +1,11 @@
+/* Licensed under MIT 2025. */
 package edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
 import edu.kit.kastel.sdq.lissa.ratlr.elementstore.ElementStore;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public abstract class AbstractPromptOptimizer {
     /**
@@ -13,8 +15,20 @@ public abstract class AbstractPromptOptimizer {
 
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
     protected final int threads;
+
     protected AbstractPromptOptimizer(int threads) {
         this.threads = Math.max(1, threads);
+    }
+
+    public static AbstractPromptOptimizer createOptimizer(ModuleConfiguration configuration) {
+        if (configuration == null) {
+            return new MockOptimizer();
+        }
+        return switch (configuration.name().split(CONFIG_NAME_SEPARATOR)[0]) {
+            case "mock" -> new MockOptimizer();
+            case "simple" -> new SimpleOptimizer(configuration);
+            default -> throw new IllegalStateException("Unexpected value: " + configuration.name());
+        };
     }
 
     /**
@@ -24,12 +38,4 @@ public abstract class AbstractPromptOptimizer {
     public abstract String optimize(ElementStore sourceStore, ElementStore targetStore, String prompt);
 
     protected abstract AbstractPromptOptimizer copyOf(AbstractPromptOptimizer original);
-
-    public static AbstractPromptOptimizer createOptimizer(ModuleConfiguration configuration) {
-        return switch (configuration.name().split(CONFIG_NAME_SEPARATOR)[0]) {
-            case "mock" -> new MockOptimizer();
-            case "simple" -> new SimpleOptimizer(configuration);
-            default -> throw new IllegalStateException("Unexpected value: " + configuration.name());
-        };
-    }
 }

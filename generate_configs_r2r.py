@@ -49,10 +49,7 @@ TEMPLATE = """
     }
   },
   "prompt_optimizer": {
-    "name" : "simple",
-    "args" : {
-      "model": "codellama:13b"
-    }
+    "name" : "mock"
   },
   "classifier" : {
     "name" : "<<CLASSIFIER_MODE>>",
@@ -81,7 +78,7 @@ classifier_modes = ["simple", "reasoning"]
 gpt_models = ["gpt-4o-mini-2024-07-18", "gpt-4o-2024-08-06"]
 gpt_models = ["o4-mini-2025-04-16"]
 ollama_models = ["llama3.1:8b-instruct-fp16", "codellama:13b"]
-ollama_models = []
+ollama_models = ["codellama:13b"]
 
 # Generate
 if not os.path.exists(CONFIG_DIR):
