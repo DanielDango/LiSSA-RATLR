@@ -2,6 +2,7 @@
 package edu.kit.kastel.sdq.lissa.ratlr.embeddingcreator;
 
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
+import edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.Environment;
 
 import dev.langchain4j.model.embedding.EmbeddingModel;
@@ -32,9 +33,10 @@ public class OpenAiEmbeddingCreator extends CachedEmbeddingCreator {
      * "text-embedding-ada-002" is used.
      *
      * @param configuration The configuration containing model settings
+     * @param contextStore The shared context store for pipeline components
      */
-    public OpenAiEmbeddingCreator(ModuleConfiguration configuration) {
-        super(configuration.argumentAsString("model", "text-embedding-ada-002"), THREADS);
+    public OpenAiEmbeddingCreator(ModuleConfiguration configuration, ContextStore contextStore) {
+        super(contextStore, configuration.argumentAsString("model", "text-embedding-ada-002"), THREADS);
     }
 
     /**

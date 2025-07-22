@@ -2,16 +2,22 @@
 package edu.kit.kastel.sdq.lissa.ratlr.postprocessor;
 
 import java.util.LinkedHashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
+import edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
 
 /**
  * Base class for postprocessors that modify trace link identifiers.
  * This class provides functionality to process trace links based on different
  * module configurations and ID processing strategies.
- *
+ * <p>
+ * All postprocessors have access to a shared {@link edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore} via the protected {@code contextStore} field,
+ * which is initialized in the constructor and available to all subclasses.
+ * Subclasses should not duplicate context handling or Javadoc for the context parameter.
+ * </p>
  * The class supports various types of trace link processing:
  * <ul>
  *     <li>req2code: Requirements to code trace links</li>
@@ -31,20 +37,30 @@ public class TraceLinkIdPostprocessor {
     private final IdProcessor idProcessor;
 
     /**
-     * Creates a new trace link ID postprocessor with the specified ID processor.
-     *
-     * @param idProcessor The ID processor to use for transforming trace link identifiers
+     * The shared context store for pipeline components.
+     * Available to all subclasses for accessing shared context.
      */
-    private TraceLinkIdPostprocessor(IdProcessor idProcessor) {
-        this.idProcessor = idProcessor;
+    protected final ContextStore contextStore;
+
+    /**
+     * Creates a new postprocessor with the specified context store.
+     *
+     * @param contextStore The shared context store for pipeline components
+     */
+    protected TraceLinkIdPostprocessor(ContextStore contextStore) {
+        this.idProcessor = null;
+        this.contextStore = Objects.requireNonNull(contextStore);
     }
 
     /**
-     * Creates a new trace link ID postprocessor without an ID processor.
-     * This constructor is intended for subclasses that override the postprocess method.
+     * Creates a new trace link ID postprocessor with the specified ID processor and context store.
+     *
+     * @param idProcessor The ID processor to use for transforming trace link identifiers
+     * @param contextStore The shared context store for pipeline components
      */
-    protected TraceLinkIdPostprocessor() {
-        this.idProcessor = null;
+    private TraceLinkIdPostprocessor(IdProcessor idProcessor, ContextStore contextStore) {
+        this.idProcessor = idProcessor;
+        this.contextStore = Objects.requireNonNull(contextStore);
     }
 
     /**
@@ -52,19 +68,21 @@ public class TraceLinkIdPostprocessor {
      * The type of postprocessor is determined by the module name in the configuration.
      *
      * @param moduleConfiguration The module configuration specifying the type of postprocessor
+     * @param contextStore The shared context store for pipeline components
      * @return A new trace link ID postprocessor instance
      * @throws IllegalStateException if the module name is not recognized
      */
-    public static TraceLinkIdPostprocessor createTraceLinkIdPostprocessor(ModuleConfiguration moduleConfiguration) {
+    public static TraceLinkIdPostprocessor createTraceLinkIdPostprocessor(
+            ModuleConfiguration moduleConfiguration, ContextStore contextStore) {
         return switch (moduleConfiguration.name()) {
-            case "req2code" -> new TraceLinkIdPostprocessor(IdProcessor.REQ2CODE);
-            case "sad2code" -> new TraceLinkIdPostprocessor(IdProcessor.SAD2CODE);
-            case "sad2sam" -> new TraceLinkIdPostprocessor(IdProcessor.SAD2SAM);
-            case "sam2sad" -> new TraceLinkIdPostprocessor(IdProcessor.SAM2SAD);
-            case "sam2code" -> new TraceLinkIdPostprocessor(IdProcessor.SAM2CODE);
-            case "req2req" -> new ReqReqPostprocessor();
-            case "identity" -> new IdentityPostprocessor();
-            case null -> new IdentityPostprocessor();
+            case "req2code" -> new TraceLinkIdPostprocessor(IdProcessor.REQ2CODE, contextStore);
+            case "sad2code" -> new TraceLinkIdPostprocessor(IdProcessor.SAD2CODE, contextStore);
+            case "sad2sam" -> new TraceLinkIdPostprocessor(IdProcessor.SAD2SAM, contextStore);
+            case "sam2sad" -> new TraceLinkIdPostprocessor(IdProcessor.SAM2SAD, contextStore);
+            case "sam2code" -> new TraceLinkIdPostprocessor(IdProcessor.SAM2CODE, contextStore);
+            case "req2req" -> new ReqReqPostprocessor(contextStore);
+            case "identity" -> new IdentityPostprocessor(contextStore);
+            case null -> new IdentityPostprocessor(contextStore);
             default -> throw new IllegalStateException("Unexpected value: " + moduleConfiguration.name());
         };
     }

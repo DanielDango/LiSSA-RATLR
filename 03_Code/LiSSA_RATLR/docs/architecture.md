@@ -33,6 +33,10 @@ The project follows a modular architecture with the following main components:
      - All extend [`CachedEmbeddingCreator`](../src/main/java/edu/kit/kastel/sdq/lissa/ratlr/embeddingcreator/CachedEmbeddingCreator.java) for caching support, improving performance by storing and reusing embeddings.
 4. **Element Stores** (`elementstore` package)
    - [`ElementStore`](../src/main/java/edu/kit/kastel/sdq/lissa/ratlr/elementstore/ElementStore.java): Manages storage and retrieval of processed elements with their embeddings, supporting similarity-based search and hierarchical relationships.
+   - **Retrieval Strategies** (`elementstore/strategy` package):
+     - [`RetrievalStrategy`](../src/main/java/edu/kit/kastel/sdq/lissa/ratlr/elementstore/strategy/RetrievalStrategy.java): Abstraction for finding similar elements in the target store. The retrieval strategy is configurable via the `target_store` section in the configuration file.
+     - [`CosineSimilarity`](../src/main/java/edu/kit/kastel/sdq/lissa/ratlr/elementstore/strategy/CosineSimilarity.java): Default strategy that finds similar elements based on cosine similarity of embeddings. Supports the `max_results` parameter.
+     - Retrieval strategies can be extended to implement custom similarity or retrieval logic.
 5. **Classifiers** (`classifier` package)
    - [`Classifier`](../src/main/java/edu/kit/kastel/sdq/lissa/ratlr/classifier/Classifier.java): Base class for classification
    - Implementations:
@@ -46,6 +50,9 @@ The project follows a modular architecture with the following main components:
      - [`AnyResultAggregator`](../src/main/java/edu/kit/kastel/sdq/lissa/ratlr/resultaggregator/AnyResultAggregator.java): Aggregates classification results based on configurable granularity levels, allowing for flexible relationship mapping between different levels of abstraction.
 7. **Postprocessors** (`postprocessor` package)
    - [`TraceLinkIdPostprocessor`](../src/main/java/edu/kit/kastel/sdq/lissa/ratlr/postprocessor/TraceLinkIdPostprocessor.java): Post-processes trace link IDs to ensure consistency and correctness in the final output, with specialized processors for different artifact types.
+8. **Context** (`context` package)
+   - [`Context`](../src/main/java/edu/kit/kastel/sdq/lissa/ratlr/context/Context.java): Interface for context objects that can be registered and retrieved by ID.
+   - [`ContextStore`](../src/main/java/edu/kit/kastel/sdq/lissa/ratlr/context/ContextStore.java): Central registry for context objects, passed to all major pipeline components. Enables components to share state, configuration, or intermediate results, and supports advanced scenarios such as cross-component coordination and caching.
 
 ### Knowledge Model
 
@@ -53,3 +60,14 @@ The framework uses a hierarchical knowledge model:
 - [`Knowledge`](../src/main/java/edu/kit/kastel/sdq/lissa/ratlr/knowledge/Knowledge.java): Base class for all knowledge elements, providing common functionality for identification and content management.
 - [`Artifact`](../src/main/java/edu/kit/kastel/sdq/lissa/ratlr/knowledge/Artifact.java): Represents source artifacts (requirements, code, etc.) with their original content and metadata.
 - [`Element`](../src/main/java/edu/kit/kastel/sdq/lissa/ratlr/knowledge/Element.java): Represents processed artifacts or parts of artifacts with parent-child relationships, enabling hierarchical organization and granular analysis.
+
+## Context Management
+
+The pipeline uses a shared context mechanism to allow components to exchange additional information or state during execution:
+
+- [`Context`](../src/main/java/edu/kit/kastel/sdq/lissa/ratlr/context/Context.java): Interface for context objects that can be registered and retrieved by ID.
+- [`ContextStore`](../src/main/java/edu/kit/kastel/sdq/lissa/ratlr/context/ContextStore.java): Central registry for context objects, passed to all major pipeline components (artifact providers, preprocessors, embedding creators, classifiers, aggregators, and postprocessors). This enables components to share state or configuration as needed.
+
+**Context handling is now managed in the superclasses of all pipeline components.** The `ContextStore` is a protected field in each superclass (e.g., `ArtifactProvider`, `Preprocessor`, `EmbeddingCreator`, `Classifier`, `ResultAggregator`, `TraceLinkIdPostprocessor`), and is automatically passed to all subclasses via their constructors. Subclasses should not duplicate context parameter documentation or handle context manually; instead, they inherit context access and documentation from their superclass.
+
+The `ContextStore` is instantiated at the start of the pipeline and passed to all component factory methods. Components can register and retrieve context objects by unique ID, enabling advanced scenarios such as cross-component coordination, caching, or sharing of intermediate results.

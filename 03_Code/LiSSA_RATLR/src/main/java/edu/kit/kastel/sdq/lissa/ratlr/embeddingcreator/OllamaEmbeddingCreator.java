@@ -7,6 +7,7 @@ import java.util.Base64;
 import java.util.Map;
 
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
+import edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.Environment;
 
 import dev.langchain4j.model.embedding.EmbeddingModel;
@@ -35,9 +36,10 @@ public class OllamaEmbeddingCreator extends CachedEmbeddingCreator {
      * "nomic-embed-text:v1.5" is used.
      *
      * @param configuration The configuration containing model settings
+     * @param contextStore The shared context store for pipeline components
      */
-    public OllamaEmbeddingCreator(ModuleConfiguration configuration) {
-        super(configuration.argumentAsString("model", "nomic-embed-text:v1.5"), 1);
+    public OllamaEmbeddingCreator(ModuleConfiguration configuration, ContextStore contextStore) {
+        super(contextStore, configuration.argumentAsString("model", "nomic-embed-text:v1.5"), 1);
     }
 
     /**

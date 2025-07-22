@@ -4,6 +4,7 @@ package edu.kit.kastel.sdq.lissa.ratlr.preprocessor;
 import java.util.*;
 
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
+import edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Artifact;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 
@@ -39,6 +40,8 @@ import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
  *     <li>Has a granularity level based on its position in the hierarchy</li>
  *     <li>Is marked for comparison based on its type and configuration</li>
  * </ul>
+ *
+ * <p>Context handling is managed by the {@link Preprocessor} superclass. Subclasses should not duplicate context parameter documentation.</p>
  */
 public class CodeTreePreprocessor extends Preprocessor {
 
@@ -48,13 +51,14 @@ public class CodeTreePreprocessor extends Preprocessor {
     private final boolean compareClasses;
 
     /**
-     * Creates a new code tree preprocessor with the specified configuration.
+     * Creates a new code tree preprocessor with the specified configuration and context store.
      *
      * @param configuration The module configuration containing language and comparison settings
-     * @throws NullPointerException if the language configuration is missing
+     * @param contextStore The shared context store for pipeline components
      */
-    public CodeTreePreprocessor(ModuleConfiguration configuration) {
-        this.language = Objects.requireNonNull(Language.valueOf(configuration.argumentAsString("language")));
+    public CodeTreePreprocessor(ModuleConfiguration configuration, ContextStore contextStore) {
+        super(contextStore);
+        this.language = Language.valueOf(configuration.argumentAsString("language", "JAVA"));
         this.compareClasses = configuration.argumentAsBoolean("compare_classes", false);
     }
 

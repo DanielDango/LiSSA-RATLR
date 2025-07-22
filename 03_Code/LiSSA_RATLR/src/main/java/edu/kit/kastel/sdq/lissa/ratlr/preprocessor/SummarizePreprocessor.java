@@ -3,19 +3,17 @@ package edu.kit.kastel.sdq.lissa.ratlr.preprocessor;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
 import edu.kit.kastel.sdq.lissa.ratlr.cache.Cache;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheKey;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheManager;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.ChatLanguageModelProvider;
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
+import edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Artifact;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
-import edu.kit.kastel.sdq.lissa.ratlr.utils.KeyGenerator;
+import edu.kit.kastel.sdq.lissa.ratlr.utils.Futures;
 
 import dev.langchain4j.model.chat.ChatModel;
 
@@ -56,12 +54,14 @@ public class SummarizePreprocessor extends Preprocessor {
     private final Cache cache;
 
     /**
-     * Creates a new summarize preprocessor with the specified configuration.
+     * Creates a new summarize preprocessor with the specified configuration and context store.
      *
      * @param moduleConfiguration The module configuration containing template and model settings
+     * @param contextStore The shared context store for pipeline components
      */
-    public SummarizePreprocessor(ModuleConfiguration moduleConfiguration) {
-        this.template = moduleConfiguration.argumentAsString("template");
+    public SummarizePreprocessor(ModuleConfiguration moduleConfiguration, ContextStore contextStore) {
+        super(contextStore);
+        this.template = moduleConfiguration.argumentAsString("template", "Summarize the following {type}: {content}");
         this.provider = new ChatLanguageModelProvider(moduleConfiguration);
         this.threads = ChatLanguageModelProvider.threads(moduleConfiguration);
         this.cache = CacheManager.getDefaultInstance()
@@ -108,9 +108,7 @@ public class SummarizePreprocessor extends Preprocessor {
         List<Callable<String>> tasks = new ArrayList<>();
         for (String request : requests) {
             tasks.add(() -> {
-                String key = KeyGenerator.generateKey(request);
-                CacheKey cacheKey =
-                        new CacheKey(provider.modelName(), provider.seed(), CacheKey.Mode.CHAT, request, key);
+                CacheKey cacheKey = CacheKey.of(provider.modelName(), provider.seed(), CacheKey.Mode.CHAT, request);
 
                 String cachedResponse = cache.get(cacheKey, String.class);
                 if (cachedResponse != null) {
@@ -129,7 +127,7 @@ public class SummarizePreprocessor extends Preprocessor {
             var summaries = executorService.invokeAll(tasks);
             for (int i = 0; i < artifacts.size(); i++) {
                 Artifact artifact = artifacts.get(i);
-                String summary = summaries.get(i).get();
+                String summary = Futures.getLogged(summaries.get(i), logger);
                 Element element = new Element(
                         artifact.getIdentifier(),
                         "Summary of '%s'".formatted(artifact.getType()),
@@ -143,8 +141,6 @@ public class SummarizePreprocessor extends Preprocessor {
             logger.error("Summarization interrupted", e);
             Thread.currentThread().interrupt();
             return elements;
-        } catch (ExecutionException e) {
-            throw new IllegalStateException(e.getMessage(), e);
         } finally {
             executorService.shutdown();
         }

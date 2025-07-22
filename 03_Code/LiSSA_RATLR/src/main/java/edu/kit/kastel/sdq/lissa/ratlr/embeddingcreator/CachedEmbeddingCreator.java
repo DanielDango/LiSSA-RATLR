@@ -2,10 +2,7 @@
 package edu.kit.kastel.sdq.lissa.ratlr.embeddingcreator;
 
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,8 +14,9 @@ import com.knuddels.jtokkit.api.EncodingRegistry;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.Cache;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheKey;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheManager;
+import edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
-import edu.kit.kastel.sdq.lissa.ratlr.utils.KeyGenerator;
+import edu.kit.kastel.sdq.lissa.ratlr.utils.Futures;
 
 import dev.langchain4j.model.embedding.EmbeddingModel;
 
@@ -50,11 +48,13 @@ abstract class CachedEmbeddingCreator extends EmbeddingCreator {
     /**
      * Creates a new cached embedding creator with the specified model and thread count.
      *
+     * @param contextStore The shared context store for pipeline components
      * @param model The name of the embedding model to use
      * @param threads The number of threads to use for parallel embedding generation
      * @param params Additional parameters for the embedding model
      */
-    protected CachedEmbeddingCreator(String model, int threads, String... params) {
+    protected CachedEmbeddingCreator(ContextStore contextStore, String model, int threads, String... params) {
+        super(contextStore);
         this.cache = CacheManager.getDefaultInstance()
                 .getCache(this.getClass().getSimpleName() + "_" + Objects.requireNonNull(model));
         this.embeddingModel = Objects.requireNonNull(createEmbeddingModel(model, params));
@@ -113,7 +113,7 @@ abstract class CachedEmbeddingCreator extends EmbeddingCreator {
         executor.close();
 
         return futureResults.stream()
-                .map(Future::resultNow)
+                .map(f -> Futures.getLogged(f, logger))
                 .flatMap(Collection::stream)
                 .toList();
     }
@@ -176,8 +176,8 @@ abstract class CachedEmbeddingCreator extends EmbeddingCreator {
      */
     private static float[] calculateFinalEmbedding(
             EmbeddingModel embeddingModel, Cache cache, String rawNameOfModel, Element element) {
-        String key = KeyGenerator.generateKey(element.getContent());
-        CacheKey cacheKey = new CacheKey(rawNameOfModel, -1, CacheKey.Mode.EMBEDDING, element.getContent(), key);
+
+        CacheKey cacheKey = CacheKey.of(rawNameOfModel, -1, CacheKey.Mode.EMBEDDING, element.getContent());
 
         float[] cachedEmbedding = cache.get(cacheKey, float[].class);
         if (cachedEmbedding != null) {
@@ -214,7 +214,10 @@ abstract class CachedEmbeddingCreator extends EmbeddingCreator {
     private static float[] tryToFixWithLength(
             EmbeddingModel embeddingModel, Cache cache, String rawNameOfModel, CacheKey key, String content) {
         String newKey = key.localKey() + "_fixed_" + MAX_TOKEN_LENGTH;
-        CacheKey newCacheKey = new CacheKey(
+
+        // We need the old keys for backwards compatibility
+        @SuppressWarnings("deprecation")
+        CacheKey newCacheKey = CacheKey.ofRaw(
                 rawNameOfModel,
                 -1,
                 CacheKey.Mode.EMBEDDING,
