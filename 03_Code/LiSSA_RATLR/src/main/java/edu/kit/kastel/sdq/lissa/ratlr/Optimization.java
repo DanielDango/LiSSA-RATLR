@@ -1,9 +1,12 @@
 /* Licensed under MIT 2025. */
 package edu.kit.kastel.sdq.lissa.ratlr;
 
+import static edu.kit.kastel.sdq.lissa.ratlr.Statistics.getTraceLinksFromGoldStandard;
+
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Objects;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,11 +15,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import edu.kit.kastel.sdq.lissa.ratlr.artifactprovider.ArtifactProvider;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheManager;
+import edu.kit.kastel.sdq.lissa.ratlr.classifier.Classifier;
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.Configuration;
 import edu.kit.kastel.sdq.lissa.ratlr.elementstore.ElementStore;
 import edu.kit.kastel.sdq.lissa.ratlr.embeddingcreator.EmbeddingCreator;
+import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
+import edu.kit.kastel.sdq.lissa.ratlr.postprocessor.TraceLinkIdPostprocessor;
 import edu.kit.kastel.sdq.lissa.ratlr.preprocessor.Preprocessor;
 import edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.AbstractPromptOptimizer;
+import edu.kit.kastel.sdq.lissa.ratlr.resultaggregator.ResultAggregator;
 
 /**
  * Represents a single prompt optimization run of the LiSSA framework.
@@ -124,8 +131,15 @@ public class Optimization {
         sourceStore = new ElementStore(configuration.sourceStore(), false);
         targetStore = new ElementStore(configuration.targetStore(), true);
 
+        Classifier classifier = configuration.createClassifier();
+        ResultAggregator aggregator = ResultAggregator.createResultAggregator(configuration.resultAggregator());
+
+        TraceLinkIdPostprocessor traceLinkIdPostProcessor =
+                TraceLinkIdPostprocessor.createTraceLinkIdPostprocessor(configuration.traceLinkIdPostprocessor());
+        Set<TraceLink> goldStandard = getTraceLinksFromGoldStandard(configuration.goldStandardConfiguration());
+
         promptOptimizer = AbstractPromptOptimizer.createOptimizer(
-                configuration.promptOptimizer(), configuration.goldStandardConfiguration());
+                configuration.promptOptimizer(), goldStandard, aggregator, traceLinkIdPostProcessor, classifier);
         configuration.serializeAndDestroyConfiguration();
     }
 
@@ -169,11 +183,11 @@ public class Optimization {
         targetStore.setup(targetElements, targetEmbeddings);
 
         logger.info("Optimizing Prompt");
-        String result = promptOptimizer.optimize(
-                sourceStore,
-                targetStore,
-                "Question: Here are two parts of software development artifacts.\n\n            {source_type}: '''{source_content}'''\n\n            {target_type}: '''{target_content}'''\n            Are they related?\n\n            Answer with 'yes' or 'no'.");
+        String result = promptOptimizer.optimize(sourceStore, targetStore);
         logger.info("Optimized Prompt: {}", result);
+
+        CacheManager.getDefaultInstance().flush();
+
         return result;
     }
 }
