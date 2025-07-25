@@ -9,6 +9,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import edu.kit.kastel.sdq.lissa.ratlr.Evaluation;
 import edu.kit.kastel.sdq.lissa.ratlr.Optimization;
 
 import picocli.CommandLine;
@@ -26,22 +27,44 @@ public class OptimizeCommand implements Runnable {
             arity = "1..*",
             description =
                     "Specifies one or more config paths to be invoked by the pipeline iteratively. If the path points to a directory, all files inside are chosen to get invoked.")
-    private Path[] configs;
+    private Path[] optimizationConfigs;
+
+    @CommandLine.Option(
+            names = {"-e", "--eval"},
+            arity = "0..*",
+            description = "Specifies optional evaluation config paths to be invoked by the pipeline iteratively. "
+                    + "Each evaluation configuration will be used with each optimization config."
+                    + "If the path points to a directory, all files inside are chosen to get invoked.")
+    private Path[] evaluationConfigs;
 
     @Override
     public void run() {
-        List<Path> configsToEvaluate = loadConfigs(configs);
-        logger.info("Found {} config files to invoke", configsToEvaluate.size());
+        List<Path> configsToOptimize = loadConfigs(optimizationConfigs);
+        List<Path> configsToEvaluate = loadConfigs(evaluationConfigs);
+        logger.info(
+                "Found {} optimization config files and {} evaluation config files to invoke",
+                configsToOptimize.size(),
+                configsToEvaluate.size());
 
-        for (Path config : configsToEvaluate) {
-            logger.info("Invoking the pipeline with '{}'", config);
+        for (Path optimizationConfig : configsToOptimize) {
+            logger.info("Invoking the optimization pipeline with '{}'", optimizationConfig);
             try {
-                var evaluation = new Optimization(config);
-                logger.info("Running evaluation for configuration");
-                evaluation.run();
+                var optimization = new Optimization(optimizationConfig);
+                optimization.run();
             } catch (Exception e) {
                 logger.warn("Exception details", e);
-                logger.warn("Configuration '{}' threw an exception: {}", config, e.getMessage());
+                logger.warn(
+                        "Optimization configuration '{}' threw an exception: {}", optimizationConfig, e.getMessage());
+            }
+            for (Path evaluationConfig : configsToEvaluate) {
+                logger.info("Invoking the evaluation pipeline with '{}'", evaluationConfig);
+                try {
+                    var evaluation = new Evaluation(evaluationConfig);
+                    evaluation.run();
+                } catch (Exception e) {
+                    logger.warn(
+                            "Evaluation configuration '{}' threw an exception: {}", evaluationConfig, e.getMessage());
+                }
             }
         }
     }
