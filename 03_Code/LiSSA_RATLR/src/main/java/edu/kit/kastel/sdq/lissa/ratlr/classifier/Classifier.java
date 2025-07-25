@@ -146,7 +146,14 @@ public abstract class Classifier {
      *
      * @return A new instance of the same classifier type
      */
-    protected abstract Classifier copyOf();
+    public abstract Classifier copyOf();
+
+    /**
+     * Sets the prompt used for classification.
+     *
+     * @param prompt The prompt template to use for classification
+     */
+    public abstract void setClassificationPrompt(String prompt);
 
     /**
      * Creates a list of classification tasks from source and target element stores.

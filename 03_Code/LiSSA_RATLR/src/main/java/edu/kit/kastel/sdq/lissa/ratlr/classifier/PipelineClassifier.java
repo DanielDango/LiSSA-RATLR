@@ -132,8 +132,13 @@ public class PipelineClassifier extends Classifier {
     }
 
     @Override
-    protected Classifier copyOf() {
+    public Classifier copyOf() {
         return new PipelineClassifier(classifiers, this.threads);
+    }
+
+    @Override
+    public void setClassificationPrompt(String prompt) {
+        throw new UnsupportedOperationException("PipelineClassifier does not support setting a classification prompt.");
     }
 
     /**

@@ -41,7 +41,7 @@ public class ReasoningClassifier extends Classifier {
     /**
      * The prompt template used for classification requests.
      */
-    private final String prompt;
+    private String prompt;
 
     /**
      * Whether to use original artifacts instead of nested elements.
@@ -97,8 +97,13 @@ public class ReasoningClassifier extends Classifier {
     }
 
     @Override
-    protected final Classifier copyOf() {
+    public final Classifier copyOf() {
         return new ReasoningClassifier(threads, cache, provider, prompt, useOriginalArtifacts, useSystemMessage);
+    }
+
+    @Override
+    public void setClassificationPrompt(String prompt) {
+        this.prompt = prompt;
     }
 
     /**
