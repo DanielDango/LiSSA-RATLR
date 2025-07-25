@@ -32,7 +32,12 @@ public class MockClassifier extends Classifier {
     }
 
     @Override
-    protected Classifier copyOf() {
+    public Classifier copyOf() {
         return new MockClassifier();
+    }
+
+    @Override
+    public void setClassificationPrompt(String prompt) {
+        // as no classification prompt is used, this method does nothing
     }
 }

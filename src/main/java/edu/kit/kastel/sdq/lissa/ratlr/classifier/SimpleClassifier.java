@@ -53,7 +53,7 @@ public class SimpleClassifier extends Classifier {
     /**
      * The template used for classification requests.
      */
-    private final String template;
+    private String template;
 
     /**
      * Creates a new simple classifier with the specified configuration.
@@ -93,8 +93,13 @@ public class SimpleClassifier extends Classifier {
      * @return A new simple classifier instance with the same configuration
      */
     @Override
-    protected final Classifier copyOf() {
+    public final Classifier copyOf() {
         return new SimpleClassifier(threads, cache, provider, template);
+    }
+
+    @Override
+    public void setClassificationPrompt(String prompt) {
+        this.template = prompt;
     }
 
     /**
