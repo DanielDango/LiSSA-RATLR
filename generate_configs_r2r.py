@@ -48,9 +48,6 @@ TEMPLATE = """
       "max_results" : "<<RETRIEVAL_COUNT>>"
     }
   },
-  "prompt_optimizer": {
-    "name" : "mock"
-  },
   "classifier" : {
     "name" : "<<CLASSIFIER_MODE>>",
     "args" : {
@@ -76,7 +73,7 @@ retrieval_counts = [str(x) for x in [4, 4, 4, 4, 4, 4]]
 
 classifier_modes = ["simple", "reasoning"]
 gpt_models = ["gpt-4o-mini-2024-07-18", "gpt-4o-2024-08-06"]
-gpt_models = ["o4-mini-2025-04-16"]
+gpt_models = ["gpt-4o-mini-2024-07-18"]
 ollama_models = ["llama3.1:8b-instruct-fp16", "codellama:13b"]
 ollama_models = ["codellama:13b"]
 

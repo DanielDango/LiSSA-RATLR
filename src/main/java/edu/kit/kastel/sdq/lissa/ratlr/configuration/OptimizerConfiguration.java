@@ -23,7 +23,7 @@ import io.soabase.recordbuilder.core.RecordBuilder;
  * It supports both single-classifier and multi-stage classifier configurations.
  */
 @RecordBuilder()
-public record Configuration(
+public record OptimizerConfiguration(
         /**
          * Directory for caching intermediate results.
          */
@@ -70,6 +70,12 @@ public record Configuration(
         @JsonProperty("target_store") ModuleConfiguration targetStore,
 
         /**
+         * Configuration for the prompt optimizer.
+         * This is used to optimize prompts for better classification results.
+         */
+        @JsonProperty("prompt_optimizer") ModuleConfiguration promptOptimizer,
+
+        /**
          * Configuration for a single classifier.
          * Either this or {@link #classifiers} must be set, but not both.
          */
@@ -108,6 +114,7 @@ public record Configuration(
         embeddingCreator.finalizeForSerialization();
         sourceStore.finalizeForSerialization();
         targetStore.finalizeForSerialization();
+        promptOptimizer.finalizeForSerialization();
         if (classifier != null) {
             classifier.finalizeForSerialization();
         }
@@ -149,7 +156,8 @@ public record Configuration(
                 + targetPreprocessor + ", embeddingCreator="
                 + embeddingCreator + ", sourceStore="
                 + sourceStore + ", targetStore="
-                + targetStore + ", classifier="
+                + targetStore + ", promptOptimizer="
+                + promptOptimizer + ", classifier="
                 + classifier + ", classifiers="
                 + classifiers + ", resultAggregator="
                 + resultAggregator + ", traceLinkIdPostprocessor="

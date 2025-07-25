@@ -16,7 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.kit.kastel.sdq.lissa.ratlr.artifactprovider.ArtifactProvider;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheManager;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.Classifier;
-import edu.kit.kastel.sdq.lissa.ratlr.configuration.Configuration;
+import edu.kit.kastel.sdq.lissa.ratlr.configuration.OptimizerConfiguration;
 import edu.kit.kastel.sdq.lissa.ratlr.elementstore.ElementStore;
 import edu.kit.kastel.sdq.lissa.ratlr.embeddingcreator.EmbeddingCreator;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
@@ -49,7 +49,7 @@ public class Optimization {
     private static final Logger logger = LoggerFactory.getLogger(Optimization.class);
     private final Path configFile;
 
-    private Configuration configuration;
+    private OptimizerConfiguration configuration;
 
     /**
      * Provider for source artifacts
@@ -118,7 +118,7 @@ public class Optimization {
      * @throws IOException If there are issues reading the configuration
      */
     private void setup() throws IOException {
-        configuration = new ObjectMapper().readValue(configFile.toFile(), Configuration.class);
+        configuration = new ObjectMapper().readValue(configFile.toFile(), OptimizerConfiguration.class);
         CacheManager.setCacheDir(configuration.cacheDir());
 
         sourceArtifactProvider = ArtifactProvider.createArtifactProvider(configuration.sourceArtifactProvider());
@@ -148,7 +148,7 @@ public class Optimization {
      *
      * @return The configuration object
      */
-    public Configuration getConfiguration() {
+    public OptimizerConfiguration getConfiguration() {
         return configuration;
     }
 
