@@ -4,6 +4,8 @@
 
 LiSSA uses JSON configuration files to define the behavior of the traceability link recovery process. This guide provides detailed information about available configuration options.
 
+All pipeline components (artifact providers, preprocessors, embedding creators, classifiers, aggregators, and postprocessors) can access shared context via a ContextStore. This context mechanism is handled automatically by the framework and does not require explicit configuration in most cases.
+
 ## Finding Configuration Options
 
 Configuration options in LiSSA are defined in the code through several mechanisms:
@@ -64,6 +66,8 @@ Configuration options in LiSSA are defined in the code through several mechanism
 ## Embedding and Classification
 
 This section describes how to configure the embedding creation and classification steps. You must configure either a single `classifier` or a list of `classifiers` for multi-stage pipelines.
+
+All classifier and embedding creator instances receive access to the shared ContextStore, enabling advanced scenarios such as sharing intermediate results or configuration between pipeline stages.
 
 ### Single Classifier
 
@@ -133,6 +137,8 @@ Each inner list represents a stage in the pipeline. Classifiers within the same 
 
 ## Stores and Aggregation
 
+The retrieval of similar elements in the target store is now handled by a configurable retrieval strategy. The most common strategy is `cosine_similarity`, which finds the most similar elements based on cosine similarity of their embeddings. You can configure the retrieval strategy and its parameters in the `target_store` section.
+
 ```json
 {
   "source_store": {
@@ -140,9 +146,9 @@ Each inner list represents a stage in the pipeline. Classifiers within the same 
     "args": {}
   },
   "target_store": {
-    "name": "custom",
+    "name": "cosine_similarity",  // Retrieval strategy for finding similar elements
     "args": {
-      "max_results": "20"  // or "infinity"
+      "max_results": "20"  // Maximum number of similar elements to return, or "infinity"
     }
   },
   "result_aggregator": {
@@ -154,5 +160,9 @@ Each inner list represents a stage in the pipeline. Classifiers within the same 
   }
 }
 ```
+
+- The `source_store` does not use a retrieval strategy and simply stores all source elements.
+- The `target_store` must specify a retrieval strategy (currently, `cosine_similarity` is supported).
+- The `max_results` argument controls how many similar elements are returned for each query. Use `"infinity"` to return all elements.
 
 For more information about using the CLI to run configurations, see the [CLI documentation](cli.md).

@@ -3,6 +3,7 @@ package edu.kit.kastel.sdq.lissa.ratlr.postprocessor;
 
 import java.util.Set;
 
+import edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
 
 /**
@@ -12,6 +13,10 @@ import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
  * or as a default processor when no specific processing is required.
  */
 public class IdentityPostprocessor extends TraceLinkIdPostprocessor {
+
+    public IdentityPostprocessor(ContextStore contextStore) {
+        super(contextStore);
+    }
 
     /**
      * Returns the input trace links without any modifications.

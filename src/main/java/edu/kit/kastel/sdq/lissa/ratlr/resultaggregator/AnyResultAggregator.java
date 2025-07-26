@@ -7,6 +7,7 @@ import java.util.Set;
 
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.ClassificationResult;
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
+import edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
 
@@ -49,8 +50,10 @@ public class AnyResultAggregator extends ResultAggregator {
      * Creates a new any-result aggregator with the specified configuration.
      *
      * @param configuration The module configuration containing granularity settings
+     * @param contextStore The shared context store for pipeline components
      */
-    public AnyResultAggregator(ModuleConfiguration configuration) {
+    public AnyResultAggregator(ModuleConfiguration configuration, ContextStore contextStore) {
+        super(contextStore);
         this.sourceGranularity = configuration.argumentAsInt("source_granularity", 0);
         this.targetGranularity = configuration.argumentAsInt("target_granularity", 0);
     }

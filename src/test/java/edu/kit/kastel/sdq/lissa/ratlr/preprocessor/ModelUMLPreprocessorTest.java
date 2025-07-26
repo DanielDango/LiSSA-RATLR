@@ -12,6 +12,7 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
+import edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Artifact;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 
@@ -57,7 +58,8 @@ class ModelUMLPreprocessorTest {
         assertTrue(model.exists(), "UML file should exist");
 
         // Create and process the artifact
-        ModelUMLPreprocessor preprocessor = new ModelUMLPreprocessor(new ModuleConfiguration("dummy", Map.of()));
+        ModelUMLPreprocessor preprocessor =
+                new ModelUMLPreprocessor(new ModuleConfiguration("dummy", Map.of()), new ContextStore());
         List<Element> elements = preprocessor.preprocess(
                 List.of(new Artifact("mediastore.uml", "uml", Files.readString(model.toPath()))));
 

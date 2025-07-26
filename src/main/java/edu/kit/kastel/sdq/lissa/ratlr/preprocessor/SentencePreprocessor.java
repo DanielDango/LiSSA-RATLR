@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
+import edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Artifact;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 
@@ -31,14 +32,19 @@ import dev.langchain4j.data.document.splitter.DocumentBySentenceSplitter;
  *     <li>Has granularity level 1</li>
  *     <li>Is marked for comparison (compare=true)</li>
  * </ul>
+ *
+ * <p>Context handling is managed by the {@link Preprocessor} superclass. Subclasses should not duplicate context parameter documentation.</p>
  */
 public class SentencePreprocessor extends Preprocessor {
     /**
      * Creates a new sentence preprocessor with the specified configuration.
      *
      * @param configuration The module configuration (currently unused)
+     * @param contextStore The shared context store for pipeline components
      */
-    public SentencePreprocessor(ModuleConfiguration configuration) {}
+    public SentencePreprocessor(ModuleConfiguration configuration, ContextStore contextStore) {
+        super(contextStore);
+    }
 
     /**
      * Preprocesses a list of artifacts by splitting each one into sentences.

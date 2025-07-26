@@ -4,6 +4,7 @@ package edu.kit.kastel.sdq.lissa.ratlr.embeddingcreator;
 import java.io.File;
 
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
+import edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore;
 
 import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.model.embedding.onnx.OnnxEmbeddingModel;
@@ -29,8 +30,8 @@ public class OnnxEmbeddingCreator extends CachedEmbeddingCreator {
      * @param pathToModel The path to the ONNX model file
      * @param pathToTokenizer The path to the tokenizer file
      */
-    public OnnxEmbeddingCreator(String model, String pathToModel, String pathToTokenizer) {
-        super(model, 1, pathToModel, pathToTokenizer);
+    public OnnxEmbeddingCreator(String model, String pathToModel, String pathToTokenizer, ContextStore contextStore) {
+        super(contextStore, model, 1, pathToModel, pathToTokenizer);
     }
 
     /**
@@ -43,12 +44,14 @@ public class OnnxEmbeddingCreator extends CachedEmbeddingCreator {
      * </ul>
      *
      * @param configuration The configuration containing model and file paths
+     * @param contextStore The shared context store for pipeline components
      */
-    public OnnxEmbeddingCreator(ModuleConfiguration configuration) {
+    public OnnxEmbeddingCreator(ModuleConfiguration configuration, ContextStore contextStore) {
         this(
                 configuration.argumentAsString("model"),
                 configuration.argumentAsString("path_to_model"),
-                configuration.argumentAsString("path_to_tokenizer"));
+                configuration.argumentAsString("path_to_tokenizer"),
+                contextStore);
     }
 
     /**

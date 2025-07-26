@@ -3,6 +3,7 @@ package edu.kit.kastel.sdq.lissa.ratlr.preprocessor;
 
 import java.util.List;
 
+import edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Artifact;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 
@@ -15,8 +16,15 @@ import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
  *     <li>Creates elements with granularity level 0</li>
  *     <li>Marks all elements for comparison (compare=true)</li>
  * </ul>
+ *
+ * <p>Context handling is managed by the {@link Preprocessor} superclass. Subclasses should not duplicate context parameter documentation.</p>
  */
 public class SingleArtifactPreprocessor extends Preprocessor {
+
+    public SingleArtifactPreprocessor(ContextStore contextStore) {
+        super(contextStore);
+    }
+
     /**
      * Preprocesses a list of artifacts by converting each one into a single element.
      * This method:
