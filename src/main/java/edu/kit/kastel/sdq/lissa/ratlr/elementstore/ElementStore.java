@@ -85,17 +85,11 @@ public class ElementStore {
      * This constructor is used for initializing the store with existing elements and their embeddings.
      *
      * @param content List of pairs containing elements and their embeddings
-     * @param maxResults The maximum number of results to return in similarity search
-     *                   -1 indicates source store mode (no similarity search).
-     *                   Positive values indicate target store mode with a limit on results.
-     * @throws IllegalArgumentException If maxResults is less than -1 or equals 0
+     * @param retrievalStrategy The retrieval strategy to use for finding similar elements
+     *                          For source stores, this should be null.
      */
-    public ElementStore(List<Pair<Element, float[]>> content, int maxResults) {
-        if (maxResults < -1 || maxResults == 0) {
-            throw new IllegalArgumentException(
-                    "The maximum number of results must be -1 to indicate a source store or greater than 0 to indicate a target store.");
-        }
-        this.maxResults = maxResults;
+    public ElementStore(List<Pair<Element, float[]>> content, RetrievalStrategy retrievalStrategy) {
+        this.retrievalStrategy = retrievalStrategy;
 
         elementsWithEmbedding = new ArrayList<>();
         idToElementWithEmbedding = new HashMap<>();

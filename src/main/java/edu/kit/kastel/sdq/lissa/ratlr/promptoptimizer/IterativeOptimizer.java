@@ -21,7 +21,6 @@ import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
 import edu.kit.kastel.sdq.lissa.ratlr.postprocessor.TraceLinkIdPostprocessor;
 import edu.kit.kastel.sdq.lissa.ratlr.resultaggregator.ResultAggregator;
-import edu.kit.kastel.sdq.lissa.ratlr.utils.KeyGenerator;
 
 import dev.langchain4j.model.chat.ChatModel;
 
@@ -119,12 +118,12 @@ public class IterativeOptimizer extends AbstractPromptOptimizer {
     public String optimize(ElementStore sourceStore, ElementStore targetStore) {
         Element source = sourceStore.getAllElements(true).getFirst().first();
         Element target = targetStore
-                .findSimilar(sourceStore.getAllElements(true).getFirst().second())
+                .findSimilar(sourceStore.getAllElements(true).getFirst())
                 .getFirst();
         // TODO consider going back to final instead of using a mutable variable
         template = template.replace("{source_type}", source.getType()).replace("{target_type}", target.getType());
         ElementStore trainingSourceStore =
-                new ElementStore(sourceStore.getAllElements(false).subList(0, TRAINING_DATA_SIZE), -1);
+                new ElementStore(sourceStore.getAllElements(false).subList(0, TRAINING_DATA_SIZE), null);
 
         return optimizeIntern(trainingSourceStore, targetStore);
     }
@@ -157,8 +156,7 @@ public class IterativeOptimizer extends AbstractPromptOptimizer {
     private String optimize(String prompt) {
         String request = template.replace(ORIGINAL_PROMPT_KEY, prompt);
 
-        String key = KeyGenerator.generateKey(request);
-        CacheKey cacheKey = new CacheKey(provider.modelName(), provider.seed(), CacheKey.Mode.CHAT, request, key);
+        CacheKey cacheKey = CacheKey.of(provider.modelName(), provider.seed(), CacheKey.Mode.CHAT, request);
         String response = cache.get(cacheKey, String.class);
         if (response == null) {
             logger.info("Optimizing ({}): {}", provider.modelName(), request);

@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.Classifier;
+import edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.KeyGenerator;
 
 import io.soabase.recordbuilder.core.RecordBuilder;
@@ -180,18 +181,19 @@ public record OptimizerConfiguration(
     /**
      * Creates a classifier instance based on this configuration.
      * Either a single classifier or a multi-stage classifier pipeline is created,
-     * depending on which configuration is set.
+     * depending on which configuration is set. The shared {@link ContextStore} is passed to all classifiers.
      *
+     * @param contextStore The shared context store for pipeline components
      * @return A classifier instance
      * @throws IllegalStateException If neither or both classifier configurations are set
      */
-    public Classifier createClassifier() {
+    public Classifier createClassifier(ContextStore contextStore) {
         if ((classifier == null) == (classifiers == null)) {
             throw new IllegalStateException("Either 'classifier' or 'classifiers' must be set, but not both.");
         }
 
         return classifier != null
-                ? Classifier.createClassifier(classifier)
-                : Classifier.createMultiStageClassifier(classifiers);
+                ? Classifier.createClassifier(classifier, contextStore)
+                : Classifier.createMultiStageClassifier(classifiers, contextStore);
     }
 }

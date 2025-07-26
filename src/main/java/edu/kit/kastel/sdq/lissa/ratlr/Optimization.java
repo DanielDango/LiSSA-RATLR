@@ -17,6 +17,7 @@ import edu.kit.kastel.sdq.lissa.ratlr.artifactprovider.ArtifactProvider;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheManager;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.Classifier;
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.OptimizerConfiguration;
+import edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore;
 import edu.kit.kastel.sdq.lissa.ratlr.elementstore.ElementStore;
 import edu.kit.kastel.sdq.lissa.ratlr.embeddingcreator.EmbeddingCreator;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
@@ -121,21 +122,26 @@ public class Optimization {
         configuration = new ObjectMapper().readValue(configFile.toFile(), OptimizerConfiguration.class);
         CacheManager.setCacheDir(configuration.cacheDir());
 
-        sourceArtifactProvider = ArtifactProvider.createArtifactProvider(configuration.sourceArtifactProvider());
-        targetArtifactProvider = ArtifactProvider.createArtifactProvider(configuration.targetArtifactProvider());
+        ContextStore contextStore = new ContextStore();
 
-        sourcePreprocessor = Preprocessor.createPreprocessor(configuration.sourcePreprocessor());
-        targetPreprocessor = Preprocessor.createPreprocessor(configuration.targetPreprocessor());
+        sourceArtifactProvider =
+                ArtifactProvider.createArtifactProvider(configuration.sourceArtifactProvider(), contextStore);
+        targetArtifactProvider =
+                ArtifactProvider.createArtifactProvider(configuration.targetArtifactProvider(), contextStore);
 
-        embeddingCreator = EmbeddingCreator.createEmbeddingCreator(configuration.embeddingCreator());
+        sourcePreprocessor = Preprocessor.createPreprocessor(configuration.sourcePreprocessor(), contextStore);
+        targetPreprocessor = Preprocessor.createPreprocessor(configuration.targetPreprocessor(), contextStore);
+
+        embeddingCreator = EmbeddingCreator.createEmbeddingCreator(configuration.embeddingCreator(), contextStore);
         sourceStore = new ElementStore(configuration.sourceStore(), false);
         targetStore = new ElementStore(configuration.targetStore(), true);
 
-        Classifier classifier = configuration.createClassifier();
-        ResultAggregator aggregator = ResultAggregator.createResultAggregator(configuration.resultAggregator());
+        Classifier classifier = configuration.createClassifier(contextStore);
+        ResultAggregator aggregator =
+                ResultAggregator.createResultAggregator(configuration.resultAggregator(), contextStore);
 
-        TraceLinkIdPostprocessor traceLinkIdPostProcessor =
-                TraceLinkIdPostprocessor.createTraceLinkIdPostprocessor(configuration.traceLinkIdPostprocessor());
+        TraceLinkIdPostprocessor traceLinkIdPostProcessor = TraceLinkIdPostprocessor.createTraceLinkIdPostprocessor(
+                configuration.traceLinkIdPostprocessor(), contextStore);
         Set<TraceLink> goldStandard = getTraceLinksFromGoldStandard(configuration.goldStandardConfiguration());
 
         promptOptimizer = AbstractPromptOptimizer.createOptimizer(
