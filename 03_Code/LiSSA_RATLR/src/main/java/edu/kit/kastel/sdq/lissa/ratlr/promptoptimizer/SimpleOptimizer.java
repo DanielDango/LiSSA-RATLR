@@ -8,7 +8,6 @@ import edu.kit.kastel.sdq.lissa.ratlr.classifier.ChatLanguageModelProvider;
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
 import edu.kit.kastel.sdq.lissa.ratlr.elementstore.ElementStore;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
-import edu.kit.kastel.sdq.lissa.ratlr.utils.KeyGenerator;
 
 import dev.langchain4j.model.chat.ChatModel;
 
@@ -83,14 +82,13 @@ public class SimpleOptimizer extends AbstractPromptOptimizer {
     public String optimize(ElementStore sourceStore, ElementStore targetStore) {
         Element source = sourceStore.getAllElements(true).getFirst().first();
         Element target = targetStore
-                .findSimilar(sourceStore.getAllElements(true).getFirst().second())
+                .findSimilar(sourceStore.getAllElements(true).getFirst())
                 .getFirst();
         String request = template.replace("{source_type}", source.getType())
                 .replace("{target_type}", target.getType())
                 .replace(ORIGINAL_PROMPT_KEY, optimizationPrompt);
 
-        String key = KeyGenerator.generateKey(request);
-        CacheKey cacheKey = new CacheKey(provider.modelName(), provider.seed(), CacheKey.Mode.CHAT, request, key);
+        CacheKey cacheKey = CacheKey.of(provider.modelName(), provider.seed(), CacheKey.Mode.CHAT, request);
         String response = cache.get(cacheKey, String.class);
         if (response == null) {
             logger.info("Optimizing ({}): {}", provider.modelName(), request);
