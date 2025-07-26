@@ -4,6 +4,7 @@ package edu.kit.kastel.sdq.lissa.ratlr.postprocessor;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
 
 /**
@@ -22,6 +23,11 @@ import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
  * and source code files.
  */
 public class ReqCodePostprocessor extends TraceLinkIdPostprocessor {
+
+    public ReqCodePostprocessor(ContextStore contextStore) {
+        super(contextStore);
+    }
+
     /**
      * Transforms a set of requirement-to-code trace links by removing file extensions
      * from both source and target identifiers. The transformation is applied to each trace link

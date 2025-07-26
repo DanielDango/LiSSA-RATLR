@@ -3,6 +3,7 @@ package edu.kit.kastel.sdq.lissa.ratlr.embeddingcreator;
 
 import java.util.List;
 
+import edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 
 /**
@@ -21,6 +22,10 @@ import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
  * classification process.
  */
 public class MockEmbeddingCreator extends EmbeddingCreator {
+    public MockEmbeddingCreator(ContextStore contextStore) {
+        super(contextStore);
+    }
+
     /**
      * Calculates mock embeddings for a list of elements.
      * Each element is assigned a zero vector of length 1.

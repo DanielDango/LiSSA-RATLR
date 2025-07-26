@@ -3,6 +3,7 @@ package edu.kit.kastel.sdq.lissa.ratlr.classifier;
 
 import java.util.Optional;
 
+import edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 
 /**
@@ -13,9 +14,11 @@ public class MockClassifier extends Classifier {
     /**
      * Creates a new mock classifier instance.
      * The classifier uses a single thread for processing.
+     *
+     * @param contextStore The shared context store for pipeline components
      */
-    public MockClassifier() {
-        super(1);
+    public MockClassifier(ContextStore contextStore) {
+        super(1, contextStore);
     }
 
     /**
@@ -33,7 +36,7 @@ public class MockClassifier extends Classifier {
 
     @Override
     public Classifier copyOf() {
-        return new MockClassifier();
+        return new MockClassifier(contextStore);
     }
 
     @Override

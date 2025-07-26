@@ -94,11 +94,11 @@ class RedisCache implements Cache {
      */
     @Override
     public synchronized <T> T get(CacheKey key, Class<T> clazz) {
-        var jsonData = jedis == null ? null : jedis.hget(key.toRawKey(), "data");
+        var jsonData = jedis == null ? null : jedis.hget(key.toJsonKey(), "data");
         if (jsonData == null && localCache != null) {
             jsonData = localCache.get(key);
             if (jedis != null && jsonData != null) {
-                jedis.set(key.toRawKey(), jsonData);
+                jedis.hset(key.toJsonKey(), "data", jsonData);
             }
         }
 
@@ -142,9 +142,9 @@ class RedisCache implements Cache {
     @Override
     public synchronized void put(CacheKey key, String value) {
         if (jedis != null) {
-            String rawKey = key.toRawKey();
-            jedis.hset(rawKey, "data", value);
-            jedis.hset(rawKey, "timestamp", String.valueOf(Instant.now().getEpochSecond()));
+            String jsonKey = key.toJsonKey();
+            jedis.hset(jsonKey, "data", value);
+            jedis.hset(jsonKey, "timestamp", String.valueOf(Instant.now().getEpochSecond()));
         }
         if (localCache != null) {
             localCache.put(key, value);

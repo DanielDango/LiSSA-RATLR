@@ -7,6 +7,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import edu.kit.kastel.sdq.lissa.ratlr.classifier.Classifier;
+
 /**
  * Represents an element in the LiSSA framework, which is a granular unit of knowledge
  * that can be traced and compared. Elements form a hierarchical structure through
@@ -50,7 +52,10 @@ public final class Element extends Knowledge {
     @JsonProperty
     private final String parentId;
 
-    /** Flag indicating whether this element should be included in comparisons */
+    /**
+     *  Flag indicating whether this element should be included in comparisons.
+     *  {@link Classifier Classifiers} will only consider this element for candidate pairs for classification if this is true.
+     */
     @JsonProperty
     private final boolean compare;
 
