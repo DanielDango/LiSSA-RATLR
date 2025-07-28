@@ -159,7 +159,7 @@ public class IterativeOptimizer extends AbstractPromptOptimizer {
         CacheKey cacheKey = CacheKey.of(provider.modelName(), provider.seed(), CacheKey.Mode.CHAT, request);
         String response = cache.get(cacheKey, String.class);
         if (response == null) {
-            logger.info("Optimizing ({}): {}", provider.modelName(), request);
+            logger.info("Optimizing ({})", provider.modelName());
             response = llm.chat(request);
             cache.put(cacheKey, response);
         }
