@@ -130,6 +130,27 @@ public final class ModuleConfiguration {
     }
 
     /**
+     * Sets an argument from a string value.
+     * This method allows overwriting the value of an argument specified in the configuration.
+     *
+     * @param key The key of the argument to set
+     * @param value The value to set for the argument
+     * @throws IllegalStateException If the configuration has been finalized
+     * @throws IllegalArgumentException If the value conflicts with a previously retrieved value
+     */
+    public void argumentFromString(String key, String value) {
+        if (finalized) {
+            throw new IllegalStateException(ALREADY_FINALIZED_FOR_SERIALIZATION);
+        }
+        arguments.put(key, value);
+        String retrievedArgument = retrievedArguments.put(key, value);
+        if (retrievedArgument != null && !retrievedArgument.equals(value)) {
+            throw new IllegalArgumentException("Default argument for key " + key + " already set to "
+                    + retrievedArgument + " and cannot be changed to " + value);
+        }
+    }
+
+    /**
      * Retrieves an argument as an integer.
      *
      * @param key The key of the argument to retrieve
