@@ -192,6 +192,8 @@ public class Optimization {
         String result = promptOptimizer.optimize(sourceStore, targetStore);
         logger.info("Optimized Prompt: {}", result);
 
+        Statistics.generateOptimizationStatistics(configFile.toFile(), configuration, result);
+
         CacheManager.getDefaultInstance().flush();
 
         return result;

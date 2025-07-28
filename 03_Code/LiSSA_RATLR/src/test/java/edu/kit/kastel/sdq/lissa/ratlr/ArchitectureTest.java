@@ -3,6 +3,7 @@ package edu.kit.kastel.sdq.lissa.ratlr;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.*;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.Future;
@@ -15,7 +16,10 @@ import com.tngtech.archunit.junit.AnalyzeClasses;
 import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.lang.ArchRule;
 
+import edu.kit.kastel.sdq.lissa.cli.command.OptimizeCommand;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheKey;
+import edu.kit.kastel.sdq.lissa.ratlr.classifier.Classifier;
+import edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.AbstractPromptOptimizer;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.Environment;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.Futures;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.KeyGenerator;
@@ -101,6 +105,28 @@ class ArchitectureTest {
                             .equals(CacheKey.class.getName());
                 }
             });
+
+    /**
+     * Prompts for classifiers should only be modified by optimizers. Otherwise there will be inconsistencies with
+     * the configuration file.
+     */
+    @ArchTest
+    static final ArchRule classifierPromptsShouldOnlyBeModifiedByOptimizers = noClasses()
+            .that()
+            .areNotAssignableTo(AbstractPromptOptimizer.class)
+            .should()
+            .callMethod(Classifier.class, "setClassificationPrompt", String.class);
+
+    /**
+     * Only the {@link OptimizeCommand} should be allowed to overwrite the prompt used for evaluation to reflect the
+     * modified prompt into the configuration.
+     */
+    @ArchTest
+    static final ArchRule onlyOptimizationCommandShouldCallEvaluationWithPromptOverwrite = noClasses()
+            .that()
+            .areNotAssignableTo(OptimizeCommand.class)
+            .should()
+            .callConstructor(Evaluation.class, Path.class, String.class);
 
     /**
      * Futures should be opened with a logger.

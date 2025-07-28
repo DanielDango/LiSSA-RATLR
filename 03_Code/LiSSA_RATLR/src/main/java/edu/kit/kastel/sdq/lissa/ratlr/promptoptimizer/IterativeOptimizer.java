@@ -61,11 +61,11 @@ public class IterativeOptimizer extends AbstractPromptOptimizer {
      */
     private String optimizationPrompt;
 
-    private Classifier classifier;
-    private ResultAggregator aggregator;
-    private TraceLinkIdPostprocessor traceLinkIdPostProcessor;
+    private final Classifier classifier;
+    private final ResultAggregator aggregator;
+    private final TraceLinkIdPostprocessor traceLinkIdPostProcessor;
     private final Set<TraceLink> validTraceLinks;
-    private ClassificationMetricsCalculator cmc;
+    private final ClassificationMetricsCalculator cmc;
     /**
      * Creates a new iterative optimizer with the specified configuration.
      *

@@ -48,9 +48,10 @@ public class OptimizeCommand implements Runnable {
 
         for (Path optimizationConfig : configsToOptimize) {
             logger.info("Invoking the optimization pipeline with '{}'", optimizationConfig);
+            String optimizedPrompt = "";
             try {
                 var optimization = new Optimization(optimizationConfig);
-                optimization.run();
+                optimizedPrompt = optimization.run();
             } catch (Exception e) {
                 logger.warn("Exception details", e);
                 logger.warn(
@@ -59,7 +60,7 @@ public class OptimizeCommand implements Runnable {
             for (Path evaluationConfig : configsToEvaluate) {
                 logger.info("Invoking the evaluation pipeline with '{}'", evaluationConfig);
                 try {
-                    var evaluation = new Evaluation(evaluationConfig);
+                    var evaluation = new Evaluation(evaluationConfig, optimizedPrompt);
                     evaluation.run();
                 } catch (Exception e) {
                     logger.warn(
