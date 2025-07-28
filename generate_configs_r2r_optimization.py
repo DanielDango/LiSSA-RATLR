@@ -104,8 +104,8 @@ ollama_args = ["\"model\": \"<<CLASSIFIER_MODEL>>\"".replace("<<CLASSIFIER_MODEL
 for dataset, postprocessor, retrieval_count in zip(datasets, postprocessors, retrieval_counts):
     for classifier_mode in optimizer_modes:
         for gpt_model, gpt_arg in zip(gpt_models, gpt_args):
-            for prompt in prompts:
-                with open(f"{CONFIG_DIR}/{gpt_model}/{dataset}/{dataset}_{classifier_mode}_gpt_{gpt_model}.json", "w+") as f:
+            for prompt, i in zip(prompts, range(len(prompts))):
+                with open(f"{CONFIG_DIR}/{gpt_model}/{dataset}/{dataset}_{classifier_mode}_gpt_{gpt_model}_{i}.json", "w+") as f:
                     f.write(TEMPLATE.replace("<<DATASET>>", dataset)
                             .replace(OPTIMIZER_MODE_PLACEHOLDER, classifier_mode + "_openai")
                             .replace("<<ARGS>>", gpt_arg)
@@ -115,8 +115,8 @@ for dataset, postprocessor, retrieval_count in zip(datasets, postprocessors, ret
 
         for ollama_model, ollama_arg in zip(ollama_models, ollama_args):
             model = ollama_model.replace(":", "_")
-            for prompt in prompts:
-                with open(f"{CONFIG_DIR}/{model}/{dataset}/{dataset}_{classifier_mode}_ollama_{model}.json", "w+") as f:
+            for prompt, i in zip(prompts, range(len(prompts))):
+                with open(f"{CONFIG_DIR}/{model}/{dataset}/{dataset}_{classifier_mode}_ollama_{model}_{i}.json", "w+") as f:
                     f.write(TEMPLATE.replace("<<DATASET>>", dataset)
                             .replace(OPTIMIZER_MODE_PLACEHOLDER, classifier_mode + "_ollama")
                             .replace("<<ARGS>>", ollama_arg)
