@@ -60,28 +60,32 @@ public class EvaluateCommand implements Runnable {
 
     private static void addSpecifiedConfigPaths(List<Path> configsToEvaluate, Path[] configs) {
         for (Path configPath : configs) {
-            if (Files.notExists(configPath)) {
-                logger.warn("Specified config path '{}' does not exist", configPath);
-                continue;
-            }
+            addSpecifiedConfigPaths(configsToEvaluate, configPath);
+        }
+    }
 
-            if (!Files.isDirectory(configPath)) {
-                configsToEvaluate.add(configPath);
-                continue;
-            }
+    private static void addSpecifiedConfigPaths(List<Path> configsToEvaluate, Path configPath) {
+        if (Files.notExists(configPath)) {
+            logger.warn("Specified config path '{}' does not exist", configPath);
+            return;
+        }
 
-            try (DirectoryStream<Path> configDir = Files.newDirectoryStream(configPath)) {
-                for (Path configDirEntry : configDir) {
-                    if (!Files.isDirectory(configDirEntry)) {
-                        configsToEvaluate.add(configDirEntry);
-                    }
+        if (!Files.isDirectory(configPath)) {
+            configsToEvaluate.add(configPath);
+            return;
+        }
+
+        try (DirectoryStream<Path> configDir = Files.newDirectoryStream(configPath)) {
+            for (Path configDirEntry : configDir) {
+                if (!Files.isDirectory(configDirEntry)) {
+                    configsToEvaluate.add(configDirEntry);
+                } else {
+                    addSpecifiedConfigPaths(configsToEvaluate, configDirEntry);
                 }
-            } catch (IOException e) {
-                logger.warn(
-                        "Skipping specified config path '{}' due to causing an exception: {}",
-                        configPath,
-                        e.getMessage());
             }
+        } catch (IOException e) {
+            logger.warn(
+                    "Skipping specified config path '{}' due to causing an exception: {}", configPath, e.getMessage());
         }
     }
 

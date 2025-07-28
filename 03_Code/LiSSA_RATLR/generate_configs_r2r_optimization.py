@@ -1,3 +1,4 @@
+import json
 import os
 
 CONFIG_DIR = "./configs/optimization"
@@ -51,16 +52,15 @@ TEMPLATE = """
     }
   },
   "prompt_optimizer": {
-    "name" : \"""" + OPTIMIZER_MODE_PLACEHOLDER + """,
+    "name" : \"""" + OPTIMIZER_MODE_PLACEHOLDER + """\",
     "args" : {
-      "prompt": \"""" + PROMPT_PLACEHOLDER + """,
+      "prompt": """ + PROMPT_PLACEHOLDER + """,
       <<ARGS>>
     }
   },
   "classifier" : {
-    "name" : "simple_openai",
+    "name" : "mock",
     "args" : {
-      "model": "gpt-4o-mini-2024-07-18"
     }
   },
   "result_aggregator" : {
@@ -83,6 +83,7 @@ optimizer_modes = ["simple", "iterative"]
 gpt_models = ["gpt-4o-mini-2024-07-18", "gpt-4o-2024-08-06"]
 gpt_models = ["gpt-4o-mini-2024-07-18"]
 ollama_models = ["llama3.1:8b-instruct-fp16", "codellama:13b"]
+ollama_models = []
 prompts = ["Question: Here are two parts of software development artifacts.\n\n            {source_type}: '''{source_content}'''\n\n            {target_type}: '''{target_content}'''\n            Are they related?\n\n            Answer with 'yes' or 'no'.",
            "Below are two artifacts from the same software system. Is there a traceability link between (1) and (2)? Give your reasoning and then answer with 'yes' or 'no' enclosed in <trace> </trace>.\n (1) {source_type}: '''{source_content}''' \n (2) {target_type}: '''{target_content}''' ",
            "Below are two artifacts from the same software system. Is there a conceivable traceability link between (1) and (2)? Give your reasoning and then answer with 'yes' or 'no' enclosed in <trace> </trace>.\n (1) {source_type}: '''{source_content}''' \n (2) {target_type}: '''{target_content}''' ",
@@ -108,7 +109,7 @@ for dataset, postprocessor, retrieval_count in zip(datasets, postprocessors, ret
                     f.write(TEMPLATE.replace("<<DATASET>>", dataset)
                             .replace(OPTIMIZER_MODE_PLACEHOLDER, classifier_mode + "_openai")
                             .replace("<<ARGS>>", gpt_arg)
-                            .replace(PROMPT_PLACEHOLDER, prompt)
+                            .replace(PROMPT_PLACEHOLDER, json.dumps(prompt))
                             .replace("<<POSTPROCESSOR>>", postprocessor)
                             .replace("<<RETRIEVAL_COUNT>>", retrieval_count))
 
@@ -119,6 +120,6 @@ for dataset, postprocessor, retrieval_count in zip(datasets, postprocessors, ret
                     f.write(TEMPLATE.replace("<<DATASET>>", dataset)
                             .replace(OPTIMIZER_MODE_PLACEHOLDER, classifier_mode + "_ollama")
                             .replace("<<ARGS>>", ollama_arg)
-                            .replace(PROMPT_PLACEHOLDER, prompt)
+                            .replace(PROMPT_PLACEHOLDER, json.dumps(prompt))
                             .replace("<<POSTPROCESSOR>>", postprocessor)
                             .replace("<<RETRIEVAL_COUNT>>", retrieval_count))
