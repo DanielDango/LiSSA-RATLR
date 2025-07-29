@@ -12,6 +12,12 @@
 \RequirePackage{mfirstuc}
 \RequirePackage{etoolbox}
 \RequirePackage{comment}
+\RequirePackage{multirow}
+\RequirePackage{makecell}
+\RequirePackage{pdflscape}%%% You need to import/define all below.
+\RequirePackage[theorems, skins, breakable, listings]{tcolorbox}
+\RequirePackage{kit_colors} %% You can also use other colors .. or the KIT colors
+\RequirePackage{footnote}
 
 \newcommand{\citewithauthor}[1]{\citeauthor{#1}~\cite{#1}\xspace}
 \newcommand{\directQuote}[3][]{\guillemotleft#2\guillemotright~\cite[#1]{#3}\xspace}
@@ -51,3 +57,30 @@
 \newcommand{\ProTeGi}[0]{\ac{ProTeGi}\xspace}
 \newcommand{\IR}[0]{\ac{IR}\xspace}
 
+%% Prompt Box
+\newcounter{prompt}
+\newtcbtheorem[use counter=prompt]{prompt}{Prompt}{%
+	attach title to upper,%
+	after title={\ },%
+	colback=white,%
+	colframe=kit-blue100,%
+	fonttitle={\bfseries\color{black}},%
+	if odd page={
+			sharp corners=west,%
+			rightrule=3mm,%
+		}{
+			sharp corners=east,%
+			leftrule=3mm,%
+		},%
+	%sharp corners=east,%
+	%leftrule=3mm,%
+	subtitle style={%
+			boxrule=0.4pt,%
+			colback=kit-blue70,%
+			fonttitle={\bfseries\color{white}}%
+		}%
+}{prompt}
+\newcommand{\promptautorefname}{Prompt}
+\def\promptautorefname{Prompt}%
+\BeforeBeginEnvironment{prompt}{\savenotes}
+\AfterEndEnvironment{prompt}{\spewnotes}

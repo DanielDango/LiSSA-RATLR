@@ -18,8 +18,50 @@
 %% -------------------
 \dots
 
-\section{First Section}
+\section{Naive Prompt Optimization with GPT-4o}
 \label{sec:Evaluation:FirstSection}
+
+\begin{prompt}{KISS Original}{yes_no}\\
+    Question: Here are two parts of software development artifacts.\\
+    \{source\_type\}: \textquotesingle{}\textquotesingle{}\textquotesingle{}\{source\_content\}\textquotesingle{}\textquotesingle{}\textquotesingle{}\\
+    \{target\_type\}: \textquotesingle{}\textquotesingle{}\textquotesingle{}\{target\_content\}\textquotesingle{}\textquotesingle{}\textquotesingle{}\\
+    Are they related?\\
+    Answer with \textquotesingle{}yes\textquotesingle{} or \textquotesingle{}no\textquotesingle{}.
+\end{prompt}
+
+\begin{prompt}{KISS Single Optimization Step}{yes_no_simple}\\
+    Question: Below are two components from software development artifacts that need to be analyzed for traceability.\\
+
+            Source Requirement \{source\_type\}: '''\{source\_content\}'''
+
+            Target Requirement \{target\_type\}: '''\{target\_content\}'''
+            
+            Based on the content and context, determine if there is a traceability link between them.
+
+            Answer with 'yes' or 'no'.
+    
+\end{prompt}
+
+\begin{prompt}{KISS Single Iterative Dumb Optimization}{yes_no_iterative}\\
+    Question: You are given two components from software development artifacts that need to be analyzed for traceability link recovery in the domain of requirement to requirement.\\
+    
+    \{source\_type\}: '''\{source\_content\}'''
+
+    \{target\_type\}: '''\{target\_content\}'''
+
+    Carefully analyze both components to determine if a traceability link exists between them. Focus on identifying shared terminology, dependencies, logical connections, and alignment of objectives and constraints. Look for direct references, similar phrasing, or common goals that might indicate a connection. Evaluate the consistency of requirements, the presence of complementary or supplementary information, and any historical or contextual relationships that could suggest a link. Consider the intent and purpose behind each requirement to ensure a thorough analysis. Pay special attention to any implicit connections that may not be immediately obvious but are crucial for understanding the relationship. Use a systematic approach to ensure no potential link is overlooked. Prioritize clarity and precision in your analysis to enhance the accuracy of your classification.
+
+    Answer with 'yes' or 'no'.
+    
+\end{prompt}
+
+\begin{landscape}
+\include{tables/naive_prompt_optimization}
+
+
+\end{landscape}
+
+
 
 \dots
 
