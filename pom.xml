@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.fuchss</groupId>
     <artifactId>maven-parent</artifactId>
-    <version>0.21.21</version>
+    <version>0.22.1</version>
   </parent>
 
   <groupId>edu.kit.kastel.sdq.lissa</groupId>
@@ -23,7 +23,7 @@
       <dependency>
         <groupId>dev.langchain4j</groupId>
         <artifactId>langchain4j-bom</artifactId>
-        <version>1.0.0</version>
+        <version>1.2.0</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -74,7 +74,7 @@
     <dependency>
       <groupId>info.picocli</groupId>
       <artifactId>picocli</artifactId>
-      <version>4.7.6</version>
+      <version>4.7.7</version>
     </dependency>
     <dependency>
       <groupId>io.github.ardoco</groupId>
@@ -100,12 +100,12 @@
     <dependency>
       <groupId>io.github.cdimascio</groupId>
       <artifactId>dotenv-java</artifactId>
-      <version>3.0.0</version>
+      <version>3.2.0</version>
     </dependency>
     <dependency>
       <groupId>io.soabase.record-builder</groupId>
       <artifactId>record-builder-processor</artifactId>
-      <version>42</version>
+      <version>47</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -231,12 +231,12 @@
             <path>
               <groupId>info.picocli</groupId>
               <artifactId>picocli-codegen</artifactId>
-              <version>4.7.6</version>
+              <version>4.7.7</version>
             </path>
             <path>
               <groupId>io.soabase.record-builder</groupId>
               <artifactId>record-builder-processor</artifactId>
-              <version>41</version>
+              <version>47</version>
             </path>
           </annotationProcessorPaths>
           <compilerArgs>
