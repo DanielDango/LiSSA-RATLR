@@ -36,7 +36,7 @@ public class IterativeOptimizer extends AbstractPromptOptimizer {
     /**
      * The default maximum number of iterations/requests for the optimization process.
      */
-    private static final int MAXIMUM_ITERATIONS = 10;
+    private static final int MAXIMUM_ITERATIONS = 5;
 
     private static final String MAXIMUM_ITERATIONS_KEY = "maximum_iterations";
 
@@ -44,7 +44,7 @@ public class IterativeOptimizer extends AbstractPromptOptimizer {
      * The default size of the training data used for optimization.
      * This is the number of elements in the source store.
      */
-    private static final int TRAINING_DATA_SIZE = 5;
+    private static final int TRAINING_DATA_SIZE = 3;
 
     /**
      * The cache used to store and retrieve prompt optimization LLM requests.
