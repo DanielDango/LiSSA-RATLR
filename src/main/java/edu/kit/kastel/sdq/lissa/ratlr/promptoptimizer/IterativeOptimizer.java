@@ -28,20 +28,27 @@ import dev.langchain4j.model.chat.ChatModel;
 
 public class IterativeOptimizer extends AbstractPromptOptimizer {
 
+    /**
+     * The default threshold for the F1 score to determine when to stop the optimization process early.
+     */
     protected static final double THRESHOLD_F1_SCORE = 1.0;
 
     /**
-     * The maximum number of iterations/requests for the optimization process.
+     * The default maximum number of iterations/requests for the optimization process.
      */
     private static final int MAXIMUM_ITERATIONS = 10;
 
     private static final String MAXIMUM_ITERATIONS_KEY = "maximum_iterations";
+
     /**
-     * The size of the training data used for optimization.
-     * This is the number of training examples provided to the language model.
+     * The default size of the training data used for optimization.
+     * This is the number of elements in the source store.
      */
     private static final int TRAINING_DATA_SIZE = 5;
 
+    /**
+     * The cache used to store and retrieve prompt optimization LLM requests.
+     */
     protected final Cache cache;
 
     /**
@@ -65,6 +72,10 @@ public class IterativeOptimizer extends AbstractPromptOptimizer {
      */
     protected String optimizationPrompt;
 
+    /**
+     * The maximum number of iterations for the optimization process.
+     * This limits how many times the prompt can be modified and retried.
+     */
     protected final int maximumIterations;
 
     private final Classifier classifier;
@@ -76,6 +87,10 @@ public class IterativeOptimizer extends AbstractPromptOptimizer {
      * Creates a new iterative optimizer with the specified configuration.
      *
      * @param configuration The module configuration containing optimizer settings
+     * @param goldStandard The set of trace links that represent the gold standard for evaluation
+     * @param aggregator The result aggregator to collect and process classification results
+     * @param traceLinkIdPostProcessor The postprocessor for trace link IDs
+     * @param classifier The classifier used for classification tasks
      */
     public IterativeOptimizer(
             ModuleConfiguration configuration,
@@ -143,6 +158,14 @@ public class IterativeOptimizer extends AbstractPromptOptimizer {
         return optimizeIntern(trainingSourceStore, trainingTargetStore);
     }
 
+    /**
+     * Optimizes the prompt by iteratively sending requests to the language model.
+     * The optimization continues until the F1 score reaches a threshold or the maximum number of iterations is reached.
+     *
+     * @param sourceStore The store containing source elements
+     * @param targetStore The store containing target elements
+     * @return The optimized prompt after the iterative process
+     */
     protected String optimizeIntern(ElementStore sourceStore, ElementStore targetStore) {
         double[] f1Scores = new double[maximumIterations];
         int i = 0;
@@ -150,7 +173,7 @@ public class IterativeOptimizer extends AbstractPromptOptimizer {
         String modifiedPrompt = optimizationPrompt;
         do {
             logger.debug("Iteration {}: RequestPrompt = {}", i, modifiedPrompt);
-            f1Score = scorePrompt(sourceStore, targetStore, modifiedPrompt);
+            f1Score = evaluateF1(sourceStore, targetStore, modifiedPrompt);
             logger.info("Iteration {}: F1-Score = {}", i, f1Score);
             f1Scores[i] = f1Score;
             String request = template.replace(ORIGINAL_PROMPT_KEY, optimizationPrompt);
@@ -182,20 +205,36 @@ public class IterativeOptimizer extends AbstractPromptOptimizer {
         return response;
     }
 
-    protected double scorePrompt(ElementStore trainingStore, ElementStore targetStore, String prompt) {
+    /**
+     * Evaluates the F1 score of the prompt by classifying trace links between the source and target stores using the
+     * provided prompt.
+     * @param sourceStore The store containing source elements
+     * @param targetStore   The store containing target elements
+     * @param prompt        The prompt to use for classification
+     * @return The F1 score of the classification results
+     */
+    protected double evaluateF1(ElementStore sourceStore, ElementStore targetStore, String prompt) {
 
-        Set<TraceLink> traceLinks = evaluateTraceLinks(trainingStore, targetStore, prompt);
-        Set<TraceLink> possibleTraceLinks = getFindableTraceLinks(trainingStore, targetStore);
+        Set<TraceLink> traceLinks = evaluateTraceLinks(sourceStore, targetStore, prompt);
+        Set<TraceLink> possibleTraceLinks = getFindableTraceLinks(sourceStore, targetStore);
         var classification = cmc.calculateMetrics(traceLinks, possibleTraceLinks, null);
         return classification.getF1();
     }
 
-    protected Set<TraceLink> evaluateTraceLinks(ElementStore trainingStore, ElementStore targetStore, String prompt) {
+    /**
+     * Evaluates trace links between the source and target stores using the provided prompt.
+     * The results are aggregated and post-processed.
+     * @param sourceStore   The store containing source elements
+     * @param targetStore   The store containing target elements
+     * @param prompt        The prompt to use for classification
+     * @return A set of trace links that were classified based on the prompt
+     */
+    protected Set<TraceLink> evaluateTraceLinks(ElementStore sourceStore, ElementStore targetStore, String prompt) {
         classifier.setClassificationPrompt(prompt);
-        List<ClassificationResult> results = classifier.classify(trainingStore, targetStore);
+        List<ClassificationResult> results = classifier.classify(sourceStore, targetStore);
 
         Set<TraceLink> traceLinks =
-                aggregator.aggregate(trainingStore.getAllElements(), targetStore.getAllElements(), results);
+                aggregator.aggregate(sourceStore.getAllElements(), targetStore.getAllElements(), results);
         return traceLinkIdPostProcessor.postprocess(traceLinks);
     }
 

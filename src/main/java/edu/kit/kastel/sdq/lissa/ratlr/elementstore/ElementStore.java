@@ -50,6 +50,12 @@ public class ElementStore {
      */
     private final List<Pair<Element, float[]>> elementsWithEmbedding;
 
+    /**
+     * Retrieves the retrieval strategy used for finding similar elements.
+     * This is only applicable in target store mode (similarityRetriever = true).
+     *
+     * @return The retrieval strategy, or null if this is a source store
+     */
     public RetrievalStrategy getRetrievalStrategy() {
         return retrievalStrategy;
     }
@@ -231,6 +237,14 @@ public class ElementStore {
         return elements;
     }
 
+    /**
+     * Sanitizes the identifier by removing the last part after a dot.
+     * This is used to ensure consistent identifiers in the element store with identifiers in gold standards.
+     * TODO: Discuss with advisor
+     *
+     * @param identifier The identifier to sanitize
+     * @return The sanitized identifier
+     */
     private String sanitizeIdentifier(String identifier) {
         return identifier.contains(".") ? identifier.substring(0, identifier.lastIndexOf(".")) : identifier;
     }

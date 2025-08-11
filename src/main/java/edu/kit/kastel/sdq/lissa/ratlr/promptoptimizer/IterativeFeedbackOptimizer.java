@@ -49,10 +49,15 @@ public class IterativeFeedbackOptimizer extends IterativeOptimizer {
             {target_type}: '''{target_content}'''
             Classification result: {classification}
             """;
+    /**
+     * The default number of feedback examples to include in the prompt.
+     * This value determines how many misclassified trace links will be shown in the feedback prompt.
+     */
+    private static final int FEEDBACK_SIZE = 5;
+
+    private static final String FEEDBACK_SIZE_KEY = "feedback_size";
 
     private final String feedbackPrompt;
-    private static final int FEEDBACK_SIZE = 5;
-    private static final String FEEDBACK_SIZE_KEY = "feedback_size";
     private final int feedbackSize;
     /**
      * Creates a new instance of the iterative feedback optimizer.
@@ -91,7 +96,7 @@ public class IterativeFeedbackOptimizer extends IterativeOptimizer {
         do {
             logger.debug("Iteration {}: RequestPrompt = {}", i, modifiedPrompt);
             traceLinks = super.evaluateTraceLinks(sourceStore, targetStore, modifiedPrompt);
-            f1Score = super.scorePrompt(sourceStore, targetStore, modifiedPrompt);
+            f1Score = super.evaluateF1(sourceStore, targetStore, modifiedPrompt);
             logger.info("Iteration {}: F1-Score = {}", i, f1Score);
             f1Scores[i] = f1Score;
             String request = template.replace(ORIGINAL_PROMPT_KEY, optimizationPrompt);
@@ -104,6 +109,16 @@ public class IterativeFeedbackOptimizer extends IterativeOptimizer {
         return optimizationPrompt;
     }
 
+    /**
+     * Fills the feedback prompt with examples of misclassified trace links using the FEEDBACK_EXAMPLE_BLOCK template.
+     *
+     * @param foundTraceLinks the trace links found by the classifier for the current prompt
+     * @param validTraceLinks the trace links that are considered valid according to the gold standard reduced to the
+     *                        training set
+     * @param sourceStore     the store containing source elements
+     * @param targetStore     the store containing target elements
+     * @return a formatted feedback prompt containing examples of misclassified trace links
+     */
     private String generateFeedbackPrompt(
             Set<TraceLink> foundTraceLinks,
             Set<TraceLink> validTraceLinks,

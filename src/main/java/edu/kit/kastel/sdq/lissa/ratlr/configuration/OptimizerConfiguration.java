@@ -22,6 +22,20 @@ import io.soabase.recordbuilder.core.RecordBuilder;
  * This record contains all necessary configurations for artifact providers,
  * preprocessors, embedding creators, stores, classifiers, and postprocessors.
  * It supports both single-classifier and multi-stage classifier configurations.
+ * @param cacheDir Directory for caching intermediate results
+ * @param goldStandardConfiguration Configuration for gold standard evaluation
+ * @param sourceArtifactProvider Configuration for the source artifact provider
+ * @param targetArtifactProvider Configuration for the target artifact provider
+ * @param sourcePreprocessor Configuration for the source artifact preprocessor
+ * @param targetPreprocessor Configuration for the target artifact preprocessor
+ * @param embeddingCreator Configuration for the embedding creator
+ * @param sourceStore Configuration for the source element store
+ * @param targetStore Configuration for the target element store
+ * @param promptOptimizer Configuration for the prompt optimizer
+ * @param classifier Configuration for a single classifier (either this or classifiers must be set)
+ * @param classifiers Configuration for a multi-stage classifier pipeline (either this or classifier must be set)
+ * @param resultAggregator Configuration for the result aggregator
+ * @param traceLinkIdPostprocessor Configuration for the trace link ID postprocessor
  */
 @RecordBuilder()
 public record OptimizerConfiguration(
