@@ -72,7 +72,6 @@ retrieval_counts = [str(x) for x in [4, 4, 4, 4, 4, 4]]
 
 classifier_modes = ["simple"]
 gpt_models = ["gpt-4o-mini-2024-07-18", "gpt-4o-2024-08-06"]
-gpt_models = ["gpt-4o-mini-2024-07-18"]
 ollama_models = ["llama3.1:8b-instruct-fp16", "codellama:13b"]
 
 # Generate

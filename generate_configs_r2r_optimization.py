@@ -76,19 +76,14 @@ TEMPLATE = """
 
 # Configurations
 datasets = ["GANNT", "ModisDataset", "CCHIT", "WARC", "dronology", "CM1-NASA"]
+datasets = ["WARC"]
 postprocessors = ["req2req", "identity", "identity", "req2req", "identity", "identity"]
 retrieval_counts = [str(x) for x in [4, 4, 4, 4, 4, 4]]
 
-optimizer_modes = ["simple", "iterative"]
+optimizer_modes = ["simple", "iterative", "feedback"]
 gpt_models = ["gpt-4o-mini-2024-07-18", "gpt-4o-2024-08-06"]
-gpt_models = ["gpt-4o-mini-2024-07-18"]
 ollama_models = ["llama3.1:8b-instruct-fp16", "codellama:13b"]
-ollama_models = []
-prompts = ["Question: Here are two parts of software development artifacts.\n\n            {source_type}: '''{source_content}'''\n\n            {target_type}: '''{target_content}'''\n            Are they related?\n\n            Answer with 'yes' or 'no'.",
-           "Below are two artifacts from the same software system. Is there a traceability link between (1) and (2)? Give your reasoning and then answer with 'yes' or 'no' enclosed in <trace> </trace>.\n (1) {source_type}: '''{source_content}''' \n (2) {target_type}: '''{target_content}''' ",
-           "Below are two artifacts from the same software system. Is there a conceivable traceability link between (1) and (2)? Give your reasoning and then answer with 'yes' or 'no' enclosed in <trace> </trace>.\n (1) {source_type}: '''{source_content}''' \n (2) {target_type}: '''{target_content}''' ",
-           "Below are two artifacts from the same software system.\n Is there a traceability link between (1) and (2)? Give your reasoning and then answer with 'yes' or 'no' enclosed in <trace> </trace>. Only answer yes if you are absolutely certain.\n (1) {source_type}: '''{source_content}''' \n (2) {target_type}: '''{target_content}''' "]
-
+prompts = ["Question: Here are two parts of software development artifacts.\n\n            {source_type}: '''{source_content}'''\n\n            {target_type}: '''{target_content}'''\n            Are they related?\n\n            Answer with 'yes' or 'no'."]
 # Generate
 if not os.path.exists(CONFIG_DIR):
     os.makedirs(CONFIG_DIR)
