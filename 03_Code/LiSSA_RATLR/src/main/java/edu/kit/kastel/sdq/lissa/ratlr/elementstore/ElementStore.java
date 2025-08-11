@@ -50,6 +50,10 @@ public class ElementStore {
      */
     private final List<Pair<Element, float[]>> elementsWithEmbedding;
 
+    public RetrievalStrategy getRetrievalStrategy() {
+        return retrievalStrategy;
+    }
+
     /**
      * Strategy to find similar elements.
      * {@code null} indicates source store mode (no similarity search).
@@ -126,7 +130,7 @@ public class ElementStore {
             var embedding = embeddings.get(i);
             var pair = new Pair<>(element, embedding);
             elementsWithEmbedding.add(pair);
-            idToElementWithEmbedding.put(element.getIdentifier(), pair);
+            idToElementWithEmbedding.put(sanitizeIdentifier(element.getIdentifier()), pair);
         }
     }
 
@@ -166,7 +170,7 @@ public class ElementStore {
      * @return A pair containing the element and its embedding, or null if not found
      */
     public Pair<Element, float[]> getById(String id) {
-        var element = idToElementWithEmbedding.get(id);
+        var element = idToElementWithEmbedding.get(sanitizeIdentifier(id));
         if (element == null) {
             return null;
         }
@@ -225,5 +229,9 @@ public class ElementStore {
             }
         }
         return elements;
+    }
+
+    private String sanitizeIdentifier(String identifier) {
+        return identifier.contains(".") ? identifier.substring(0, identifier.lastIndexOf(".")) : identifier;
     }
 }

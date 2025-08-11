@@ -49,6 +49,9 @@ public abstract class AbstractPromptOptimizer {
             case "simple" -> new SimpleOptimizer(configuration);
             case "iterative" ->
                 new IterativeOptimizer(configuration, goldStandard, aggregator, traceLinkIdPostProcessor, classifier);
+            case "feedback" ->
+                new IterativeFeedbackOptimizer(
+                        configuration, goldStandard, aggregator, traceLinkIdPostProcessor, classifier);
             default -> throw new IllegalStateException("Unexpected value: " + configuration.name());
         };
     }

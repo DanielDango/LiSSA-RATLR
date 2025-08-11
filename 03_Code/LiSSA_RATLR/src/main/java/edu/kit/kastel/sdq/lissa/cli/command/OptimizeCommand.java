@@ -46,6 +46,19 @@ public class OptimizeCommand implements Runnable {
                 configsToOptimize.size(),
                 configsToEvaluate.size());
 
+        for (Path evaluationConfig : configsToEvaluate) {
+            logger.info("Invoking the baseline evaluation pipeline with '{}'", evaluationConfig);
+            try {
+                var evaluation = new Evaluation(evaluationConfig);
+                evaluation.run();
+            } catch (Exception e) {
+                logger.warn(
+                        "Baseline evaluation configuration '{}' threw an exception: {}",
+                        evaluationConfig,
+                        e.getMessage());
+            }
+        }
+
         for (Path optimizationConfig : configsToOptimize) {
             logger.info("Invoking the optimization pipeline with '{}'", optimizationConfig);
             String optimizedPrompt = "";
