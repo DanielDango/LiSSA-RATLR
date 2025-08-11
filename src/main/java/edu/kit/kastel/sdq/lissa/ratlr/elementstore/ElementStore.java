@@ -245,7 +245,7 @@ public class ElementStore {
      * @param identifier The identifier to sanitize
      * @return The sanitized identifier
      */
-    private String sanitizeIdentifier(String identifier) {
+    public static String sanitizeIdentifier(String identifier) {
         return identifier.contains(".") ? identifier.substring(0, identifier.lastIndexOf(".")) : identifier;
     }
 }
