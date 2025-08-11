@@ -84,3 +84,15 @@
 \def\promptautorefname{Prompt}%
 \BeforeBeginEnvironment{prompt}{\savenotes}
 \AfterEndEnvironment{prompt}{\spewnotes}
+
+% *** ALIGNMENT PACKAGES ***
+%
+\RequirePackage{array}
+\RequirePackage{tabularx}
+\newcolumntype{Y}{>{\raggedleft\arraybackslash}X}
+\newcolumntype{Z}{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}X}
+\RequirePackage{booktabs}
+\RequirePackage{multirow}
+\RequirePackage{colortbl}
+\newsavebox\CBox
+\def\textBF#1{\sbox\CBox{#1}\resizebox{\wd\CBox}{\ht\CBox}{\textbf{#1}}}
