@@ -249,11 +249,9 @@ public class IterativeOptimizer extends AbstractPromptOptimizer {
     protected Set<TraceLink> getFindableTraceLinks(ElementStore sourceStore, ElementStore targetStore) {
         List<String> sourceTraceLinkIds = sourceStore.getAllElements().stream()
                 .map(Element::getIdentifier)
-                .map(ElementStore::sanitizeIdentifier)
                 .toList();
         List<String> targetTraceLinkIds = targetStore.getAllElements().stream()
                 .map(Element::getIdentifier)
-                .map(ElementStore::sanitizeIdentifier)
                 .toList();
         return validTraceLinks.stream()
                 .filter(tl -> sourceTraceLinkIds.contains(tl.sourceId()))

@@ -136,7 +136,7 @@ public class ElementStore {
             var embedding = embeddings.get(i);
             var pair = new Pair<>(element, embedding);
             elementsWithEmbedding.add(pair);
-            idToElementWithEmbedding.put(sanitizeIdentifier(element.getIdentifier()), pair);
+            idToElementWithEmbedding.put(element.getIdentifier(), pair);
         }
     }
 
@@ -176,7 +176,7 @@ public class ElementStore {
      * @return A pair containing the element and its embedding, or null if not found
      */
     public Pair<Element, float[]> getById(String id) {
-        var element = idToElementWithEmbedding.get(sanitizeIdentifier(id));
+        var element = idToElementWithEmbedding.get(id);
         if (element == null) {
             return null;
         }
@@ -235,17 +235,5 @@ public class ElementStore {
             }
         }
         return elements;
-    }
-
-    /**
-     * Sanitizes the identifier by removing the last part after a dot.
-     * This is used to ensure consistent identifiers in the element store with identifiers in gold standards.
-     * TODO: Discuss with advisor
-     *
-     * @param identifier The identifier to sanitize
-     * @return The sanitized identifier
-     */
-    public static String sanitizeIdentifier(String identifier) {
-        return identifier.contains(".") ? identifier.substring(0, identifier.lastIndexOf(".")) : identifier;
     }
 }

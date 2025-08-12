@@ -109,13 +109,17 @@ public class TransitiveTraceCommand implements Runnable {
         if (goldStandardConfiguration != null) {
             int sourceArtifacts = evaluations.getFirst().getSourceArtifactCount();
             int targetArtifacts = evaluations.getLast().getTargetArtifactCount();
-            Statistics.generateStatistics(
-                    "transitive-trace-links_" + key,
-                    joinConfigs(evaluations, goldStandardConfiguration),
-                    transitiveTraceLinks,
-                    goldStandardConfiguration,
-                    sourceArtifacts,
-                    targetArtifacts);
+            throw new UnsupportedOperationException(
+                    "Transitive trace link evaluation is no longer supported as the gold standard trace links will need to be postprocessed.");
+            /**
+             * Statistics.generateStatistics(
+             * "transitive-trace-links_" + key,
+             * joinConfigs(evaluations, goldStandardConfiguration),
+             * transitiveTraceLinks,
+             * goldStandardConfiguration,
+             * sourceArtifacts,
+             * targetArtifacts);
+             */
         }
     }
 

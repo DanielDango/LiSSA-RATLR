@@ -27,9 +27,7 @@ import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
  */
 enum IdProcessor {
     /** Processes requirement-to-code trace links by removing file extensions from both identifiers */
-    REQ2CODE(
-            sourceId -> sourceId.substring(0, sourceId.indexOf(".")),
-            targetId -> targetId.substring(0, targetId.indexOf("."))),
+    REQ2CODE(sourceId -> sourceId, targetId -> targetId),
     /** Processes Software Architecture Documentation to code trace links */
     SAD2CODE(IdProcessor::processSAD, targetId -> targetId),
     /** Processes Software Architecture Model to Software Architecture Documentation trace links */
