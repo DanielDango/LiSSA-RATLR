@@ -1,32 +1,32 @@
-\begin{tabular}{llccc}
+\begin{tabular}{llcccc}
 \toprule
- & Prompt Group & \multicolumn{3}{c}{Original} \\
- & Classifier Model & \makecell{GPT-4o \\ mini} & \makecell{Code- \\ llama} & \makecell{Llama \\ 3.1} \\
-Dataset & Metric &  &  &  \\
+ & Prompt Group & \multicolumn{3}{c}{Original} & Feedback \\
+ & Classifier Model & \makecell{GPT-4o \\ mini} & \makecell{Code- \\ llama} & \makecell{Llama \\ 3.1} & \makecell{GPT-4o \\ mini} \\
+Dataset & Metric &  &  &  &  \\
 \midrule
-\multirow[t]{3}{*}{\rotatebox{90}{CCHIT}} & F1 & 0.178 & 0.180 & 0.178 \\
- & Precision & 0.209 & 0.218 & 0.206 \\
- & Recall & 0.155 & 0.153 & 0.157 \\
-\cline{1-5}
-\multirow[t]{3}{*}{\rotatebox{90}{CM1-NASA}} & F1 & 0.443 & 0.446 & - \\
- & Precision & 0.337 & 0.341 & - \\
- & Recall & 0.644 & 0.644 & - \\
-\cline{1-5}
-\multirow[t]{3}{*}{\rotatebox{90}{GANNT}} & F1 & 0.544 & 0.526 & - \\
- & Precision & 0.544 & 0.538 & - \\
- & Recall & 0.544 & 0.515 & - \\
-\cline{1-5}
-\multirow[t]{3}{*}{\rotatebox{90}{ModisDataset}} & F1 & 0.237 & 0.161 & - \\
- & Precision & 0.212 & 0.238 & - \\
- & Recall & 0.268 & 0.122 & - \\
-\cline{1-5}
-\multirow[t]{3}{*}{\rotatebox{90}{WARC}} & F1 & 0.491 & 0.491 & - \\
- & Precision & 0.378 & 0.429 & - \\
- & Recall & 0.699 & 0.574 & - \\
-\cline{1-5}
-\multirow[t]{3}{*}{\rotatebox{90}{dronology}} & F1 & 0.498 & 0.495 & - \\
- & Precision & 0.387 & 0.413 & - \\
- & Recall & 0.695 & 0.618 & - \\
-\cline{1-5}
+\multirow[t]{3}{*}{\rotatebox{90}{CCHIT}} & F1 & 0.178 & 0.180 & 0.178 & 0.175 \\
+ & Precision & 0.209 & 0.218 & 0.206 & 0.199 \\
+ & Recall & 0.155 & 0.153 & 0.157 & 0.157 \\
+\cline{1-6}
+\multirow[t]{3}{*}{\rotatebox{90}{CM1-NASA}} & F1 & 0.443 & 0.446 & - & 0.436 \\
+ & Precision & 0.337 & 0.341 & - & 0.330 \\
+ & Recall & 0.644 & 0.644 & - & 0.644 \\
+\cline{1-6}
+\multirow[t]{3}{*}{\rotatebox{90}{GANNT}} & F1 & 0.544 & 0.526 & - & 0.163 \\
+ & Precision & 0.544 & 0.538 & - & 0.389 \\
+ & Recall & 0.544 & 0.515 & - & 0.103 \\
+\cline{1-6}
+\multirow[t]{3}{*}{\rotatebox{90}{ModisDataset}} & F1 & 0.237 & 0.161 & - & 0.237 \\
+ & Precision & 0.212 & 0.238 & - & 0.257 \\
+ & Recall & 0.268 & 0.122 & - & 0.220 \\
+\cline{1-6}
+\multirow[t]{3}{*}{\rotatebox{90}{WARC}} & F1 & 0.491 & 0.491 & - & 0.490 \\
+ & Precision & 0.378 & 0.429 & - & 0.377 \\
+ & Recall & 0.699 & 0.574 & - & 0.699 \\
+\cline{1-6}
+\multirow[t]{3}{*}{\rotatebox{90}{dronology}} & F1 & 0.498 & 0.495 & - & 0.498 \\
+ & Precision & 0.387 & 0.413 & - & 0.390 \\
+ & Recall & 0.695 & 0.618 & - & 0.691 \\
+\cline{1-6}
 \bottomrule
 \end{tabular}
