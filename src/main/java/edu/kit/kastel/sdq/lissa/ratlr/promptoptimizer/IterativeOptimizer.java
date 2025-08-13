@@ -174,7 +174,7 @@ public class IterativeOptimizer extends AbstractPromptOptimizer {
         do {
             logger.debug("Iteration {}: RequestPrompt = {}", i, modifiedPrompt);
             f1Score = evaluateF1(sourceStore, targetStore, modifiedPrompt);
-            logger.info("Iteration {}: F1-Score = {}", i, f1Score);
+            logger.debug("Iteration {}: F1-Score = {}", i, f1Score);
             f1Scores[i] = f1Score;
             String request = template.replace(ORIGINAL_PROMPT_KEY, optimizationPrompt);
             modifiedPrompt = cachedRequest(request);

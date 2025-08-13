@@ -105,7 +105,7 @@ public abstract class Classifier {
             });
         }
 
-        logger.info("Waiting for classification to finish. Tasks in queue: {}", taskQueue.size());
+        logger.debug("Waiting for classification to finish. Tasks in queue: {}", taskQueue.size());
 
         for (Thread worker : workers) {
             try {
@@ -117,7 +117,7 @@ public abstract class Classifier {
         }
 
         List<ClassificationResult> resultList = new ArrayList<>(results);
-        logger.info("Finished parallel classification with {} results.", resultList.size());
+        logger.debug("Finished parallel classification with {} results.", resultList.size());
         return resultList;
     }
 
@@ -139,7 +139,7 @@ public abstract class Classifier {
                     result);
             result.ifPresent(results::add);
         }
-        logger.info("Finished sequential classification with {} results.", results.size());
+        logger.debug("Finished sequential classification with {} results.", results.size());
         return results;
     }
 

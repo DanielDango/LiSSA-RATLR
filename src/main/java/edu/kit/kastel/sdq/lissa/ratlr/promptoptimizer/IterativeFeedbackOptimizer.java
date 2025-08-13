@@ -97,7 +97,7 @@ public class IterativeFeedbackOptimizer extends IterativeOptimizer {
             logger.debug("Iteration {}: RequestPrompt = {}", i, modifiedPrompt);
             traceLinks = super.evaluateTraceLinks(sourceStore, targetStore, modifiedPrompt);
             f1Score = super.evaluateF1(sourceStore, targetStore, modifiedPrompt);
-            logger.info("Iteration {}: F1-Score = {}", i, f1Score);
+            logger.debug("Iteration {}: F1-Score = {}", i, f1Score);
             f1Scores[i] = f1Score;
             String request = template.replace(ORIGINAL_PROMPT_KEY, optimizationPrompt);
             request = generateFeedbackPrompt(traceLinks, possibleTraceLinks, sourceStore, targetStore) + request;
@@ -139,7 +139,7 @@ public class IterativeFeedbackOptimizer extends IterativeOptimizer {
             if (count > feedbackSize) {
                 break;
             }
-            logger.info("Example {}: TraceLink {} was misclassified", count, traceLink);
+            logger.debug("Example {}: TraceLink {} was misclassified", count, traceLink);
             Element source = sourceStore.getById(traceLink.sourceId()).first();
             Element target = targetStore.getById(traceLink.targetId()).first();
             feedback.append(FEEDBACK_EXAMPLE_BLOCK
