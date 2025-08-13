@@ -135,7 +135,7 @@ public class IterativeFeedbackOptimizer extends IterativeOptimizer {
         misclassifiedTraceLinks.addAll(foundTraceLinks);
         misclassifiedTraceLinks.removeAll(correctlyClassifiedTraceLinks);
 
-        for (TraceLink traceLink : misclassifiedTraceLinks) {
+        for (TraceLink traceLink : misclassifiedTraceLinks.stream().sorted().toList()) {
             if (count > feedbackSize) {
                 break;
             }
