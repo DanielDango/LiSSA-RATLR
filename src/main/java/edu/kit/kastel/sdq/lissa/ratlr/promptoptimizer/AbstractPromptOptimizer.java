@@ -1,9 +1,6 @@
 /* Licensed under MIT 2025. */
 package edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer;
 
-import static edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.SimpleOptimizer.PROMPT_END;
-import static edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.SimpleOptimizer.PROMPT_START;
-
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -28,6 +25,14 @@ public abstract class AbstractPromptOptimizer {
      * Separator used in configuration names.
      */
     public static final String CONFIG_NAME_SEPARATOR = "_";
+    /**
+     * Start marker for the prompt in the optimization template.
+     */
+    public static final String PROMPT_START = "<prompt>";
+    /**
+     * End marker for the prompt in the optimization template.
+     */
+    public static final String PROMPT_END = "</prompt>";
 
     /**
      * Key for the prompt optimization template in the configuration.
@@ -69,7 +74,7 @@ public abstract class AbstractPromptOptimizer {
      * @param configuration The configuration for the optimizer
      * @param goldStandard The gold standard trace links for evaluation
      * @param aggregator The result aggregator for collecting optimization results
-     * @param traceLinkIdPostProcessor Postprocessor for trace link IDs TODO: Take into consideration for id sanitization
+     * @param traceLinkIdPostProcessor Postprocessor for trace link IDs
      * @param classifier The classifier used in the optimization process
      * @return An instance of AbstractPromptOptimizer based on the configuration
      */
@@ -114,21 +119,22 @@ public abstract class AbstractPromptOptimizer {
     protected abstract AbstractPromptOptimizer copyOf(AbstractPromptOptimizer original);
 
     /**
-     * Extracts the prompt from the response string.
+     * Extracts the prompt from the response string and removes any surrounding quotes.
      * The prompt is expected to be enclosed between PROMPT_START and PROMPT_END markers.
      *
      * @param response The response string containing the prompt
      * @return The extracted prompt, or an empty string if no prompt is found
      */
     protected static String extractPromptFromResponse(String response) {
+        String prompt = response;
         Pattern pattern = Pattern.compile(
                 (PROMPT_START + "((?s).*?)" + PROMPT_END).replace("/", "\\/"), Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(response);
         if (matcher.find()) {
-            response = matcher.group(1).strip();
+            prompt = matcher.group(1).strip().replaceAll("((^[\"']+)|([\"']+$))", "");
         } else {
             staticLogger.warn("No prompt found in response: {}", response);
         }
-        return response;
+        return prompt;
     }
 }

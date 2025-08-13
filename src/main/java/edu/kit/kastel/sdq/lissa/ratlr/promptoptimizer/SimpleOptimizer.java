@@ -22,13 +22,15 @@ public class SimpleOptimizer extends AbstractPromptOptimizer {
                     Optimize the following prompt to achieve better classification results for traceability link recovery.
                     Traceability links are to be found in the domain of {source_type} to {target_type}.
                     Do not modify the input and output formats specified by the original prompt.
-                    Enclose your optimized prompt with <prompt> </prompt> brackets.
+                    Enclose your optimized prompt with"""
+                    + PROMPT_START
+                    + PROMPT_END
+                    + """
+                    brackets.
                     The original prompt is provided below:
                     '''{original_prompt}'''
                     """;
 
-    public static final String PROMPT_START = "<prompt>";
-    public static final String PROMPT_END = "</prompt>";
     public static final String ORIGINAL_PROMPT_KEY = "{original_prompt}";
 
     private final Cache cache;
