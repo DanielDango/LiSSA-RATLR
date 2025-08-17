@@ -1,49 +1,47 @@
 %! Author = ???
-%! Date = 2025-08-13
+%! Date = 2025-08-17
 
-\begin{tabularx}{\textwidth}{p{1.3em}l Z  Z  Z  Z  Z  Z  Z  Z  Z  Z  Z  Z  Z  Z  Z }
+\begin{tabularx}{\textwidth}{p{1.3em}l Z  Z  Z  Z  Z  Z  Z  Z  Z }
     \toprule
-    \multirow{2}{1em}[-0.45em]{\rotatebox{90}{Dataset}} & \multirow{2}{*}[-0.9em]{\rotatebox{90}{Metric}}  & \multicolumn{ 3 }{c}{KISS-Original}  & \multicolumn{ 3 }{c}{feedback (mi=1, n=0)}  & \multicolumn{ 3 }{c}{feedback (mi=10, n=5)}  & \multicolumn{ 3 }{c}{feedback (mi=5, n=3)}  & \multicolumn{ 3 }{c}{unknown}                                                                                          \\
+    \multirow{2}{1em}[-0.45em]{\rotatebox{90}{Dataset}} & \multirow{2}{*}[-0.9em]{\rotatebox{90}{Metric}}  & \multicolumn{ 3 }{c}{KISS-Original}  & \multicolumn{ 3 }{c}{feedback (mi=10, n=5)}  & \multicolumn{ 3 }{c}{feedback (mi=5, n=3)}                                                                                          \\
         \cmidrule(lr){ 3-5 }
         \cmidrule(lr){ 6-8 }
         \cmidrule(lr){ 9-11 }
-        \cmidrule(lr){ 12-14 }
-        \cmidrule(lr){ 15-17 }
-    &                            & Codellama        & GPT-4o-mini        & Llama 3.1        & Codellama        & GPT-4o-mini        & Llama 3.1        & Codellama        & GPT-4o-mini        & Llama 3.1        & Codellama        & GPT-4o-mini        & Llama 3.1        & Codellama        & GPT-4o-mini        & Llama 3.1           \\
+    &                            & GPT-4o        & GPT-4o-mini        & Llama 3.1        & GPT-4o        & GPT-4o-mini        & Llama 3.1        & GPT-4o        & GPT-4o-mini        & Llama 3.1           \\
     \midrule
         \multirow{3}{*}{\rotatebox{90}{CCHIT}}
-                & P.                     & 0.242  & 0.0  & 0.206  & -  & 0.0  & -  & -  & 0.0  & -  & -  & 0.0  & -  & -  & 0.267  & -  \\
-                & R.                     & 0.153     & 0.0     & 0.157     & -     & 0.0     & -     & -     & 0.0     & -     & -     & 0.0     & -     & -     & 0.155     & -     \\
-                & F\textsubscript{1}     & 0.188         & 0.0         & 0.178         & -         & 0.0         & -         & -         & 0.0         & -         & -         & 0.0         & -         & -         & 0.196         & -         \\
+                & P.                     & 0.23  & 0.209  & 0.206  & 0.512  & 0.235  & 0.321  & 0.385  & 0.244  & 0.198  \\
+                & R.                     & 0.155     & 0.155     & 0.157     & 0.037     & 0.14     & 0.101     & 0.089     & 0.111     & 0.157     \\
+                & F\textsubscript{1}     & 0.185         & 0.178         & 0.178         & 0.07         & 0.175         & 0.153         & 0.144         & 0.152         & 0.175         \\
                 \arrayrulecolor{kit-gray30}     \midrule     \arrayrulecolor{black}
         \multirow{3}{*}{\rotatebox{90}{CM1-NASA}}
-                & P.                     & 0.333  & 0.0  & -  & -  & 0.0  & -  & -  & 0.0  & -  & -  & 0.0  & -  & -  & 0.575  & -  \\
-                & R.                     & 0.644     & 0.0     & -     & -     & 0.0     & -     & -     & 0.0     & -     & -     & 0.0     & -     & -     & 0.511     & -     \\
-                & F\textsubscript{1}     & 0.439         & 0.0         & -         & -         & 0.0         & -         & -         & 0.0         & -         & -         & 0.0         & -         & -         & 0.541         & -         \\
+                & P.                     & 0.349  & 0.337  & 0.33  & 0.333  & 0.367  & 0.364  & 0.345  & 0.372  & 0.33  \\
+                & R.                     & 0.644     & 0.644     & 0.644     & 0.644     & 0.644     & 0.444     & 0.644     & 0.644     & 0.644     \\
+                & F\textsubscript{1}     & 0.453         & 0.443         & 0.436         & 0.439         & 0.468         & 0.4         & 0.45         & 0.472         & 0.436         \\
                 \arrayrulecolor{kit-gray30}     \midrule     \arrayrulecolor{black}
         \multirow{3}{*}{\rotatebox{90}{GANNT}}
-                & P.                     & 0.544  & 0.544  & -  & -  & 0.544  & -  & -  & 0.389  & -  & -  & 0.561  & -  & -  & 0.544  & -  \\
-                & R.                     & 0.544     & 0.544     & -     & -     & 0.544     & -     & -     & 0.103     & -     & -     & 0.544     & -     & -     & 0.544     & -     \\
-                & F\textsubscript{1}     & 0.544         & 0.544         & -         & -         & 0.544         & -         & -         & 0.163         & -         & -         & 0.552         & -         & -         & 0.544         & -         \\
+                & P.                     & 0.552  & 0.544  & 0.561  & 0.561  & 0.544  & 0.558  & 0.552  & 0.561  & 0.562  \\
+                & R.                     & 0.544     & 0.544     & 0.544     & 0.544     & 0.544     & 0.426     & 0.544     & 0.544     & 0.529     \\
+                & F\textsubscript{1}     & 0.548         & 0.544         & 0.552         & 0.552         & 0.544         & 0.483         & 0.548         & 0.552         & 0.545         \\
                 \arrayrulecolor{kit-gray30}     \midrule     \arrayrulecolor{black}
         \multirow{3}{*}{\rotatebox{90}{ModisDataset}}
-                & P.                     & 0.275  & 0.0  & -  & -  & 0.0  & -  & -  & 0.0  & -  & -  & 0.0  & -  & -  & 0.444  & -  \\
-                & R.                     & 0.268     & 0.0     & -     & -     & 0.0     & -     & -     & 0.0     & -     & -     & 0.0     & -     & -     & 0.098     & -     \\
-                & F\textsubscript{1}     & 0.272         & 0.0         & -         & -         & 0.0         & -         & -         & 0.0         & -         & -         & 0.0         & -         & -         & 0.16         & -         \\
+                & P.                     & 0.0  & 0.0  & 0.0  & 0.0  & 0.0  & 0.0  & 0.0  & 0.0  & 0.0  \\
+                & R.                     & 0.0     & 0.0     & 0.0     & 0.0     & 0.0     & 0.0     & 0.0     & 0.0     & 0.0     \\
+                & F\textsubscript{1}     & 0.0         & 0.0         & 0.0         & 0.0         & 0.0         & 0.0         & 0.0         & 0.0         & 0.0         \\
                 \arrayrulecolor{kit-gray30}     \midrule     \arrayrulecolor{black}
         \multirow{3}{*}{\rotatebox{90}{WARC}}
-                & P.                     & 0.442  & 0.38  & -  & -  & 0.377  & -  & -  & 0.377  & -  & -  & 0.382  & -  & -  & 0.0  & -  \\
-                & R.                     & 0.309     & 0.699     & -     & -     & 0.699     & -     & -     & 0.699     & -     & -     & 0.691     & -     & -     & 0.0     & -     \\
-                & F\textsubscript{1}     & 0.364         & 0.492         & -         & -         & 0.49         & -         & -         & 0.49         & -         & -         & 0.492         & -         & -         & 0.0         & -         \\
+                & P.                     & 0.394  & 0.38  & 0.377  & 0.403  & 0.381  & 0.38  & 0.394  & 0.412  & 0.376  \\
+                & R.                     & 0.699     & 0.699     & 0.684     & 0.699     & 0.684     & 0.676     & 0.699     & 0.691     & 0.691     \\
+                & F\textsubscript{1}     & 0.504         & 0.492         & 0.486         & 0.511         & 0.489         & 0.487         & 0.504         & 0.516         & 0.487         \\
                 \arrayrulecolor{kit-gray30}     \midrule     \arrayrulecolor{black}
         \multirow{3}{*}{\rotatebox{90}{dronology}}
-                & P.                     & 0.379  & 0.387  & -  & -  & 0.386  & -  & -  & 0.39  & -  & -  & 0.388  & -  & -  & 0.387  & -  \\
-                & R.                     & 0.591     & 0.695     & -     & -     & 0.695     & -     & -     & 0.691     & -     & -     & 0.691     & -     & -     & 0.695     & -     \\
-                & F\textsubscript{1}     & 0.462         & 0.498         & -         & -         & 0.497         & -         & -         & 0.498         & -         & -         & 0.497         & -         & -         & 0.498         & -         \\
+                & P.                     & 0.395  & 0.387  & 0.382  & 0.41  & 0.384  & 1.0  & 0.406  & 0.396  & 0.333  \\
+                & R.                     & 0.695     & 0.695     & 0.682     & 0.691     & 0.645     & 0.0     & 0.691     & 0.691     & 0.245     \\
+                & F\textsubscript{1}     & 0.504         & 0.498         & 0.489         & 0.514         & 0.481         & 0.0         & 0.512         & 0.503         & 0.283         \\
                 \arrayrulecolor{kit-gray30}     \midrule     \arrayrulecolor{black}
         \multirow{3}{*}{\rotatebox{90}{Avg.}}
-                & P.                     & 0.369  & 0.218  & 0.206  & -  & 0.218  & -  & -  & 0.193  & -  & -  & 0.222  & -  & -  & 0.369  & -  \\
-                & R.                     & 0.418     & 0.323     & 0.157     & -     & 0.323     & -     & -     & 0.249     & -     & -     & 0.321     & -     & -     & 0.334     & -     \\
-                & F\textsubscript{1}     & 0.378         & 0.256         & 0.178         & -         & 0.255         & -         & -         & 0.192         & -         & -         & 0.257         & -         & -         & 0.323         & -         \\
+                & P.                     & 0.32  & 0.31  & 0.309  & 0.37  & 0.319  & 0.437  & 0.347  & 0.331  & 0.3  \\
+                & R.                     & 0.456     & 0.456     & 0.452     & 0.436     & 0.443     & 0.275     & 0.444     & 0.447     & 0.378     \\
+                & F\textsubscript{1}     & 0.366         & 0.359         & 0.357         & 0.348         & 0.359         & 0.254         & 0.36         & 0.366         & 0.321         \\
                 \arrayrulecolor{kit-gray30}     \midrule     \arrayrulecolor{black}
 \end{tabularx}
