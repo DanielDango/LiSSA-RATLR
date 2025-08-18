@@ -91,12 +91,93 @@ The performance of this prompt, as seen in \autoref{tab:naive_optimization}, see
 
 \newpage
 \section{Simple Feedback Optimization}
+
+The following parameters will be used to describe prompts for this section. They can be used as configuration parameters for the feedback optimization process.
+
+\begin{align*}
+    mi:=  & \text{maximum iterations}\\
+          & \text{the prompt will be optimized $mi$ times} \\
+    n  := & \text{feedback sample size}\\  
+          & \text{$n$ examples of misclassified \TLs will be provided}
+\end{align*}
+
+\begin{prompt}{Feedback Prompt}{feedback_initial}\\
+    The current prompt is not performing well in classifying the following trace links. To help you improve the prompt, I will provide examples of misclassified trace links. Please analyze these examples and adjust the prompt accordingly. The examples are as follows: \\
+    \{identifier\}\\
+    \{source\_type\}: \tripplequote\{source\_content\}\tripplequote\\
+    \{target\_type\}: \tripplequote\{target\_content\}\tripplequote\\
+    Classification result: \{classification\}
+\end{prompt}
+
 \subsection{Optimized Prompt Analysis}
+
+\begin{prompt}{Optimized Prompt n = 3, mi = 1}\\
+Question: Here are two parts of software development artifacts.
+
+\{source\_type\}: \tripplequote\{source\_content\}\tripplequote
+
+\{target\_type\}: \tripplequote\{target\_content\}\tripplequote
+
+Consider the following when determining if they are related:\\
+1. Look for shared terminology or concepts, such as specific functions, interfaces, or standards mentioned in both requirements.\\
+2. Assess whether one requirement describes a feature or functionality that directly supports or complements the other.\\
+3. Determine if there is a dependency or a logical connection between the two requirements, such as one requirement ensuring compatibility or compliance that the other relies on.
+
+Are they related?
+
+Answer with \textquotesingle{}yes\textquotesingle{} or \textquotesingle{}no\textquotesingle{}.
+\end{prompt}
+
+\begin{prompt}{Optimized Prompt n = 5, mi = 10}\\
+Question: Here are two parts of software development artifacts.
+
+\{source\_type\}: \tripplequote\{source\_content\}\tripplequote
+
+\{target\_type\}: \tripplequote\{target\_content\}\tripplequote
+
+Consider the following when determining if they are related:
+
+1. Identify shared terminology or concepts, such as specific functions, interfaces, standards, or types of records mentioned in both requirements. Pay attention to synonyms or closely related terms that may indicate a connection.
+
+2. Evaluate whether one requirement describes a functionality or feature that directly supports, complements, or is necessary for the implementation of the other. Consider if one requirement provides a foundation or prerequisite for the other.
+
+3. Determine if there is a dependency, logical connection, or encapsulation relationship between the two requirements, such as one requirement ensuring compatibility, compliance, or abstraction that the other relies on. Consider if changes in one requirement would impact the other.
+
+\[\dots\]
+
+11. Look for explicit mentions of memory management, remote management, or other specific functionalities that might indicate a relationship, even if not directly related to WARC records.
+
+12. Consider the broader context of the requirements, such as the overall architecture or design principles they support, to identify indirect relationships.
+
+13. Pay attention to the specific phrasing and structure of the requirements, as similar language or structure can indicate a relationship.
+
+14. Consider the intent and purpose behind each requirement, as aligning intents can suggest a relationship even if the specifics differ.
+
+15. Evaluate if the requirements mention or imply the need for compatibility or interoperability, as this can indicate a relationship.
+
+16. Consider if the requirements address scalability, performance, or optimization aspects that might be interrelated.
+
+17. Look for any implicit or explicit dependencies that might not be immediately obvious but are crucial for the system's functionality.
+
+18. Pay attention to the specific types of WARC records mentioned and whether they are addressed in both requirements, as this can indicate a direct relationship.
+
+19. Consider if the requirements mention or imply the need for a single header file or universal interface, as this is a critical aspect in this domain.
+
+20. Reflect on whether the requirements address encapsulation or abstraction, as these are key concepts that often indicate a relationship.
+
+Are they related?
+
+Answer with \textquotesingle{}yes\textquotesingle{} or \textquotesingle{}no\textquotesingle{}.
+\end{prompt}
 \subsection{Systematic Evaluation Results}
 
+\begin{landscape}
 \begin{table}
     \centering
+    \renewcommand{\arraystretch}{1}
     \input{tables/FeedbackOptimizer}
+    \renewcommand{\arraystretch}{1}
     \caption{Naive prompt optimization approach considering previous misclassified \TLs}
     \label{tab:placeholder}
 \end{table}
+\end{landscape}
