@@ -1,0 +1,51 @@
+\ProvidesPackage{acronyms}
+
+\RequirePackage{acro}
+\RequirePackage{xspace}
+
+\acsetup{
+    single = true,
+    barriers / use = true,
+    barriers / reset = true,
+    barriers / single = true
+}
+
+\preto\chapter\acbarrier
+\preto\section\acbarrier
+
+\DeclareAcronym{ToT}{short=ToT, long=tree-of-thought}
+\DeclareAcronym{CoT}{short=CoT, long=chain-of-thought}
+\DeclareAcronym{APO}{short=APO, long=automatic prompt optimization}
+\DeclareAcronym{APE}{short=APE, long=automatic prompt engineering}
+\DeclareAcronym{LLM}{short=LLM, long=large language model}
+\DeclareAcronym{TLR}{short=TLR, long = traceability link recovery}
+\DeclareAcronym{TL}{short=TL, long = traceability link}
+\DeclareAcronym{ProTeGi}{short=ProTeGi, long = Prompt Optimization with Textual Gradients}
+\DeclareAcronym{IR}{short=IR, long = information retrieval}
+\DeclareAcronym{KISS}{short=KISS, long = keep it short and simple}
+\DeclareAcronym{LiSSA}{short=LiSSA, long = Linking Software System Artifacts, cite=fuchss2025LiSSAGeneric}
+\DeclareAcronym{LiSSAf}{short=LiSSA-framework, long = Linking Software System Artifacts framework, cite=fuchss2025LiSSAGeneric}
+\DeclareAcronym{Req2Req}{short=Req2Req, long = requiremens-to-requirements}
+
+
+\newcommand{\ToT}[0]{\ac{ToT}\xspace}
+\newcommand{\CoT}[0]{\ac{CoT}\xspace}
+\newcommand{\APO}[0]{\ac{APO}\xspace}
+\newcommand{\APE}[0]{\ac{APE}\xspace}
+\newcommand{\LLM}[0]{\ac{LLM}\xspace}
+\newcommand{\LLMs}[0]{\acp{LLM}\xspace}
+\newcommand{\TLR}[0]{\ac{TLR}\xspace}
+\newcommand{\TLs}[0]{\acp{TL}\xspace}
+\newcommand{\ProTeGi}[0]{\ac{ProTeGi}\xspace}
+\newcommand{\IR}[0]{\ac{IR}\xspace}
+\newcommand{\KISS}[0]{\ac{KISS}\xspace}
+\newcommand{\LiSSA}[0]{\ac{LiSSA}\xspace}
+\newcommand{\LISSA}[0]{\LiSSA}
+\newcommand{\LiSSAf}[0]{\ac{LiSSAf}\xspace}
+\newcommand{\LISSAf}[0]{\LISSAf}
+\newcommand{\LiSSAF}[0]{\LISSAf}
+\newcommand{\LISSAF}[0]{\LISSAf}
+\newcommand{\RtR}[0]{\ac{Req2Req}\xspace}
+
+
+\newcommand{\tripplequote}[0]{\textquotesingle{}\textquotesingle{}\textquotesingle{}}

@@ -13,28 +13,43 @@
 \chapter{Evaluation}
 \label{ch:Evaluation}
 
-%% -------------------
-%% | Example content |
-%% -------------------
-\dots
+\Todo{Talk about evaluation in general}
 
-\section{Naive Prompt Optimization with GPT-4o}
+\section{Naive Prompt Optimization}
 \label{sec:Evaluation:FirstSection}
 
-\begin{prompt}{KISS Original}{yes_no}\\
+The initial thought people may have when thinking about prompt optimization is to ask the \LLM to optimize the prompt before usage. To utilize this very simple approach, just two prerequisites are required. Firstly, we need our prompt, which is to be optimized. \autoref{prompt:yes_no} was chosen here as the initial prompt. It is a \KISS binary classification prompt. As the \LiSSAf has already employed this prompt for their simple classifier, I decided to start the optimization process with this prompt as well. Secondly, an optimization prompt is needed. Herefore \autoref{prompt:initial_optimization} has been arbitrarily selected. Unlike \autoref{prompt:yes_no}, this prompt has not been used yet to my knowledge. %Was it written utilizing IntelliJ's ai assistant autocompletion? I believe so...
+
+\begin{prompt}{\KISS Original}{yes_no}\\
     Question: Here are two parts of software development artifacts.\\
-    \{source\_type\}: \textquotesingle{}\textquotesingle{}\textquotesingle{}\{source\_content\}\textquotesingle{}\textquotesingle{}\textquotesingle{}\\
-    \{target\_type\}: \textquotesingle{}\textquotesingle{}\textquotesingle{}\{target\_content\}\textquotesingle{}\textquotesingle{}\textquotesingle{}\\
+    \{source\_type\}: \tripplequote \{source\_content\}\tripplequote\\
+    \{target\_type\}: \tripplequote\{target\_content\}\tripplequote\\
     Are they related?\\
     Answer with \textquotesingle{}yes\textquotesingle{} or \textquotesingle{}no\textquotesingle{}.
 \end{prompt}
 
-\begin{prompt}{KISS Single Optimization Step}{yes_no_simple}\\
+\begin{prompt}{Simple Optimization Prompt}{initial_optimization}\\
+    Optimize the following prompt to achieve better classification results for traceability link recovery. \\
+    Traceability links are to be found in the domain of \{source\_type\} to \{target\_type\}. \\
+    Do not modify the input and output formats specified by the original prompt.\\
+    Enclose your optimized prompt with <prompt></prompt> brackets.\\
+    The original prompt is provided below:\\
+    \tripplequote\{original\_prompt\}\tripplequote
+\end{prompt}
+
+With these two prompts the naive prompt optimization can be evaluated. The results seemed to be quite consistent across different tested \LLMs. I will present the optimized prompts by OpenAI's GPT-4o model as an example of these.
+\Todo{Add other models' outputs to the appendix?}
+
+\subsection{Optimized Prompt Analysis}
+The first application of the optimization prompt usually yielded an inclusion of the source and target types into the text of the prompt. This was possible as a set of training data was also provided for later, more sophisticated prompt optimization approaches. Further, the very simple classification question "Are they related?" was also expanded to be more specific for the \TLR problem.  The result can be seen in \autoref{prompt:yes_no_simple}.
+The optimized prompt only depends on the input prompt and the domain of the source and target elements. This very prompt thus is used for all simple GPT-4o evaluations in \autoref{tab:naive_optimization} for the domain of \RtR. 
+
+\begin{prompt}{\KISS Single Optimization Step}{yes_no_simple}\\
     Question: Below are two components from software development artifacts that need to be analyzed for traceability.\\
 
-            Source Requirement \{source\_type\}: \textquotesingle{}\textquotesingle{}\textquotesingle{}\{source\_content\}\textquotesingle{}\textquotesingle{}\textquotesingle{}
+            Source Requirement \{source\_type\}: \tripplequote\{source\_content\}\tripplequote
 
-            Target Requirement \{target\_type\}: \textquotesingle{}\textquotesingle{}\textquotesingle{}\{target\_content\}\textquotesingle{}\textquotesingle{}\textquotesingle{}
+            Target Requirement \{target\_type\}: \tripplequote\{target\_content\}\tripplequote
             
             Based on the content and context, determine if there is a traceability link between them.
 
@@ -42,12 +57,20 @@
     
 \end{prompt}
 
-\begin{prompt}{KISS Single Iterative Dumb Optimization}{yes_no_iterative}\\
+As seen in \autoref{tab:naive_optimization}, application of the optimization prompt seems to generally improve the $f_1-score$. 
+By repeatedly applying the optimization prompt to the optimized prompt of the previous iteration, we can push this optimization further.
+This yields \autoref{prompt:yes_no_iterative}
+Once more, the behavior of different \LLMs is quite similar here.
+We can see that mostly longer and more detailed instructions are included on how to find \TLs. 
+However, unfortunately, this prompt does not necessarily perform better for our task. 
+The performance of this prompt, as seen in \autoref{tab:naive_optimization}, seems to be generally worse than just the singular optimization application.
+
+\begin{prompt}{\KISS Single Iterative Dumb Optimization}{yes_no_iterative}\\
     Question: You are given two components from software development artifacts that need to be analyzed for traceability link recovery in the domain of requirement to requirement.\\
     
-    \{source\_type\}: \textquotesingle{}\textquotesingle{}\textquotesingle{}\{source\_content\}\textquotesingle{}\textquotesingle{}\textquotesingle{}
+    \{source\_type\}: \tripplequote\{source\_content\}\tripplequote
 
-    \{target\_type\}: \textquotesingle{}\textquotesingle{}\textquotesingle{}\{target\_content\}\textquotesingle{}\textquotesingle{}\textquotesingle{}
+    \{target\_type\}: \tripplequote\{target\_content\}\tripplequote
 
     Carefully analyze both components to determine if a traceability link exists between them. Focus on identifying shared terminology, dependencies, logical connections, and alignment of objectives and constraints. Look for direct references, similar phrasing, or common goals that might indicate a connection. Evaluate the consistency of requirements, the presence of complementary or supplementary information, and any historical or contextual relationships that could suggest a link. Consider the intent and purpose behind each requirement to ensure a thorough analysis. Pay special attention to any implicit connections that may not be immediately obvious but are crucial for understanding the relationship. Use a systematic approach to ensure no potential link is overlooked. Prioritize clarity and precision in your analysis to enhance the accuracy of your classification.
 
@@ -55,28 +78,25 @@
     
 \end{prompt}
 
-\begin{landscape}
-\include{tables/SimpleAndRepeatedOptimization}
-\include{tables/FeedbackOptimizer}
-\end{landscape}
+\subsection{Systematic Evaluation Results}
 
-\include{tables/1}
-\include{tables/2}
+\begin{table}
+    \centering
+    \renewcommand{\arraystretch}{1.4}
+    \input{tables/SimpleAndRepeatedOptimization}
+    \renewcommand{\arraystretch}{1}
+    \caption{Naive prompt optimization approach prompting the model to optimize the classification prompt}
+    \label{tab:naive_optimization}
+\end{table}
 
+\newpage
+\section{Simple Feedback Optimization}
+\subsection{Optimized Prompt Analysis}
+\subsection{Systematic Evaluation Results}
 
-
-
-\dots
-
-\section{Second Section}
-\label{sec:Evaluation:SecondSection}
-
-\dots
-
-\section{Third Section}
-\label{sec:Evaluation:ThirdSection}
-
-\dots
-%% ---------------------
-%% | / Example content |
-%% ---------------------
+\begin{table}
+    \centering
+    \input{tables/FeedbackOptimizer}
+    \caption{Naive prompt optimization approach considering previous misclassified \TLs}
+    \label{tab:placeholder}
+\end{table}
