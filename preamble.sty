@@ -1,61 +1,33 @@
 
 \ProvidesPackage{preamble}
 
+\RequirePackage{acronyms}
+
 %custom commands
 \RequirePackage{pgfgantt}
 \RequirePackage{nameref}
 \RequirePackage{algorithm}
 \RequirePackage{algpseudocode}
 \RequirePackage{svg}
-\RequirePackage{acro}
 \RequirePackage{xspace}
 \RequirePackage{mfirstuc}
 \RequirePackage{etoolbox}
 \RequirePackage{comment}
 \RequirePackage{multirow}
 \RequirePackage{makecell}
-\RequirePackage{pdflscape}%%% You need to import/define all below.
+\RequirePackage{pdflscape}
+%%% You need to import/define all below.
 \RequirePackage[theorems, skins, breakable, listings]{tcolorbox}
-\RequirePackage{kit_colors} %% You can also use other colors .. or the KIT colors
+\RequirePackage{kit_colors}
+%% You can also use other colors .. or the KIT colors
 \RequirePackage{footnote}
+\RequirePackage{todo}
 
 \newcommand{\citewithauthor}[1]{\citeauthor{#1}~\cite{#1}\xspace}
 \newcommand{\directQuote}[3][]{\guillemotleft#2\guillemotright~\cite[#1]{#3}\xspace}
 \newcommand{\citeiterative}[0]{\cite{pryzant2023AutomaticPrompt, zadenoori2025AutomaticPrompt, zhou2023LargeLanguage, madaan2023SelfRefineIterative}\xspace}
 \newcommand{\eq}[0]{=}
 \newcommand{\algorithmautorefname}{Algorithm}
-
-\acsetup{
-    single = true,
-    barriers / use = true,
-    barriers / reset = true,
-    barriers / single = true
-}
-
-\preto\chapter\acbarrier
-\preto\section\acbarrier
-
-\DeclareAcronym{ToT}{short=ToT, long=tree-of-thought}
-\DeclareAcronym{CoT}{short=CoT, long=chain-of-thought}
-\DeclareAcronym{APO}{short=APO, long=automatic prompt optimization}
-\DeclareAcronym{APE}{short=APE, long=automatic prompt engineering}
-\DeclareAcronym{LLM}{short=LLM, long=large language model}
-\DeclareAcronym{TLR}{short=TLR, long = traceability link recovery}
-\DeclareAcronym{TL}{short=TL, long = traceability link}
-\DeclareAcronym{ProTeGi}{short=ProTeGi, long = Prompt Optimization with Textual Gradients}
-\DeclareAcronym{IR}{short=IR, long = information retrieval}
-
-
-\newcommand{\ToT}[0]{\ac{ToT}\xspace}
-\newcommand{\CoT}[0]{\ac{CoT}\xspace}
-\newcommand{\APO}[0]{\ac{APO}\xspace}
-\newcommand{\APE}[0]{\ac{APE}\xspace}
-\newcommand{\LLM}[0]{\ac{LLM}\xspace}
-\newcommand{\LLMs}[0]{\acp{LLM}\xspace}
-\newcommand{\TLR}[0]{\ac{TLR}\xspace}
-\newcommand{\TLs}[0]{\acp{TL}\xspace}
-\newcommand{\ProTeGi}[0]{\ac{ProTeGi}\xspace}
-\newcommand{\IR}[0]{\ac{IR}\xspace}
 
 %% Prompt Box
 \newcounter{prompt}
@@ -96,3 +68,5 @@
 \RequirePackage{colortbl}
 \newsavebox\CBox
 \def\textBF#1{\sbox\CBox{#1}\resizebox{\wd\CBox}{\ht\CBox}{\textbf{#1}}}
+
+\hyphenation{Code-llama}
