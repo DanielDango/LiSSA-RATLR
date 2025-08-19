@@ -186,6 +186,9 @@ Answer with \textquotesingle{}yes\textquotesingle{} or \textquotesingle{}no\text
 
 \section{Varying the Optimization Prompt}
 In a recent paper by \citewithauthor{zadenoori2025AutomaticPrompt} the authors \Todo{Text needs to be added}.
+Their prompt is designed to optimize classification prompts by enhancing the explanations of categories within the prompt.
+As it also utilizes feedback from misclassified \TLs, it can be used as an alternative optimization prompt for the naive feedback optimization approach.
+
 They used the following optimization prompt:
 \begin{prompt}{Zadenoori Optimization Prompt}{zadenoori_optimization}\\
      You are required to enhance and clarify the explanations of the categories in the prompt by integrating illustrative examples and information implicitly referenced in the initial context. \\
@@ -199,7 +202,8 @@ They used the following optimization prompt:
      Do not add any additional steps, conclusions, or content beyond this point. \\
 \end{prompt}
 
-As their optimization prompt is more detailed than the one used in \autoref{sec:Evaluation:simple_feedback_optimization} and \autoref{sec:Evaluation:naive_optimization}, I decided to use it as a second optimization prompt for the naive optimization approach.
+As their optimization prompt is more detailed than the one used in \autoref{sec:Evaluation:simple_feedback_optimization} , it is used as an alternative optimization prompt for the naive optimization approach.
+As seen in \autoref{tab:zadenoori_optimization} the results of this optimization approach are quite similar to the ones of \autoref{sec:Evaluation:naive_optimization}.
 \begin{table}
     \centering
     \renewcommand{\arraystretch}{1.4}
