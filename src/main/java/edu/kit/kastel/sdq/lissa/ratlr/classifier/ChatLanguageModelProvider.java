@@ -71,7 +71,7 @@ public class ChatLanguageModelProvider {
      * Models that do not support temperature settings. Lower temperature values mean less creativity and variation
      * in the model's responses.
      */
-    private static final String[] MODELS_WITHOUT_TEMPERATURE = {"o4-mini-2025-04-16"};
+    private static final String[] MODELS_WITHOUT_TEMPERATURE = {"o4-mini-2025-04-16", "gpt-5-mini"};
     /**
      * The platform to use for the language model.
      */
