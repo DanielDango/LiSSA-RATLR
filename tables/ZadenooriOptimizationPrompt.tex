@@ -1,0 +1,17 @@
+
+\begin{tabularx}{\textwidth}{p{1.3em}l Z  Z  Z  Z  Z  Z  Z  Z }
+    \toprule
+    \multirow{2}{1em}[-0.45em]{\rotatebox{90}{Dataset}} & \multirow{2}{*}[-0.9em]{\rotatebox{90}{Metric}}  & \multicolumn{ 2 }{c}{KISS-Original}  & \multicolumn{ 2 }{c}{feedback (mi=1, n=3)}  & \multicolumn{ 2 }{c}{feedback (mi=3, n=1)}  & \multicolumn{ 2 }{c}{feedback (mi=5, n=3)}                                                                                          \\
+    \cmidrule(lr){ 3-4 }
+    \cmidrule(lr){ 5-6 }
+    \cmidrule(lr){ 7-8 }
+    \cmidrule(lr){ 9-10 }
+    &                            & GPT-4o        & GPT-4o-mini        & GPT-4o        & GPT-4o-mini        & GPT-4o        & GPT-4o-mini        & GPT-4o        & GPT-4o-mini           \\
+    \midrule
+    \multirow{ 3 }{*}{\rotatebox{90}{WARC}}
+    & P.    & 0.394    & 0.38    & 0.455    & 0.378    & 0.44    & 0.392    & \textbf{ 0.485 }    & 0.383 \\
+    & R.    & \textbf{ 0.699 }    & \textbf{ 0.699 }    & \textbf{ 0.699 }    & 0.691    & \textbf{ 0.699 }    & 0.669    & \textbf{ 0.699 }    & 0.684 \\
+    & F\textsubscript{1}    & 0.504    & 0.492    & 0.551    & 0.488    & 0.54    & 0.495    & \textbf{ 0.572 }    & 0.491 \\
+    \arrayrulecolor{kit-gray30} \midrule \arrayrulecolor{black}
+
+\end{tabularx}

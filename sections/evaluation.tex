@@ -1,4 +1,4 @@
-%% LaTeX2e class for student theses
+\usepackage{hyperref}%% LaTeX2e class for student theses
 %% sections/evaluation.tex
 %% 
 %% Karlsruhe Institute of Technology
@@ -16,7 +16,7 @@
 \Todo{Talk about evaluation in general}
 
 \section{Naive Prompt Optimization}
-\label{sec:Evaluation:FirstSection}
+\label{sec:Evaluation:naive_optimization}
 
 The initial thought people may have when thinking about prompt optimization is to ask the \LLM to optimize the prompt before usage. To utilize this very simple approach, just two prerequisites are required. Firstly, we need our prompt, which is to be optimized. \autoref{prompt:yes_no} was chosen here as the initial prompt. It is a \KISS binary classification prompt. As the \LiSSAf has already employed this prompt for their simple classifier, I decided to start the optimization process with this prompt as well. Secondly, an optimization prompt is needed. Herefore \autoref{prompt:initial_optimization} has been arbitrarily selected. Unlike \autoref{prompt:yes_no}, this prompt has not been used yet to my knowledge. %Was it written utilizing IntelliJ's ai assistant autocompletion? I believe so...
 
@@ -91,6 +91,7 @@ The performance of this prompt, as seen in \autoref{tab:naive_optimization}, see
 
 \newpage
 \section{Simple Feedback Optimization}
+\label{sec:Evaluation:simple_feedback_optimization}
 
 The following parameters will be used to describe prompts for this section. They can be used as configuration parameters for the feedback optimization process.
 
@@ -182,3 +183,28 @@ Answer with \textquotesingle{}yes\textquotesingle{} or \textquotesingle{}no\text
     \label{tab:placeholder}
 \end{table}
 \end{landscape}
+
+\section{Varying the Optimization Prompt}
+In a recent paper by \citewithauthor{zadenoori2025AutomaticPrompt} the authors \Todo{Text needs to be added}.
+They used the following optimization prompt:
+\begin{prompt}{Zadenoori Optimization Prompt}{zadenoori_optimization}\\
+     You are required to enhance and clarify the explanations of the categories in the prompt by integrating illustrative examples and information implicitly referenced in the initial context. \\
+     The optimized prompt must follow these strict guidelines: \\
+     Maintain the Original Steps: The steps in the optimized prompt must remain exactly the same as in the sample prompt; no changes should be made to the steps’ structure or order. \\
+     Expand Explanations: Enrich and expand the explanations of each category within the steps, incorporating examples provided.
+     Use these examples to enhance understanding and provide clarity, but ensure all content remains within the existing steps and does not extend beyond them. \\
+     Incorporate Class Explanations: Specifically, integrate the detailed "Class Explanations" of categories from the first prompt into the optimized prompt.
+     For each category, introduce implicit clarifications based on relevant data extracted from the context, keeping all additions within the boundaries of the original steps. \\
+     End Strictly After Step 5: The optimized prompt must strictly end after step 5.
+     Do not add any additional steps, conclusions, or content beyond this point. \\
+\end{prompt}
+
+As their optimization prompt is more detailed than the one used in \autoref{sec:Evaluation:simple_feedback_optimization} and \autoref{sec:Evaluation:naive_optimization}, I decided to use it as a second optimization prompt for the naive optimization approach.
+\begin{table}
+    \centering
+    \renewcommand{\arraystretch}{1.4}
+    \input{tables/ZadenooriOptimizationPrompt}
+    \renewcommand{\arraystretch}{1}
+    \caption{Naive prompt optimization approach using the optimization prompt by \citeauthor{zadenoori2025AutomaticPrompt}}
+    \label{tab:zadenoori_optimization}
+\end{table}
