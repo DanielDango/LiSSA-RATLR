@@ -8,6 +8,12 @@
     \cmidrule(lr){ 9-10 }
     &                            & GPT-4o        & GPT-4o-mini        & GPT-4o        & GPT-4o-mini        & GPT-4o        & GPT-4o-mini        & GPT-4o        & GPT-4o-mini           \\
     \midrule
+    \multirow{ 3 }{*}{\rotatebox{90}{CCHIT}}
+    & P.    & 0.23    & 0.209    & \textbf{ 0.311 }    & 0.262    & 0.304    & 0.225    & 0.294    & 0.251 \\
+    & R.    & \textbf{ 0.155 }    & \textbf{ 0.155 }    & 0.148    & 0.153    & 0.148    & \textbf{ 0.155 }    & 0.148    & 0.153 \\
+    & F\textsubscript{1}    & 0.185    & 0.178    & \textbf{ 0.201 }    & 0.193    & 0.199    & 0.184    & 0.197    & 0.19 \\
+    \arrayrulecolor{kit-gray30} \midrule \arrayrulecolor{black}
+
     \multirow{ 3 }{*}{\rotatebox{90}{CM1-NASA}}
     & P.    & 0.349    & 0.337    & 0.354    & \textbf{ 0.372 }    & 0.362    & 0.358    & 0.354    & 0.358 \\
     & R.    & \textbf{ 0.644 }    & \textbf{ 0.644 }    & \textbf{ 0.644 }    & \textbf{ 0.644 }    & \textbf{ 0.644 }    & \textbf{ 0.644 }    & \textbf{ 0.644 }    & \textbf{ 0.644 } \\
@@ -20,16 +26,28 @@
     & F\textsubscript{1}    & 0.548    & 0.544    & 0.548    & 0.544    & \textbf{ 0.556 }    & 0.544    & 0.548    & \textbf{ 0.556 } \\
     \arrayrulecolor{kit-gray30} \midrule \arrayrulecolor{black}
 
+    \multirow{ 3 }{*}{\rotatebox{90}{ModisDataset}}
+    & P.    & 0.212    & 0.212    & \textbf{ 0.562 }    & 0.324    & 0.314    & 0.5    & 0.444    & 0.275 \\
+    & R.    & \textbf{ 0.268 }    & \textbf{ 0.268 }    & 0.22    & \textbf{ 0.268 }    & \textbf{ 0.268 }    & \textbf{ 0.268 }    & 0.195    & \textbf{ 0.268 } \\
+    & F\textsubscript{1}    & 0.237    & 0.237    & 0.316    & 0.293    & 0.289    & \textbf{ 0.349 }    & 0.271    & 0.272 \\
+    \arrayrulecolor{kit-gray30} \midrule \arrayrulecolor{black}
+
     \multirow{ 3 }{*}{\rotatebox{90}{WARC}}
     & P.    & 0.394    & 0.38    & 0.455    & 0.378    & 0.44    & 0.392    & \textbf{ 0.485 }    & 0.383 \\
     & R.    & \textbf{ 0.699 }    & \textbf{ 0.699 }    & \textbf{ 0.699 }    & 0.691    & \textbf{ 0.699 }    & 0.669    & \textbf{ 0.699 }    & 0.684 \\
     & F\textsubscript{1}    & 0.504    & 0.492    & 0.551    & 0.488    & 0.54    & 0.495    & \textbf{ 0.572 }    & 0.491 \\
     \arrayrulecolor{kit-gray30} \midrule \arrayrulecolor{black}
 
+    \multirow{ 3 }{*}{\rotatebox{90}{dronology}}
+    & P.    & 0.395    & 0.387    & 0.459    & 0.408    & 0.422    & 0.408    & 0.436    & \textbf{ 0.475 } \\
+    & R.    & \textbf{ 0.695 }    & \textbf{ 0.695 }    & 0.686    & 0.686    & 0.691    & 0.686    & 0.686    & 0.614 \\
+    & F\textsubscript{1}    & 0.504    & 0.498    & \textbf{ 0.55 }    & 0.512    & 0.524    & 0.512    & 0.534    & 0.536 \\
+    \arrayrulecolor{kit-gray30} \midrule \arrayrulecolor{black}
+
     \multirow{ 3 }{*}{\rotatebox{90}{Avg.}}
-    & P.    & 0.432    & 0.42    & 0.454    & 0.431    & 0.457    & 0.431    & \textbf{ 0.464 }    & 0.437 \\
-    & R.    & \textbf{ 0.629 }    & \textbf{ 0.629 }    & \textbf{ 0.629 }    & 0.626    & \textbf{ 0.629 }    & 0.619    & \textbf{ 0.629 }    & 0.624 \\
-    & F\textsubscript{1}    & 0.502    & 0.493    & 0.519    & 0.501    & 0.52    & 0.5    & \textbf{ 0.526 }    & 0.502 \\
+    & P.    & 0.355    & 0.345    & \textbf{ 0.449 }    & 0.381    & 0.402    & 0.405    & 0.427    & 0.385 \\
+    & R.    & \textbf{ 0.501 }    & \textbf{ 0.501 }    & 0.49    & 0.498    & 0.499    & 0.494    & 0.486    & 0.484 \\
+    & F\textsubscript{1}    & 0.405    & 0.399    & \textbf{ 0.437 }    & 0.417    & 0.429    & 0.424    & 0.43    & 0.417 \\
     \arrayrulecolor{kit-gray30} \midrule \arrayrulecolor{black}
 
 \end{tabularx}

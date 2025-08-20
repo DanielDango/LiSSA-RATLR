@@ -1,4 +1,4 @@
-\usepackage{hyperref}%% LaTeX2e class for student theses
+%% LaTeX2e class for student theses
 %% sections/evaluation.tex
 %% 
 %% Karlsruhe Institute of Technology
@@ -15,17 +15,63 @@
 
 \Todo{Talk about evaluation in general}
 
+\section{Setup}
+\label{sec:Evaluation:setup}
+To evaluate the \APE algorithms proposed in \Todo{add link to approach}, a multitude of different datasets will be used.
+They are taken from \citewithauthor{hey2025ReplicationPackage}'s replication package.
+Some of the gold standard files were modified to provide consistency between artifact naming and the gold standard reference.
+The actual contents are not affected by this.
+The CCHIT dataset was omitted, as it differs from the others in that it does not link high-level artifacts with low-level artifacts. 
+An overview of the sets used can be seen in \autoref{tab:dataset_overview}.
+\directQuote{Datasets comprise either high-level requirements (HLR), low-level requirements (LLR), requirements (R) or regulatory codes (RC). Percentage of linked source and target artifacts in the gold standard is given in brackets.}{hey2025RequirementsTraceability}
+
+\begin{table}[]
+    \centering
+    \begin{tabular}{lccccc}
+                 & \multicolumn{2}{c}{Artifact Type} & \multicolumn{3}{c}{Number of Artifacts} \\
+        \cmidrule(lr){ 2-3 } \cmidrule(lr){ 4-6 }
+         Dataset    & Source& Target& Source    & Target    & \TLs \\
+        \arrayrulecolor{kit-gray30} \midrule \arrayrulecolor{black}
+         CM1-NASA   & HLR   & LLR   & 22 (86\%) & 53 (57\%) & 45 \\
+         Dronology  & HLR   & LLR   & 99 (93\%) & 211 (99\%)& 220 \\
+         GANNT      & HLR   & LLR   & 17 (100\%)& 69 (99\%) & 68 \\
+         MODIS      & HLR   & LLR   & 19 (63\%) & 49 (63\%) & 41 \\
+         WARC       & HLR   & LLR   & 63 (95\%) & 89 (89\%) & 136 \\
+        \arrayrulecolor{kit-gray30} \midrule \arrayrulecolor{black}
+    \end{tabular}
+    \caption{Overview of the datasets adjusted from \citeauthor{hey2025RequirementsTraceability} \cite[Table 1]{hey2025RequirementsTraceability}}
+    \label{tab:dataset_overview}
+\end{table}
+
+
+Several \LLMs will be used. 
+The focus will be on \OAI's \gpt and \gptmini models. 
+Compared to the locally hosted \codellama and \llama models by Meta AI, they enable faster evaluation with parallel requests.
+\API access is already implemented in the \LiSSAf.
+In addition the the four models used by \citewithauthor{hey2025RequirementsTraceability} in their preceding work, current models will also be considered for evaluation.
+\OAI recently introduced their \gptf model.
+
+The \LiSSAf enables the usage of different embedding models for evaluation.
+However, the singular embedding model which will be used is \ac{text-embedding} by \OAI.
+As of this publication, it is the most up-to-date text embedding model by \OAI and was also used by \citeauthor{hey2025RequirementsTraceability}, thus improving comparability.
+
+The similarity retriever in the \LiSSA pipeline will also not be modified for this evaluation.
+The default cosine-similarity-retriever will be utilized.
+\Todo{What is a cosine similarity retriever?}
+
+Last but not least, the different \APE algorithms presented in \autoref{ch:Approach} will be added as an additional degree of freedom compared to the baseline evaluation.
+Depending on the implementation, different variables, such as mainly the optimization prompt, will be introduced. 
+Unless specified, each evaluation will assume that the model used to optimize the prompt will be used to classify the \TLs later to derive the quantitative metrics for evaluation.
+
+
 \section{Naive Prompt Optimization}
 \label{sec:Evaluation:naive_optimization}
 
-The initial thought people may have when thinking about prompt optimization is to ask the \LLM to optimize the prompt before usage. To utilize this very simple approach, just two prerequisites are required. Firstly, we need our prompt, which is to be optimized. \autoref{prompt:yes_no} was chosen here as the initial prompt. It is a \KISS binary classification prompt. As the \LiSSAf has already employed this prompt for their simple classifier, I decided to start the optimization process with this prompt as well. Secondly, an optimization prompt is needed. Herefore \autoref{prompt:initial_optimization} has been arbitrarily selected. Unlike \autoref{prompt:yes_no}, this prompt has not been used yet to my knowledge. %Was it written utilizing IntelliJ's ai assistant autocompletion? I believe so...
+The initial thought people may have when thinking about prompt optimization is to ask the \LLM to optimize the prompt before usage. To utilize this very simple approach, just two prerequisites are required. Firstly, we need our prompt, which is to be optimized. \autoref{prompt:yes_no} was chosen here as the initial prompt. It is a \KISS binary classification prompt. As the \LiSSAf has already employed this prompt for their simple classifier, I decided to start the optimization process with this prompt as well. Secondly, an optimization prompt is needed. Herefore \autoref{prompt:initial_optimization} has been arbitrarily selected. Unlike \autoref{prompt:yes_no}, this prompt has not been used in reasearch yet to my knowledge. 
+The optimization prompt was designed by me while implementing the naive prompt optimization approach.
 
 \begin{prompt}{\KISS Original}{yes_no}\\
-    Question: Here are two parts of software development artifacts.\\
-    \{source\_type\}: \tripplequote \{source\_content\}\tripplequote\\
-    \{target\_type\}: \tripplequote\{target\_content\}\tripplequote\\
-    Are they related?\\
-    Answer with \textquotesingle{}yes\textquotesingle{} or \textquotesingle{}no\textquotesingle{}.
+\include{prompts/original-kiss}
 \end{prompt}
 
 \begin{prompt}{Simple Optimization Prompt}{initial_optimization}\\
@@ -189,26 +235,22 @@ In a recent paper by \citewithauthor{zadenoori2025AutomaticPrompt} the authors \
 Their prompt is designed to optimize classification prompts by enhancing the explanations of categories within the prompt.
 As it also utilizes feedback from misclassified \TLs, it can be used as an alternative optimization prompt for the naive feedback optimization approach.
 
-They used the following optimization prompt:
-\begin{prompt}{Zadenoori Optimization Prompt}{zadenoori_optimization}\\
-     You are required to enhance and clarify the explanations of the categories in the prompt by integrating illustrative examples and information implicitly referenced in the initial context. \\
-     The optimized prompt must follow these strict guidelines: \\
-     Maintain the Original Steps: The steps in the optimized prompt must remain exactly the same as in the sample prompt; no changes should be made to the steps’ structure or order. \\
-     Expand Explanations: Enrich and expand the explanations of each category within the steps, incorporating examples provided.
-     Use these examples to enhance understanding and provide clarity, but ensure all content remains within the existing steps and does not extend beyond them. \\
-     Incorporate Class Explanations: Specifically, integrate the detailed "Class Explanations" of categories from the first prompt into the optimized prompt.
-     For each category, introduce implicit clarifications based on relevant data extracted from the context, keeping all additions within the boundaries of the original steps. \\
-     End Strictly After Step 5: The optimized prompt must strictly end after step 5.
-     Do not add any additional steps, conclusions, or content beyond this point. \\
-\end{prompt}
+They used the following optimization prompt \autoref{prompt:zadenoori_optimization}:
+\input{prompts/ZadenooriOptimizationPrompt}
 
-As their optimization prompt is more detailed than the one used in \autoref{sec:Evaluation:simple_feedback_optimization} , it is used as an alternative optimization prompt for the naive optimization approach.
+As their optimization prompt is more detailed than the one used in \autoref{sec:Evaluation:simple_feedback_optimization}, it is used as an alternative optimization prompt for the naive optimization approach.
 As seen in \autoref{tab:zadenoori_optimization} the results of this optimization approach are quite similar to the ones of \autoref{sec:Evaluation:naive_optimization}.
+
+\newpage
+\begin{prompt}{Opimized WARC prompt}{warc_zandoori_optimized}
+    \include{prompts/ZadenooriOptimizationPrompt/results-prompt-optimizationWARC_feedback_gpt_gpt-4o-2024-08-06_0_mi5_fs3.json}
+\end{prompt}
+\newpage
 \begin{table}
     \centering
     \renewcommand{\arraystretch}{1.4}
     \input{tables/ZadenooriOptimizationPrompt}
     \renewcommand{\arraystretch}{1}
-    \caption{Naive prompt optimization approach using the optimization prompt by \citeauthor{zadenoori2025AutomaticPrompt}}
+    \caption{Naive prompt optimization approach using the optimization prompt by \citewithauthor{zadenoori2025AutomaticPrompt}}
     \label{tab:zadenoori_optimization}
 \end{table}
