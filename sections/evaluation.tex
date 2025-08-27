@@ -15,6 +15,7 @@
 
 \Todo{Talk about evaluation in general}
 
+
 \section{Setup}
 \label{sec:Evaluation:setup}
 To evaluate the \APE algorithms proposed in \Todo{add link to approach}, a multitude of different datasets will be used.
@@ -28,18 +29,18 @@ An overview of the sets used can be seen in \autoref{tab:dataset_overview}.
 \begin{table}[]
     \centering
     \begin{tabular}{lccccc}
-                 & \multicolumn{2}{c}{Artifact Type} & \multicolumn{3}{c}{Number of Artifacts} \\
+        & \multicolumn{2}{c}{Artifact Type} & \multicolumn{3}{c}{Number of Artifacts} \\
         \cmidrule(lr){ 2-3 } \cmidrule(lr){ 4-6 }
-         Dataset    & Source& Target& Source    & Target    & \TLs \\
+        Dataset   & Source & Target & Source     & Target     & \TLs \\
         \arrayrulecolor{kit-gray30} \midrule \arrayrulecolor{black}
-         CM1-NASA   & HLR   & LLR   & 22 (86\%) & 53 (57\%) & 45 \\
-         Dronology  & HLR   & LLR   & 99 (93\%) & 211 (99\%)& 220 \\
-         GANNT      & HLR   & LLR   & 17 (100\%)& 69 (99\%) & 68 \\
-         MODIS      & HLR   & LLR   & 19 (63\%) & 49 (63\%) & 41 \\
-         WARC       & HLR   & LLR   & 63 (95\%) & 89 (89\%) & 136 \\
+        CM1-NASA  & HLR    & LLR    & 22 (86\%)  & 53 (57\%)  & 45   \\
+        Dronology & HLR    & LLR    & 99 (93\%)  & 211 (99\%) & 220  \\
+        GANNT     & HLR    & LLR    & 17 (100\%) & 69 (99\%)  & 68   \\
+        MODIS     & HLR    & LLR    & 19 (63\%)  & 49 (63\%)  & 41   \\
+        WARC      & HLR    & LLR    & 63 (95\%)  & 89 (89\%)  & 136  \\
         \arrayrulecolor{kit-gray30} \midrule \arrayrulecolor{black}
     \end{tabular}
-    \caption{Overview of the datasets adjusted from \citeauthor{hey2025RequirementsTraceability} \cite[Table 1]{hey2025RequirementsTraceability}}
+    \caption{Overview of the datasets adjusted from \citeauthor{hey2025RequirementsTraceability}~\cite[Table 1]{hey2025RequirementsTraceability}}
     \label{tab:dataset_overview}
 \end{table}
 
@@ -48,7 +49,7 @@ Several \LLMs will be used.
 The focus will be on \OAI's \gpt and \gptmini models.
 Compared to the locally hosted \codellama and \llama models by Meta AI, they enable faster evaluation with parallel requests instead of limitations through the host-hardware.
 \API access is already implemented in the \LiSSAf.
-In addition the the four models used by \citewithauthor{hey2025RequirementsTraceability} in their preceding work, current models will also be considered for evaluation.
+In addition to the four models used by \citewithauthor{hey2025RequirementsTraceability} in their preceding work, current models will also be considered for evaluation.
 \OAI recently introduced their \gptf model.
 
 The \LiSSAf enables the usage of different embedding models for evaluation.
@@ -67,23 +68,25 @@ Unless specified, each evaluation will assume that the model used to optimize th
 \section{Naive Prompt Optimization}
 \label{sec:Evaluation:naive_optimization}
 
-The initial thought people may have when thinking about prompt optimization is to ask the \LLM to optimize the prompt before usage. 
+The initial thought people may have when thinking about prompt optimization is to ask the \LLM to optimize the prompt before usage.
 To utilize this very simple approach, just two prerequisites are required.
 Firstly, we need our prompt, which is to be optimized.
 \autoref{prompt:yes_no} was chosen here as the initial prompt.
 It is a \KISS binary classification prompt.
 As the \LiSSAf has already employed this prompt for their simple classifier, I decided to start the optimization process with this prompt as well.
 Secondly, an optimization prompt is needed.
-Herefore \autoref{prompt:initial_optimization} has been arbitrarily selected.
-Unlike \autoref{prompt:yes_no}, this prompt has not been used in reasearch yet to my knowledge.
+Therefore, \autoref{prompt:initial_optimization} has been arbitrarily selected.
+Unlike \autoref{prompt:yes_no}, this prompt has not been used in research yet to my knowledge.
 The optimization prompt was designed by me, while implementing the naive prompt optimization approach.
 Sentence completion through GitHub Copilot based on the \ac{gpt-copilot} model was also utilized.
 
-\begin{prompt}{\KISS Original}{yes_no}\\
+\begin{prompt}{\KISS Original}{yes_no}
+    \\
     \input{prompts/original-kiss}
 \end{prompt}
 
-\begin{prompt}{Simple Optimization Prompt}{initial_optimization}\\
+\begin{prompt}{Simple Optimization Prompt}{initial_optimization}
+    \\
     \input{prompts/optimization-prompt-simple}
 \end{prompt}
 
@@ -93,26 +96,51 @@ I will present the optimized prompts by \OAI's \gpt model as an example of these
 \Todo{Add other models' outputs to the appendix?}
 
 \subsection{Optimized Prompt Analysis}
-The first application of the optimization prompt usually yielded an inclusion of the source and target types into the text of the prompt. This was possible as a set of training data was also provided for following, more sophisticated, prompt optimization approaches. Further, the very simple classification question \Quote[\autoref{prompt:yes_no}]{Are they related?} was also expanded to be more specific for the \TLR problem.  The result can be seen in \autoref{prompt:yes_no_simple}.
-The optimized prompt only depends on the input prompt and the domain of the source and target elements. This very prompt thus is used for all simple GPT-4o evaluations in \autoref{tab:naive_optimization} for the domain of \RtR. 
+\label{subsec:Evaluation:naive_optimization:optimized-prompt-analysis}
+The first application of the optimization prompt usually yielded an inclusion of the source and target types into the text of the prompt.
+This was possible as a set of training data was also provided for following, more sophisticated, prompt optimization approaches.
+Further, the very simple classification question \Quote[\autoref{prompt:yes_no}]{Are they related?} was also expanded to be more specific for the \TLR problem.
+The result can be seen in \autoref{prompt:yes_no_simple}.
+The optimized prompt only depends on the input prompt and the domain of the source and target elements.
+This very prompt thus is used for all simple \gpt evaluations in \autoref{tab:naive_optimization} for the domain of \RtR.
 
-\begin{prompt}{\KISS Single Optimization Step}{yes_no_simple}\\
+\begin{prompt}{\KISS Single Optimization Step}{yes_no_simple}
+    \\
     \input{prompts/SimpleAndRepeatedOptimization/results-prompt-optimizationWARC_simple_gpt_gpt-4o-2024-08-06_0.json_411c69c3-cec3-3948-ad97-bb474536d21c}
 \end{prompt}
 
-As seen in \autoref{tab:naive_optimization}, application of the optimization prompt seems to generally improve the $f_1-score$. 
+As seen in \autoref{tab:naive_optimization}, application of the optimization prompt in the column \Quote[\autoref{tab:naive_optimization}]{simple} seems to generally improve the \fone.
 By repeatedly applying the optimization prompt to the optimized prompt of the previous iteration, we can push this optimization further.
 This yields \autoref{prompt:yes_no_iterative}
+This particular prompt was again generated by \gpt using five iteration steps.
 Once more, the behavior of different \LLMs is quite similar here.
-We can see that mostly longer and more detailed instructions are included on how to find \TLs. 
-However, unfortunately, this prompt does not necessarily perform better for our task. 
-The performance of this prompt, as seen in \autoref{tab:naive_optimization}, seems to be generally worse than just the singular optimization application.
+We can see that mostly longer and more detailed instructions are included on how to find \TLs.
 
-\begin{prompt}{\KISS Single Iterative Dumb Optimization}{yes_no_iterative}\\
+\begin{prompt}{\KISS Iterative Dumb Optimization}{yes_no_iterative}
+    \\
     \input{prompts/SimpleAndRepeatedOptimization/results-prompt-optimizationWARC_iterative_gpt_gpt-4o-2024-08-06_0.json_e81eaea6-576b-337c-8a98-f2e65913a143}
 \end{prompt}
 
+However, unfortunately, this prompt does not necessarily perform better for our task.
+The performance of this prompt, as seen in the \Quote[\autoref{tab:naive_optimization}]{iterative} column, seems to be generally worse than just the singular optimization application.
+What is especially noteworthy, is that for \llama the classification fails completely with this prompt.
+We can see in \autoref{prompt:yes_no_llama} that the prompt manged to modify the output format into different types of relationships.
+The current classifiers of the \LiSSA project expect the \LLM output to include the classification result clearly as \textquotesingle yes \textquotesingle or \textquotesingle no \textquotesingle.
+Thus, while this more detailed classification of the \LLM might even improve performance, it can not be properly evaluated.
+\Todo{Consider how this might be mitiaged}
+
+\begin{prompt}{\KISS Iterative Dumb Optimization \llama}{yes_no_llama}
+    \\
+    \input{prompts/SimpleAndRepeatedOptimization/results-prompt-optimizationWARC_iterative_ollama_llama3.1_8b-instruct-fp16_0.json_28d45aa7-dc74-3651-942a-c21f7ab1e001}
+\end{prompt}
+
 \subsection{Systematic Evaluation Results}
+\label{subsec:Evaluation:naive_optimization:systematic-evaluation-results}
+
+The systematic evaluation results for varying models and datasets can be found in \autoref{tab:naive_optimization}.
+The average and weighted average are also included.
+The average value is computed across all datasets, while the weighted average factors the dataset size in as well.
+The amount of \TLs in the gold standard reference for the dataset, seen in \autoref{tab:dataset_overview}, is used as the metric for dataset size.
 
 \begin{table}
     \centering
@@ -124,52 +152,64 @@ The performance of this prompt, as seen in \autoref{tab:naive_optimization}, see
 \end{table}
 
 \newpage
+
+
 \section{Simple Feedback Optimization}
 \label{sec:Evaluation:simple_feedback_optimization}
 
-The following parameters will be used to describe prompts for this section. They can be used as configuration parameters for the feedback optimization process.
+The following parameters will be used to describe prompts for this section.
+They can be used as configuration parameters for the feedback optimization process.
 
 \begin{align*}
-    mi:=  & \text{maximum iterations}\\
-          & \text{the prompt will be optimized $mi$ times} \\
-    n  := & \text{feedback sample size}\\  
-          & \text{$n$ examples of misclassified \TLs will be provided}
+    mi\coloneqq  & \text{maximum iterations}\\
+    & \text{the prompt will be optimized $mi$ times} \\
+    n \coloneqq & \text{feedback sample size}\\
+    & \text{$n$ examples of misclassified \TLs will be provided}
 \end{align*}
 
-\begin{prompt}{Feedback Prompt}{feedback_initial}\\
+\begin{prompt}{Feedback Prompt}{feedback_initial}
+    \\
     \input{prompts/optimization-prompt-feedback}
 \end{prompt}
 
 \subsection{Optimized Prompt Analysis}
+\label{subsec:Evaluation:simple_feedback:optimized-prompt-analysis}
 
-\begin{prompt}{Optimized Prompt n = 3, mi = 1}{feedback_optimized_3_1}\\
+\begin{prompt}{Optimized Prompt n = 3, mi = 1}{feedback_optimized_3_1}
+    \\
     \input{prompts/FeedbackOptimizer/results-prompt-optimizationWARC_feedback_gpt_gpt-4o-2024-08-06_0_mi1_fs3.json_763f1e98-fde5-3555-8289-67e08e354d5a}
 \end{prompt}
 
-\begin{prompt}{Optimized Prompt n = 5, mi = 10}{feedback_optimized_5_10}\\
+\begin{prompt}{Optimized Prompt n = 5, mi = 10}{feedback_optimized_5_10}
+    \\
     \input{prompts/FeedbackOptimizer/results-prompt-optimizationWARC_feedback_gpt_gpt-4o-2024-08-06_0_mi10_fs5.json_475529c1-57eb-36c3-a3fb-87ea9674a11c}
 \end{prompt}
+
 \subsection{Systematic Evaluation Results}
+\label{subsec:Evaluation:simple_feedback_optimization:systematic-evaluation-results}
 
 \begin{landscape}
-\begin{table}
-    \centering
-    %TODO: Careful, currently the tabularx width is manually replaced with \hsize in the table to adjust to landscape mode
-    \renewcommand{\arraystretch}{1}
-    \input{tables/FeedbackOptimizer}
-    \renewcommand{\arraystretch}{1}
-    \caption{Naive prompt optimization approach considering previous misclassified \TLs}
-    \label{tab:placeholder}
-\end{table}
+    \begin{table}
+        \centering
+        %TODO: Careful, currently the tabularx width is manually replaced with \hsize in the table to adjust to landscape mode
+        \renewcommand{\arraystretch}{1}
+        \input{tables/FeedbackOptimizer}
+        \renewcommand{\arraystretch}{1}
+        \caption{Naive prompt optimization approach considering previous misclassified \TLs}
+        \label{tab:placeholder}
+    \end{table}
 \end{landscape}
 
+
 \section{Varying the Optimization Prompt}
+\label{sec:Evaluation:varying-the-optimization-prompt}
 In a recent paper by \citewithauthor{zadenoori2025AutomaticPrompt} the authors \Todo{Text needs to be added}.
 Their prompt is designed to optimize classification prompts by enhancing the explanations of categories within the prompt.
 As it also utilizes feedback from misclassified \TLs, it can be used as an alternative optimization prompt for the naive feedback optimization approach.
 
 They used the following optimization prompt \autoref{prompt:zadenoori_optimization}:
-\begin{prompt}{Zadenoori Optimization Prompt}{zadenoori_optimization}\\
+\begin{prompt}{Zadenoori Optimization Prompt}{zadenoori_optimization}
+    \\
     \input{prompts/ZadenooriOptimizationPrompt}
 \end{prompt}
 
@@ -177,7 +217,8 @@ As their optimization prompt is more detailed than the one used in \autoref{sec:
 As seen in \autoref{tab:zadenoori_optimization} the results of this optimization approach are quite similar to the ones of \autoref{sec:Evaluation:naive_optimization}.
 
 \newpage
-\begin{prompt}{Opimized WARC prompt}{warc_zandoori_optimized}\\
+\begin{prompt}{Opimized WARC prompt}{warc_zandoori_optimized}
+    \\
     \input{prompts/ZadenooriOptimizationPrompt/results-prompt-optimizationWARC_feedback_gpt_gpt-4o-2024-08-06_0_mi5_fs3.json_f757620e-36c1-36a1-9314-c0acb1d5432f }
 \end{prompt}
 
