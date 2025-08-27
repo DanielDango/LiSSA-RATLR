@@ -1,0 +1,14 @@
+Question: Here are two parts of software development artifacts.\newline
+\newline
+\{source\_type\}: \textquotesingle{}\textquotesingle{}\textquotesingle{}\{source\_content\}\textquotesingle{}\textquotesingle{}\textquotesingle{}\newline
+\newline
+\{target\_type\}: \textquotesingle{}\textquotesingle{}\textquotesingle{}\{target\_content\}\textquotesingle{}\textquotesingle{}\textquotesingle{}\newline
+Are they related?\newline
+\newline
+Answer with \textquotesingle{}yes\textquotesingle{} or \textquotesingle{}no\textquotesingle{}.\newline
+\newline
+Class Explanations:\newline
+\newline
+1. Related \(Yes\): This category is used when the two artifacts have a direct or indirect connection that is essential for the functionality or understanding of the software system. For example, if a requirement specifies a feature that is directly implemented or supported by another requirement, they are related. Consider a scenario where a requirement specifies the use of a universal header file, and another requirement details the functionalities provided by that header file. They are related because the header file is essential for implementing the specified feature. The connection is crucial for the system\textquotesingle{}s operation, as the header file\textquotesingle{}s functionalities directly support the requirement\textquotesingle{}s implementation. Another example could be a requirement that outlines a specific data format, and another requirement that describes how to process that data format; they are related because the processing is dependent on the data format specification.\newline
+\newline
+2. Not Related \(No\): This category is used when the two artifacts do not have a meaningful connection or dependency that affects the software system\textquotesingle{}s functionality or understanding. For instance, if one requirement specifies a general feature of a software tool and another requirement details specific functionalities of a component that does not directly support or implement the general feature, they are not related. In the example provided, the requirement for a single header file does not directly depend on the specific types of WARC records detailed in another requirement. The absence of a direct dependency or support relationship means they do not influence each other\textquotesingle{}s implementation or understanding, hence they are not related. Another example is when one requirement describes a user interface feature, while another describes a backend processing algorithm that does not interact with or support the user interface feature; they are not related because there is no direct or indirect dependency between them.
