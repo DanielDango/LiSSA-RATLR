@@ -46,7 +46,7 @@ An overview of the sets used can be seen in \autoref{tab:dataset_overview}.
 
 Several \LLMs will be used.
 The focus will be on \OAI's \gpt and \gptmini models.
-Compared to the locally hosted \codellama and \llama models by Meta AI, they enable faster evaluation with parallel requests.
+Compared to the locally hosted \codellama and \llama models by Meta AI, they enable faster evaluation with parallel requests instead of limitations through the host-hardware.
 \API access is already implemented in the \LiSSAf.
 In addition the the four models used by \citewithauthor{hey2025RequirementsTraceability} in their preceding work, current models will also be considered for evaluation.
 \OAI recently introduced their \gptf model.
@@ -67,40 +67,37 @@ Unless specified, each evaluation will assume that the model used to optimize th
 \section{Naive Prompt Optimization}
 \label{sec:Evaluation:naive_optimization}
 
-The initial thought people may have when thinking about prompt optimization is to ask the \LLM to optimize the prompt before usage. To utilize this very simple approach, just two prerequisites are required. Firstly, we need our prompt, which is to be optimized. \autoref{prompt:yes_no} was chosen here as the initial prompt. It is a \KISS binary classification prompt. As the \LiSSAf has already employed this prompt for their simple classifier, I decided to start the optimization process with this prompt as well. Secondly, an optimization prompt is needed. Herefore \autoref{prompt:initial_optimization} has been arbitrarily selected. Unlike \autoref{prompt:yes_no}, this prompt has not been used in reasearch yet to my knowledge.
-The optimization prompt was designed by me while implementing the naive prompt optimization approach.
+The initial thought people may have when thinking about prompt optimization is to ask the \LLM to optimize the prompt before usage. 
+To utilize this very simple approach, just two prerequisites are required.
+Firstly, we need our prompt, which is to be optimized.
+\autoref{prompt:yes_no} was chosen here as the initial prompt.
+It is a \KISS binary classification prompt.
+As the \LiSSAf has already employed this prompt for their simple classifier, I decided to start the optimization process with this prompt as well.
+Secondly, an optimization prompt is needed.
+Herefore \autoref{prompt:initial_optimization} has been arbitrarily selected.
+Unlike \autoref{prompt:yes_no}, this prompt has not been used in reasearch yet to my knowledge.
+The optimization prompt was designed by me, while implementing the naive prompt optimization approach.
+Sentence completion through GitHub Copilot based on the \ac{gpt-copilot} model was also utilized.
 
 \begin{prompt}{\KISS Original}{yes_no}\\
-\include{prompts/original-kiss}
+    \input{prompts/original-kiss}
 \end{prompt}
 
 \begin{prompt}{Simple Optimization Prompt}{initial_optimization}\\
-    Optimize the following prompt to achieve better classification results for traceability link recovery. \\
-    Traceability links are to be found in the domain of \{source\_type\} to \{target\_type\}. \\
-    Do not modify the input and output formats specified by the original prompt.\\
-    Enclose your optimized prompt with <prompt></prompt> brackets.\\
-    The original prompt is provided below:\\
-    \tripplequote\{original\_prompt\}\tripplequote
+    \input{prompts/optimization-prompt-simple}
 \end{prompt}
 
-With these two prompts the naive prompt optimization can be evaluated. The results seemed to be quite consistent across different tested \LLMs. I will present the optimized prompts by OpenAI's GPT-4o model as an example of these.
+With these two prompts the naive prompt optimization can be evaluated.
+The results seemed to be quite consistent across different tested \LLMs.
+I will present the optimized prompts by \OAI's \gpt model as an example of these.
 \Todo{Add other models' outputs to the appendix?}
 
 \subsection{Optimized Prompt Analysis}
-The first application of the optimization prompt usually yielded an inclusion of the source and target types into the text of the prompt. This was possible as a set of training data was also provided for later, more sophisticated prompt optimization approaches. Further, the very simple classification question "Are they related?" was also expanded to be more specific for the \TLR problem.  The result can be seen in \autoref{prompt:yes_no_simple}.
+The first application of the optimization prompt usually yielded an inclusion of the source and target types into the text of the prompt. This was possible as a set of training data was also provided for following, more sophisticated, prompt optimization approaches. Further, the very simple classification question \Quote[\autoref{prompt:yes_no}]{Are they related?} was also expanded to be more specific for the \TLR problem.  The result can be seen in \autoref{prompt:yes_no_simple}.
 The optimized prompt only depends on the input prompt and the domain of the source and target elements. This very prompt thus is used for all simple GPT-4o evaluations in \autoref{tab:naive_optimization} for the domain of \RtR. 
 
 \begin{prompt}{\KISS Single Optimization Step}{yes_no_simple}\\
-    Question: Below are two components from software development artifacts that need to be analyzed for traceability.\\
-
-            Source Requirement \{source\_type\}: \tripplequote\{source\_content\}\tripplequote
-
-            Target Requirement \{target\_type\}: \tripplequote\{target\_content\}\tripplequote
-            
-            Based on the content and context, determine if there is a traceability link between them.
-
-            Answer with \textquotesingle{}yes\textquotesingle{} or \textquotesingle{}no\textquotesingle{}.
-    
+    \input{prompts/SimpleAndRepeatedOptimization/results-prompt-optimizationWARC_simple_gpt_gpt-4o-2024-08-06_0.json_411c69c3-cec3-3948-ad97-bb474536d21c}
 \end{prompt}
 
 As seen in \autoref{tab:naive_optimization}, application of the optimization prompt seems to generally improve the $f_1-score$. 
@@ -112,16 +109,7 @@ However, unfortunately, this prompt does not necessarily perform better for our 
 The performance of this prompt, as seen in \autoref{tab:naive_optimization}, seems to be generally worse than just the singular optimization application.
 
 \begin{prompt}{\KISS Single Iterative Dumb Optimization}{yes_no_iterative}\\
-    Question: You are given two components from software development artifacts that need to be analyzed for traceability link recovery in the domain of requirement to requirement.\\
-    
-    \{source\_type\}: \tripplequote\{source\_content\}\tripplequote
-
-    \{target\_type\}: \tripplequote\{target\_content\}\tripplequote
-
-    Carefully analyze both components to determine if a traceability link exists between them. Focus on identifying shared terminology, dependencies, logical connections, and alignment of objectives and constraints. Look for direct references, similar phrasing, or common goals that might indicate a connection. Evaluate the consistency of requirements, the presence of complementary or supplementary information, and any historical or contextual relationships that could suggest a link. Consider the intent and purpose behind each requirement to ensure a thorough analysis. Pay special attention to any implicit connections that may not be immediately obvious but are crucial for understanding the relationship. Use a systematic approach to ensure no potential link is overlooked. Prioritize clarity and precision in your analysis to enhance the accuracy of your classification.
-
-    Answer with \textquotesingle{}yes\textquotesingle{} or \textquotesingle{}no\textquotesingle{}.
-    
+    \input{prompts/SimpleAndRepeatedOptimization/results-prompt-optimizationWARC_iterative_gpt_gpt-4o-2024-08-06_0.json_e81eaea6-576b-337c-8a98-f2e65913a143}
 \end{prompt}
 
 \subsection{Systematic Evaluation Results}
@@ -149,72 +137,17 @@ The following parameters will be used to describe prompts for this section. They
 \end{align*}
 
 \begin{prompt}{Feedback Prompt}{feedback_initial}\\
-    The current prompt is not performing well in classifying the following trace links. To help you improve the prompt, I will provide examples of misclassified trace links. Please analyze these examples and adjust the prompt accordingly. The examples are as follows: \\
-    \{identifier\}\\
-    \{source\_type\}: \tripplequote\{source\_content\}\tripplequote\\
-    \{target\_type\}: \tripplequote\{target\_content\}\tripplequote\\
-    Classification result: \{classification\}
+    \input{prompts/optimization-prompt-feedback}
 \end{prompt}
 
 \subsection{Optimized Prompt Analysis}
 
-\begin{prompt}{Optimized Prompt n = 3, mi = 1}\\
-Question: Here are two parts of software development artifacts.
-
-\{source\_type\}: \tripplequote\{source\_content\}\tripplequote
-
-\{target\_type\}: \tripplequote\{target\_content\}\tripplequote
-
-Consider the following when determining if they are related:\\
-1. Look for shared terminology or concepts, such as specific functions, interfaces, or standards mentioned in both requirements.\\
-2. Assess whether one requirement describes a feature or functionality that directly supports or complements the other.\\
-3. Determine if there is a dependency or a logical connection between the two requirements, such as one requirement ensuring compatibility or compliance that the other relies on.
-
-Are they related?
-
-Answer with \textquotesingle{}yes\textquotesingle{} or \textquotesingle{}no\textquotesingle{}.
+\begin{prompt}{Optimized Prompt n = 3, mi = 1}{feedback_optimized_3_1}\\
+    \input{prompts/FeedbackOptimizer/results-prompt-optimizationWARC_feedback_gpt_gpt-4o-2024-08-06_0_mi1_fs3.json_763f1e98-fde5-3555-8289-67e08e354d5a}
 \end{prompt}
 
-\begin{prompt}{Optimized Prompt n = 5, mi = 10}\\
-Question: Here are two parts of software development artifacts.
-
-\{source\_type\}: \tripplequote\{source\_content\}\tripplequote
-
-\{target\_type\}: \tripplequote\{target\_content\}\tripplequote
-
-Consider the following when determining if they are related:
-
-1. Identify shared terminology or concepts, such as specific functions, interfaces, standards, or types of records mentioned in both requirements. Pay attention to synonyms or closely related terms that may indicate a connection.
-
-2. Evaluate whether one requirement describes a functionality or feature that directly supports, complements, or is necessary for the implementation of the other. Consider if one requirement provides a foundation or prerequisite for the other.
-
-3. Determine if there is a dependency, logical connection, or encapsulation relationship between the two requirements, such as one requirement ensuring compatibility, compliance, or abstraction that the other relies on. Consider if changes in one requirement would impact the other.
-
-\[\dots\]
-
-11. Look for explicit mentions of memory management, remote management, or other specific functionalities that might indicate a relationship, even if not directly related to WARC records.
-
-12. Consider the broader context of the requirements, such as the overall architecture or design principles they support, to identify indirect relationships.
-
-13. Pay attention to the specific phrasing and structure of the requirements, as similar language or structure can indicate a relationship.
-
-14. Consider the intent and purpose behind each requirement, as aligning intents can suggest a relationship even if the specifics differ.
-
-15. Evaluate if the requirements mention or imply the need for compatibility or interoperability, as this can indicate a relationship.
-
-16. Consider if the requirements address scalability, performance, or optimization aspects that might be interrelated.
-
-17. Look for any implicit or explicit dependencies that might not be immediately obvious but are crucial for the system's functionality.
-
-18. Pay attention to the specific types of WARC records mentioned and whether they are addressed in both requirements, as this can indicate a direct relationship.
-
-19. Consider if the requirements mention or imply the need for a single header file or universal interface, as this is a critical aspect in this domain.
-
-20. Reflect on whether the requirements address encapsulation or abstraction, as these are key concepts that often indicate a relationship.
-
-Are they related?
-
-Answer with \textquotesingle{}yes\textquotesingle{} or \textquotesingle{}no\textquotesingle{}.
+\begin{prompt}{Optimized Prompt n = 5, mi = 10}{feedback_optimized_5_10}\\
+    \input{prompts/FeedbackOptimizer/results-prompt-optimizationWARC_feedback_gpt_gpt-4o-2024-08-06_0_mi10_fs5.json_475529c1-57eb-36c3-a3fb-87ea9674a11c}
 \end{prompt}
 \subsection{Systematic Evaluation Results}
 
@@ -236,14 +169,16 @@ Their prompt is designed to optimize classification prompts by enhancing the exp
 As it also utilizes feedback from misclassified \TLs, it can be used as an alternative optimization prompt for the naive feedback optimization approach.
 
 They used the following optimization prompt \autoref{prompt:zadenoori_optimization}:
-\input{prompts/ZadenooriOptimizationPrompt}
+\begin{prompt}{Zadenoori Optimization Prompt}{zadenoori_optimization}\\
+    \input{prompts/ZadenooriOptimizationPrompt}
+\end{prompt}
 
 As their optimization prompt is more detailed than the one used in \autoref{sec:Evaluation:simple_feedback_optimization}, it is used as an alternative optimization prompt for the naive optimization approach.
 As seen in \autoref{tab:zadenoori_optimization} the results of this optimization approach are quite similar to the ones of \autoref{sec:Evaluation:naive_optimization}.
 
 \newpage
-\begin{prompt}{Opimized WARC prompt}{warc_zandoori_optimized}
-    \input{prompts/ZadenooriOptimizationPrompt/results-prompt-optimizationWARC_feedback_gpt_gpt-4o-2024-08-06_0_mi5_fs3.json}
+\begin{prompt}{Opimized WARC prompt}{warc_zandoori_optimized}\\
+    \input{prompts/ZadenooriOptimizationPrompt/results-prompt-optimizationWARC_feedback_gpt_gpt-4o-2024-08-06_0_mi5_fs3.json_f757620e-36c1-36a1-9314-c0acb1d5432f }
 \end{prompt}
 
 As their optimization prompt is more detailed than the one used in \autoref{sec:Evaluation:simple_feedback_optimization} , it is used as an alternative optimization prompt for the naive optimization approach.
