@@ -238,27 +238,60 @@ Also compared to the naive optimization approach in \autoref{tab:naive_optimizat
 
 \section{Varying the Optimization Prompt}
 \label{sec:Evaluation:varying-the-optimization-prompt}
-In a recent paper by \citewithauthor{zadenoori2025AutomaticPrompt} the authors \Todo{Text needs to be added}.
+In a recent paper by \citewithauthor{zadenoori2025AutomaticPrompt} the authors discussed the application of \APE for requirement classification.
+They took varying initial prompts to run the optimization process with Meta's open source \llama model.
+They were able to improve \fone and \ftwo scores by 5 \% and 9 \% respectively to around 80 \%.
+Their \APE process is generally aligned with the general iterative optimization loop visualized in \autoref{fig:iterative_core_loop}.
+
 Their prompt is designed to optimize classification prompts by enhancing the explanations of categories within the prompt.
 As it also utilizes feedback from misclassified \TLs, it can be used as an alternative optimization prompt for the naive feedback optimization approach.
+They used the following optimization prompt in \autoref{prompt:zadenoori_optimization}.
+The prompt is tailored to their \CoT classification prompt compromising of a five-step pipeline for requirement classification.
 
-They used the following optimization prompt \autoref{prompt:zadenoori_optimization}:
 \begin{prompt}{Zadenoori Optimization Prompt}{zadenoori_optimization}
     \\
     \input{prompts/ZadenooriOptimizationPrompt}
 \end{prompt}
 
+We can see, that \citeauthor{zadenoori2025AutomaticPrompt} used some similar elements to my optimization prompt.
+Just as I instructed the model, that the in and output format are not to be modified, in order to ensure correct classification with the used classifiers, they also included that \Quote[\autoref{prompt:zadenoori_optimization}]{he steps in the optimized prompt must remain exactly the same}.
+Further the instruction \Quote[\autoref{prompt:zadenoori_optimization}]{ensure all content remains within the existing steps and does not extend beyond them} is intended to negate behavior such as in \autoref{prompt:feedback_optimized_5_10}.
+However, they also gave the \LLM more specific instructions in how to optimize the prompt.
+Their classification tasks includes more different outputs than just the simple yes and no of \autoref{prompt:yes_no}.
+The \LLM is instructed to add details to these classes.
+\autoref{prompt:warc_zandoori_optimized} illustrates what this can look like for our simple \TLR \RtR task.
+
 As their optimization prompt is more detailed than the one used in \autoref{sec:Evaluation:simple_feedback_optimization}, it is used as an alternative optimization prompt for the naive optimization approach.
+The initial prompt \autoref{prompt:yes_no} in my work does not incorporate this multistep process.
+It needs to be adjusted to be used for \RtR prompt optimization.
+\Todo{The modified version of this prompt can be found in the appendix}
 As seen in \autoref{tab:zadenoori_optimization} the results of this optimization approach are quite similar to the ones of \autoref{sec:Evaluation:naive_optimization}.
 
-\newpage
-\begin{prompt}{Opimized WARC prompt}{warc_zandoori_optimized}
+\subsection{Optimized Prompt Analysis}
+\label{subsec:Evaluation:varying-the-optimization-prompt:optimized-prompt-analysis}
+
+An optimized prompt generated with the \gpt model for the WARC dataset can be seen in \autoref{prompt:warc_zandoori_optimized}.
+We can see, that the \LLM focused on adding explanations to each of the two possible classification results.
+While this does include general instructions, overfitting is becoming quite obvious as well.
+Some sections from the prompt are specified for the WARC dataset, but might also find appliance elsewhere too.
+For instance, a \Quote[\autoref{prompt:warc_zandoori_optimized}]{universal interface to create WARC records and another requirement details the types of WARC records that can be created through such an interface} can be generalized to other applications.
+On the other hand solutions are also directly embedded in the prompt.
+The phrase \Quote[\autoref{prompt:warc_zandoori_optimized}]{"FR 3" specifies providing functions \[\dots\], and "SRS 7" specifies \[\dots\], they are directly related} is referring to two requirements which are present in the training set.
+As such \fone scores during the \APE process on the reduced training set started to diverge more from the actual performance in \autoref{tab:zadenoori_optimization} than the previous prompt in \nameref{sec:Evaluation:simple_feedback_optimization}.
+
+\begin{prompt}{Opimized WARC prompt n = 3, iter = 5}{warc_zandoori_optimized}
     \\
     \input{prompts/ZadenooriOptimizationPrompt/results-prompt-optimizationWARC_feedback_gpt_gpt-4o-2024-08-06_0_mi5_fs3.json_f757620e-36c1-36a1-9314-c0acb1d5432f }
 \end{prompt}
 
-As their optimization prompt is more detailed than the one used in \autoref{sec:Evaluation:simple_feedback_optimization} , it is used as an alternative optimization prompt for the naive optimization approach.
-As seen in \autoref{tab:zadenoori_optimization} the results of this optimization approach are quite similar to the ones of \autoref{sec:Evaluation:naive_optimization}.
+\subsection{Systematic Evaluation Results}
+\label{subsec:Evaluation:varying-the-optimization-prompt:systematic-evaluation-results}
+
+The systematic evaluation results for varying models, datasets, and parameters can be found in \autoref{tab:zadenoori_optimization}.
+Once again the average and weighted average are also included.
+The results are quite similar to the naive feedback optimization approach in \autoref{tab:feedback_optimizer}.
+The \fone scores are slightly higher on average.
+A prevalent issue remains, that more iteration steps often do not yield better results.
 
 \begin{table}
     \centering
