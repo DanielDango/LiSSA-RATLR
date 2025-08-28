@@ -41,7 +41,7 @@ Second, this will broaden the baseline to compare later results and possible imp
 \section{Naive Iterative Optimizing Classifier}
 \label{approach:sec:naive_iterative}
 Another classifier implementation will be the simplest automatic iterative prompt optimization algorithm.
-The same existing abstract \verb|classifier| class can be used as in \autoref{phase_initial_overview} to provide basic functionality for the iteratively optimized classifier.
+The same existing abstract \verb|classifier| class can be used as in \Todo{fix ref phase initial overview} to provide basic functionality for the iteratively optimized classifier.
 
 Next, a function $f$ will be required to quantify the result, also referred to as performance, of the current prompt $p$ iteration, called to a large language model $llm$ using a set of training data $X$.
 The simple approach here is to use the successful retrieval rate by dividing the number of correctly classified trace links by the total number of recoverable trace links.
@@ -71,12 +71,12 @@ To limit resource usage, a hard limit will also be included to put an upper boun
 \end{figure}
 
 Implementing this naive, iteratively optimized classifier will yield fast results to evaluate later, even if more complicated implementations might fail.
-The core concepts also apply to \autoref{phase_gradient_descent} and can be reused.
+The core concepts also apply to \Todo{fix ref phase gradient descent} and can be reused.
 
 
 \section{Automatic Prompt Optimization with Gradient Descent}
 \label{approach:sec:gradient_descent}
-The existing iterative optimization implementation from~\autoref{phase_naive_iterative} can be used as a foundation for the implementation, as the core concepts remain the same.
+The existing iterative optimization implementation from~\Todo{fix ref phase naive iterative} can be used as a foundation for the implementation, as the core concepts remain the same.
 Refer to~\autoref{sec:gradient_descent} for details of the gradient-descent-based optimization algorithm.
 
 \citewithauthor{pryzant2023AutomaticPrompt} have provided their Python source code in a publicly accessible repository\footnote{https://github.com/microsoft/LMOps/tree/main/prompt\_optimization} under the MIT license.
