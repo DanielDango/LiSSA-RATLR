@@ -1,7 +1,14 @@
 %! Author = Daniel Schwab
 %! Date = 2025-08-30
+\providecommand{\CMOneNASA}{CMOneNASA}
+\providecommand{\Dronology}{Dronology}
+\providecommand{\GANNT}{GANNT}
+\providecommand{\ModisDataset}{ModisDataset}
+\providecommand{\WARC}{WARC}
+\providecommand{\Avg}{Avg}
+\providecommand{\WeightedAvg}{WeightedAvg}
 
-\begin{tabularx}{\textwidth}{p{1.3em}l Z  Z  Z  Z  Z  Z  Z  Z }
+\begin{tabularx}{\hsize}{p{1.3em}l Z  Z  Z  Z  Z  Z  Z  Z }
     \toprule
     \multirow{2}{1em}[-0.45em]{\rotatebox{90}{Dataset}} & \multirow{2}{*}[-0.9em]{\rotatebox{90}{Metric}}  & \multicolumn{ 2 }{c}{KISS-Original}  & \multicolumn{ 2 }{c}{feedback (\iter=1, \feed=3)}  & \multicolumn{ 2 }{c}{feedback (\iter=3, \feed=1)}  & \multicolumn{ 2 }{c}{feedback (\iter=5, \feed=3)}                                                                                          \\
     \cmidrule(lr){ 3-4 }
@@ -10,43 +17,43 @@
     \cmidrule(lr){ 9-10 }
     &                            & GPT-4o        & GPT-4o-mini        & GPT-4o        & GPT-4o-mini        & GPT-4o        & GPT-4o-mini        & GPT-4o        & GPT-4o-mini           \\
     \midrule
-    \multirow{ 3 }{*}{\rotatebox{90}{CM1-NASA}}
+    \multirow{ 3 }{*}{\rotatebox{90}{\CMOneNASA}}
     & P.    & 0.345    & 0.337    & 0.354    & \textbf{ 0.372 }    & 0.362    & 0.358    & 0.354    & 0.358 \\
     & R.    & \textbf{ 0.644 }    & \textbf{ 0.644 }    & \textbf{ 0.644 }    & \textbf{ 0.644 }    & \textbf{ 0.644 }    & \textbf{ 0.644 }    & \textbf{ 0.644 }    & \textbf{ 0.644 } \\
     & F\textsubscript{1}    & 0.45    & 0.443    & 0.457    & \textbf{ 0.472 }    & 0.464    & 0.46    & 0.457    & 0.46 \\
     \arrayrulecolor{kit-gray30} \midrule \arrayrulecolor{black}
 
-    \multirow{ 3 }{*}{\rotatebox{90}{GANNT}}
-    & P.    & 0.552    & 0.544    & 0.552    & 0.544    & \textbf{ 0.569 }    & 0.544    & 0.552    & \textbf{ 0.569 } \\
-    & R.    & \textbf{ 0.544 }    & \textbf{ 0.544 }    & \textbf{ 0.544 }    & \textbf{ 0.544 }    & \textbf{ 0.544 }    & \textbf{ 0.544 }    & \textbf{ 0.544 }    & \textbf{ 0.544 } \\
-    & F\textsubscript{1}    & 0.548    & 0.544    & 0.548    & 0.544    & \textbf{ 0.556 }    & 0.544    & 0.548    & \textbf{ 0.556 } \\
-    \arrayrulecolor{kit-gray30} \midrule \arrayrulecolor{black}
-
-    \multirow{ 3 }{*}{\rotatebox{90}{ModisDataset}}
-    & P.    & 0.212    & 0.212    & \textbf{ 0.562 }    & 0.324    & 0.314    & 0.5    & 0.444    & 0.275 \\
-    & R.    & \textbf{ 0.268 }    & \textbf{ 0.268 }    & 0.22    & \textbf{ 0.268 }    & \textbf{ 0.268 }    & \textbf{ 0.268 }    & 0.195    & \textbf{ 0.268 } \\
-    & F\textsubscript{1}    & 0.237    & 0.237    & 0.316    & 0.293    & 0.289    & \textbf{ 0.349 }    & 0.271    & 0.272 \\
-    \arrayrulecolor{kit-gray30} \midrule \arrayrulecolor{black}
-
-    \multirow{ 3 }{*}{\rotatebox{90}{WARC}}
-    & P.    & 0.394    & 0.38    & 0.455    & 0.378    & 0.44    & 0.392    & \textbf{ 0.485 }    & 0.383 \\
-    & R.    & \textbf{ 0.699 }    & \textbf{ 0.699 }    & \textbf{ 0.699 }    & 0.691    & \textbf{ 0.699 }    & 0.669    & \textbf{ 0.699 }    & 0.684 \\
-    & F\textsubscript{1}    & 0.504    & 0.492    & 0.551    & 0.488    & 0.54    & 0.495    & \textbf{ 0.572 }    & 0.491 \\
-    \arrayrulecolor{kit-gray30} \midrule \arrayrulecolor{black}
-
-    \multirow{ 3 }{*}{\rotatebox{90}{dronology}}
+    \multirow{ 3 }{*}{\rotatebox{90}{\Dronology}}
     & P.    & 0.395    & 0.387    & 0.459    & 0.408    & 0.422    & 0.408    & 0.436    & \textbf{ 0.475 } \\
     & R.    & \textbf{ 0.695 }    & \textbf{ 0.695 }    & 0.686    & 0.686    & 0.691    & 0.686    & 0.686    & 0.614 \\
     & F\textsubscript{1}    & 0.504    & 0.498    & \textbf{ 0.55 }    & 0.512    & 0.524    & 0.512    & 0.534    & 0.536 \\
     \arrayrulecolor{kit-gray30} \midrule \arrayrulecolor{black}
 
-    \multirow{ 3 }{*}{\rotatebox{90}{Avg.}}
+    \multirow{ 3 }{*}{\rotatebox{90}{\GANNT}}
+    & P.    & 0.552    & 0.544    & 0.552    & 0.544    & \textbf{ 0.569 }    & 0.544    & 0.552    & \textbf{ 0.569 } \\
+    & R.    & \textbf{ 0.544 }    & \textbf{ 0.544 }    & \textbf{ 0.544 }    & \textbf{ 0.544 }    & \textbf{ 0.544 }    & \textbf{ 0.544 }    & \textbf{ 0.544 }    & \textbf{ 0.544 } \\
+    & F\textsubscript{1}    & 0.548    & 0.544    & 0.548    & 0.544    & \textbf{ 0.556 }    & 0.544    & 0.548    & \textbf{ 0.556 } \\
+    \arrayrulecolor{kit-gray30} \midrule \arrayrulecolor{black}
+
+    \multirow{ 3 }{*}{\rotatebox{90}{\ModisDataset}}
+    & P.    & 0.212    & 0.212    & \textbf{ 0.562 }    & 0.324    & 0.314    & 0.5    & 0.444    & 0.275 \\
+    & R.    & \textbf{ 0.268 }    & \textbf{ 0.268 }    & 0.22    & \textbf{ 0.268 }    & \textbf{ 0.268 }    & \textbf{ 0.268 }    & 0.195    & \textbf{ 0.268 } \\
+    & F\textsubscript{1}    & 0.237    & 0.237    & 0.316    & 0.293    & 0.289    & \textbf{ 0.349 }    & 0.271    & 0.272 \\
+    \arrayrulecolor{kit-gray30} \midrule \arrayrulecolor{black}
+
+    \multirow{ 3 }{*}{\rotatebox{90}{\WARC}}
+    & P.    & 0.394    & 0.38    & 0.455    & 0.378    & 0.44    & 0.392    & \textbf{ 0.485 }    & 0.383 \\
+    & R.    & \textbf{ 0.699 }    & \textbf{ 0.699 }    & \textbf{ 0.699 }    & 0.691    & \textbf{ 0.699 }    & 0.669    & \textbf{ 0.699 }    & 0.684 \\
+    & F\textsubscript{1}    & 0.504    & 0.492    & 0.551    & 0.488    & 0.54    & 0.495    & \textbf{ 0.572 }    & 0.491 \\
+    \arrayrulecolor{kit-gray30} \midrule \arrayrulecolor{black}
+
+    \multirow{ 3 }{*}{\rotatebox{90}{\Avg}}
     & P.    & 0.38    & 0.372    & \textbf{ 0.476 }    & 0.405    & 0.421    & 0.44    & 0.454    & 0.412 \\
     & R.    & \textbf{ 0.57 }    & \textbf{ 0.57 }    & 0.559    & 0.567    & 0.569    & 0.562    & 0.554    & 0.551 \\
     & F\textsubscript{1}    & 0.449    & 0.443    & \textbf{ 0.484 }    & 0.462    & 0.475    & 0.472    & 0.476    & 0.463 \\
     \arrayrulecolor{kit-gray30} \midrule \arrayrulecolor{black}
 
-    \multirow{ 3 }{*}{\rotatebox{90}{Weighted Avg.}}
+    \multirow{ 3 }{*}{\rotatebox{90}{\WeightedAvg}}
     & P.    & 0.397    & 0.388    & \textbf{ 0.469 }    & 0.408    & 0.432    & 0.425    & 0.458    & 0.437 \\
     & R.    & \textbf{ 0.637 }    & \textbf{ 0.637 }    & 0.629    & 0.631    & 0.635    & 0.625    & 0.627    & 0.598 \\
     & F\textsubscript{1}    & 0.484    & 0.477    & \textbf{ 0.523 }    & 0.489    & 0.508    & 0.494    & 0.518    & 0.499 \\

@@ -63,10 +63,10 @@ To evaluate the \APE algorithms proposed in \Todo{add link to approach}, a multi
 They are taken from \citewithauthor{hey2025ReplicationPackage}'s replication package.
 Some of the gold standard files were modified to provide consistency between artifact naming and the gold standard reference.
 The actual contents are not affected by this.
-The CCHIT dataset was omitted, as it differs from the others in that it does not link high-level artifacts with low-level artifacts.
+The \ac{CCHIT} dataset was omitted, as it differs from the others in that it does not link high-level artifacts with low-level artifacts.
 An overview of the sets used can be seen in \autoref{tab:dataset_overview}.
 \directQuote{Datasets comprise either high-level requirements (HLR), low-level requirements (LLR), requirements (R) or regulatory codes (RC). Percentage of linked source and target artifacts in the gold standard is given in brackets.}{hey2025RequirementsTraceability}
-
+\Todo{add citation to dataset acronyms; add full names and mention them here as well?}
 \begin{table}[]
     \centering
     \begin{tabular}{lccccc}
@@ -74,11 +74,11 @@ An overview of the sets used can be seen in \autoref{tab:dataset_overview}.
         \cmidrule(lr){ 2-3 } \cmidrule(lr){ 4-6 }
         Dataset   & Source & Target & Source     & Target     & Traceability Links \\
         \arrayrulecolor{kit-gray30} \midrule \arrayrulecolor{black}
-        CM1-NASA  & HLR    & LLR    & 22 (86\%)  & 53 (57\%)  & 45   \\
-        Dronology & HLR    & LLR    & 99 (93\%)  & 211 (99\%) & 220  \\
-        GANNT     & HLR    & LLR    & 17 (100\%) & 69 (99\%)  & 68   \\
-        MODIS     & HLR    & LLR    & 19 (63\%)  & 49 (63\%)  & 41   \\
-        WARC      & HLR    & LLR    & 63 (95\%)  & 89 (89\%)  & 136  \\
+        \acl{CM-1NASA}  & HLR    & LLR    & 22 (86\%)  & 53 (57\%)  & 45   \\
+        \acl{Dronology} & HLR    & LLR    & 99 (93\%)  & 211 (99\%) & 220  \\
+        \acl{GANNT}     & HLR    & LLR    & 17 (100\%) & 69 (99\%)  & 68   \\
+        \acl{MODIS}     & HLR    & LLR    & 19 (63\%)  & 49 (63\%)  & 41   \\
+        \acl{WARC}      & HLR    & LLR    & 63 (95\%)  & 89 (89\%)  & 136  \\
         \arrayrulecolor{kit-gray30} \midrule \arrayrulecolor{black}
     \end{tabular}
     \caption{Overview of the datasets adjusted from \citeauthor{hey2025RequirementsTraceability}~\cite[Table 1]{hey2025RequirementsTraceability}}
@@ -184,8 +184,8 @@ Thus, while this more detailed classification of the \LLM might even improve per
 \label{subsec:Evaluation:naive_optimization:systematic-evaluation-results}
 
 The systematic evaluation results for varying models and datasets are presented in \autoref{tab:naive_optimization}.
-The average and weighted average are also included.
-The average value is computed across all datasets, while the weighted average factors the dataset size in as well.
+The \Average and \WeightedAverage are also included.
+The \Average value is computed across all datasets, while the \WeightedAverage factors the dataset size in as well.
 The amount of \TLs in the gold standard reference for the dataset, seen in \autoref{tab:dataset_overview}, is used as the metric for dataset size.
 
 \autoref{tab:naive_optimization} \Todo{Consider removing the 1 - 0 - 0 column. bietet hier wenig mehrwert; ggf nur in text packen und dann aus der tabelle raus. sorgt auch dafür, dass die andere dinge außer 1.0 fett sind.}
@@ -279,7 +279,7 @@ Several of these are fitted to the WARC dataset, explicitly mentioning it, for e
 \label{subsec:Evaluation:simple_feedback_optimization:systematic-evaluation-results}
 
 The systematic evaluation results for varying models, datasets, and parameters are presented in \autoref{tab:feedback_optimizer}.
-Like in \autoref{subsec:Evaluation:naive_optimization:systematic-evaluation-results}, the average and weighted average are also included.
+Like in \autoref{subsec:Evaluation:naive_optimization:systematic-evaluation-results}, the \Average and \WeightedAverage are also included.
 Noteworthy is that \llama once again fails to comply with the instruction to leave the output format as \textquotesingle yes \textquotesingle or \textquotesingle no \textquotesingle for the dronology dataset. \Todo{Include in Appendix?}
 Also, compared to the naive optimization approach in \autoref{tab:naive_optimization}, more iteration steps actually provide a benefit.
 
@@ -350,18 +350,19 @@ As such, \fone scores during the \APE process on the reduced training set starte
 \label{subsec:Evaluation:varying-the-optimization-prompt:systematic-evaluation-results}
 
 The systematic evaluation results for varying models, datasets, and parameters are presented in \autoref{tab:zadenoori_optimization}.
-Once again, the average and weighted average are also included.
+Once again, the \Average and \WeightedAverage are also included.
 The results are quite similar to the naive feedback optimization approach in \autoref{tab:feedback_optimizer}.
 The \fone scores are slightly higher on average.
 A prevalent issue remains that more iteration steps often do not yield better results.
 
-\autoref{tab:zadenoori_optimization} \Todo{Careful, the column names are often modified here}
-
-\begin{table}
-    \centering
-    \renewcommand{\arraystretch}{1.4}
-    \input{tables/ZadenooriOptimizationPrompt}
-    \renewcommand{\arraystretch}{1}
-    \caption{Naive prompt optimization approach using the optimization prompt by \citewithauthor{zadenoori2025AutomaticPrompt}}
-    \label{tab:zadenoori_optimization}
-\end{table}
+\begin{landscape}
+    % Todo: Careful, currently the tabularx width is manually replaced with \hsize in the table to adjust to landscape mode
+    \begin{table}
+        \centering
+        \renewcommand{\arraystretch}{1}
+        \input{tables/ZadenooriOptimizationPrompt}
+        \renewcommand{\arraystretch}{1}
+        \caption{Naive prompt optimization approach using the optimization prompt by \citewithauthor{zadenoori2025AutomaticPrompt}}
+        \label{tab:zadenoori_optimization}
+    \end{table}
+\end{landscape}
