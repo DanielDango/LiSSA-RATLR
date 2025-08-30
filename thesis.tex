@@ -77,6 +77,13 @@
 %% ====================================
 %% ====================================
 \begin{document}
+
+% Adjust autoref capitalization for consistency as requested by advisor
+\renewcommand{\sectionautorefname}{Section}
+\renewcommand{\subsectionautorefname}{Section}
+\renewcommand{\subsubsectionautorefname}{Section}
+\renewcommand{\chapterautorefname}{Chapter}
+
 %% Set PDF metadata
 \setpdf
 
@@ -135,6 +142,9 @@
 %% --------------------
 
 %% Add entry to the table of contents for the bibliography
+\setcounter{biburllcpenalty}{7000}
+\setcounter{biburlucpenalty}{8000}
+
 \printbibliography[heading=bibintoc]
 
 %% ----------------
