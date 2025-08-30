@@ -1,35 +1,42 @@
 \chapter{Foundations}
+\label{ch:foundations}
 
 To understand the application of automated prompt engineering for \TLR, some key concepts are quite important.
 They will be explained in the following subsections.
 
 
-\section{Definition of Traceability Link Recovery}
-Traceability is \directQuote[]{the ability to find or follow something}{2025Traceability}, according to the Cambridge Dictionary.
+\section{Traceability Link Recovery}
+\label{sec:foundations:tlr}
+According to the Cambridge Dictionary, traceability is \directQuote{the ability to find or follow something}{2025Traceability}.
 Meaning, there is evidence of some past occurrence.
 The task of \TLR in software engineering is to find instances of the same element across different software artifacts and link them for further processing.
-What these elements might look like was visualized in \autoref{fig:artifact_overview}.
+\Todo{ggf dann hier auch ne Quelle}
+What these elements might look like is visualized in \autoref{fig:artifact_overview}.
 These traceability links help track relationships between, for example, code, requirements, diagrams, documentation, and other elements.
 This information can be used to ensure consistency between different artifacts and versions.
 To find all or most \TLs in a larger project can be quite a time-consuming task if done manually.
 
 This becomes especially apparent when inconsistencies are introduced into the project's artifacts.
-As shown by \citewithauthor{wohlrab2019ImprovingConsistency}, inconsistencies in wording and language are quite common during different stages of development.
+As shown by \citewithauthor{wohlrab2019ImprovingConsistency}, inconsistencies \Todo{ggf dann hier auch die ArDoCo Inconsistency Detection (ID) nennen; die nutzt TLR für ID: https://ardoco.de/approaches/inconsistency-detection/} in wording and language are quite common during different stages of development.
 For example, naming conventions for architectural components might not be followed during implementation.
 They find the impact of these naming inconsistencies to be quite insignificant.
 In this case, typically, there will be different naming conventions on each layer, which are followed correspondingly.
 This might thus not be much of a hurdle when a human is looking for \TLs.
 However, for automated trace link recovery, this means that simple string comparisons by name are insufficient.
-While \LLMs can overcome these inconsistencies, finding suitable prompts might be challenging or include tedious manual work in prompt engineering. 
+While \LLMs can overcome these inconsistencies, finding suitable prompts might be challenging or include tedious manual work in prompt engineering.
 
+\section{\LiSSA}
+\label{sec:foundations:lissa}
+\Todo{ggf wäre hier LiSSA als Abschnitt gut, damit man einschätzen kann, wo man prompts jetzt in der TLR verwendet.}
 
-\section{Definition of Automated Prompt Engineering}
-\label{foundations:sec:automated_prompt_engineering}
+\section{Automated Prompt Engineering}
+\label{sec:foundations:ape}
 Prompt engineering is the process of refining a prompt for a specific use case.
-This is typically done in a non-systematic, manual manner. \Acl{APE} enables \LLMs to refine the initial prompt to optimize their performance~\cite{zadenoori2025AutomaticPrompt}.
-
-Typically, \APE processes are iterated to improve previous results further \citeiterative.
+This is typically done in a non-systematic, manual manner.
+\Acl{APE} enables \LLMs to refine the initial prompt to optimize their performance~\cite{zadenoori2025AutomaticPrompt}.
+Usually, \APE processes are iterated to improve previous results further \citeiterative.
 An illustration of the core concept and how it can be implemented will be shown in \autoref{approach:sec:naive_iterative} and  \autoref{fig:iterative_core_loop}.
+\Todo{Bitte keine vorwärts-referenzen.}
 
 In general, the refinement process will start with some initial prompt.
 It needs to be selected first before any optimization can occur.
@@ -41,8 +48,10 @@ They prompt the model to generate a likely set of instructions, also called cand
 The instructions will achieve good results when prompted with a batch of input/output pairs.
 These pairs of input/output data will be processed as text by the \LLM, pre- and or post-processing may be required.
 
+\Todo{für die abläufe wären kleine grafiken gut}
+
 The performance of prompts can be estimated using a set of training data, which consists of textual input/output pairs for the \LLM.
-The exact content of these pairs depends on the context of the problem for which the prompts are optimized. 
+The exact content of these pairs depends on the context of the problem for which the prompts are optimized.
 For example, sentiment analysis training data might provide pairs consisting of sentences and their correctly identified sentiment.
 A prompt performs better the more inputs are correctly mapped onto their expected outputs.
 
@@ -52,37 +61,32 @@ While this is a very simple and general attempt to \APE, algorithms can of cours
 \section{Automatic Prompt Optimization Using Gradient Descent}
 \label{sec:gradient_descent}
 \citewithauthor{pryzant2023AutomaticPrompt} propose the \ProTeGi algorithm.
+\Todo{2.3 sollte so gebaut werden, dass 2.3.1 und 2.3.2 auch eingeführt werden, also um was es darin geht. 2.3 ist irgenwie teil von 2.2 .. da muss man schauen, wie man das kombinieren / abgrenzen kann.}
 This entire section is based on their work.
 
-In contrast to the general iterative \APE in \autoref{foundations:sec:automated_prompt_engineering}, they create multiple improved prompts after each step of the optimization during a single iteration.
+In contrast to the general iterative \APE in \autoref{sec:foundations:ape}, they create multiple improved prompts after each step of the optimization during a single iteration.
 This is also illustrated in \autoref{fig:gradient_descent}.
 The set of candidates for optimization, the set of improved candidates that corrected previous shortcomings, as well as a set of paraphrased improved candidates, are taken into consideration when selecting the candidates that are carried to the next iteration.
 Once any candidate performs better than some threshold value or a maximum number of iterations has been reached, the best performing candidate will be returned as the output of the \ProTeGi algorithm.
 
 \begin{figure}
-\centering
-\includesvg[width=0.7\linewidth]{graphics/gradient_descent}
-\caption{Overview of the iterative optimization loop in~\cite{pryzant2023AutomaticPrompt}}
-\label{fig:gradient_descent}
+    \centering
+    \includesvg[width=0.7\linewidth]{graphics/gradient_descent}
+    \caption{Overview of the iterative optimization loop in~\cite{pryzant2023AutomaticPrompt}}
+    \label{fig:gradient_descent}
 \end{figure}
+\Todo{add legend, symbolise core loop, add description in text, adjust image to fit page better}
 
-\begin{comment}
-TODO: 
-\begin{itemize}
-    \item add legend
-    \item symbolise core loop
-\end{itemize}
-\end{comment}
 
 The following subsections will explain each step of the \ProTeGi optimization in more detail.
 The \ProTeGi algorithm also takes an initial prompt $p_0$ and training data $\{(x_1, y_1), \dots, (x_n, y_n)\}$ consisting of inputs and outputs.
-They \directQuote[sec. 2]{assume access to a black box LLM API [...] which returns a likely text continuation y of the prompt formed by concatenating p and x}{pryzant2023AutomaticPrompt}.
+They \directQuote[sec. 2]{assume access to a black box LLM API \idots which returns a likely text continuation y of the prompt formed by concatenating p and x}{pryzant2023AutomaticPrompt}.
 They then iteratively optimize the initial prompt $p_0$ to produce an approximation of the most optimized prompt for the given task.
 In order to optimize the prompt, a function is required that computes deviance between the actual output $y$ and the expected output $y_i$ as a numeric value.
 
-
 \subsection{Evaluation and Expansion}
-To evaluate the output of the current prompt $p_i$, \citeauthor{pryzant2023AutomaticPrompt} use a loss signal prompt $\triangledown$, the gradient prompt.
+\Todo{Auch hier wäre ein Ablauf gut}
+To evaluate the output of the current prompt $p_i$, \citeauthor{pryzant2023AutomaticPrompt} use a loss signal prompt \Todo{Was ist das? Bitte einführen} $\triangledown$, the gradient prompt.
 In addition to the prompt, inputs that were not correctly classified when testing $p_i$ are also provided as context for $\triangledown$.
 The result summarizes the flaws of $p_i$ in natural language.
 This summary is called the textual gradient $g$.
@@ -92,8 +96,7 @@ They differ from other iterative implementations by generating multiple gradient
 In addition, they broaden their candidate prompts further by paraphrasing them into semantically similar prompts, which are worded differently.
 Generating new prompts with $g$ and broadening them is considered candidate expansion.
 
-
-\subsection{Candidate Selection with  Multi-Armed Bandit}
+\subsection{Candidate Selection with Multi-Armed Bandit}
 To select candidates for the next iteration, \citeauthor{pryzant2023AutomaticPrompt} apply a beam search algorithm.
 Beam search is a heuristic best-first graph search algorithm to select a fixed number of promising paths.
 The remaining paths will be discarded to allocate resources to more promising paths instead~\cite{BeamSearch}.
@@ -119,8 +122,8 @@ If the prompt $p$ provides the expected output $y$ for a given input $x$, one is
 Otherwise, zero will be returned.
 
 \begin{equation}
-\label{eq:sample_binary_metric}
-    m(llm(p, x), y) = 
+    \label{eq:sample_binary_metric}
+    m(llm(p, x), y) =
     \begin{cases}
         0, \text{if $llm(p, x) \neq y$}\\
         1, \text{if $llm(p, x) \eq y$}
@@ -134,15 +137,15 @@ A pseudocode implementation of this candidate selection algorithm can be seen in
 
 
 \begin{algorithm}
-\caption{\directQuote[Modified from Algorithm 4, p. 4]{$Select(\cdot)$ with Successive Rejects}{pryzant2023AutomaticPrompt}}
-\label{alg:gradient_descent_select}
-\begin{algorithmic}[1]
-    \State Initialize: $S_0 \gets \{p_1, \dots , p_n\}$
-    \For{$k = 1, \dots , {n  - 1}$}
-        \State Sample $D_{sample} \subset D_{tr}, |D_{sample}| = n(k)$
-        \State Evaluate $p_i \in S_{k-1}$ with $m(p_i, D_{sample})$
-        \State $S_k \gets S_{k-1}$, excluding the prompt with the lowest score from the previous step
-    \EndFor
-    \State \Return Best prompt $p^* \in S_{n-1}$
-\end{algorithmic}
+    \caption{\directQuote[Modified from Algorithm 4, p. 4]{$Select(\cdot)$ with Successive Rejects}{pryzant2023AutomaticPrompt}}
+    \label{alg:gradient_descent_select}
+    \begin{algorithmic}[1]
+        \State Initialize: $S_0 \gets \{p_1, \dots , p_n\}$
+        \For{$k = 1, \dots , {n - 1}$}
+            \State Sample $D_{sample} \subset D_{tr}, |D_{sample}| = n(k)$
+            \State Evaluate $p_i \in S_{k-1}$ with $m(p_i, D_{sample})$
+            \State $S_k \gets S_{k-1}$, excluding the prompt with the lowest score from the previous step
+        \EndFor
+        \State \Return Best prompt $p^* \in S_{n-1}$
+    \end{algorithmic}
 \end{algorithm}
