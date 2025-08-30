@@ -188,13 +188,14 @@ The average and weighted average are also included.
 The average value is computed across all datasets, while the weighted average factors the dataset size in as well.
 The amount of \TLs in the gold standard reference for the dataset, seen in \autoref{tab:dataset_overview}, is used as the metric for dataset size.
 
+\autoref{tab:naive_optimization} \Todo{Consider removing the 1 - 0 - 0 column. bietet hier wenig mehrwert; ggf nur in text packen und dann aus der tabelle raus. sorgt auch dafür, dass die andere dinge außer 1.0 fett sind.}
+
 \begin{table}
     \centering
     \renewcommand{\arraystretch}{1.4}
     \input{tables/SimpleAndRepeatedOptimization}
     \renewcommand{\arraystretch}{1}
-    \caption{Naive prompt optimization approach prompting the model to optimize the classification prompt.
-    \Todo{Consider removing the 1 - 0 - 0 column. bietet hier wenig mehrwert; ggf nur in text packen und dann aus der tabelle raus. sorgt auch dafür, dass die andere dinge außer 1.0 fett sind.}}
+    \caption{Naive prompt optimization approach prompting the model to optimize the classification prompt.}
     \label{tab:naive_optimization}
 \end{table}
 
@@ -208,10 +209,11 @@ The \APE process with feedback, as described in \autoref{ch:Approach} \Todo{Fix 
 To describe the different configurations used in this evaluation section, the parameters in \autoref{eq:feedback_parameters} will be used.
 \Todo{Are default values mentioned here or in the corresponding approach text?}
 
+\autoref{eq:feedback_parameters}\Todo{Consider removing the textual description of the parameters and just keep the equations.}
+
 \begin{figure}
     \raggedright
-    \caption{Configurable parameters used in the \APE process. \\
-    \Todo{Consider removing the textual description of the parameters and just keep the equations.}}
+    \caption{Configurable parameters used in the \APE process.}
     \begin{equation}
         \label{eq:feedback_parameters}
         \begin{aligned}
@@ -352,6 +354,8 @@ Once again, the average and weighted average are also included.
 The results are quite similar to the naive feedback optimization approach in \autoref{tab:feedback_optimizer}.
 The \fone scores are slightly higher on average.
 A prevalent issue remains that more iteration steps often do not yield better results.
+
+\autoref{tab:zadenoori_optimization} \Todo{Careful, the column names are often modified here}
 
 \begin{table}
     \centering
