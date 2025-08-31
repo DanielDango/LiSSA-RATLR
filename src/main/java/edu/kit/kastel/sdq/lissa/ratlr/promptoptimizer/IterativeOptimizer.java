@@ -1,10 +1,11 @@
 /* Licensed under MIT 2025. */
 package edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer;
 
+import static edu.kit.kastel.sdq.lissa.ratlr.elementstore.ElementStore.reduceSourceElementStore;
+import static edu.kit.kastel.sdq.lissa.ratlr.elementstore.ElementStore.reduceTargetStore;
 import static edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.SimpleOptimizer.DEFAULT_OPTIMIZATION_TEMPLATE;
 import static edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.SimpleOptimizer.ORIGINAL_PROMPT_KEY;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -146,15 +147,8 @@ public class IterativeOptimizer extends AbstractPromptOptimizer {
                 .getFirst();
         // TODO consider going back to final instead of using a mutable variable
         template = template.replace("{source_type}", source.getType()).replace("{target_type}", target.getType());
-        ElementStore trainingSourceStore =
-                new ElementStore(sourceStore.getAllElements(false).subList(0, TRAINING_DATA_SIZE), null);
-        List<Pair<Element, float[]>> trainingTargetElements = new ArrayList<>();
-        for (var element : trainingSourceStore.getAllElements(true)) {
-            for (Element candidate : targetStore.findSimilar(element)) {
-                trainingTargetElements.add(targetStore.getById(candidate.getIdentifier()));
-            }
-        }
-        ElementStore trainingTargetStore = new ElementStore(trainingTargetElements, targetStore.getRetrievalStrategy());
+        ElementStore trainingSourceStore = reduceSourceElementStore(sourceStore, TRAINING_DATA_SIZE);
+        ElementStore trainingTargetStore = reduceTargetStore(trainingSourceStore, targetStore);
         return optimizeIntern(trainingSourceStore, trainingTargetStore);
     }
 

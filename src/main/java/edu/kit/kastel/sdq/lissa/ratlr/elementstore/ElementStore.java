@@ -236,4 +236,37 @@ public class ElementStore {
         }
         return elements;
     }
+
+    /**
+     * Retrieves a subset of the source store to be used as training data for optimization.
+     * The training data consists of the first size elements from the source store.
+     *
+     * @param sourceStore The original source element store
+     * @param size The number of elements to include in the training source store
+     * @return A new ElementStore containing only the training data elements
+     * @throws IllegalStateException If this is a target store (similarityRetriever = true)
+     */
+    public static ElementStore reduceSourceElementStore(ElementStore sourceStore, int size) {
+        return new ElementStore(sourceStore.getAllElements(false).subList(0, size), null);
+    }
+
+    /**
+     * Retrieves a subset of the target store that corresponds to the source store.
+     * This method finds all elements in the target store that are similar to the elements in the source store.
+     *
+     *
+     * @param sourceStore The training source element store
+     * @param targetStore The original target element store
+     * @return A new ElementStore containing only the target elements that correspond to the training source elements
+     * @throws IllegalStateException If this the source store is a target store (similarityRetriever = true) or the target store is a source store (similarityRetriever = false)
+     */
+    public static ElementStore reduceTargetStore(ElementStore sourceStore, ElementStore targetStore) {
+        List<Pair<Element, float[]>> reducedTargetElements = new ArrayList<>();
+        for (var element : sourceStore.getAllElements(true)) {
+            for (Element candidate : targetStore.findSimilar(element)) {
+                reducedTargetElements.add(targetStore.getById(candidate.getIdentifier()));
+            }
+        }
+        return new ElementStore(reducedTargetElements, targetStore.getRetrievalStrategy());
+    }
 }
