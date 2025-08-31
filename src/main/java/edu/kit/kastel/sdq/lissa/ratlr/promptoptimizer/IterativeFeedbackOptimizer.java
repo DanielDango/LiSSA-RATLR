@@ -101,7 +101,7 @@ public class IterativeFeedbackOptimizer extends IterativeOptimizer {
             f1Scores[i] = f1Score;
             String request = template.replace(ORIGINAL_PROMPT_KEY, optimizationPrompt);
             request = generateFeedbackPrompt(traceLinks, possibleTraceLinks, sourceStore, targetStore) + request;
-            modifiedPrompt = cachedRequest(request);
+            modifiedPrompt = cachedSanitizedRequest(request);
             optimizationPrompt = modifiedPrompt;
             i++;
         } while (i < maximumIterations && f1Score < THRESHOLD_F1_SCORE);

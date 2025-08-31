@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 
 import edu.kit.kastel.mcse.ardoco.metrics.ClassificationMetricsCalculator;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.Cache;
-import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheKey;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheManager;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.ChatLanguageModelProvider;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.ClassificationResult;
@@ -23,7 +22,7 @@ import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
 import edu.kit.kastel.sdq.lissa.ratlr.postprocessor.TraceLinkIdPostprocessor;
 import edu.kit.kastel.sdq.lissa.ratlr.resultaggregator.ResultAggregator;
-import edu.kit.kastel.sdq.lissa.ratlr.utils.Pair;
+import edu.kit.kastel.sdq.lissa.ratlr.utils.ChatLanguageModelUtils;
 
 import dev.langchain4j.model.chat.ChatModel;
 
@@ -171,7 +170,7 @@ public class IterativeOptimizer extends AbstractPromptOptimizer {
             logger.debug("Iteration {}: F1-Score = {}", i, f1Score);
             f1Scores[i] = f1Score;
             String request = template.replace(ORIGINAL_PROMPT_KEY, optimizationPrompt);
-            modifiedPrompt = cachedRequest(request);
+            modifiedPrompt = cachedSanitizedRequest(request);
             optimizationPrompt = modifiedPrompt;
             i++;
         } while (i < maximumIterations && f1Score < THRESHOLD_F1_SCORE);
@@ -186,15 +185,8 @@ public class IterativeOptimizer extends AbstractPromptOptimizer {
      * @param request The request to send to the language model
      * @return The optimized prompt extracted from the response
      */
-    protected String cachedRequest(String request) {
-        CacheKey cacheKey = CacheKey.of(provider.modelName(), provider.seed(), CacheKey.Mode.CHAT, request);
-        String response = cache.get(cacheKey, String.class);
-        if (response == null) {
-            logger.info("Optimizing ({})", provider.modelName());
-            response = llm.chat(request);
-            cache.put(cacheKey, response);
-        }
-        logger.debug("Response: {}", response);
+    protected String cachedSanitizedRequest(String request) {
+        String response = ChatLanguageModelUtils.cachedRequest(request, provider, llm, cache);
         response = extractPromptFromResponse(response);
         return response;
     }
