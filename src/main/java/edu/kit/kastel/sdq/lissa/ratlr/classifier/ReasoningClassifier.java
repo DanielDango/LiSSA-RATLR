@@ -26,6 +26,7 @@ import dev.langchain4j.model.chat.response.ChatResponse;
  * using configurable prompts and caching to improve performance.
  */
 public class ReasoningClassifier extends Classifier {
+    public static final String REGEX_TRACE_PATTERN = "<trace>(.*?)</trace>";
     private final Cache cache;
 
     /**
@@ -138,7 +139,7 @@ public class ReasoningClassifier extends Classifier {
         String llmResponse = classifyIntern(sourceToConsider, targetToConsider);
         boolean isRelated = isRelated(llmResponse);
         if (isRelated) {
-            return Optional.of(ClassificationResult.of(source, targetToConsider));
+            return Optional.of(ClassificationResult.of(source, targetToConsider, getReasoning(llmResponse), 1.0));
         }
         return Optional.empty();
     }
@@ -151,15 +152,28 @@ public class ReasoningClassifier extends Classifier {
      * @return true if the response indicates a trace link, false otherwise
      */
     private boolean isRelated(String llmResponse) {
-        Pattern pattern = Pattern.compile("<trace>(.*?)</trace>", Pattern.CASE_INSENSITIVE);
+        Pattern pattern = Pattern.compile(REGEX_TRACE_PATTERN, Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(llmResponse);
         boolean related = false;
         if (matcher.find()) {
-            related = matcher.group().toLowerCase().contains("yes");
+            related = matcher.group(1).toLowerCase().contains("yes");
         } else {
             logger.debug("No trace tag found in response: {}", llmResponse);
         }
         return related;
+    }
+
+    /**
+     * Extracts the reasoning part from the language model's response by removing the trace tag.
+     *
+     * @param llmResponse The response from the language model
+     * @return The reasoning text without the trace tag
+     */
+    private String getReasoning(String llmResponse) {
+        Pattern pattern = Pattern.compile(REGEX_TRACE_PATTERN, Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(llmResponse);
+
+        return matcher.replaceAll("");
     }
 
     /**
@@ -172,10 +186,10 @@ public class ReasoningClassifier extends Classifier {
      */
     private String classifyIntern(Element source, Element target) {
         List<ChatMessage> messages = new ArrayList<>();
-        if (useSystemMessage)
+        if (useSystemMessage) {
             messages.add(new SystemMessage(
                     "Your job is to determine if there is a traceability link between two artifacts of a system."));
-
+        }
         String request = prompt.replace("{source_type}", source.getType())
                 .replace("{source_content}", source.getContent())
                 .replace("{target_type}", target.getType())

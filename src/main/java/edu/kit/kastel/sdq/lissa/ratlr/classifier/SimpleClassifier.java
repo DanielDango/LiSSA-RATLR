@@ -2,6 +2,8 @@
 package edu.kit.kastel.sdq.lissa.ratlr.classifier;
 
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import edu.kit.kastel.sdq.lissa.ratlr.cache.Cache;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheKey;
@@ -37,6 +39,8 @@ public class SimpleClassifier extends Classifier {
 
             Answer with 'yes' or 'no'.
             """;
+
+    private static final String REGEX_THINK_PATTERN = "<think>(.*?)</think>";
 
     private final Cache cache;
 
@@ -115,21 +119,40 @@ public class SimpleClassifier extends Classifier {
     @Override
     protected final Optional<ClassificationResult> classify(Element source, Element target) {
         String llmResponse = classifyIntern(source, target);
-
-        String thinkEnd = "</think>";
-        if (llmResponse.startsWith("<think>") && llmResponse.contains(thinkEnd)) {
-            // Omit the thinking of models like deepseek-r1
-            llmResponse = llmResponse
-                    .substring(llmResponse.indexOf(thinkEnd) + thinkEnd.length())
-                    .strip();
-        }
-
-        boolean isRelated = llmResponse.toLowerCase().contains("yes");
-        if (isRelated) {
-            return Optional.of(ClassificationResult.of(source, target));
+        if (isRelated(llmResponse)) {
+            return Optional.of(ClassificationResult.of(source, target, getReasoning(llmResponse), 1.0));
         }
 
         return Optional.empty();
+    }
+
+    /**
+     * The response is expected to contain a label with "yes" or "no".
+     * Omits the thinking of models like deepseek-r1.
+     *
+     * @param llmResponse The response from the language model
+     * @return true if the response indicates a trace link, false otherwise
+     */
+    private boolean isRelated(String llmResponse) {
+        Pattern pattern = Pattern.compile(REGEX_THINK_PATTERN, Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(llmResponse);
+        return matcher.replaceAll("").toLowerCase().contains("yes");
+    }
+
+    /**
+     * Extracts the reasoning part from the language model's response by removing the think tag.
+     * This is present for models like deepseek-r1.
+     *
+     * @param llmResponse The response from the language model
+     * @return The reasoning text without the think tag
+     */
+    private String getReasoning(String llmResponse) {
+        Pattern pattern = Pattern.compile(REGEX_THINK_PATTERN, Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(llmResponse);
+        if (matcher.find()) {
+            return matcher.group(1).toLowerCase();
+        }
+        return "";
     }
 
     /**

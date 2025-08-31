@@ -20,6 +20,12 @@ public record ClassificationResult(
         Element target,
 
         /**
+         * Optional textual explanation or reasoning behind the classification decision.
+         * If no explanation is provided, this field may empty.
+         */
+        String explanation,
+
+        /**
          * The confidence score of the classification, ranging from 0.0 to 1.0.
          * A score of 1.0 indicates maximum confidence in the relationship.
          */
@@ -43,7 +49,7 @@ public record ClassificationResult(
      * @return A new classification result with maximum confidence
      */
     public static ClassificationResult of(Element source, Element target) {
-        return new ClassificationResult(source, target, 1.0);
+        return new ClassificationResult(source, target, "", 1.0);
     }
 
     /**
@@ -56,6 +62,20 @@ public record ClassificationResult(
      * @throws IllegalArgumentException If the confidence score is not between 0 and 1
      */
     public static ClassificationResult of(Element source, Element target, double confidence) {
-        return new ClassificationResult(source, target, confidence);
+        return new ClassificationResult(source, target, "", confidence);
+    }
+
+    /**
+     * Creates a classification result with the specified confidence score and explanation.
+     *
+     * @param source The source element
+     * @param target The target element
+     * @param explanation The textual explanation for the classification decision
+     * @param confidence The confidence score (must be between 0 and 1)
+     * @return A new classification result with the specified confidence
+     * @throws IllegalArgumentException If the confidence score is not between 0 and 1
+     */
+    public static ClassificationResult of(Element source, Element target, String explanation, double confidence) {
+        return new ClassificationResult(source, target, explanation, confidence);
     }
 }
