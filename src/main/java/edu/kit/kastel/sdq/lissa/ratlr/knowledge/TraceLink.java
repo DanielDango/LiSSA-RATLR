@@ -18,4 +18,8 @@ public record TraceLink(String sourceId, String targetId) implements Comparable<
                 ? this.sourceId.compareTo(o.sourceId)
                 : this.targetId.compareTo(o.targetId);
     }
+
+    public static TraceLink of(String sourceId, String targetId) {
+        return new TraceLink(sourceId, targetId);
+    }
 }

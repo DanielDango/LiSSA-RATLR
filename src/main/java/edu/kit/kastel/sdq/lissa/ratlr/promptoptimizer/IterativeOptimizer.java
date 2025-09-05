@@ -44,7 +44,7 @@ public class IterativeOptimizer extends AbstractPromptOptimizer {
      * The default size of the training data used for optimization.
      * This is the number of elements in the source store.
      */
-    private static final int TRAINING_DATA_SIZE = 3;
+    protected static final int TRAINING_DATA_SIZE = 3;
 
     /**
      * The cache used to store and retrieve prompt optimization LLM requests.
@@ -78,10 +78,10 @@ public class IterativeOptimizer extends AbstractPromptOptimizer {
      */
     protected final int maximumIterations;
 
-    private final Classifier classifier;
+    protected final Classifier classifier;
     private final ResultAggregator aggregator;
     private final TraceLinkIdPostprocessor traceLinkIdPostProcessor;
-    private final Set<TraceLink> validTraceLinks;
+    protected final Set<TraceLink> validTraceLinks;
     private final ClassificationMetricsCalculator cmc;
     /**
      * Creates a new iterative optimizer with the specified configuration.
@@ -201,21 +201,22 @@ public class IterativeOptimizer extends AbstractPromptOptimizer {
      */
     protected double evaluateF1(ElementStore sourceStore, ElementStore targetStore, String prompt) {
 
-        Set<TraceLink> traceLinks = evaluateTraceLinks(sourceStore, targetStore, prompt);
-        Set<TraceLink> possibleTraceLinks = getFindableTraceLinks(sourceStore, targetStore);
+        Set<TraceLink> traceLinks = getTraceLinks(sourceStore, targetStore, prompt);
+        Set<TraceLink> possibleTraceLinks = getReducedGoldStandardLinks(sourceStore, targetStore);
         var classification = cmc.calculateMetrics(traceLinks, possibleTraceLinks, null);
         return classification.getF1();
     }
 
     /**
-     * Evaluates trace links between the source and target stores using the provided prompt.
+     * Utilizes the internal classifier to determine existing trace links between the source and target stores using the
+     * provided prompt.
      * The results are aggregated and post-processed.
      * @param sourceStore   The store containing source elements
      * @param targetStore   The store containing target elements
      * @param prompt        The prompt to use for classification
      * @return A set of trace links that were classified based on the prompt
      */
-    protected Set<TraceLink> evaluateTraceLinks(ElementStore sourceStore, ElementStore targetStore, String prompt) {
+    protected Set<TraceLink> getTraceLinks(ElementStore sourceStore, ElementStore targetStore, String prompt) {
         classifier.setClassificationPrompt(prompt);
         List<ClassificationResult> results = classifier.classify(sourceStore, targetStore);
 
@@ -232,7 +233,7 @@ public class IterativeOptimizer extends AbstractPromptOptimizer {
      * @param targetStore The store containing target elements
      * @return A subset of the gold standard trace links that can be created between the source and target stores
      */
-    protected Set<TraceLink> getFindableTraceLinks(ElementStore sourceStore, ElementStore targetStore) {
+    protected Set<TraceLink> getReducedGoldStandardLinks(ElementStore sourceStore, ElementStore targetStore) {
         List<String> sourceTraceLinkIds = sourceStore.getAllElements().stream()
                 .map(Element::getIdentifier)
                 .toList();

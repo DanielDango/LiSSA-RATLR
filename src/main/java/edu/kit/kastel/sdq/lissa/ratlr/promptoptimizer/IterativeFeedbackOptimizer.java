@@ -26,7 +26,7 @@ public class IterativeFeedbackOptimizer extends IterativeOptimizer {
      * The {examples} placeholder will be replaced with specific examples of misclassified trace links, so this key
      * should be included in the prompt.
      */
-    private static final String FEEDBACK_PROMPT_TEMPLATE =
+    public static final String FEEDBACK_PROMPT_TEMPLATE =
             """
             The current prompt is not performing well in classifying the following trace links. To help you improve the
             prompt, I will provide examples of misclassified trace links. Please analyze these examples and adjust the
@@ -34,7 +34,7 @@ public class IterativeFeedbackOptimizer extends IterativeOptimizer {
             {examples}
             """;
 
-    private static final String FEEDBACK_PROMPT_KEY = "feedback_prompt";
+    public static final String FEEDBACK_PROMPT_KEY = "feedback_prompt";
 
     /**
      * The template for the feedback example block.
@@ -53,9 +53,9 @@ public class IterativeFeedbackOptimizer extends IterativeOptimizer {
      * The default number of feedback examples to include in the prompt.
      * This value determines how many misclassified trace links will be shown in the feedback prompt.
      */
-    private static final int FEEDBACK_SIZE = 5;
+    public static final int FEEDBACK_SIZE = 5;
 
-    private static final String FEEDBACK_SIZE_KEY = "feedback_size";
+    public static final String FEEDBACK_SIZE_KEY = "feedback_size";
 
     private final String feedbackPrompt;
     private final int feedbackSize;
@@ -88,14 +88,14 @@ public class IterativeFeedbackOptimizer extends IterativeOptimizer {
     @Override
     protected String optimizeIntern(ElementStore sourceStore, ElementStore targetStore) {
         double[] f1Scores = new double[maximumIterations];
-        Set<TraceLink> possibleTraceLinks = getFindableTraceLinks(sourceStore, targetStore);
+        Set<TraceLink> possibleTraceLinks = getReducedGoldStandardLinks(sourceStore, targetStore);
         int i = 0;
         double f1Score;
         Set<TraceLink> traceLinks;
         String modifiedPrompt = optimizationPrompt;
         do {
             logger.debug("Iteration {}: RequestPrompt = {}", i, modifiedPrompt);
-            traceLinks = super.evaluateTraceLinks(sourceStore, targetStore, modifiedPrompt);
+            traceLinks = super.getTraceLinks(sourceStore, targetStore, modifiedPrompt);
             f1Score = super.evaluateF1(sourceStore, targetStore, modifiedPrompt);
             logger.debug("Iteration {}: F1-Score = {}", i, f1Score);
             f1Scores[i] = f1Score;
