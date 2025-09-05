@@ -143,6 +143,10 @@ public abstract class Classifier {
         return results;
     }
 
+    public Optional<ClassificationResult> classify(ClassificationTask task) {
+        return classify(task.source(), task.target());
+    }
+
     /**
      * Classifies a pair of elements.
      * This method must be implemented by concrete classifier implementations to define
