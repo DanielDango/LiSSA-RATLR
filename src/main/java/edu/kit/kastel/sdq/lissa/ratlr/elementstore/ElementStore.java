@@ -247,7 +247,7 @@ public class ElementStore {
      * @throws IllegalStateException If this is a target store (similarityRetriever = true)
      */
     public static ElementStore reduceSourceElementStore(ElementStore sourceStore, int size) {
-        return new ElementStore(sourceStore.getAllElements(false).subList(0, size), null);
+        return new ElementStore(sourceStore.getAllElements(false).subList(0, Math.min(size, sourceStore.size())), null);
     }
 
     /**
@@ -268,5 +268,9 @@ public class ElementStore {
             }
         }
         return new ElementStore(reducedTargetElements, targetStore.getRetrievalStrategy());
+    }
+
+    private int size() {
+        return elementsWithEmbedding.size();
     }
 }
