@@ -41,6 +41,11 @@ public class AutomaticPromptOptimizer extends IterativeFeedbackOptimizer {
     public static final String START_TAG = "<START>";
     public static final String END_TAG = "<END>";
     public static final String SECTION_HEADER_PREFIX = "# ";
+    private static final String TASK_SECTION = "task";
+
+    // Default prompts from the original implementation
+
+    private static final String GRADIENT_PROMPT_KEY = "gradient_prompt";
     private static final String DEFAULT_GRADIENT_PROMPT =
             """
                 I'm trying to write a zero-shot classifier prompt.
@@ -54,28 +59,9 @@ public class AutomaticPromptOptimizer extends IterativeFeedbackOptimizer {
                 give %d reasons why the prompt could have gotten these examples wrong.
                 Wrap each reason with <START> and <END>
                 """;
-    private static final String TASK_SECTION = "task";
 
-    private static final String NUMBER_OF_GRADIENTS_KEY = "number_of_gradients";
-    private static final int DEFAULT_NUMBER_OF_GRADIENTS = 4;
-    private static final String NUMBER_OF_ERRORS_KEY = "number_of_errors";
-    private static final int DEFAULT_NUMBER_OF_ERRORS = 1;
-    private static final String NUMBER_OF_GRADIENTS_PER_ERROR_KEY = "gradients_per_error";
-    private static final int DEFAULT_NUMBER_OF_GRADIENTS_PER_ERROR = 1;
-    // parser.add_argument('--steps_per_gradient', default=1, type=int)
-    private static final String STEPS_PER_GRADIENT_KEY = "steps_per_gradient";
-    private static final int STEPS_PER_GRADIENT = 1;
-    // parser.add_argument('--mc_samples_per_step', default=2, type=int)
-    private static final String MC_SAMPLES_PER_STEP_KEY = "mc_samples_per_step";
-    private static final int MC_SAMPLES_PER_STEP = 2;
-    // parser.add_argument('--max_expansion_factor', default=8, type=int)
-    private static final String MAX_EXPANSION_FACTOR_KEY = "max_expansion_factor";
-    private static final int MAX_EXPANSION_FACTOR = 8;
-    // parser.add_argument('--reject_on_errors', action='store_true')
-    private static final String REJECT_ON_ERRORS_KEY = "reject_on_errors";
-    private static final boolean REJECT_ON_ERRORS = true;
-
-    public static final String DEFAULT_TRANSFORMATION_PROMPT =
+    private static final String TRANSFORMATION_PROMPT_KEY = "transformation_prompt";
+    private static final String DEFAULT_TRANSFORMATION_PROMPT =
             """
             I'm trying to write a zero-shot classifier.
 
@@ -92,33 +78,57 @@ public class AutomaticPromptOptimizer extends IterativeFeedbackOptimizer {
 
             The %d new prompts are:
             """;
-    public static final String DEFAULT_SYNONYM_PROMPT =
-            "Generate a variation of the following instruction while keeping the semantic meaning.%n%nInput: %s%n%nOutput:";
-    public static final int MAX_ERROR_SAMPLES_TODO = 16;
 
-    // parser.add_argument('--samples_per_eval', default=32, type=int)
+    private static final String SYNONYM_PROMPT_KEY = "synonym_prompt";
+    private static final String DEFAULT_SYNONYM_PROMPT =
+            "Generate a variation of the following instruction while keeping the semantic meaning.%n%nInput: %s%n%nOutput:";
+
+    //TODO add to config
+    private static final int MAX_ERROR_SAMPLES_TODO = 16;
+
+    private static final String NUMBER_OF_GRADIENTS_KEY = "number_of_gradients";
+    private static final int DEFAULT_NUMBER_OF_GRADIENTS = 4;
+    private static final String NUMBER_OF_ERRORS_KEY = "number_of_errors";
+    private static final int DEFAULT_NUMBER_OF_ERRORS = 1;
+    private static final String NUMBER_OF_GRADIENTS_PER_ERROR_KEY = "gradients_per_error";
+    private static final int DEFAULT_NUMBER_OF_GRADIENTS_PER_ERROR = 1;
+    private static final String STEPS_PER_GRADIENT_KEY = "steps_per_gradient";
+    private static final int STEPS_PER_GRADIENT = 1;
+    private static final String MC_SAMPLES_PER_STEP_KEY = "mc_samples_per_step";
+    private static final int MC_SAMPLES_PER_STEP = 2;
+    private static final String MAX_EXPANSION_FACTOR_KEY = "max_expansion_factor";
+    private static final int MAX_EXPANSION_FACTOR = 8;
+    private static final String REJECT_ON_ERRORS_KEY = "reject_on_errors";
+    private static final boolean REJECT_ON_ERRORS = true;
     private static final String SAMPLES_PER_EVAL_KEY = "samples_per_eval";
     private static final int SAMPLES_PER_EVAL = 32;
-    // parser.add_argument('--eval_rounds', default=8, type=int)
     private static final String EVAL_ROUNDS_KEY = "eval_rounds";
     private static final int EVAL_ROUNDS = 8;
-    // parser.add_argument('--eval_prompts_per_round', default=8, type=int)
     private static final String EVAL_PROMPTS_PER_ROUND_KEY = "eval_prompts_per_round";
     private static final int EVAL_PROMPTS_PER_ROUND = 8;
-    // config['eval_budget'] = config['samples_per_eval'] * config['eval_rounds'] * config['eval_prompts_per_round']
-    private static final int EVALUATION_BUDGET = SAMPLES_PER_EVAL * EVAL_ROUNDS * EVAL_PROMPTS_PER_ROUND;
-    // parser.add_argument('--minibatch_size', default=64, type=int)
     private static final String MINIBATCH_SIZE_KEY = "minibatch_size";
     private static final int MINIBATCH_SIZE = 64;
-    // parser.add_argument('--beam_size', default=4, type=int)
     private static final String BEAM_SIZE_KEY = "beam_size";
     private static final int BEAM_SIZE = 4;
 
-    private final String feedbackPrompt;
-    private final int feedbackSize;
     private final int numberOfGradients;
     private final int numberOfErrors;
     private final int numberOfGradientsPerError;
+    private final int stepsPerGradient;
+    private final int mcSamplesPerStep;
+    private final int maxExpansionFactor;
+    private final boolean rejectOnErrors;
+    private final int samplesPerEval;
+    private final int evalRounds;
+    private final int evalPromptsPerRound;
+    private final int evaluationBudget;
+    private final int minibatchSize;
+    private final int beamSize;
+
+    private final String gradientPrompt;
+    private final String transformationPrompt;
+    private final String synonymPrompt;
+
     private final AbstractEvaluator evaluator;
     private final AbstractScorer scorer;
 
@@ -129,13 +139,27 @@ public class AutomaticPromptOptimizer extends IterativeFeedbackOptimizer {
             TraceLinkIdPostprocessor traceLinkIdPostProcessor,
             Classifier classifier) {
         super(configuration, goldStandard, aggregator, traceLinkIdPostProcessor, classifier);
-        this.feedbackPrompt = configuration.argumentAsString(FEEDBACK_PROMPT_KEY, FEEDBACK_PROMPT_TEMPLATE);
-        this.feedbackSize = configuration.argumentAsInt(FEEDBACK_SIZE_KEY, FEEDBACK_SIZE);
-        // Todo: Remember to add temperature parameter
         this.numberOfGradients = configuration.argumentAsInt(NUMBER_OF_GRADIENTS_KEY, DEFAULT_NUMBER_OF_GRADIENTS);
         this.numberOfErrors = configuration.argumentAsInt(NUMBER_OF_ERRORS_KEY, DEFAULT_NUMBER_OF_ERRORS);
         this.numberOfGradientsPerError =
                 configuration.argumentAsInt(NUMBER_OF_GRADIENTS_PER_ERROR_KEY, DEFAULT_NUMBER_OF_GRADIENTS_PER_ERROR);
+        this.stepsPerGradient = configuration.argumentAsInt(STEPS_PER_GRADIENT_KEY, STEPS_PER_GRADIENT);
+        this.mcSamplesPerStep = configuration.argumentAsInt(MC_SAMPLES_PER_STEP_KEY, MC_SAMPLES_PER_STEP);
+        this.maxExpansionFactor = configuration.argumentAsInt(MAX_EXPANSION_FACTOR_KEY, MAX_EXPANSION_FACTOR);
+        this.rejectOnErrors = configuration.argumentAsBoolean(REJECT_ON_ERRORS_KEY, REJECT_ON_ERRORS);
+        this.samplesPerEval = configuration.argumentAsInt(SAMPLES_PER_EVAL_KEY, SAMPLES_PER_EVAL);
+        this.evalRounds = configuration.argumentAsInt(EVAL_ROUNDS_KEY, EVAL_ROUNDS);
+        this.evalPromptsPerRound = configuration.argumentAsInt(EVAL_PROMPTS_PER_ROUND_KEY, EVAL_PROMPTS_PER_ROUND);
+        this.evaluationBudget = this.samplesPerEval * this.evalRounds * this.evalPromptsPerRound;
+        this.minibatchSize = configuration.argumentAsInt(MINIBATCH_SIZE_KEY, MINIBATCH_SIZE);
+        this.beamSize = configuration.argumentAsInt(BEAM_SIZE_KEY, BEAM_SIZE);
+
+        this.gradientPrompt = configuration.argumentAsString(GRADIENT_PROMPT_KEY, DEFAULT_GRADIENT_PROMPT);
+        this.transformationPrompt =
+                configuration.argumentAsString(TRANSFORMATION_PROMPT_KEY, DEFAULT_TRANSFORMATION_PROMPT);
+        this.synonymPrompt = configuration.argumentAsString(SYNONYM_PROMPT_KEY, DEFAULT_SYNONYM_PROMPT);
+
+        // Todo: Remember to add temperature parameter
         // TODO: Get through config by factory
         this.evaluator = new UCBanditEvaluator();
         this.scorer = new BinaryScorer();
@@ -224,8 +248,8 @@ public class AutomaticPromptOptimizer extends IterativeFeedbackOptimizer {
                     .sorted((a, b) -> Double.compare(b.first(), a.first()))
                     .toList();
             candidatePrompts =
-                    scorePromptPairs.stream().map(Pair::second).limit(BEAM_SIZE).toList();
-            scores = scorePromptPairs.stream().map(Pair::first).limit(BEAM_SIZE).toList();
+                    scorePromptPairs.stream().map(Pair::second).limit(beamSize).toList();
+            scores = scorePromptPairs.stream().map(Pair::first).limit(beamSize).toList();
             // record candidates, estimated scores, and true scores
             logger.info("Scores: {}", scores);
         }
@@ -251,8 +275,8 @@ public class AutomaticPromptOptimizer extends IterativeFeedbackOptimizer {
      *  Get "gradients" for a prompt based on the error string.
      */
     private List<String> getGradientsInternal(String prompt, String errorString, int numberOfResponses) {
-        String gradientPrompt = String.format(DEFAULT_GRADIENT_PROMPT, prompt, errorString, numberOfGradientsPerError);
-        return cachedSanitizedPromptRequest(numberOfResponses, gradientPrompt);
+        String formattedGradientPrompt = String.format(gradientPrompt, prompt, errorString, numberOfGradientsPerError);
+        return cachedSanitizedPromptRequest(numberOfResponses, formattedGradientPrompt);
     }
 
     /**
@@ -311,7 +335,7 @@ public class AutomaticPromptOptimizer extends IterativeFeedbackOptimizer {
      */
     private List<String> expandCandidates(List<String> prompts, ElementStore sourceStore, ElementStore targetStore) {
         // minibatch
-        ElementStore trainingSourceStore = ElementStore.reduceSourceElementStore(sourceStore, MINIBATCH_SIZE);
+        ElementStore trainingSourceStore = ElementStore.reduceSourceElementStore(sourceStore, minibatchSize);
         ElementStore trainingTargetStore = ElementStore.reduceTargetStore(trainingSourceStore, targetStore);
 
         List<String> newPrompts = new ArrayList<>();
@@ -330,10 +354,10 @@ public class AutomaticPromptOptimizer extends IterativeFeedbackOptimizer {
             // generate synonyms
             // TODO Find out what MC is
             ArrayList<String> mcSampledTaskSections = new ArrayList<>();
-            if (MC_SAMPLES_PER_STEP > 0) {
+            if (mcSamplesPerStep > 0) {
                 for (String section : Stream.concat(newTaskSections.stream(), Stream.of(taskSection))
                         .toList()) {
-                    mcSampledTaskSections.addAll(generateSynonyms(section, MC_SAMPLES_PER_STEP));
+                    mcSampledTaskSections.addAll(generateSynonyms(section, mcSamplesPerStep));
                 }
             }
             // combine
@@ -345,8 +369,8 @@ public class AutomaticPromptOptimizer extends IterativeFeedbackOptimizer {
                 tempNewPrompts.add(prompt.replace(taskSection, section));
             }
             // filter a little
-            if (combinedTaskSections.size() > MAX_EXPANSION_FACTOR) {
-                if (REJECT_ON_ERRORS) {
+            if (combinedTaskSections.size() > maxExpansionFactor) {
+                if (rejectOnErrors) {
                     List<ClassificationTask> errorExamples = new ArrayList<>();
                     for (EvaluationResult<Boolean> result : evaluation) {
                         if (!result.isCorrect()) {
@@ -358,10 +382,10 @@ public class AutomaticPromptOptimizer extends IterativeFeedbackOptimizer {
                             errorExamples.stream().limit(MAX_ERROR_SAMPLES_TODO).toList();
                     // speed up a little
                     tempNewPrompts = tempNewPrompts.stream()
-                            .limit(MAX_EXPANSION_FACTOR * 2)
+                            .limit(maxExpansionFactor * 2)
                             .toList();
                     AbstractScorer scorer = new BinaryScorer();
-                    AbstractEvaluator evaluator = new BruteForceEvaluator(EVALUATION_BUDGET);
+                    AbstractEvaluator evaluator = new BruteForceEvaluator(evaluationBudget);
                     List<Double> errorScores = evaluator.call(tempNewPrompts, errorExamples, classifier, scorer);
                     List<Integer> sortedIdxs = errorScores.stream()
                             .sorted()
@@ -370,12 +394,12 @@ public class AutomaticPromptOptimizer extends IterativeFeedbackOptimizer {
                             .boxed()
                             .toList();
                     tempNewPrompts = sortedIdxs.stream()
-                            .skip(Math.max(0, sortedIdxs.size() - MAX_EXPANSION_FACTOR))
+                            .skip(Math.max(0, sortedIdxs.size() - maxExpansionFactor))
                             .map(tempNewPrompts::get)
                             .toList();
                 } else {
                     tempNewPrompts =
-                            tempNewPrompts.stream().limit(MAX_EXPANSION_FACTOR).toList();
+                            tempNewPrompts.stream().limit(maxExpansionFactor).toList();
                 }
             }
             newPrompts.addAll(tempNewPrompts);
@@ -390,14 +414,14 @@ public class AutomaticPromptOptimizer extends IterativeFeedbackOptimizer {
      */
     private List<String> applyGradient(
             String prompt, String errorString, String feedbackString, int numberOfResponses) {
-        String transformationPrompt = String.format(
-                DEFAULT_TRANSFORMATION_PROMPT,
+        String formattedTransformationPrompt = String.format(
+                transformationPrompt,
                 prompt,
                 errorString,
                 feedbackString,
-                STEPS_PER_GRADIENT,
-                STEPS_PER_GRADIENT);
-        return cachedSanitizedPromptRequest(numberOfResponses, transformationPrompt);
+                stepsPerGradient,
+                stepsPerGradient);
+        return cachedSanitizedPromptRequest(numberOfResponses, formattedTransformationPrompt);
     }
 
     private List<String> cachedSanitizedPromptRequest(int n, String prompt) {
@@ -417,8 +441,8 @@ public class AutomaticPromptOptimizer extends IterativeFeedbackOptimizer {
      * Generate synonyms for a prompt section.
      */
     private List<String> generateSynonyms(String promptSection, int n) {
-        String rewriterPrompt = String.format(DEFAULT_SYNONYM_PROMPT, promptSection);
-        return nCachedRequest(rewriterPrompt, provider, llm, cache, n);
+        String formattedSynonymPrompt = String.format(synonymPrompt, promptSection);
+        return nCachedRequest(formattedSynonymPrompt, provider, llm, cache, n);
     }
 
     /**
