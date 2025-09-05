@@ -183,6 +183,9 @@ public class AutomaticPromptOptimizer extends IterativeFeedbackOptimizer {
                 result.put(currentHeader, result.get(currentHeader) + line + System.lineSeparator());
             }
         }
+        if (result.isEmpty()) {
+            result.put(TASK_SECTION, prompt);
+        }
         return result;
     }
 
@@ -309,7 +312,7 @@ public class AutomaticPromptOptimizer extends IterativeFeedbackOptimizer {
     private List<String> expandCandidates(List<String> prompts, ElementStore sourceStore, ElementStore targetStore) {
         // minibatch
         ElementStore trainingSourceStore = ElementStore.reduceSourceElementStore(sourceStore, MINIBATCH_SIZE);
-        ElementStore trainingTargetStore = ElementStore.reduceTargetStore(targetStore, trainingSourceStore);
+        ElementStore trainingTargetStore = ElementStore.reduceTargetStore(trainingSourceStore, targetStore);
 
         List<String> newPrompts = new ArrayList<>();
         for (String prompt : prompts) {
