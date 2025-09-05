@@ -20,6 +20,7 @@ import edu.kit.kastel.sdq.lissa.ratlr.elementstore.ElementStore;
 import edu.kit.kastel.sdq.lissa.ratlr.evaluator.AbstractEvaluator;
 import edu.kit.kastel.sdq.lissa.ratlr.evaluator.BruteForceEvaluator;
 import edu.kit.kastel.sdq.lissa.ratlr.evaluator.UCBanditEvaluator;
+import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
 import edu.kit.kastel.sdq.lissa.ratlr.postprocessor.TraceLinkIdPostprocessor;
 import edu.kit.kastel.sdq.lissa.ratlr.resultaggregator.ResultAggregator;
@@ -452,11 +453,24 @@ public class AutomaticPromptOptimizer extends IterativeFeedbackOptimizer {
     private static Set<TraceLink> getAllTraceLinks(ElementStore sourceStore, ElementStore targetStore) {
         Set<TraceLink> allLinks = new HashSet<>();
         for (var source : sourceStore.getAllElements(true)) {
-            for (var target : targetStore.getAllElements(true)) {
-                allLinks.add(TraceLink.of(
-                        source.first().getIdentifier(), target.first().getIdentifier()));
+            for (Element target : targetStore.findSimilar(source)) {
+                allLinks.add(TraceLink.of(source.first().getIdentifier(), target.getIdentifier()));
             }
         }
         return allLinks;
+    }
+
+    private List<ClassificationTask> getAllClassificationTasks(ElementStore sourceStore, ElementStore targetStore) {
+        List<ClassificationTask> tasks = new ArrayList<>();
+        for (Pair<Element, float[]> source : sourceStore.getAllElements(true)) {
+            for (Element target : targetStore.findSimilar(source)) {
+                tasks.add(new ClassificationTask(
+                        source.first(),
+                        target,
+                        validTraceLinks.contains(
+                                TraceLink.of(source.first().getIdentifier(), target.getIdentifier()))));
+            }
+        }
+        return tasks;
     }
 }
