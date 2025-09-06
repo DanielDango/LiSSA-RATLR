@@ -9,10 +9,14 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Random;
 import java.util.Set;
+import java.util.random.RandomGenerator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import edu.kit.kastel.sdq.lissa.ratlr.classifier.ClassificationResult;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.ClassificationTask;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.Classifier;
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
@@ -108,6 +112,8 @@ public class AutomaticPromptOptimizer extends IterativeFeedbackOptimizer {
     private static final int MINIBATCH_SIZE = 64;
     private static final String BEAM_SIZE_KEY = "beam_size";
     private static final int BEAM_SIZE = 4;
+    private static final String SEED_KEY = "seed";
+    private static final int DEFAULT_SEED = 133742243;
 
     private final int numberOfGradients;
     private final int numberOfErrors;
@@ -129,6 +135,7 @@ public class AutomaticPromptOptimizer extends IterativeFeedbackOptimizer {
 
     private final AbstractEvaluator evaluator;
     private final AbstractScorer scorer;
+    private final RandomGenerator random;
 
     public AutomaticPromptOptimizer(
             ModuleConfiguration configuration,
@@ -161,8 +168,8 @@ public class AutomaticPromptOptimizer extends IterativeFeedbackOptimizer {
 
         this.evaluator = evaluator;
         this.scorer = scorer;
+        this.random = new Random(configuration.argumentAsInt(SEED_KEY, DEFAULT_SEED));
     }
-
 
     /**
      * Parses a sectioned prompt into a map of section headers to their corresponding content.
@@ -202,26 +209,18 @@ public class AutomaticPromptOptimizer extends IterativeFeedbackOptimizer {
 
     @Override
     public String optimize(ElementStore sourceStore, ElementStore targetStore) {
-        List<ClassificationTask> tasks = new ArrayList<>();
-        Set<TraceLink> possibleTraceLinks = getAllTraceLinks(sourceStore, targetStore);
-        for (TraceLink link : possibleTraceLinks) {
-            tasks.add(new ClassificationTask(
-                    sourceStore.getById(link.sourceId()).first(),
-                    targetStore.getById(link.targetId()).first(),
-                    validTraceLinks.contains(link)));
-        }
-        return optimizeInternal(sourceStore, targetStore, tasks);
+        List<ClassificationTask> tasks = getAllClassificationTasks(sourceStore, targetStore);
+        return optimizeInternal(tasks);
     }
     /**
      */
-    private String optimizeInternal(
-            ElementStore sourceStore, ElementStore targetStore, List<ClassificationTask> tasks) {
+    private String optimizeInternal(List<ClassificationTask> tasks) {
         List<String> candidatePrompts = new ArrayList<>(Collections.singleton(optimizationPrompt));
         for (int round = 0; round < maximumIterations; round++) {
             logger.info("Starting apo iteration {}/{}", round + 1, maximumIterations);
             // expand candidates
             if (round > 0) {
-                candidatePrompts = expandCandidates(candidatePrompts, sourceStore, targetStore);
+                candidatePrompts = expandCandidates(candidatePrompts, tasks);
                 logger.info("Expanded to {} candidates", candidatePrompts.size());
             }
             // score candidates
@@ -325,23 +324,22 @@ public class AutomaticPromptOptimizer extends IterativeFeedbackOptimizer {
     /**
      * Expand a list of prompts by generating gradient-based successors and synonyms for each section.
      */
-    private List<String> expandCandidates(List<String> prompts, ElementStore sourceStore, ElementStore targetStore) {
+    private List<String> expandCandidates(List<String> prompts, List<ClassificationTask> tasks) {
         // minibatch
-        ElementStore trainingSourceStore = ElementStore.reduceSourceElementStore(sourceStore, minibatchSize);
-        ElementStore trainingTargetStore = ElementStore.reduceTargetStore(trainingSourceStore, targetStore);
+        List<ClassificationTask> reducedTasks = new ArrayList<>(tasks);
+        Collections.shuffle(reducedTasks, random);
+        reducedTasks = reducedTasks.stream().limit(minibatchSize).toList();
 
         List<String> newPrompts = new ArrayList<>();
         for (String prompt : prompts) {
             String taskSection = parseSectionedPrompt(prompt).get(TASK_SECTION).strip();
             // evaluate prompt on minibatch
-            List<EvaluationResult<Boolean>> evaluation =
-                    evaluatePrompt(prompt, trainingSourceStore, trainingTargetStore);
+            List<EvaluationResult<Boolean>> evaluation = evaluatePrompt(reducedTasks, prompt);
             // get gradients
             List<Pair<String, String>> gradients = getGradients(taskSection, evaluation);
             List<String> newTaskSections = new ArrayList<>();
             for (Pair<String, String> feedbackAndError : gradients) {
-                newTaskSections.addAll(
-                        applyGradient(taskSection, feedbackAndError.second(), feedbackAndError.first()));
+                newTaskSections.addAll(applyGradient(taskSection, feedbackAndError.second(), feedbackAndError.first()));
             }
             // generate synonyms
             // TODO Find out what MC is
@@ -400,6 +398,23 @@ public class AutomaticPromptOptimizer extends IterativeFeedbackOptimizer {
         return newPrompts.stream().distinct().toList();
     }
 
+    // TODO: This looks like bad practice
+    private List<EvaluationResult<Boolean>> evaluatePrompt(
+            List<ClassificationTask> classificationTasks, String prompt) {
+        List<EvaluationResult<Boolean>> evaluation2 = new ArrayList<>();
+        classifier.setClassificationPrompt(prompt);
+        for (ClassificationTask task : classificationTasks) {
+            Optional<ClassificationResult> result = classifier.classify(task);
+            if (result.isPresent()) {
+                evaluation2.add(new EvaluationResult<>(
+                        task.source(), task.target(), task.label(), result.get().confidence() > 0.0));
+            } else {
+                evaluation2.add(new EvaluationResult<>(task.source(), task.target(), task.label(), false));
+            }
+        }
+        return evaluation2;
+    }
+
     /**
      * Incorporate feedback gradient into a prompt.
      */
@@ -425,31 +440,6 @@ public class AutomaticPromptOptimizer extends IterativeFeedbackOptimizer {
     private List<String> generateSynonyms(String promptSection, int n) {
         String formattedSynonymPrompt = String.format(synonymPrompt, promptSection);
         return cachedSanitizedPromptRequest(n, formattedSynonymPrompt);
-    }
-
-    /**
-     * Evaluate a prompt amd return a list of evaluation results, containing the source and target elements, the
-     * ground truth and classification result.
-     *
-     *
-     * @param prompt
-     * @param sourceStore
-     * @param targetStore
-     * @return
-     */
-    private List<EvaluationResult<Boolean>> evaluatePrompt(
-            String prompt, ElementStore sourceStore, ElementStore targetStore) {
-        Set<TraceLink> possibleTraceLinks = getAllTraceLinks(sourceStore, targetStore);
-        Set<TraceLink> classifiedTraceLinks = super.getTraceLinks(sourceStore, targetStore, prompt);
-        List<EvaluationResult<Boolean>> results = new ArrayList<>();
-        for (TraceLink link : possibleTraceLinks) {
-            results.add(new EvaluationResult<>(
-                    sourceStore.getById(link.sourceId()).first(),
-                    targetStore.getById(link.targetId()).first(),
-                    validTraceLinks.contains(link),
-                    classifiedTraceLinks.contains(link)));
-        }
-        return results;
     }
 
     /**
