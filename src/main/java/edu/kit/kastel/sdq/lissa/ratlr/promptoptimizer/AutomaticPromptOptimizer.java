@@ -159,8 +159,6 @@ public class AutomaticPromptOptimizer extends IterativeFeedbackOptimizer {
                 configuration.argumentAsString(TRANSFORMATION_PROMPT_KEY, DEFAULT_TRANSFORMATION_PROMPT);
         this.synonymPrompt = configuration.argumentAsString(SYNONYM_PROMPT_KEY, DEFAULT_SYNONYM_PROMPT);
 
-        // Todo: Remember to add temperature parameter
-
         this.evaluator = evaluator;
         this.scorer = scorer;
     }
