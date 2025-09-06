@@ -166,29 +166,38 @@ public class AutomaticPromptOptimizer extends IterativeFeedbackOptimizer {
 
     /**
      * Parses a sectioned prompt into a map of section headers to their corresponding content.
-     * Sections are identified by lines starting with "# ".
+     * Sections are identified by lines starting with "# " as in the Markdown syntax.
+     * If no sections are found, the entire prompt is treated as a single {@value TASK_SECTION} section.
      *
      * @param prompt The sectioned prompt string
      * @return A map where keys are section headers (in lowercase, without punctuation) and values are the section content
      */
     private static Map<String, String> parseSectionedPrompt(String prompt) {
-        Map<String, String> result = new HashMap<>();
+        Map<String, String> sections = new HashMap<>();
         String currentHeader = "";
+        StringBuilder currentSection = new StringBuilder();
         for (String line : prompt.split(System.lineSeparator())) {
             line = line.strip();
             if (line.startsWith(SECTION_HEADER_PREFIX)) {
-                // first word without punctuation
-                currentHeader = line.substring(2).strip().toLowerCase().split(" ")[0];
-                currentHeader = currentHeader.replaceAll("\\p{Punct}", "");
-                result.put(currentHeader, "");
-            } else if (!currentHeader.isEmpty()) {
-                result.put(currentHeader, result.get(currentHeader) + line + System.lineSeparator());
+                // save previous section
+                if (!currentHeader.isEmpty()) {
+                    sections.put(currentHeader, currentSection.toString().trim());
+                    currentSection = new StringBuilder();
+                }
+                // first word without punctuation as new header
+                currentHeader = line.substring(SECTION_HEADER_PREFIX.length())
+                        .strip()
+                        .toLowerCase()
+                        .split(" ")[0]
+                        .replaceAll("\\p{Punct}", "");
+            } else {
+                currentSection.append(line).append(System.lineSeparator());
             }
         }
-        if (result.isEmpty()) {
-            result.put(TASK_SECTION, prompt);
+        if (sections.isEmpty()) {
+            sections.put(TASK_SECTION, prompt);
         }
-        return result;
+        return sections;
     }
 
     @Override
