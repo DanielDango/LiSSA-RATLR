@@ -46,8 +46,8 @@ To get started with LiSSA, follow these steps:
 1. **Clone the Repository**:
 
    ```bash
-   git clone https://github.com/ArDoCo/LiSSA-RATLR
-   cd LiSSA-RATLR
+   git clone https://github.com/ardoco/lissa-ratlr
+   cd lissa-ratlr
    ```
 2. **Install Dependencies**:
    Ensure you have Java JDK 21 or later installed. Then, build the project using Maven:

@@ -39,43 +39,24 @@ import dev.langchain4j.model.openai.OpenAiChatModel;
  *     </ul>
  *   </li>
  * </ul>
+ *
+ * @see ChatLanguageModelPlatform
  */
 public class ChatLanguageModelProvider {
     /**
-     * Identifier for the OpenAI platform.
-     */
-    public static final String OPENAI = "openai";
-
-    /**
-     * Identifier for the Ollama platform.
-     */
-    public static final String OLLAMA = "ollama";
-
-    /**
-     * Identifier for the Blablador platform.
-     */
-    public static final String BLABLADOR = "blablador";
-
-    /**
-     * Identifier for the DeepSeek platform.
-     */
-    public static final String DEEPSEEK = "deepseek";
-
-    /**
-     * Default seed value for model randomization.
+     * Default seed value for model.
      */
     public static final int DEFAULT_SEED = 133742243;
 
-    // TODO: Refactor as Module Parameter?
     /**
-     * Models that do not support temperature settings. Lower temperature values mean less creativity and variation
-     * in the model's responses.
+     * Default temperature setting for the model.
      */
-    private static final String[] MODELS_WITHOUT_TEMPERATURE = {"o4-mini-2025-04-16", "gpt-5-mini"};
+    public static final double DEFAULT_TEMPERATURE = 0.0;
+
     /**
      * The platform to use for the language model.
      */
-    private final String platform;
+    private final ChatLanguageModelPlatform platform;
 
     /**
      * The name of the model to use.
@@ -88,19 +69,19 @@ public class ChatLanguageModelProvider {
     private int seed;
 
     /**
+     * Temperature setting for the model.
+     */
+    private double temperature;
+
+    /**
      * Creates a new chat language model provider with the specified configuration.
      * The configuration name should be in the format "mode_platform" (e.g., "simple_openai").
      *
      * @param configuration The module configuration containing model settings
      */
     public ChatLanguageModelProvider(ModuleConfiguration configuration) {
-        String[] modeXplatform = configuration.name().split(Classifier.CONFIG_NAME_SEPARATOR, 2);
-        if (modeXplatform.length == 1) {
-            this.platform = null;
-            return;
-        }
-        this.platform = modeXplatform[1];
-        initModelPlatform(configuration);
+        this.platform = ChatLanguageModelPlatform.fromModuleConfiguration(configuration);
+        this.initPlatformParameters(configuration);
     }
 
     /**
@@ -111,11 +92,10 @@ public class ChatLanguageModelProvider {
      */
     public ChatModel createChatModel() {
         return switch (platform) {
-            case OPENAI -> createOpenAiChatModel(modelName, seed);
-            case OLLAMA -> createOllamaChatModel(modelName, seed);
-            case BLABLADOR -> createBlabladorChatModel(modelName, seed);
-            case DEEPSEEK -> createDeepSeekChatModel(modelName, seed);
-            default -> throw new IllegalArgumentException("Unsupported platform: " + platform);
+            case OPENAI -> createOpenAiChatModel(modelName, seed, temperature);
+            case OLLAMA -> createOllamaChatModel(modelName, seed, temperature);
+            case BLABLADOR -> createBlabladorChatModel(modelName, seed, temperature);
+            case DEEPSEEK -> createDeepSeekChatModel(modelName, seed, temperature);
         };
     }
 
@@ -126,15 +106,11 @@ public class ChatLanguageModelProvider {
      * @param configuration The module configuration containing model settings
      * @throws IllegalArgumentException If the platform is not supported
      */
-    private void initModelPlatform(ModuleConfiguration configuration) {
+    private void initPlatformParameters(ModuleConfiguration configuration) {
         final String modelKey = "model";
-        this.modelName = switch (platform) {
-            case OPENAI -> configuration.argumentAsString(modelKey, "gpt-4o-mini");
-            case OLLAMA -> configuration.argumentAsString(modelKey, "llama3:8b");
-            case BLABLADOR -> configuration.argumentAsString(modelKey, "2 - Llama 3.3 70B instruct");
-            default -> throw new IllegalArgumentException("Unsupported platform: " + platform);
-        };
+        this.modelName = configuration.argumentAsString(modelKey, platform.getDefaultModel());
         this.seed = configuration.argumentAsInt("seed", DEFAULT_SEED);
+        this.temperature = configuration.argumentAsDouble("temperature", DEFAULT_TEMPERATURE);
     }
 
     /**
@@ -156,11 +132,20 @@ public class ChatLanguageModelProvider {
     }
 
     /**
+     * Gets the temperature setting for the model.
+     *
+     * @return The temperature value
+     */
+    public double temperature() {
+        return temperature;
+    }
+
+    /**
      * Gets the platform for which the language model is configured.
      *
      * @return The platform name
      */
-    public String platform() {
+    public ChatLanguageModelPlatform platform() {
         return platform;
     }
 
@@ -172,7 +157,7 @@ public class ChatLanguageModelProvider {
      * @return The number of threads to use
      */
     public static int threads(ModuleConfiguration configuration) {
-        return configuration.name().contains(OPENAI) || configuration.name().contains(BLABLADOR) ? 100 : 1;
+        return ChatLanguageModelPlatform.fromModuleConfiguration(configuration).getThreads();
     }
 
     /**
@@ -181,9 +166,10 @@ public class ChatLanguageModelProvider {
      *
      * @param model The name of the model to use
      * @param seed The seed value for randomization
+     * @param temperature The temperature setting for the model
      * @return A configured Ollama chat model instance
      */
-    private static OllamaChatModel createOllamaChatModel(String model, int seed) {
+    private static OllamaChatModel createOllamaChatModel(String model, int seed, double temperature) {
         String host = Environment.getenv("OLLAMA_HOST");
         String user = Environment.getenv("OLLAMA_USER");
         String password = Environment.getenv("OLLAMA_PASSWORD");
@@ -192,7 +178,7 @@ public class ChatLanguageModelProvider {
                 .baseUrl(host)
                 .modelName(model)
                 .timeout(Duration.ofMinutes(15))
-                .temperature(0.0)
+                .temperature(temperature)
                 .seed(seed);
         if (user != null && password != null && !user.isEmpty() && !password.isEmpty()) {
             ollama.customHeaders(Map.of(
@@ -210,23 +196,15 @@ public class ChatLanguageModelProvider {
      *
      * @param model The name of the model to use
      * @param seed The seed value for randomization
+     * @param temperature The temperature setting for the model
      * @return A configured OpenAI chat model instance
      * @throws IllegalStateException If required environment variables are not set
      */
-    private static OpenAiChatModel createOpenAiChatModel(String model, int seed) {
+    private static OpenAiChatModel createOpenAiChatModel(String model, int seed, double temperature) {
         String openAiOrganizationId = Environment.getenv("OPENAI_ORGANIZATION_ID");
         String openAiApiKey = Environment.getenv("OPENAI_API_KEY");
         if (openAiOrganizationId == null || openAiApiKey == null) {
             throw new IllegalStateException("OPENAI_ORGANIZATION_ID or OPENAI_API_KEY environment variable not set");
-        }
-        // Ideal temperature for most deterministic results
-        double temperature = 0.0;
-        // Set temperature based on the model type as some do not support temperature values
-        for (String modelWithoutTemperature : MODELS_WITHOUT_TEMPERATURE) {
-            if (model.equals(modelWithoutTemperature)) {
-                temperature = 1.0;
-                break;
-            }
         }
         return new OpenAiChatModel.OpenAiChatModelBuilder()
                 .modelName(model)
@@ -243,10 +221,11 @@ public class ChatLanguageModelProvider {
      *
      * @param model The name of the model to use
      * @param seed The seed value for randomization
+     * @param temperature The temperature setting for the model
      * @return A configured Blablador chat model instance
      * @throws IllegalStateException If required environment variables are not set
      */
-    private static OpenAiChatModel createBlabladorChatModel(String model, int seed) {
+    private static OpenAiChatModel createBlabladorChatModel(String model, int seed, double temperature) {
         String blabladorApiKey = Environment.getenv("BLABLADOR_API_KEY");
         if (blabladorApiKey == null) {
             throw new IllegalStateException("BLABLADOR_API_KEY environment variable not set");
@@ -255,7 +234,7 @@ public class ChatLanguageModelProvider {
                 .baseUrl("https://api.helmholtz-blablador.fz-juelich.de/v1")
                 .modelName(model)
                 .apiKey(blabladorApiKey)
-                .temperature(0.0)
+                .temperature(temperature)
                 .seed(seed)
                 .build();
     }
@@ -266,10 +245,11 @@ public class ChatLanguageModelProvider {
      *
      * @param model The name of the model to use
      * @param seed The seed value for randomization
+     * @param temperature The temperature setting for the model
      * @return A configured DeepSeek chat model instance
      * @throws IllegalStateException If required environment variables are not set
      */
-    private static OpenAiChatModel createDeepSeekChatModel(String model, int seed) {
+    private static OpenAiChatModel createDeepSeekChatModel(String model, int seed, double temperature) {
         String deepseekApiKey = Environment.getenv("DEEPSEEK_API_KEY");
         if (deepseekApiKey == null) {
             throw new IllegalStateException("DEEPSEEK_API_KEY environment variable not set");
@@ -278,8 +258,24 @@ public class ChatLanguageModelProvider {
                 .baseUrl("https://api.deepseek.com/v1")
                 .modelName(model)
                 .apiKey(deepseekApiKey)
-                .temperature(0.0)
+                .temperature(temperature)
                 .seed(seed)
                 .build();
+    }
+
+    /**
+     * Returns the parameters used to create the cache key for this model.
+     * This method is used to identify the cache uniquely.
+     *
+     * @return An array of strings representing the cache parameters
+     * @see edu.kit.kastel.sdq.lissa.ratlr.cache.CacheManager#getCache(Object, String[])
+     */
+    public String[] getCacheParameters() {
+        if (temperature == 0.0) {
+            // Backwards compatibility with the old mode that did not have temperature
+            return new String[] {modelName(), String.valueOf(seed())};
+        } else {
+            return new String[] {modelName(), String.valueOf(seed()), String.valueOf(temperature())};
+        }
     }
 }

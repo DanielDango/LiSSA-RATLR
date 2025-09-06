@@ -17,35 +17,19 @@ import edu.kit.kastel.sdq.lissa.ratlr.utils.KeyGenerator;
  * <p>
  * The key can be serialized to JSON for storage and retrieval from the cache.
  * <p>
- * Please always use the {@link #of(String, int, Mode, String)} method to create a new instance.
+ * Please always use the {@link #of(String, int, double, Mode, String)} method to create a new instance.
+ *
+ * @param model The identifier of the model used for the cached operation.
+ * @param seed The seed value used for randomization in the cached operation.
+ * @param temperature The temperature setting used in the cached operation.
+ * @param mode The mode of operation that was cached (e.g., embedding generation or chat
+ * @param content The content that was processed in the cached operation.
+ * @param localKey A local key for additional identification, not included in JSON serialization.
  */
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record CacheKey(
-        /**
-         * The identifier of the model used for the cached operation.
-         */
-        String model,
-
-        /**
-         * The seed value used for randomization in the cached operation.
-         */
-        int seed,
-
-        /**
-         * The mode of operation that was cached (e.g., embedding generation or chat).
-         */
-        Mode mode,
-
-        /**
-         * The content that was processed in the cached operation.
-         */
-        String content,
-
-        /**
-         * A local key for additional identification, not included in JSON serialization.
-         */
-        @JsonIgnore String localKey) {
+        String model, int seed, double temperature, Mode mode, String content, @JsonIgnore String localKey) {
     /**
      * Defines the possible modes of operation that can be cached.
      */
@@ -66,18 +50,19 @@ public record CacheKey(
      */
     private static final ObjectMapper MAPPER = new ObjectMapper().configure(SerializationFeature.INDENT_OUTPUT, true);
 
-    public static CacheKey of(String model, int seed, Mode mode, String content) {
-        return new CacheKey(model, seed, mode, content, KeyGenerator.generateKey(content));
+    public static CacheKey of(String model, int seed, double temperature, Mode mode, String content) {
+        return new CacheKey(model, seed, temperature, mode, content, KeyGenerator.generateKey(content));
     }
 
     /**
      * Only use this method if you want to use a custom local key. You mostly do not want to do this. Only for special handling of embeddings.
-     * You should always prefer the {@link #of(String, int, Mode, String)} method.
-     * @deprecated please use {@link #of(String, int, Mode, String)} instead.
+     * You should always prefer the {@link #of(String, int, double, Mode, String)} method.
+     * @deprecated please use {@link #of(String, int, double, Mode, String)} instead.
      */
     @Deprecated(forRemoval = false)
-    public static CacheKey ofRaw(String model, int seed, Mode mode, String content, String localKey) {
-        return new CacheKey(model, seed, mode, content, localKey);
+    public static CacheKey ofRaw(
+            String model, int seed, double temperature, Mode mode, String content, String localKey) {
+        return new CacheKey(model, seed, temperature, mode, content, localKey);
     }
 
     /**
