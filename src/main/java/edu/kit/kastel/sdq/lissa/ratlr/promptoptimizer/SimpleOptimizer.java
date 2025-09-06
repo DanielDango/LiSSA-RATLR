@@ -65,8 +65,7 @@ public class SimpleOptimizer extends AbstractPromptOptimizer {
         this.provider = new ChatLanguageModelProvider(configuration);
         this.optimizationPrompt = configuration.argumentAsString(PROMPT_KEY, "");
         this.template = configuration.argumentAsString("optimization_template", DEFAULT_OPTIMIZATION_TEMPLATE);
-        this.cache = CacheManager.getDefaultInstance()
-                .getCache(this.getClass().getSimpleName() + "_" + provider.modelName() + "_" + provider.seed());
+        this.cache = CacheManager.getDefaultInstance().getCache(this, provider.getCacheParameters());
         this.llm = provider.createChatModel();
     }
 
@@ -90,7 +89,8 @@ public class SimpleOptimizer extends AbstractPromptOptimizer {
                 .replace("{target_type}", target.getType())
                 .replace(ORIGINAL_PROMPT_KEY, optimizationPrompt);
 
-        CacheKey cacheKey = CacheKey.of(provider.modelName(), provider.seed(), CacheKey.Mode.CHAT, request);
+        CacheKey cacheKey =
+                CacheKey.of(provider.modelName(), provider.seed(), provider.temperature(), CacheKey.Mode.CHAT, request);
         String response = cache.get(cacheKey, String.class);
         if (response == null) {
             logger.info("Optimizing ({}):", provider.modelName());

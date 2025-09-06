@@ -52,6 +52,7 @@ public class ChatLanguageModelProvider {
      * Default temperature setting for the model.
      */
     public static final double DEFAULT_TEMPERATURE = 0.0;
+    public static final int OLLAMA_MINUTES_TO_TIMEOUT = 15;
 
     /**
      * The platform to use for the language model.
@@ -141,15 +142,6 @@ public class ChatLanguageModelProvider {
     }
 
     /**
-     * Gets the platform for which the language model is configured.
-     *
-     * @return The platform name
-     */
-    public ChatLanguageModelPlatform platform() {
-        return platform;
-    }
-
-    /**
      * Determines the number of threads to use based on the platform.
      * OpenAI and Blablador platforms use 100 threads, while others use 1.
      *
@@ -177,7 +169,7 @@ public class ChatLanguageModelProvider {
         var ollama = OllamaChatModel.builder()
                 .baseUrl(host)
                 .modelName(model)
-                .timeout(Duration.ofMinutes(15))
+                .timeout(Duration.ofMinutes(OLLAMA_MINUTES_TO_TIMEOUT))
                 .temperature(temperature)
                 .seed(seed);
         if (user != null && password != null && !user.isEmpty() && !password.isEmpty()) {

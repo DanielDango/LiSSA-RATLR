@@ -103,8 +103,7 @@ public class IterativeOptimizer extends AbstractPromptOptimizer {
         this.template = configuration.argumentAsString(PROMPT_OPTIMIZATION_TEMPLATE_KEY, DEFAULT_OPTIMIZATION_TEMPLATE);
         this.maximumIterations = configuration.argumentAsInt(MAXIMUM_ITERATIONS_KEY, MAXIMUM_ITERATIONS);
         this.optimizationPrompt = configuration.argumentAsString(PROMPT_KEY, "");
-        this.cache = CacheManager.getDefaultInstance()
-                .getCache(this.getClass().getSimpleName() + "_" + provider.modelName() + "_" + provider.seed());
+        this.cache = CacheManager.getDefaultInstance().getCache(this, provider.getCacheParameters());
         this.llm = provider.createChatModel();
         this.validTraceLinks = goldStandard;
         this.aggregator = aggregator;

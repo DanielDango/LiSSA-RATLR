@@ -36,7 +36,11 @@ public class ChatLanguageModelUtils {
     public static List<String> nCachedRequest(
             String request, ChatLanguageModelProvider provider, ChatModel llm, Cache cache, int numberOfRequests) {
         CacheKey cacheKey = CacheKey.of(
-                provider.modelName(), provider.seed(), CacheKey.Mode.CHAT, numberOfRequests + " results: \n" + request);
+                provider.modelName(),
+                provider.seed(),
+                provider.temperature(),
+                CacheKey.Mode.CHAT,
+                numberOfRequests + " results: \n" + request);
         List<String> responses = cache.get(cacheKey, List.class);
         if (responses == null || responses.size() < numberOfRequests) {
             responses = new ArrayList<>();
