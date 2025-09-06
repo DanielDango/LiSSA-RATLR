@@ -1,6 +1,8 @@
 /* Licensed under MIT 2025. */
 package edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -47,7 +49,7 @@ public abstract class AbstractPromptOptimizer {
      */
     protected static final String PROMPT_KEY = "prompt";
 
-    private static final Logger staticLogger = LoggerFactory.getLogger(AbstractPromptOptimizer.class);
+    protected static final Logger staticLogger = LoggerFactory.getLogger(AbstractPromptOptimizer.class);
 
     /**
      * Logger for the prompt optimizer.
@@ -137,7 +139,9 @@ public abstract class AbstractPromptOptimizer {
      *
      * @param response The response string containing the prompt
      * @return The extracted prompt, or an empty string if no prompt is found
+     * @deprecated Use {@link #parseTaggedTextFirst(String, String, String)} instead.
      */
+    @Deprecated(forRemoval = true)
     protected static String extractPromptFromResponse(String response) {
         String prompt = response;
         Pattern pattern = Pattern.compile(
@@ -148,6 +152,64 @@ public abstract class AbstractPromptOptimizer {
         } else {
             staticLogger.warn("No prompt found in response: {}", response);
         }
-        return prompt;
+
+        String result = parseTaggedTextFirst(prompt, PROMPT_START, PROMPT_END);
+        if (!result.equals(prompt)) {
+            staticLogger.warn("parseTaggedTextSingle found a different prompt than extractPromptFromResponse.");
+        }
+        return result;
+    }
+
+    /**
+     * Parses and extracts a single substring from the input text that is enclosed between the specified start and end tags.
+     * If multiple tagged substrings are found, a warning is logged and the first one is returned.
+     * If no tagged substrings are found, a warning is logged and the original text is returned.
+     *
+     * @param text     The input text to parse
+     * @param startTag The starting tag to look for
+     * @param endTag   The ending tag to look for
+     * @return         The extracted substring found between the specified tags, or the original text if none are found
+     */
+    protected static String parseTaggedTextFirst(String text, String startTag, String endTag) {
+        List<String> taggedTexts = parseTaggedText(text, startTag, endTag);
+        if (taggedTexts.size() > 1) {
+            staticLogger.warn("Multiple tagged texts found, using the first one.");
+        }
+        if (taggedTexts.isEmpty()) {
+            staticLogger.warn("No tagged text found, returning the original text.");
+        }
+        return parseTaggedText(text, startTag, endTag).stream().findFirst().orElse(text);
+    }
+
+    /**
+     * Parses and extracts all substrings from the input text that are enclosed between the specified start and end tags.
+     * The method uses regular expressions to identify and extract the tagged substrings, allowing for multi-line
+     * content and case-insensitive matching of the tags.
+     *
+     * @param text     The input text to parse
+     * @param startTag The starting tag to look for
+     * @param endTag   The ending tag to look for
+     * @return         A list possibly empty list of extracted substrings found between the specified tags
+     */
+    protected static List<String> parseTaggedText(String text, String startTag, String endTag) {
+        List<String> texts = new ArrayList<>();
+
+        Pattern pattern = Pattern.compile(startTag + "(.*?)" + endTag, Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(text);
+        while (matcher.find()) {
+            texts.add(matcher.group(1));
+        }
+        return texts;
+    }
+
+    /**
+     * Sanitizes the given prompt string by removing leading and trailing quotes and whitespace.
+     *
+     * @param prompt The prompt string to sanitize
+     * @return The prompt string without leading/trailing quotes and whitespace
+     */
+    protected static String sanitizePrompt(String prompt) {
+        // Remove leading and trailing quotes and whitespace
+        return prompt.trim().replaceAll("((^[\"']+)|([\"']+$))", "").trim();
     }
 }

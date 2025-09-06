@@ -97,7 +97,7 @@ public class SimpleOptimizer extends AbstractPromptOptimizer {
             response = llm.chat(request);
             cache.put(cacheKey, response);
         }
-        response = extractPromptFromResponse(response);
+        response = sanitizePrompt(parseTaggedTextFirst(response, PROMPT_START, PROMPT_END));
         return response;
     }
 

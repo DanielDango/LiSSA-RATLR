@@ -186,8 +186,7 @@ public class IterativeOptimizer extends AbstractPromptOptimizer {
      */
     protected String cachedSanitizedRequest(String request) {
         String response = ChatLanguageModelUtils.cachedRequest(request, provider, llm, cache);
-        response = extractPromptFromResponse(response);
-        return response;
+        return sanitizePrompt(parseTaggedTextFirst(response, PROMPT_START, PROMPT_END));
     }
 
     /**

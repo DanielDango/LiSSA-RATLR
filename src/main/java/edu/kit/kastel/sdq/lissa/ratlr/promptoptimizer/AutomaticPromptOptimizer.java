@@ -163,26 +163,6 @@ public class AutomaticPromptOptimizer extends IterativeFeedbackOptimizer {
         this.scorer = scorer;
     }
 
-    /**
-     *  Parse text that is tagged with start and end tags.
-     */
-    private static List<String> parseTaggedText(String text, String startTag, String endTag) {
-        List<String> texts = new ArrayList<>();
-        while (true) {
-            int startIndex = text.indexOf(startTag);
-            if (startIndex == -1) {
-                break;
-            }
-            int endIndex = text.indexOf(endTag, startIndex);
-            if (endIndex == -1) {
-                break;
-            }
-            startIndex += startTag.length();
-            texts.add(text.substring(startIndex, endIndex).strip());
-            text = text.substring(endIndex + endTag.length());
-        }
-        return texts;
-    }
 
     /**
      * Parses a sectioned prompt into a map of section headers to their corresponding content.
@@ -420,14 +400,11 @@ public class AutomaticPromptOptimizer extends IterativeFeedbackOptimizer {
     private List<String> cachedSanitizedPromptRequest(int n, String prompt) {
         prompt = String.join("\n", prompt.lines().map(String::stripLeading).toList());
         List<String> responses = nCachedRequest(prompt, provider, llm, cache, n);
-        List<String> results = responses.stream()
-                .map(IterativeOptimizer::extractPromptFromResponse)
-                .toList();
         List<String> newPrompts = new ArrayList<>();
-        for (String result : results) {
+        for (String result : responses) {
             newPrompts.addAll(parseTaggedText(result, START_TAG, END_TAG));
         }
-        return newPrompts;
+        return sanitizePrompts(newPrompts);
     }
 
     /**
@@ -435,7 +412,7 @@ public class AutomaticPromptOptimizer extends IterativeFeedbackOptimizer {
      */
     private List<String> generateSynonyms(String promptSection, int n) {
         String formattedSynonymPrompt = String.format(synonymPrompt, promptSection);
-        return nCachedRequest(formattedSynonymPrompt, provider, llm, cache, n);
+        return cachedSanitizedPromptRequest(n, formattedSynonymPrompt);
     }
 
     /**
@@ -492,5 +469,15 @@ public class AutomaticPromptOptimizer extends IterativeFeedbackOptimizer {
             }
         }
         return tasks;
+    }
+
+    /**
+     * Apply the {@link AbstractPromptOptimizer#sanitizePrompt(String)} method to a list of prompts.
+     *
+     * @param prompts the list of prompts to sanitize
+     * @return        a list of sanitized prompts
+     */
+    private static List<String> sanitizePrompts(List<String> prompts) {
+        return prompts.stream().map(AbstractPromptOptimizer::sanitizePrompt).toList();
     }
 }
