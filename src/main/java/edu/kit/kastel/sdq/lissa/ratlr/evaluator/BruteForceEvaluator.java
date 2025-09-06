@@ -4,10 +4,10 @@ package edu.kit.kastel.sdq.lissa.ratlr.evaluator;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.ClassificationTask;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.Classifier;
+import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
 import edu.kit.kastel.sdq.lissa.ratlr.scorer.AbstractScorer;
 
 /**
@@ -15,12 +15,26 @@ import edu.kit.kastel.sdq.lissa.ratlr.scorer.AbstractScorer;
  */
 public class BruteForceEvaluator extends AbstractEvaluator {
 
-    private final int evaluationBudget;
-    private final Random random;
-
+    /**
+     * Deprecated constructor that only takes an evaluation budget.
+     * This constructor is deprecated and will be removed in future versions.
+     * Use {@link #BruteForceEvaluator(ModuleConfiguration)} instead.
+     *
+     * @param evaluationBudget The total number of evaluations to perform.
+     * @deprecated Use {@link #BruteForceEvaluator(ModuleConfiguration)} instead.
+     */
+    @Deprecated(forRemoval = true)
     public BruteForceEvaluator(int evaluationBudget) {
-        this.evaluationBudget = evaluationBudget;
-        this.random = new Random(DEFAULT_SEED);
+        super(new ModuleConfiguration("", Collections.emptyMap()));
+    }
+
+    /**
+     * Creates a new brute-force evaluator instance with the given configuration.
+     *
+     * @param configuration The configuration for the evaluator.
+     */
+    public BruteForceEvaluator(ModuleConfiguration configuration) {
+        super(configuration);
     }
 
     /**

@@ -19,13 +19,11 @@ import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
 import edu.kit.kastel.sdq.lissa.ratlr.elementstore.ElementStore;
 import edu.kit.kastel.sdq.lissa.ratlr.evaluator.AbstractEvaluator;
 import edu.kit.kastel.sdq.lissa.ratlr.evaluator.BruteForceEvaluator;
-import edu.kit.kastel.sdq.lissa.ratlr.evaluator.UCBanditEvaluator;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
 import edu.kit.kastel.sdq.lissa.ratlr.postprocessor.TraceLinkIdPostprocessor;
 import edu.kit.kastel.sdq.lissa.ratlr.resultaggregator.ResultAggregator;
 import edu.kit.kastel.sdq.lissa.ratlr.scorer.AbstractScorer;
-import edu.kit.kastel.sdq.lissa.ratlr.scorer.BinaryScorer;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.Pair;
 
 /**
@@ -83,7 +81,7 @@ public class AutomaticPromptOptimizer extends IterativeFeedbackOptimizer {
     private static final String DEFAULT_SYNONYM_PROMPT =
             "Generate a variation of the following instruction while keeping the semantic meaning.%n%nInput: %s%n%nOutput:";
 
-    //TODO add to config
+    // TODO add to config
     private static final int MAX_ERROR_SAMPLES_TODO = 16;
 
     private static final String NUMBER_OF_GRADIENTS_KEY = "number_of_gradients";
@@ -137,7 +135,9 @@ public class AutomaticPromptOptimizer extends IterativeFeedbackOptimizer {
             Set<TraceLink> goldStandard,
             ResultAggregator aggregator,
             TraceLinkIdPostprocessor traceLinkIdPostProcessor,
-            Classifier classifier) {
+            Classifier classifier,
+            AbstractScorer scorer,
+            AbstractEvaluator evaluator) {
         super(configuration, goldStandard, aggregator, traceLinkIdPostProcessor, classifier);
         this.numberOfGradients = configuration.argumentAsInt(NUMBER_OF_GRADIENTS_KEY, DEFAULT_NUMBER_OF_GRADIENTS);
         this.numberOfErrors = configuration.argumentAsInt(NUMBER_OF_ERRORS_KEY, DEFAULT_NUMBER_OF_ERRORS);
@@ -160,9 +160,9 @@ public class AutomaticPromptOptimizer extends IterativeFeedbackOptimizer {
         this.synonymPrompt = configuration.argumentAsString(SYNONYM_PROMPT_KEY, DEFAULT_SYNONYM_PROMPT);
 
         // Todo: Remember to add temperature parameter
-        // TODO: Get through config by factory
-        this.evaluator = new UCBanditEvaluator();
-        this.scorer = new BinaryScorer();
+
+        this.evaluator = evaluator;
+        this.scorer = scorer;
     }
 
     /**
@@ -384,9 +384,8 @@ public class AutomaticPromptOptimizer extends IterativeFeedbackOptimizer {
                     tempNewPrompts = tempNewPrompts.stream()
                             .limit(maxExpansionFactor * 2)
                             .toList();
-                    AbstractScorer scorer = new BinaryScorer();
-                    AbstractEvaluator evaluator = new BruteForceEvaluator(evaluationBudget);
-                    List<Double> errorScores = evaluator.call(tempNewPrompts, errorExamples, classifier, scorer);
+                    AbstractEvaluator bruteForceEvaluator = new BruteForceEvaluator(evaluationBudget);
+                    List<Double> errorScores = bruteForceEvaluator.call(tempNewPrompts, errorExamples, classifier, scorer);
                     List<Integer> sortedIdxs = errorScores.stream()
                             .sorted()
                             // TODO Check if this is correct
@@ -415,12 +414,7 @@ public class AutomaticPromptOptimizer extends IterativeFeedbackOptimizer {
     private List<String> applyGradient(
             String prompt, String errorString, String feedbackString, int numberOfResponses) {
         String formattedTransformationPrompt = String.format(
-                transformationPrompt,
-                prompt,
-                errorString,
-                feedbackString,
-                stepsPerGradient,
-                stepsPerGradient);
+                transformationPrompt, prompt, errorString, feedbackString, stepsPerGradient, stepsPerGradient);
         return cachedSanitizedPromptRequest(numberOfResponses, formattedTransformationPrompt);
     }
 

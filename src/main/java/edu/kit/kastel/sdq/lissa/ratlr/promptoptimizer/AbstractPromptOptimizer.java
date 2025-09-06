@@ -11,9 +11,11 @@ import org.slf4j.LoggerFactory;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.Classifier;
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
 import edu.kit.kastel.sdq.lissa.ratlr.elementstore.ElementStore;
+import edu.kit.kastel.sdq.lissa.ratlr.evaluator.AbstractEvaluator;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
 import edu.kit.kastel.sdq.lissa.ratlr.postprocessor.TraceLinkIdPostprocessor;
 import edu.kit.kastel.sdq.lissa.ratlr.resultaggregator.ResultAggregator;
+import edu.kit.kastel.sdq.lissa.ratlr.scorer.AbstractScorer;
 
 /**
  * Abstract base class for prompt optimizers in the LiSSA framework.
@@ -83,7 +85,9 @@ public abstract class AbstractPromptOptimizer {
             Set<TraceLink> goldStandard,
             ResultAggregator aggregator,
             TraceLinkIdPostprocessor traceLinkIdPostProcessor,
-            Classifier classifier) {
+            Classifier classifier,
+            AbstractScorer scorer,
+            AbstractEvaluator evaluator) {
         if (configuration == null) {
             return new MockOptimizer();
         }
@@ -97,7 +101,13 @@ public abstract class AbstractPromptOptimizer {
                         configuration, goldStandard, aggregator, traceLinkIdPostProcessor, classifier);
             case "gradient" ->
                 new AutomaticPromptOptimizer(
-                        configuration, goldStandard, aggregator, traceLinkIdPostProcessor, classifier);
+                        configuration,
+                        goldStandard,
+                        aggregator,
+                        traceLinkIdPostProcessor,
+                        classifier,
+                        scorer,
+                        evaluator);
             default -> throw new IllegalStateException("Unexpected value: " + configuration.name());
         };
     }

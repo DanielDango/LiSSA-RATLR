@@ -5,6 +5,7 @@ import java.util.List;
 
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.ClassificationTask;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.Classifier;
+import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.Pair;
 
 /**
@@ -12,8 +13,13 @@ import edu.kit.kastel.sdq.lissa.ratlr.utils.Pair;
  */
 public class BinaryScorer extends AbstractScorer {
 
-    public BinaryScorer() {
-        super();
+    /**
+     * Creates a new binary scorer instance with the given configuration.
+     *
+     * @param configuration The configuration for the scorer.
+     */
+    public BinaryScorer(ModuleConfiguration configuration) {
+        super(configuration);
     }
 
     /**

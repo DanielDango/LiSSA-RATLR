@@ -20,11 +20,13 @@ import edu.kit.kastel.sdq.lissa.ratlr.configuration.OptimizerConfiguration;
 import edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore;
 import edu.kit.kastel.sdq.lissa.ratlr.elementstore.ElementStore;
 import edu.kit.kastel.sdq.lissa.ratlr.embeddingcreator.EmbeddingCreator;
+import edu.kit.kastel.sdq.lissa.ratlr.evaluator.AbstractEvaluator;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
 import edu.kit.kastel.sdq.lissa.ratlr.postprocessor.TraceLinkIdPostprocessor;
 import edu.kit.kastel.sdq.lissa.ratlr.preprocessor.Preprocessor;
 import edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.AbstractPromptOptimizer;
 import edu.kit.kastel.sdq.lissa.ratlr.resultaggregator.ResultAggregator;
+import edu.kit.kastel.sdq.lissa.ratlr.scorer.AbstractScorer;
 
 /**
  * Represents a single prompt optimization run of the LiSSA framework.
@@ -144,8 +146,17 @@ public class Optimization {
                 configuration.traceLinkIdPostprocessor(), contextStore);
         Set<TraceLink> goldStandard = getTraceLinksFromGoldStandard(configuration.goldStandardConfiguration());
 
+        AbstractScorer scorer = AbstractScorer.createScorer(configuration.scorer());
+        AbstractEvaluator evaluator = AbstractEvaluator.createEvaluator(configuration.evaluator());
+
         promptOptimizer = AbstractPromptOptimizer.createOptimizer(
-                configuration.promptOptimizer(), goldStandard, aggregator, traceLinkIdPostProcessor, classifier);
+                configuration.promptOptimizer(),
+                goldStandard,
+                aggregator,
+                traceLinkIdPostProcessor,
+                classifier,
+                scorer,
+                evaluator);
         configuration.serializeAndDestroyConfiguration();
     }
 

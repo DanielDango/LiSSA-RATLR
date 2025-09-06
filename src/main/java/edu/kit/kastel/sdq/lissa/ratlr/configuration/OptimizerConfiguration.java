@@ -110,7 +110,16 @@ public record OptimizerConfiguration(
         /**
          * Configuration for the trace link ID postprocessor.
          */
-        @JsonProperty("tracelinkid_postprocessor") ModuleConfiguration traceLinkIdPostprocessor)
+        @JsonProperty("tracelinkid_postprocessor") ModuleConfiguration traceLinkIdPostprocessor,
+
+        /**
+         * Configuration for the scorer used in optimization
+         */
+        @JsonProperty("scorer") ModuleConfiguration scorer,
+        /**
+         * Configuration for the evaluator used in optimization
+         */
+        @JsonProperty("evaluator") ModuleConfiguration evaluator)
         implements ConfigurationBuilder.With {
 
     /**
@@ -130,6 +139,8 @@ public record OptimizerConfiguration(
         sourceStore.finalizeForSerialization();
         targetStore.finalizeForSerialization();
         promptOptimizer.finalizeForSerialization();
+        scorer.finalizeForSerialization();
+        evaluator.finalizeForSerialization();
         if (classifier != null) {
             classifier.finalizeForSerialization();
         }
@@ -171,7 +182,9 @@ public record OptimizerConfiguration(
                 + targetPreprocessor + ", embeddingCreator="
                 + embeddingCreator + ", sourceStore="
                 + sourceStore + ", targetStore="
-                + targetStore + ", promptOptimizer="
+                + targetStore + ", scorer="
+                + scorer + ", evaluator="
+                + evaluator + ", promptOptimizer="
                 + promptOptimizer + ", classifier="
                 + classifier + ", classifiers="
                 + classifiers + ", resultAggregator="

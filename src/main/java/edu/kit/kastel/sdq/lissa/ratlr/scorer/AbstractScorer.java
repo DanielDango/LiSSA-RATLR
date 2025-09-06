@@ -10,20 +10,52 @@ import java.util.Optional;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.ClassificationResult;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.ClassificationTask;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.Classifier;
+import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.Pair;
 
 /**
  * Abstract base class for scorers in the LiSSA framework.
  * This class provides the foundation for implementing different scoring strategies
  * for evaluating prompts in classification tasks.
- * TODO: factory
  */
 public abstract class AbstractScorer {
 
-    private final Map<String, Double> cache;
+    private static final String CONFIDENCE_THRESHOLD_KEY = "confidence_threshold";
+    private static final double DEFAULT_CONFIDENCE_THRESHOLD = 1.0;
 
-    protected AbstractScorer() {
+    private final Map<String, Double> cache;
+    private final double confidenceThreshold;
+
+    /**
+     * Creates a new scorer with the specified configuration.
+     * The configuration can include parameters such as confidence threshold.
+     *
+     * @param configuration The configuration for the scorer.
+     */
+    protected AbstractScorer(ModuleConfiguration configuration) {
         this.cache = new HashMap<>();
+        this.confidenceThreshold =
+                configuration.argumentAsDouble(CONFIDENCE_THRESHOLD_KEY, DEFAULT_CONFIDENCE_THRESHOLD);
+    }
+
+    /**
+     * Factory method to create a scorer based on the provided configuration.
+     * The name field indicates the type of scorer to create.
+     * If the configuration is null, a MockScorer is returned by default.
+     *
+     * @param configuration The configuration specifying the type of scorer to create.
+     * @return An instance of a concrete scorer implementation.
+     * @throws IllegalStateException If the configuration name does not match any known scorer types.
+     */
+    public static AbstractScorer createScorer(ModuleConfiguration configuration) {
+        if (configuration == null) {
+            return new MockScorer();
+        }
+        return switch (configuration.name()) {
+            case "mock" -> new MockScorer();
+            case "binary" -> new BinaryScorer(configuration);
+            default -> throw new IllegalStateException("Unexpected value: " + configuration.name());
+        };
     }
 
     /**
@@ -111,8 +143,7 @@ public abstract class AbstractScorer {
         Optional<ClassificationResult> result = classifier.classify(task);
         if (result.isPresent()) {
             double confidence = result.get().confidence();
-            // Todo: what should be the threshold?
-            return confidence >= 1.0;
+            return confidence >= confidenceThreshold;
         } else {
             return false;
         }

@@ -37,13 +37,21 @@
   },
   "source_store" : {
     "name" : "custom",
-    "args" : { }
+    "args" : {}
   },
   "target_store" : {
     "name" : "cosine_similarity",
     "args" : {
       "max_results" : "4"
     }
+  },
+  "scorer" : {
+    "name" : "binary",
+    "args" : {}
+  },
+  "evaluator" : {
+    "name" : "ucb",
+    "args" : {}
   },
   "prompt_optimizer": {
     "name" : "gradient_openai",

@@ -8,6 +8,7 @@ import java.util.Random;
 
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.ClassificationTask;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.Classifier;
+import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
 import edu.kit.kastel.sdq.lissa.ratlr.scorer.AbstractScorer;
 
 /**
@@ -30,35 +31,36 @@ import edu.kit.kastel.sdq.lissa.ratlr.scorer.AbstractScorer;
  */
 public class UCBanditEvaluator extends AbstractEvaluator {
 
+    private static final String ROUNDS_KEY = "rounds";
     private static final int DEFAULT_ROUNDS = 40;
+    private static final String NUM_PROMPTS_PER_ROUND_KEY = "num_prompts_per_round";
     private static final int DEFAULT_NUM_PROMPTS_PER_ROUND = 10;
-    private static final int DEFAULT_SAMPLES_PER_EVAL = 5;
+    private static final String MAX_THREADS_KEY = "max_threads";
     private static final int DEFAULT_MAX_THREADS = 1;
+    private static final String C_KEY = "c";
     private static final double DEFAULT_C = 1.0;
+    private static final String MODE_KEY = "mode";
     private static final String DEFAULT_MODE = "ucb";
+
     private final int rounds;
     private final int numberOfPromptsPerRound;
-    private final int samplesPerEval;
     private final int maxThreads;
     private final double c;
     private final String mode;
 
-    public UCBanditEvaluator() {
-        this.rounds = DEFAULT_ROUNDS;
-        this.numberOfPromptsPerRound = DEFAULT_NUM_PROMPTS_PER_ROUND;
-        this.samplesPerEval = DEFAULT_SAMPLES_PER_EVAL;
-        this.c = DEFAULT_C;
-        this.mode = DEFAULT_MODE;
-        this.maxThreads = DEFAULT_MAX_THREADS;
-    }
-
-    public UCBanditEvaluator(int rounds, int numberOfPromptsPerRound, int samplesPerEval, double c, String mode) {
-        this.rounds = rounds;
-        this.numberOfPromptsPerRound = numberOfPromptsPerRound;
-        this.samplesPerEval = samplesPerEval;
-        this.c = c;
-        this.mode = mode;
-        this.maxThreads = DEFAULT_MAX_THREADS;
+    /**
+     * Creates a new UCBanditEvaluator instance with the given configuration.
+     *
+     * @param configuration The configuration for the evaluator.
+     */
+    public UCBanditEvaluator(ModuleConfiguration configuration) {
+        super(configuration);
+        this.rounds = configuration.argumentAsInt(ROUNDS_KEY, DEFAULT_ROUNDS);
+        this.numberOfPromptsPerRound =
+                configuration.argumentAsInt(NUM_PROMPTS_PER_ROUND_KEY, DEFAULT_NUM_PROMPTS_PER_ROUND);
+        this.maxThreads = configuration.argumentAsInt(MAX_THREADS_KEY, DEFAULT_MAX_THREADS);
+        this.c = configuration.argumentAsDouble(C_KEY, DEFAULT_C);
+        this.mode = configuration.argumentAsString(MODE_KEY, DEFAULT_MODE);
     }
 
     @Override
