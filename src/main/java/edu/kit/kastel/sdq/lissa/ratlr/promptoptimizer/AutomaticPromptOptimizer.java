@@ -327,7 +327,7 @@ public class AutomaticPromptOptimizer extends IterativeFeedbackOptimizer {
             List<String> newTaskSections = new ArrayList<>();
             for (Pair<String, String> feedbackAndError : gradients) {
                 newTaskSections.addAll(
-                        applyGradient(taskSection, feedbackAndError.second(), feedbackAndError.first(), 1));
+                        applyGradient(taskSection, feedbackAndError.second(), feedbackAndError.first()));
             }
             // generate synonyms
             // TODO Find out what MC is
@@ -388,13 +388,11 @@ public class AutomaticPromptOptimizer extends IterativeFeedbackOptimizer {
 
     /**
      * Incorporate feedback gradient into a prompt.
-     * TODO: numberOfResponses
      */
-    private List<String> applyGradient(
-            String prompt, String errorString, String feedbackString, int numberOfResponses) {
+    private List<String> applyGradient(String prompt, String errorString, String feedbackString) {
         String formattedTransformationPrompt = String.format(
                 transformationPrompt, prompt, errorString, feedbackString, stepsPerGradient, stepsPerGradient);
-        return cachedSanitizedPromptRequest(numberOfResponses, formattedTransformationPrompt);
+        return cachedSanitizedPromptRequest(stepsPerGradient, formattedTransformationPrompt);
     }
 
     private List<String> cachedSanitizedPromptRequest(int n, String prompt) {
