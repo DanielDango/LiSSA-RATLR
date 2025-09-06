@@ -52,6 +52,10 @@ public class ChatLanguageModelProvider {
      * Default temperature setting for the model.
      */
     public static final double DEFAULT_TEMPERATURE = 0.0;
+
+    /**
+     * Time in minutes before an Ollama request times out.
+     */
     public static final int OLLAMA_MINUTES_TO_TIMEOUT = 15;
 
     /**
