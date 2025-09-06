@@ -259,9 +259,14 @@ public class AutomaticPromptOptimizer extends IterativeFeedbackOptimizer {
     }
 
     /**
-     *  Get "gradients" for a prompt based on the error string.
+     * Get textual "gradients" for a prompt based on an error string that indicate why the prompt might yielded the error.
+     *
+     * @param prompt The prompt section to improve
+     * @param errorString The error string indicating the errors made by the prompt
+     * @param numberOfResponses The number of gradient responses to generate
+     * @return A list of textual gradients suggesting improvements to the prompt
      */
-    private List<String> getGradientsInternal(String prompt, String errorString, int numberOfResponses) {
+    private List<String> getTextualGradients(String prompt, String errorString, int numberOfResponses) {
         String formattedGradientPrompt = String.format(gradientPrompt, prompt, errorString, numberOfGradientsPerError);
         return cachedSanitizedPromptRequest(numberOfResponses, formattedGradientPrompt);
     }
@@ -274,7 +279,7 @@ public class AutomaticPromptOptimizer extends IterativeFeedbackOptimizer {
         List<Pair<String, String>> feedbacks = new ArrayList<>();
         for (int i = 0; i < numberOfGradients; i++) {
             String errorString = sampleErrorString(evaluation);
-            List<String> gradients = getGradientsInternal(taskSection, errorString, 1);
+            List<String> gradients = getTextualGradients(taskSection, errorString, 1);
             feedbacks.addAll(
                     gradients.stream().map(x -> new Pair<>(x, errorString)).collect(Collectors.toSet()));
         }
