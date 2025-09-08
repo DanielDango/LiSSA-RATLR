@@ -12,7 +12,7 @@ import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
  *
  * The enum supports the following processing strategies:
  * <ul>
- *     <li>REQ2CODE: Processes requirement-to-code trace links by removing file extensions</li>
+ *     <li>REQ2CODE: Processes requirement-to-code trace links</li>
  *     <li>SAD2CODE: Processes Software Architecture Documentation to code trace links</li>
  *     <li>SAM2SAD: Processes Software Architecture Model to Software Architecture Documentation trace links</li>
  *     <li>SAD2SAM: Processes Software Architecture Documentation to Software Architecture Model trace links</li>
@@ -26,7 +26,7 @@ import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
  * </ul>
  */
 enum IdProcessor {
-    /** Processes requirement-to-code trace links by removing file extensions from both identifiers */
+    /** Processes requirement-to-code trace links */
     REQ2CODE(sourceId -> sourceId, targetId -> targetId),
     /** Processes Software Architecture Documentation to code trace links */
     SAD2CODE(IdProcessor::processSAD, targetId -> targetId),
