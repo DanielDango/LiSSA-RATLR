@@ -16,6 +16,7 @@ import picocli.CommandLine;
  * <ul>
  *     <li>{@link EvaluateCommand} - Evaluates trace link analysis configurations</li>
  *     <li>{@link TransitiveTraceCommand} - Performs transitive trace link analysis</li>
+ *     <li>{@link OptimizeCommand} - Optimize a single prompt for better trace link analysis classification results</li>
  * </ul>
  *
  * The CLI supports various command-line options and provides help information

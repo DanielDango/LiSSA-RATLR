@@ -14,6 +14,12 @@ import edu.kit.kastel.sdq.lissa.ratlr.Optimization;
 
 import picocli.CommandLine;
 
+/**
+ * Command implementation for optimizing prompts used in trace link analysis configurations.
+ * This command processes one or more optimization configuration files to run the prompt
+ * optimization pipeline, and optionally evaluates the optimized prompts using specified
+ * evaluation configuration files.
+ */
 @CommandLine.Command(
         name = "optimize",
         mixinStandardHelpOptions = true,
@@ -22,13 +28,24 @@ public class OptimizeCommand implements Runnable {
 
     private static final Logger logger = LoggerFactory.getLogger(OptimizeCommand.class);
 
+    /**
+     * Array of optimization configuration file paths to be processed.
+     * If a path points to a directory, all files within that directory will be processed.
+     * This option is required to run the optimization command.
+     */
     @CommandLine.Option(
             names = {"-c", "--configs"},
             arity = "1..*",
             description =
-                    "Specifies one or more config paths to be invoked by the pipeline iteratively. If the path points to a directory, all files inside are chosen to get invoked.")
+                    "Specifies one or more config paths to be invoked by the pipeline iteratively. If the path points "
+                            + "to a directory, all files inside are chosen to get invoked.")
     private Path[] optimizationConfigs;
 
+    /**
+     * Array of evaluation configuration file paths to be processed.
+     * If a path points to a directory, all files within that directory will be processed.
+     * This option is optional; if not provided, no evaluation will be performed after optimization.
+     */
     @CommandLine.Option(
             names = {"-e", "--eval"},
             arity = "0..*",
@@ -37,6 +54,14 @@ public class OptimizeCommand implements Runnable {
                     + "If the path points to a directory, all files inside are chosen to get invoked.")
     private Path[] evaluationConfigs;
 
+    /**
+     * Runs the optimization and evaluation pipelines based on the provided configuration files.
+     * It first loads the optimization and evaluation configurations, then executes the evaluation
+     * pipeline for each evaluation configuration. This is the unoptimized baseline evaluation. <br>
+     * After that, it runs the optimization pipeline for
+     * each optimization configuration, and subsequently evaluates the optimized prompt using each
+     * evaluation configuration once more with the optimized prompt instead of the original one.
+     */
     @Override
     public void run() {
         List<Path> configsToOptimize = loadConfigs(optimizationConfigs);
