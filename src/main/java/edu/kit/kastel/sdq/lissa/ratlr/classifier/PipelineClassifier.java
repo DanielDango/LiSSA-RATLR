@@ -6,7 +6,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
 import edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore;
-import edu.kit.kastel.sdq.lissa.ratlr.elementstore.ElementStore;
+import edu.kit.kastel.sdq.lissa.ratlr.elementstore.SourceElementStore;
+import edu.kit.kastel.sdq.lissa.ratlr.elementstore.TargetElementStore;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.Pair;
 
@@ -66,7 +67,7 @@ public class PipelineClassifier extends Classifier {
      * @return A list of classification results for the remaining trace links
      */
     @Override
-    public List<ClassificationResult> classify(ElementStore sourceStore, ElementStore targetStore) {
+    public List<ClassificationResult> classify(SourceElementStore sourceStore, TargetElementStore targetStore) {
         List<ClassificationResult> results = new ArrayList<>();
         List<Pair<Element, Element>> tasks = createClassificationTasks(sourceStore, targetStore);
 

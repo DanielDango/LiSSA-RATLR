@@ -12,7 +12,8 @@ import org.slf4j.LoggerFactory;
 
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
 import edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore;
-import edu.kit.kastel.sdq.lissa.ratlr.elementstore.ElementStore;
+import edu.kit.kastel.sdq.lissa.ratlr.elementstore.SourceElementStore;
+import edu.kit.kastel.sdq.lissa.ratlr.elementstore.TargetElementStore;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.Pair;
 
@@ -61,7 +62,7 @@ public abstract class Classifier {
      * @param targetStore The store containing target elements
      * @return A list of classification results
      */
-    public List<ClassificationResult> classify(ElementStore sourceStore, ElementStore targetStore) {
+    public List<ClassificationResult> classify(SourceElementStore sourceStore, TargetElementStore targetStore) {
         var tasks = createClassificationTasks(sourceStore, targetStore);
 
         if (threads <= 1) {
@@ -191,7 +192,7 @@ public abstract class Classifier {
      * @return A list of element pairs to classify
      */
     protected static List<Pair<Element, Element>> createClassificationTasks(
-            ElementStore sourceStore, ElementStore targetStore) {
+            SourceElementStore sourceStore, TargetElementStore targetStore) {
         List<Pair<Element, Element>> tasks = new ArrayList<>();
 
         for (var source : sourceStore.getAllElements(true)) {

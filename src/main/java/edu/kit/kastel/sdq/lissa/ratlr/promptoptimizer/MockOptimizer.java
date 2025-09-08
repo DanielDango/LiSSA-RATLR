@@ -1,7 +1,8 @@
 /* Licensed under MIT 2025. */
 package edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer;
 
-import edu.kit.kastel.sdq.lissa.ratlr.elementstore.ElementStore;
+import edu.kit.kastel.sdq.lissa.ratlr.elementstore.SourceElementStore;
+import edu.kit.kastel.sdq.lissa.ratlr.elementstore.TargetElementStore;
 
 public class MockOptimizer extends AbstractPromptOptimizer {
     /**
@@ -16,7 +17,7 @@ public class MockOptimizer extends AbstractPromptOptimizer {
     }
 
     @Override
-    public String optimize(ElementStore sourceStore, ElementStore targetStore) {
+    public String optimize(SourceElementStore sourceStore, TargetElementStore targetStore) {
         return optimizationPrompt;
     }
 

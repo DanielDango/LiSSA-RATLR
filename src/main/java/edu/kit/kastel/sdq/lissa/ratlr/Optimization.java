@@ -18,7 +18,8 @@ import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheManager;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.Classifier;
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.OptimizerConfiguration;
 import edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore;
-import edu.kit.kastel.sdq.lissa.ratlr.elementstore.ElementStore;
+import edu.kit.kastel.sdq.lissa.ratlr.elementstore.SourceElementStore;
+import edu.kit.kastel.sdq.lissa.ratlr.elementstore.TargetElementStore;
 import edu.kit.kastel.sdq.lissa.ratlr.embeddingcreator.EmbeddingCreator;
 import edu.kit.kastel.sdq.lissa.ratlr.evaluator.AbstractEvaluator;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
@@ -77,11 +78,11 @@ public class Optimization {
     /**
      * Store for source elements
      */
-    private ElementStore sourceStore;
+    private SourceElementStore sourceStore;
     /**
      * Store for target elements
      */
-    private ElementStore targetStore;
+    private TargetElementStore targetStore;
     /**
      * Optimizer for prompt used in classification
      */
@@ -135,8 +136,8 @@ public class Optimization {
         targetPreprocessor = Preprocessor.createPreprocessor(configuration.targetPreprocessor(), contextStore);
 
         embeddingCreator = EmbeddingCreator.createEmbeddingCreator(configuration.embeddingCreator(), contextStore);
-        sourceStore = new ElementStore(configuration.sourceStore(), false);
-        targetStore = new ElementStore(configuration.targetStore(), true);
+        sourceStore = new SourceElementStore(configuration.sourceStore());
+        targetStore = new TargetElementStore(configuration.targetStore());
 
         Classifier classifier = configuration.createClassifier(contextStore);
         ResultAggregator aggregator =

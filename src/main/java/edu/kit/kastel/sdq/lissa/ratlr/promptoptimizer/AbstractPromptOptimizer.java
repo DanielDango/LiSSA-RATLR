@@ -12,7 +12,8 @@ import org.slf4j.LoggerFactory;
 
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.Classifier;
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
-import edu.kit.kastel.sdq.lissa.ratlr.elementstore.ElementStore;
+import edu.kit.kastel.sdq.lissa.ratlr.elementstore.SourceElementStore;
+import edu.kit.kastel.sdq.lissa.ratlr.elementstore.TargetElementStore;
 import edu.kit.kastel.sdq.lissa.ratlr.evaluator.AbstractEvaluator;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
 import edu.kit.kastel.sdq.lissa.ratlr.postprocessor.TraceLinkIdPostprocessor;
@@ -122,7 +123,7 @@ public abstract class AbstractPromptOptimizer {
      * @param targetStore The store containing target elements of the domain/dataset the prompt is optimized for
      * @return A string representing the optimized prompt
      */
-    public abstract String optimize(ElementStore sourceStore, ElementStore targetStore);
+    public abstract String optimize(SourceElementStore sourceStore, TargetElementStore targetStore);
 
     /**
      * Creates a copy of the current optimizer instance.

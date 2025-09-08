@@ -20,7 +20,8 @@ import edu.kit.kastel.sdq.lissa.ratlr.classifier.ClassificationResult;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.ClassificationTask;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.Classifier;
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
-import edu.kit.kastel.sdq.lissa.ratlr.elementstore.ElementStore;
+import edu.kit.kastel.sdq.lissa.ratlr.elementstore.SourceElementStore;
+import edu.kit.kastel.sdq.lissa.ratlr.elementstore.TargetElementStore;
 import edu.kit.kastel.sdq.lissa.ratlr.evaluator.AbstractEvaluator;
 import edu.kit.kastel.sdq.lissa.ratlr.evaluator.BruteForceEvaluator;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
@@ -208,7 +209,7 @@ public class AutomaticPromptOptimizer extends IterativeFeedbackOptimizer {
     }
 
     @Override
-    public String optimize(ElementStore sourceStore, ElementStore targetStore) {
+    public String optimize(SourceElementStore sourceStore, TargetElementStore targetStore) {
         List<ClassificationTask> tasks = getAllClassificationTasks(sourceStore, targetStore);
         return optimizeInternal(tasks);
     }
@@ -449,7 +450,7 @@ public class AutomaticPromptOptimizer extends IterativeFeedbackOptimizer {
      * @param targetStore the target element store
      * @return a set of all possible trace links between the source and target store, of which the gold standard is a subset
      */
-    private static Set<TraceLink> getAllTraceLinks(ElementStore sourceStore, ElementStore targetStore) {
+    private static Set<TraceLink> getAllTraceLinks(SourceElementStore sourceStore, TargetElementStore targetStore) {
         Set<TraceLink> allLinks = new HashSet<>();
         for (var source : sourceStore.getAllElements(true)) {
             for (Element target : targetStore.findSimilar(source)) {
@@ -459,7 +460,8 @@ public class AutomaticPromptOptimizer extends IterativeFeedbackOptimizer {
         return allLinks;
     }
 
-    private List<ClassificationTask> getAllClassificationTasks(ElementStore sourceStore, ElementStore targetStore) {
+    private List<ClassificationTask> getAllClassificationTasks(
+            SourceElementStore sourceStore, TargetElementStore targetStore) {
         List<ClassificationTask> tasks = new ArrayList<>();
         for (Pair<Element, float[]> source : sourceStore.getAllElements(true)) {
             for (Element target : targetStore.findSimilar(source)) {

@@ -1,8 +1,6 @@
 /* Licensed under MIT 2025. */
 package edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer;
 
-import static edu.kit.kastel.sdq.lissa.ratlr.elementstore.ElementStore.reduceSourceElementStore;
-import static edu.kit.kastel.sdq.lissa.ratlr.elementstore.ElementStore.reduceTargetStore;
 import static edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.SimpleOptimizer.DEFAULT_OPTIMIZATION_TEMPLATE;
 import static edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.SimpleOptimizer.ORIGINAL_PROMPT_KEY;
 
@@ -17,7 +15,8 @@ import edu.kit.kastel.sdq.lissa.ratlr.classifier.ChatLanguageModelProvider;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.ClassificationResult;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.Classifier;
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
-import edu.kit.kastel.sdq.lissa.ratlr.elementstore.ElementStore;
+import edu.kit.kastel.sdq.lissa.ratlr.elementstore.SourceElementStore;
+import edu.kit.kastel.sdq.lissa.ratlr.elementstore.TargetElementStore;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
 import edu.kit.kastel.sdq.lissa.ratlr.postprocessor.TraceLinkIdPostprocessor;
@@ -138,15 +137,15 @@ public class IterativeOptimizer extends AbstractPromptOptimizer {
     }
 
     @Override
-    public String optimize(ElementStore sourceStore, ElementStore targetStore) {
+    public String optimize(SourceElementStore sourceStore, TargetElementStore targetStore) {
         Element source = sourceStore.getAllElements(true).getFirst().first();
         Element target = targetStore
                 .findSimilar(sourceStore.getAllElements(true).getFirst())
                 .getFirst();
         // TODO consider going back to final instead of using a mutable variable
         template = template.replace("{source_type}", source.getType()).replace("{target_type}", target.getType());
-        ElementStore trainingSourceStore = reduceSourceElementStore(sourceStore, TRAINING_DATA_SIZE);
-        ElementStore trainingTargetStore = reduceTargetStore(trainingSourceStore, targetStore);
+        SourceElementStore trainingSourceStore = sourceStore.reduceSourceElementStore(TRAINING_DATA_SIZE);
+        TargetElementStore trainingTargetStore = targetStore.reduceTargetElementStore(trainingSourceStore);
         return optimizeIntern(trainingSourceStore, trainingTargetStore);
     }
 
@@ -158,7 +157,7 @@ public class IterativeOptimizer extends AbstractPromptOptimizer {
      * @param targetStore The store containing target elements
      * @return The optimized prompt after the iterative process
      */
-    protected String optimizeIntern(ElementStore sourceStore, ElementStore targetStore) {
+    protected String optimizeIntern(SourceElementStore sourceStore, TargetElementStore targetStore) {
         double[] f1Scores = new double[maximumIterations];
         int i = 0;
         double f1Score;
@@ -197,7 +196,7 @@ public class IterativeOptimizer extends AbstractPromptOptimizer {
      * @param prompt        The prompt to use for classification
      * @return The F1 score of the classification results
      */
-    protected double evaluateF1(ElementStore sourceStore, ElementStore targetStore, String prompt) {
+    protected double evaluateF1(SourceElementStore sourceStore, TargetElementStore targetStore, String prompt) {
 
         Set<TraceLink> traceLinks = getTraceLinks(sourceStore, targetStore, prompt);
         Set<TraceLink> possibleTraceLinks = getReducedGoldStandardLinks(sourceStore, targetStore);
@@ -214,7 +213,8 @@ public class IterativeOptimizer extends AbstractPromptOptimizer {
      * @param prompt        The prompt to use for classification
      * @return A set of trace links that were classified based on the prompt
      */
-    protected Set<TraceLink> getTraceLinks(ElementStore sourceStore, ElementStore targetStore, String prompt) {
+    protected Set<TraceLink> getTraceLinks(
+            SourceElementStore sourceStore, TargetElementStore targetStore, String prompt) {
         classifier.setClassificationPrompt(prompt);
         List<ClassificationResult> results = classifier.classify(sourceStore, targetStore);
 
@@ -231,7 +231,8 @@ public class IterativeOptimizer extends AbstractPromptOptimizer {
      * @param targetStore The store containing target elements
      * @return A subset of the gold standard trace links that can be created between the source and target stores
      */
-    protected Set<TraceLink> getReducedGoldStandardLinks(ElementStore sourceStore, ElementStore targetStore) {
+    protected Set<TraceLink> getReducedGoldStandardLinks(
+            SourceElementStore sourceStore, TargetElementStore targetStore) {
         List<String> sourceTraceLinkIds = sourceStore.getAllElements().stream()
                 .map(Element::getIdentifier)
                 .toList();

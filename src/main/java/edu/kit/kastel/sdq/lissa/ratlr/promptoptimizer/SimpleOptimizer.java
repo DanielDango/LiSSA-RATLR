@@ -6,7 +6,8 @@ import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheKey;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheManager;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.ChatLanguageModelProvider;
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
-import edu.kit.kastel.sdq.lissa.ratlr.elementstore.ElementStore;
+import edu.kit.kastel.sdq.lissa.ratlr.elementstore.SourceElementStore;
+import edu.kit.kastel.sdq.lissa.ratlr.elementstore.TargetElementStore;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 
 import dev.langchain4j.model.chat.ChatModel;
@@ -80,7 +81,7 @@ public class SimpleOptimizer extends AbstractPromptOptimizer {
     }
 
     @Override
-    public String optimize(ElementStore sourceStore, ElementStore targetStore) {
+    public String optimize(SourceElementStore sourceStore, TargetElementStore targetStore) {
         Element source = sourceStore.getAllElements(true).getFirst().first();
         Element target = targetStore
                 .findSimilar(sourceStore.getAllElements(true).getFirst())

@@ -19,7 +19,8 @@ import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheManager;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.Classifier;
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.Configuration;
 import edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore;
-import edu.kit.kastel.sdq.lissa.ratlr.elementstore.ElementStore;
+import edu.kit.kastel.sdq.lissa.ratlr.elementstore.SourceElementStore;
+import edu.kit.kastel.sdq.lissa.ratlr.elementstore.TargetElementStore;
 import edu.kit.kastel.sdq.lissa.ratlr.embeddingcreator.EmbeddingCreator;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
 import edu.kit.kastel.sdq.lissa.ratlr.postprocessor.TraceLinkIdPostprocessor;
@@ -73,9 +74,9 @@ public class Evaluation {
     /** Creator for element embeddings */
     private EmbeddingCreator embeddingCreator;
     /** Store for source elements */
-    private ElementStore sourceStore;
+    private SourceElementStore sourceStore;
     /** Store for target elements */
-    private ElementStore targetStore;
+    private TargetElementStore targetStore;
     /** Classifier for trace link analysis */
     private Classifier classifier;
     /** Aggregator for classification results */
@@ -154,8 +155,8 @@ public class Evaluation {
         targetPreprocessor = Preprocessor.createPreprocessor(configuration.targetPreprocessor(), contextStore);
 
         embeddingCreator = EmbeddingCreator.createEmbeddingCreator(configuration.embeddingCreator(), contextStore);
-        sourceStore = new ElementStore(configuration.sourceStore(), false);
-        targetStore = new ElementStore(configuration.targetStore(), true);
+        sourceStore = new SourceElementStore(configuration.sourceStore());
+        targetStore = new TargetElementStore(configuration.targetStore());
         // TODO: careful, this is a hack to allow the optimization to overwrite the prompt and store it to the config
         // for serialization.
         if (!prompt.isEmpty()) {

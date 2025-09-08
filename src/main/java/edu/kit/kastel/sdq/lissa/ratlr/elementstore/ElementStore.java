@@ -15,25 +15,12 @@ import edu.kit.kastel.sdq.lissa.ratlr.utils.Pair;
 /**
  * A store for elements and their embeddings in the LiSSA framework.
  * This class manages a collection of elements and their associated vector embeddings,
- * providing functionality for similarity search and element retrieval as part of
- * LiSSA's trace link analysis approach.
+ * as part of LiSSA's trace link analysis approach.
  *
  * The store can operate in two distinct roles within the LiSSA pipeline:
  * <ul>
- *     <li><b>Target Store</b> (similarityRetriever = true):
- *         <ul>
- *             <li>Used to store target elements that will be searched for similarity in LiSSA's classification phase</li>
- *             <li>Cannot retrieve all elements at once</li>
- *         </ul>
- *     </li>
- *     <li><b>Source Store</b> (similarityRetriever = false):
- *         <ul>
- *             <li>Used to store source elements that will be used as queries in LiSSA's classification phase</li>
- *             <li>Does not support similarity search as it's unnecessary for source elements</li>
- *             <li>Can retrieve all elements at once for LiSSA's batch processing</li>
- *             <li>Supports filtering elements by comparison flag for LiSSA's selective analysis</li>
- *         </ul>
- *     </li>
+ *     <li>{@link SourceElementStore}</li>
+ *     <li>{@link TargetElementStore}</li>
  * </ul>
  */
 public class ElementStore {
@@ -51,22 +38,6 @@ public class ElementStore {
     private final List<Pair<Element, float[]>> elementsWithEmbedding;
 
     /**
-     * Retrieves the retrieval strategy used for finding similar elements.
-     * This is only applicable in target store mode (similarityRetriever = true).
-     *
-     * @return The retrieval strategy, or null if this is a source store
-     */
-    public RetrievalStrategy getRetrievalStrategy() {
-        return retrievalStrategy;
-    }
-
-    /**
-     * Strategy to find similar elements.
-     * {@code null} indicates source store mode (no similarity search).
-     */
-    private final RetrievalStrategy retrievalStrategy;
-
-    /**
      * Creates a new element store for the LiSSA framework.
      *
      * @param configuration The configuration of the module
@@ -76,14 +47,9 @@ public class ElementStore {
      * @throws IllegalArgumentException If max_results is less than 1 in target store mode
      */
     public ElementStore(ModuleConfiguration configuration, boolean similarityRetriever) {
-        if (similarityRetriever) {
-            this.retrievalStrategy = RetrievalStrategy.createStrategy(configuration);
-        } else {
-            if (!"custom".equals(configuration.name())) {
-                RetrievalStrategy.logger.error(
-                        "The element store is created in source store mode, but the retrieval strategy is not set to \"custom\". This is likely a configuration error as source stores do not use retrieval strategies.");
-            }
-            this.retrievalStrategy = null;
+        if (!similarityRetriever && !"custom".equals(configuration.name())) {
+            RetrievalStrategy.logger.error(
+                    "The element store is created in source store mode, but the retrieval strategy is not set to \"custom\". This is likely a configuration error as source stores do not use retrieval strategies.");
         }
 
         elementsWithEmbedding = new ArrayList<>();
@@ -99,7 +65,6 @@ public class ElementStore {
      *                          For source stores, this should be null.
      */
     public ElementStore(List<Pair<Element, float[]>> content, RetrievalStrategy retrievalStrategy) {
-        this.retrievalStrategy = retrievalStrategy;
 
         elementsWithEmbedding = new ArrayList<>();
         idToElementWithEmbedding = new HashMap<>();
@@ -141,34 +106,6 @@ public class ElementStore {
     }
 
     /**
-     * Finds elements similar to the given query vector as part of LiSSA's similarity matching.
-     * Only available in target store mode.
-     *
-     * @param query The element and vector to find similar elements for
-     * @return List of similar elements, sorted by similarity
-     * @throws IllegalStateException If this is a source store (similarityRetriever = false)
-     */
-    public final List<Element> findSimilar(Pair<Element, float[]> query) {
-        return findSimilarWithDistances(query).stream().map(Pair::first).toList();
-    }
-
-    /**
-     * Finds elements similar to the given query vector, including their similarity scores.
-     * Used by LiSSA for similarity-based matching in the classification phase.
-     * Only available in target store mode.
-     *
-     * @param query The element and vector to find similar elements for
-     * @return List of pairs containing similar elements and their similarity scores
-     * @throws IllegalStateException If this is a source store (similarityRetriever = false)
-     */
-    public List<Pair<Element, Float>> findSimilarWithDistances(Pair<Element, float[]> query) {
-        if (retrievalStrategy == null) {
-            throw new IllegalStateException("You should set retriever to true to activate this feature.");
-        }
-        return retrievalStrategy.findSimilarElements(query, getAllElementsIntern(true));
-    }
-
-    /**
      * Retrieves an element and its embedding by its identifier.
      * Available in both source and target store modes for LiSSA's element lookup.
      *
@@ -202,32 +139,13 @@ public class ElementStore {
     }
 
     /**
-     * Retrieves all elements in the store for LiSSA's batch processing.
-     * Only available in source store mode.
-     *
-     * @param onlyCompare If true, only returns elements marked for comparison
-     * @return List of pairs containing elements and their embeddings
-     * @throws IllegalStateException If this is a target store (similarityRetriever = true)
-     */
-    public List<Pair<Element, float[]>> getAllElements(boolean onlyCompare) {
-        if (retrievalStrategy != null) {
-            throw new IllegalStateException("You should set retriever to false to activate this feature.");
-        }
-        return getAllElementsIntern(onlyCompare);
-    }
-
-    public List<Element> getAllElements() {
-        return getAllElementsIntern(false).stream().map(Pair::first).toList();
-    }
-
-    /**
      * Internal method to retrieve all elements.
      * Available in both source and target store modes for LiSSA's internal processing.
      *
      * @param onlyCompare If true, only returns elements marked for comparison
      * @return List of pairs containing elements and their embeddings
      */
-    private List<Pair<Element, float[]>> getAllElementsIntern(boolean onlyCompare) {
+    protected List<Pair<Element, float[]>> getAllElementsIntern(boolean onlyCompare) {
         List<Pair<Element, float[]>> elements = new ArrayList<>();
         for (Pair<Element, float[]> element : elementsWithEmbedding) {
             if (!onlyCompare || element.first().isCompare()) {
@@ -237,40 +155,7 @@ public class ElementStore {
         return elements;
     }
 
-    /**
-     * Retrieves a subset of the source store to be used as training data for optimization.
-     * The training data consists of the first size elements from the source store.
-     *
-     * @param sourceStore The original source element store
-     * @param size The number of elements to include in the training source store
-     * @return A new ElementStore containing only the training data elements
-     * @throws IllegalStateException If this is a target store (similarityRetriever = true)
-     */
-    public static ElementStore reduceSourceElementStore(ElementStore sourceStore, int size) {
-        return new ElementStore(sourceStore.getAllElements(false).subList(0, Math.min(size, sourceStore.size())), null);
-    }
-
-    /**
-     * Retrieves a subset of the target store that corresponds to the source store.
-     * This method finds all elements in the target store that are similar to the elements in the source store.
-     *
-     *
-     * @param sourceStore The training source element store
-     * @param targetStore The original target element store
-     * @return A new ElementStore containing only the target elements that correspond to the training source elements
-     * @throws IllegalStateException If this the source store is a target store (similarityRetriever = true) or the target store is a source store (similarityRetriever = false)
-     */
-    public static ElementStore reduceTargetStore(ElementStore sourceStore, ElementStore targetStore) {
-        List<Pair<Element, float[]>> reducedTargetElements = new ArrayList<>();
-        for (var element : sourceStore.getAllElements(true)) {
-            for (Element candidate : targetStore.findSimilar(element)) {
-                reducedTargetElements.add(targetStore.getById(candidate.getIdentifier()));
-            }
-        }
-        return new ElementStore(reducedTargetElements, targetStore.getRetrievalStrategy());
-    }
-
-    private int size() {
+    protected int size() {
         return elementsWithEmbedding.size();
     }
 }

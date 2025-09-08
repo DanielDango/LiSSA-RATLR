@@ -9,6 +9,8 @@ import java.util.Set;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.Classifier;
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
 import edu.kit.kastel.sdq.lissa.ratlr.elementstore.ElementStore;
+import edu.kit.kastel.sdq.lissa.ratlr.elementstore.SourceElementStore;
+import edu.kit.kastel.sdq.lissa.ratlr.elementstore.TargetElementStore;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
 import edu.kit.kastel.sdq.lissa.ratlr.postprocessor.TraceLinkIdPostprocessor;
@@ -86,7 +88,7 @@ public class IterativeFeedbackOptimizer extends IterativeOptimizer {
     }
 
     @Override
-    protected String optimizeIntern(ElementStore sourceStore, ElementStore targetStore) {
+    protected String optimizeIntern(SourceElementStore sourceStore, TargetElementStore targetStore) {
         double[] f1Scores = new double[maximumIterations];
         Set<TraceLink> possibleTraceLinks = getReducedGoldStandardLinks(sourceStore, targetStore);
         int i = 0;
