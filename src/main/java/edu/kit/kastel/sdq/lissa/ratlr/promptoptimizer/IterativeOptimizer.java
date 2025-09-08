@@ -246,16 +246,6 @@ public class IterativeOptimizer extends AbstractPromptOptimizer {
 
     @Override
     protected AbstractPromptOptimizer copyOf(AbstractPromptOptimizer original) {
-        return new IterativeOptimizer(
-                threads,
-                cache,
-                provider,
-                template,
-                optimizationPrompt,
-                maximumIterations,
-                validTraceLinks,
-                aggregator,
-                traceLinkIdPostProcessor,
-                classifier.copyOf());
+        return null;
     }
 }

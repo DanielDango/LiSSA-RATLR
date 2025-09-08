@@ -8,7 +8,7 @@ public class MockOptimizer extends AbstractPromptOptimizer {
      * The prompt used for optimization.
      * This is the initial prompt that will not be optimized.
      */
-    private String optimizationPrompt;
+    private final String optimizationPrompt;
 
     public MockOptimizer() {
         super(1);

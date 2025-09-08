@@ -98,7 +98,7 @@ public class ReasoningClassifier extends Classifier {
     }
 
     @Override
-    public final Classifier copyOf() {
+    protected final Classifier copyOf() {
         return new ReasoningClassifier(
                 threads, cache, provider, prompt, useOriginalArtifacts, useSystemMessage, contextStore);
     }

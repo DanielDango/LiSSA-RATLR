@@ -20,6 +20,9 @@ import dev.langchain4j.model.chat.ChatModel;
  */
 public class SimpleClassifier extends Classifier {
 
+    /**
+     * The configuration key for the prompt template.
+     */
     public static final String PROMPT_TEMPLATE_KEY = "template";
 
     /**
@@ -94,7 +97,7 @@ public class SimpleClassifier extends Classifier {
      * @return A new simple classifier instance with the same configuration
      */
     @Override
-    public final Classifier copyOf() {
+    protected final Classifier copyOf() {
         return new SimpleClassifier(threads, cache, provider, template, contextStore);
     }
 

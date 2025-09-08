@@ -143,6 +143,14 @@ public abstract class Classifier {
         return results;
     }
 
+    /**
+     * Classifies a single classification task.
+     * This method delegates to the abstract {@link #classify(Element, Element)} method
+     * which must be implemented by concrete classifier subclasses.
+     *
+     * @param task The classification task containing source and target elements
+     * @return     A classification result if a trace link is found, empty otherwise
+     */
     public Optional<ClassificationResult> classify(ClassificationTask task) {
         return classify(task.source(), task.target());
     }
@@ -164,10 +172,11 @@ public abstract class Classifier {
      *
      * @return A new instance of the same classifier type
      */
-    public abstract Classifier copyOf();
+    protected abstract Classifier copyOf();
 
     /**
      * Sets the prompt used for classification.
+     * This method is only intended for use by optimizers
      *
      * @param prompt The prompt template to use for classification
      */
