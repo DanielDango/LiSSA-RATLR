@@ -46,11 +46,11 @@
     }
   },
   "scorer" : {
-    "name" : "binary",
+    "name" : "mock",
     "args" : {}
   },
   "evaluator" : {
-    "name" : "ucb",
+    "name" : "mock",
     "args" : {}
   },
   "prompt_optimizer": {
