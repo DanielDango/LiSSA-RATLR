@@ -147,7 +147,7 @@ public class Optimization {
                 configuration.traceLinkIdPostprocessor(), contextStore);
         Set<TraceLink> goldStandard = getTraceLinksFromGoldStandard(configuration.goldStandardConfiguration());
 
-        AbstractScorer scorer = AbstractScorer.createScorer(configuration.scorer());
+        AbstractScorer scorer = AbstractScorer.createScorer(configuration.scorer(), classifier);
         AbstractEvaluator evaluator = AbstractEvaluator.createEvaluator(configuration.evaluator());
 
         promptOptimizer = AbstractPromptOptimizer.createOptimizer(

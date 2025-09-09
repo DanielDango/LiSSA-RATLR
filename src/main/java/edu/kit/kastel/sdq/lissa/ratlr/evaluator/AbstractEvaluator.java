@@ -8,7 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.ClassificationTask;
-import edu.kit.kastel.sdq.lissa.ratlr.classifier.Classifier;
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
 import edu.kit.kastel.sdq.lissa.ratlr.scorer.AbstractScorer;
 
@@ -76,10 +75,8 @@ public abstract class AbstractEvaluator {
      *
      * @param prompts A list of prompts to evaluate.
      * @param examples A list of classification task examples.
-     * @param classifier The classifier instance to use for evaluation.
      * @param scorer The scorer instance to use for scoring the prompts.
      * @return A list of scores corresponding to each prompt.
      */
-    public abstract List<Double> call(
-            List<String> prompts, List<ClassificationTask> examples, Classifier classifier, AbstractScorer scorer);
+    public abstract List<Double> call(List<String> prompts, List<ClassificationTask> examples, AbstractScorer scorer);
 }

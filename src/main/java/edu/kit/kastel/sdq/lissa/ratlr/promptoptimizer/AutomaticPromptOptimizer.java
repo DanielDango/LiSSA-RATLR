@@ -255,7 +255,7 @@ public class AutomaticPromptOptimizer extends IterativeFeedbackOptimizer {
         if (prompts.size() == 1) {
             return List.of(1.0);
         }
-        return evaluator.call(prompts, tasks, classifier, scorer);
+        return evaluator.call(prompts, tasks, scorer);
     }
 
     /**
@@ -376,8 +376,7 @@ public class AutomaticPromptOptimizer extends IterativeFeedbackOptimizer {
                             .limit(maxExpansionFactor * 2)
                             .toList();
                     AbstractEvaluator bruteForceEvaluator = new BruteForceEvaluator(evaluationBudget);
-                    List<Double> errorScores =
-                            bruteForceEvaluator.call(tempNewPrompts, errorExamples, classifier, scorer);
+                    List<Double> errorScores = bruteForceEvaluator.call(tempNewPrompts, errorExamples, scorer);
                     List<Integer> sortedIdxs = errorScores.stream()
                             .sorted()
                             // TODO Check if this is correct

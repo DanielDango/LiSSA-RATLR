@@ -18,38 +18,33 @@ public class BinaryScorer extends AbstractScorer {
      *
      * @param configuration The configuration for the scorer.
      */
-    public BinaryScorer(ModuleConfiguration configuration) {
-        super(configuration);
+    public BinaryScorer(ModuleConfiguration configuration, Classifier classifier) {
+        super(configuration, classifier);
     }
 
     /**
      * Computes scores for a list of prompt-example pairs.
      * Each score is 1.0 if the classifier's prediction matches the example's label, otherwise 0.0.
      *
-     * @param classifier                The classifier instance to use for predictions.
      * @param promptExamplesToCompute   A list of pairs containing prompts and classification task examples.
      * @return                          A list of computed scores (1.0 or 0.0).
      */
     @Override
-    protected List<Double> computeScores(
-            Classifier classifier, List<Pair<String, ClassificationTask>> promptExamplesToCompute) {
-        return promptExamplesToCompute.stream()
-                .map(pe -> computeSingleScore(classifier, pe))
-                .toList();
+    protected List<Double> computeScores(List<Pair<String, ClassificationTask>> promptExamplesToCompute) {
+        return promptExamplesToCompute.stream().map(this::computeSingleScore).toList();
     }
 
     /**
      * Computes the score for a single prompt-example pair.
      * The score is 1.0 if the classifier's prediction matches the example's label, otherwise 0.0.
      *
-     * @param classifier     The classifier instance to use for prediction.
      * @param promptExample  A pair containing the prompt and the classification task example.
      * @return               The computed score (1.0 or 0.0).
      */
-    private Double computeSingleScore(Classifier classifier, Pair<String, ClassificationTask> promptExample) {
+    private Double computeSingleScore(Pair<String, ClassificationTask> promptExample) {
         String prompt = promptExample.first();
         ClassificationTask example = promptExample.second();
         classifier.setClassificationPrompt(prompt);
-        return super.classify(classifier, example) == example.label() ? 1.0 : 0.0;
+        return super.classify(example) == example.label() ? 1.0 : 0.0;
     }
 }

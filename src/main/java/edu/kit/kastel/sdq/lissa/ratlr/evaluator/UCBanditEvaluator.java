@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Random;
 
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.ClassificationTask;
-import edu.kit.kastel.sdq.lissa.ratlr.classifier.Classifier;
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
 import edu.kit.kastel.sdq.lissa.ratlr.scorer.AbstractScorer;
 
@@ -64,8 +63,7 @@ public class UCBanditEvaluator extends AbstractEvaluator {
     }
 
     @Override
-    public List<Double> call(
-            List<String> prompts, List<ClassificationTask> examples, Classifier classifier, AbstractScorer scorer) {
+    public List<Double> call(List<String> prompts, List<ClassificationTask> examples, AbstractScorer scorer) {
         UCBBandits banditAlgo = new UCBBandits(prompts.size(), this.samplesPerEval, this.c, this.mode);
         int numPromptsPerRound = Math.min(this.numberOfPromptsPerRound, prompts.size());
         for (int ri = 1; ri <= this.rounds; ri++) {
@@ -79,7 +77,7 @@ public class UCBanditEvaluator extends AbstractEvaluator {
             List<Double> scores;
             while (true) {
                 try {
-                    scores = scorer.parallelCall(classifier, sampledPrompts, sampledData, this.maxThreads);
+                    scores = scorer.parallelCall(sampledPrompts, sampledData, this.maxThreads);
                     break;
                 } catch (Exception e) {
                     logger.warn("Exception during scoring: {}. Retrying...", e.getMessage());

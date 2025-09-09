@@ -5,8 +5,9 @@ import java.util.Collections;
 import java.util.List;
 
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.ClassificationTask;
-import edu.kit.kastel.sdq.lissa.ratlr.classifier.Classifier;
+import edu.kit.kastel.sdq.lissa.ratlr.classifier.MockClassifier;
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
+import edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.Pair;
 
 /**
@@ -16,15 +17,14 @@ import edu.kit.kastel.sdq.lissa.ratlr.utils.Pair;
 public class MockScorer extends AbstractScorer {
 
     /**
-     * Creates a new instance of MockScorer with an empty configuration.
+     * Creates a new instance of MockScorer with an empty configuration and a MockClassifier.
      */
     public MockScorer() {
-        super(new ModuleConfiguration("", Collections.emptyMap()));
+        super(new ModuleConfiguration("", Collections.emptyMap()), new MockClassifier(new ContextStore()));
     }
 
     @Override
-    protected List<Double> computeScores(
-            Classifier classifier, List<Pair<String, ClassificationTask>> promptExamplesToCompute) {
+    protected List<Double> computeScores(List<Pair<String, ClassificationTask>> promptExamplesToCompute) {
         return Collections.nCopies(promptExamplesToCompute.size(), 1.0);
     }
 }

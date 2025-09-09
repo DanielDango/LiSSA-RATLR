@@ -25,6 +25,10 @@ public abstract class AbstractScorer {
 
     private final Map<String, Double> cache;
     private final double confidenceThreshold;
+    /**
+     * The classifier used for scoring.
+     */
+    protected final Classifier classifier;
 
     /**
      * Creates a new scorer with the specified configuration.
@@ -32,8 +36,9 @@ public abstract class AbstractScorer {
      *
      * @param configuration The configuration for the scorer.
      */
-    protected AbstractScorer(ModuleConfiguration configuration) {
+    protected AbstractScorer(ModuleConfiguration configuration, Classifier classifier) {
         this.cache = new HashMap<>();
+        this.classifier = classifier;
         this.confidenceThreshold =
                 configuration.argumentAsDouble(CONFIDENCE_THRESHOLD_KEY, DEFAULT_CONFIDENCE_THRESHOLD);
     }
@@ -44,16 +49,17 @@ public abstract class AbstractScorer {
      * If the configuration is null, a MockScorer is returned by default.
      *
      * @param configuration The configuration specifying the type of scorer to create.
+     * @param classifier The classifier to be used by the scorer.
      * @return An instance of a concrete scorer implementation.
      * @throws IllegalStateException If the configuration name does not match any known scorer types.
      */
-    public static AbstractScorer createScorer(ModuleConfiguration configuration) {
+    public static AbstractScorer createScorer(ModuleConfiguration configuration, Classifier classifier) {
         if (configuration == null) {
             return new MockScorer();
         }
         return switch (configuration.name()) {
             case "mock" -> new MockScorer();
-            case "binary" -> new BinaryScorer(configuration);
+            case "binary" -> new BinaryScorer(configuration, classifier);
             default -> throw new IllegalStateException("Unexpected value: " + configuration.name());
         };
     }
@@ -64,12 +70,11 @@ public abstract class AbstractScorer {
      * Each prompt is evaluated against all examples, and the mean score amongst them is returned.
      * It utilizes caching to avoid redundant computations. <br>
      *
-     * @param classifier The classifier instance to use for scoring.
      * @param prompts A list of prompts to evaluate.
      * @param examples A list of classification task examples.
      * @return A list of computed scores corresponding to each prompt.
      */
-    public List<Double> sequentialCall(Classifier classifier, List<String> prompts, List<ClassificationTask> examples) {
+    public List<Double> sequentialCall(List<String> prompts, List<ClassificationTask> examples) {
         Map<String, List<Double>> cachedScores = new HashMap<>();
         for (String prompt : prompts) {
             cachedScores.put(prompt, new ArrayList<>());
@@ -86,7 +91,7 @@ public abstract class AbstractScorer {
                 }
             }
         }
-        List<Double> computedScores = computeScores(classifier, promptsExsToCompute);
+        List<Double> computedScores = computeScores(promptsExsToCompute);
         for (int i = 0; i < promptsExsToCompute.size(); i++) {
             String prompt = promptsExsToCompute.get(i).first();
             ClassificationTask example = promptsExsToCompute.get(i).second();
@@ -106,15 +111,13 @@ public abstract class AbstractScorer {
      * Currently, it calls the sequential implementation. <br>
      * Todo: implement parallel call?
      *
-     * @param classifier The classifier instance to use for scoring.
      * @param prompts A list of prompts to evaluate.
      * @param examples A list of classification task examples.
      * @param threads The number of threads to use for parallel processing.
      * @return A list of computed scores corresponding to each prompt.
      */
-    public List<Double> parallelCall(
-            Classifier classifier, List<String> prompts, List<ClassificationTask> examples, int threads) {
-        return sequentialCall(classifier, prompts, examples);
+    public List<Double> parallelCall(List<String> prompts, List<ClassificationTask> examples, int threads) {
+        return sequentialCall(prompts, examples);
     }
 
     /**
@@ -122,23 +125,20 @@ public abstract class AbstractScorer {
      * This method must be implemented by concrete scorer implementations to define
      * their specific scoring logic.
      *
-     * @param classifier The classifier instance to use for scoring.
      * @param promptExamplesToCompute A list of pairs, each containing a prompt and a classification task example.
      * @return A list of computed scores corresponding to each prompt-example pair.
      */
-    protected abstract List<Double> computeScores(
-            Classifier classifier, List<Pair<String, ClassificationTask>> promptExamplesToCompute);
+    protected abstract List<Double> computeScores(List<Pair<String, ClassificationTask>> promptExamplesToCompute);
 
     /**
      * Classifies a single classification task using the provided classifier.
      * The classification is considered positive if the confidence of the result
      * meets or exceeds a predefined threshold (currently set to 1.0).
      *
-     * @param classifier The classifier instance to use for classification.
      * @param task The classification task to classify.
      * @return true if the classification is positive, false otherwise.
      */
-    protected boolean classify(Classifier classifier, ClassificationTask task) {
+    protected boolean classify(ClassificationTask task) {
         Optional<ClassificationResult> result = classifier.classify(task);
         if (result.isPresent()) {
             double confidence = result.get().confidence();
