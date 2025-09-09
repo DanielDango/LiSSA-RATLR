@@ -110,7 +110,7 @@ public class AutomaticPromptOptimizer extends IterativeFeedbackOptimizer {
     private static final String EVAL_PROMPTS_PER_ROUND_KEY = "eval_prompts_per_round";
     private static final int EVAL_PROMPTS_PER_ROUND = 8;
     private static final String MINIBATCH_SIZE_KEY = "minibatch_size";
-    private static final int MINIBATCH_SIZE = 64;
+    private static final int DEFAULT_MINIBATCH_SIZE = 64;
     private static final String BEAM_SIZE_KEY = "beam_size";
     private static final int BEAM_SIZE = 4;
     private static final String SEED_KEY = "seed";
@@ -159,7 +159,7 @@ public class AutomaticPromptOptimizer extends IterativeFeedbackOptimizer {
         this.evalRounds = configuration.argumentAsInt(EVAL_ROUNDS_KEY, EVAL_ROUNDS);
         this.evalPromptsPerRound = configuration.argumentAsInt(EVAL_PROMPTS_PER_ROUND_KEY, EVAL_PROMPTS_PER_ROUND);
         this.evaluationBudget = this.samplesPerEval * this.evalRounds * this.evalPromptsPerRound;
-        this.minibatchSize = configuration.argumentAsInt(MINIBATCH_SIZE_KEY, MINIBATCH_SIZE);
+        this.minibatchSize = configuration.argumentAsInt(MINIBATCH_SIZE_KEY, DEFAULT_MINIBATCH_SIZE);
         this.beamSize = configuration.argumentAsInt(BEAM_SIZE_KEY, BEAM_SIZE);
 
         this.gradientPrompt = configuration.argumentAsString(GRADIENT_PROMPT_KEY, DEFAULT_GRADIENT_PROMPT);

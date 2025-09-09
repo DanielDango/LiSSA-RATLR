@@ -63,7 +63,6 @@ public abstract class AbstractScorer {
      * using the provided classifier.
      * Each prompt is evaluated against all examples, and the mean score amongst them is returned.
      * It utilizes caching to avoid redundant computations. <br>
-     * TODO: use persistent file cache instead
      *
      * @param classifier The classifier instance to use for scoring.
      * @param prompts A list of prompts to evaluate.
