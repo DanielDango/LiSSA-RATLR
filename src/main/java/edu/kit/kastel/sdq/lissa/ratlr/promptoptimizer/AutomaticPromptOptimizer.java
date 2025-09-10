@@ -344,7 +344,7 @@ public class AutomaticPromptOptimizer extends IterativeFeedbackOptimizer {
             }
             // generate synonyms
             // TODO Find out what MC is
-            ArrayList<String> mcSampledTaskSections = new ArrayList<>();
+            List<String> mcSampledTaskSections = new ArrayList<>();
             if (mcSamplesPerStep > 0) {
                 for (String section : Stream.concat(newTaskSections.stream(), Stream.of(taskSection))
                         .toList()) {

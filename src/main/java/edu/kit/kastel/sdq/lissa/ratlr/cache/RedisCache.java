@@ -84,8 +84,10 @@ class RedisCache implements Cache {
     /**
      * Retrieves a value from the cache and deserializes it to the specified type.
      * The method first attempts to retrieve the value from Redis, and if not found,
-     * falls back to the local cache. If the value is found in the local cache and
-     * Redis is available, it will be synchronized to Redis.
+     * falls back to the local cache.
+     * If the value is found in the local cache and Redis is available, it will be synchronized to Redis.
+     * If the value is found in Redis and the local cache is available, it will be synchronized to the local cache.
+     * In case of a mismatch between Redis and local cache values, a warning is logged.
      *
      * @param <T> The type to deserialize the value to
      * @param key The cache key to look up
@@ -94,12 +96,22 @@ class RedisCache implements Cache {
      */
     @Override
     public synchronized <T> T get(CacheKey key, Class<T> clazz) {
-        var jsonData = jedis == null ? null : jedis.hget(key.toJsonKey(), "data");
-        if (jsonData == null && localCache != null) {
-            jsonData = localCache.get(key);
-            if (jedis != null && jsonData != null) {
+        String jsonData = jedis == null ? null : jedis.hget(key.toJsonKey(), "data");
+        if (localCache == null) {
+            return convert(jsonData, clazz);
+        }
+        String localData = localCache.get(key);
+        if (localData == null && jsonData != null) {
+            localCache.put(key, jsonData);
+        }
+        if (localData != null && jsonData == null) {
+            jsonData = localData;
+            if (jedis != null) {
                 jedis.hset(key.toJsonKey(), "data", jsonData);
             }
+        }
+        if (jsonData != null && localData != null && !jsonData.equals(localData)) {
+            logger.warn("Cache inconsistency detected for key {}, using Redis value", key);
         }
 
         return convert(jsonData, clazz);
