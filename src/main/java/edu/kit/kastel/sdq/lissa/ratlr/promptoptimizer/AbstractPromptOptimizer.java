@@ -194,8 +194,9 @@ public abstract class AbstractPromptOptimizer {
      */
     protected static List<String> parseTaggedText(String text, String startTag, String endTag) {
         List<String> texts = new ArrayList<>();
-
-        Pattern pattern = Pattern.compile(startTag + "(.*?)" + endTag, Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
+        // TODO Hat das Fragezeichen eine Bedeutung?
+        Pattern pattern =
+                Pattern.compile("%s(.*?)%s".formatted(startTag, endTag), Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(text);
         while (matcher.find()) {
             texts.add(matcher.group(1));

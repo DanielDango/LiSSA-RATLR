@@ -97,8 +97,8 @@ public class IterativeFeedbackOptimizer extends IterativeOptimizer {
         String modifiedPrompt = optimizationPrompt;
         do {
             logger.debug("Iteration {}: RequestPrompt = {}", i, modifiedPrompt);
-            traceLinks = super.getTraceLinks(sourceStore, targetStore, modifiedPrompt);
-            f1Score = super.evaluateF1(sourceStore, targetStore, modifiedPrompt);
+            traceLinks = getTraceLinks(sourceStore, targetStore, modifiedPrompt);
+            f1Score = evaluateF1(sourceStore, targetStore, modifiedPrompt);
             logger.debug("Iteration {}: F1-Score = {}", i, f1Score);
             f1Scores[i] = f1Score;
             String request = template.replace(ORIGINAL_PROMPT_KEY, optimizationPrompt);
