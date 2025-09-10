@@ -1,0 +1,15 @@
+
+```
+Question: Here are two parts of software development artifacts\.
+
+            \{source\_type\}: '''\{source\_content\}'''
+
+            \{target\_type\}: '''\{target\_content\}'''
+            Analyze the relationship between these two requirements\. Consider whether they share similar functionality, purpose, or compliance with relevant standards\. Look for specific terms, concepts, or objectives that indicate a connection\. Pay particular attention to the specific functionalities described, the interfaces mentioned, and the compliance with standards related to WARC records\. Evaluate how well the requirements align in terms of encapsulation, abstraction, and the provision of interfaces for creating WARC records\.
+
+            Additionally, assess whether the requirements address similar aspects of the WARC standard, such as the types of records, the encapsulation of functionality, and the compatibility across versions\.
+
+            Are they related in terms of functionality, purpose, or compliance with standards?
+
+            Answer with 'yes' or 'no'\.
+```
