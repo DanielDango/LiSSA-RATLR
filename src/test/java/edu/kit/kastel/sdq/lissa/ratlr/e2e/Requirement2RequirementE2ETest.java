@@ -92,7 +92,7 @@ OPENAI_API_KEY=sk-DUMMY
      */
     @ParameterizedTest
     @MethodSource("provideOptimizationTestCases")
-    void testEnd2EndSimpleOptimizer(String configPath, String expectedPrompt) throws Exception {
+    void testEnd2EndOptimizers(String configPath, String expectedPrompt) throws Exception {
         File config = new File(configPath);
         Assertions.assertTrue(
                 config.exists(), "The configuration file should exists at %s".formatted(config.getAbsolutePath()));
