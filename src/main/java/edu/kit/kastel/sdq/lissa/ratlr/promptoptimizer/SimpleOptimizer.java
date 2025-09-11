@@ -2,13 +2,13 @@
 package edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer;
 
 import edu.kit.kastel.sdq.lissa.ratlr.cache.Cache;
-import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheKey;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheManager;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.ChatLanguageModelProvider;
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
 import edu.kit.kastel.sdq.lissa.ratlr.elementstore.SourceElementStore;
 import edu.kit.kastel.sdq.lissa.ratlr.elementstore.TargetElementStore;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
+import edu.kit.kastel.sdq.lissa.ratlr.utils.ChatLanguageModelUtils;
 
 import dev.langchain4j.model.chat.ChatModel;
 
@@ -32,6 +32,11 @@ public class SimpleOptimizer extends AbstractPromptOptimizer {
                     '''{original_prompt}'''
                     """;
 
+    private static final String OPTIMIZATION_TEMPLATE_KEY = "optimization_template";
+
+    /**
+     * Key for the prompt in the configuration.
+     */
     public static final String ORIGINAL_PROMPT_KEY = "{original_prompt}";
 
     private final Cache cache;
@@ -65,7 +70,7 @@ public class SimpleOptimizer extends AbstractPromptOptimizer {
         super(ChatLanguageModelProvider.threads(configuration));
         this.provider = new ChatLanguageModelProvider(configuration);
         this.optimizationPrompt = configuration.argumentAsString(PROMPT_KEY, "");
-        this.template = configuration.argumentAsString("optimization_template", DEFAULT_OPTIMIZATION_TEMPLATE);
+        this.template = configuration.argumentAsString(OPTIMIZATION_TEMPLATE_KEY, DEFAULT_OPTIMIZATION_TEMPLATE);
         this.cache = CacheManager.getDefaultInstance().getCache(this, provider.getCacheParameters());
         this.llm = provider.createChatModel();
     }
@@ -89,15 +94,7 @@ public class SimpleOptimizer extends AbstractPromptOptimizer {
         String request = template.replace("{source_type}", source.getType())
                 .replace("{target_type}", target.getType())
                 .replace(ORIGINAL_PROMPT_KEY, optimizationPrompt);
-
-        CacheKey cacheKey =
-                CacheKey.of(provider.modelName(), provider.seed(), provider.temperature(), CacheKey.Mode.CHAT, request);
-        String response = cache.get(cacheKey, String.class);
-        if (response == null) {
-            logger.info("Optimizing ({}):", provider.modelName());
-            response = llm.chat(request);
-            cache.put(cacheKey, response);
-        }
+        String response = ChatLanguageModelUtils.cachedRequest(request, provider, llm, cache);
         response = sanitizePrompt(parseTaggedTextFirst(response, PROMPT_START, PROMPT_END));
         return response;
     }

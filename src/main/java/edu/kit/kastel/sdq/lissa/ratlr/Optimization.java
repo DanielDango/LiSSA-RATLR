@@ -50,7 +50,7 @@ import edu.kit.kastel.sdq.lissa.ratlr.scorer.AbstractScorer;
  */
 public class Optimization {
 
-    private static final Logger logger = LoggerFactory.getLogger(Optimization.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Optimization.class);
     private final Path configFile;
 
     private OptimizerConfiguration configuration;
@@ -184,25 +184,25 @@ public class Optimization {
      * @return Set of identified trace links
      */
     public String run() {
-        logger.info("Loading artifacts");
+        LOGGER.info("Loading artifacts");
         var sourceArtifacts = sourceArtifactProvider.getArtifacts();
         var targetArtifacts = targetArtifactProvider.getArtifacts();
 
-        logger.info("Preprocessing artifacts");
+        LOGGER.info("Preprocessing artifacts");
         var sourceElements = sourcePreprocessor.preprocess(sourceArtifacts);
         var targetElements = targetPreprocessor.preprocess(targetArtifacts);
 
-        logger.info("Calculating embeddings");
+        LOGGER.info("Calculating embeddings");
         var sourceEmbeddings = embeddingCreator.calculateEmbeddings(sourceElements);
         var targetEmbeddings = embeddingCreator.calculateEmbeddings(targetElements);
 
-        logger.info("Building element stores");
+        LOGGER.info("Building element stores");
         sourceStore.setup(sourceElements, sourceEmbeddings);
         targetStore.setup(targetElements, targetEmbeddings);
 
-        logger.info("Optimizing Prompt");
+        LOGGER.info("Optimizing Prompt");
         String result = promptOptimizer.optimize(sourceStore, targetStore);
-        logger.info("Optimized Prompt: {}", result);
+        LOGGER.info("Optimized Prompt: {}", result);
 
         Statistics.generateOptimizationStatistics(configFile.toFile(), configuration, result);
 

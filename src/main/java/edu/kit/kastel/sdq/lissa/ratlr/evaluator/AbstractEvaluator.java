@@ -3,6 +3,7 @@ package edu.kit.kastel.sdq.lissa.ratlr.evaluator;
 
 import java.util.List;
 import java.util.Random;
+import java.util.random.RandomGenerator;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +39,7 @@ public abstract class AbstractEvaluator {
     protected int evalRounds;
     protected int evalPromptsPerRound;
     protected final int evaluationBudget;
-    protected final Random random;
+    protected final RandomGenerator random;
 
     protected AbstractEvaluator(ModuleConfiguration configuration) {
         this.samplesPerEval = configuration.argumentAsInt(SAMPLES_PER_EVAL_KEY, SAMPLES_PER_EVAL);
