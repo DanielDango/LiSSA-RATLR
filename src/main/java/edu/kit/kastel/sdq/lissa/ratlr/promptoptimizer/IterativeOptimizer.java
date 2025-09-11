@@ -13,6 +13,7 @@ import edu.kit.kastel.sdq.lissa.ratlr.cache.Cache;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheManager;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.ChatLanguageModelProvider;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.ClassificationResult;
+import edu.kit.kastel.sdq.lissa.ratlr.classifier.ClassificationTask;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.Classifier;
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
 import edu.kit.kastel.sdq.lissa.ratlr.elementstore.SourceElementStore;
@@ -21,6 +22,7 @@ import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
 import edu.kit.kastel.sdq.lissa.ratlr.postprocessor.TraceLinkIdPostprocessor;
 import edu.kit.kastel.sdq.lissa.ratlr.resultaggregator.ResultAggregator;
+import edu.kit.kastel.sdq.lissa.ratlr.scorer.AbstractScorer;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.ChatLanguageModelUtils;
 
 import dev.langchain4j.model.chat.ChatModel;
@@ -82,6 +84,7 @@ public class IterativeOptimizer extends AbstractPromptOptimizer {
     private final TraceLinkIdPostprocessor traceLinkIdPostProcessor;
     protected final Set<TraceLink> validTraceLinks;
     private final ClassificationMetricsCalculator cmc;
+    private final AbstractScorer scorer;
     /**
      * Creates a new iterative optimizer with the specified configuration.
      *
@@ -90,13 +93,15 @@ public class IterativeOptimizer extends AbstractPromptOptimizer {
      * @param aggregator The result aggregator to collect and process classification results
      * @param traceLinkIdPostProcessor The postprocessor for trace link IDs
      * @param classifier The classifier used for classification tasks
+     * @param scorer The scorer used to score prompt classification
      */
     public IterativeOptimizer(
             ModuleConfiguration configuration,
             Set<TraceLink> goldStandard,
             ResultAggregator aggregator,
             TraceLinkIdPostprocessor traceLinkIdPostProcessor,
-            Classifier classifier) {
+            Classifier classifier,
+            AbstractScorer scorer) {
         super(ChatLanguageModelProvider.threads(configuration));
         this.provider = new ChatLanguageModelProvider(configuration);
         this.template = configuration.argumentAsString(PROMPT_OPTIMIZATION_TEMPLATE_KEY, DEFAULT_OPTIMIZATION_TEMPLATE);
@@ -109,6 +114,7 @@ public class IterativeOptimizer extends AbstractPromptOptimizer {
         this.traceLinkIdPostProcessor = traceLinkIdPostProcessor;
         this.classifier = classifier;
         this.cmc = ClassificationMetricsCalculator.getInstance();
+        this.scorer = scorer;
     }
 
     private IterativeOptimizer(
@@ -121,7 +127,8 @@ public class IterativeOptimizer extends AbstractPromptOptimizer {
             Set<TraceLink> validTraceLinks,
             ResultAggregator aggregator,
             TraceLinkIdPostprocessor traceLinkIdPostProcessor,
-            Classifier classifier) {
+            Classifier classifier,
+            AbstractScorer scorer) {
         super(threads);
         this.cache = cache;
         this.provider = provider;
@@ -134,6 +141,7 @@ public class IterativeOptimizer extends AbstractPromptOptimizer {
         this.traceLinkIdPostProcessor = traceLinkIdPostProcessor;
         this.classifier = classifier;
         this.cmc = ClassificationMetricsCalculator.getInstance();
+        this.scorer = scorer;
     }
 
     @Override
@@ -161,10 +169,20 @@ public class IterativeOptimizer extends AbstractPromptOptimizer {
         double[] f1Scores = new double[maximumIterations];
         int i = 0;
         double f1Score;
+        double oldF1Score;
+        List<ClassificationTask> examples = getClassificationTasks(sourceStore, targetStore, validTraceLinks);
         String modifiedPrompt = optimizationPrompt;
         do {
             logger.debug("Iteration {}: RequestPrompt = {}", i, modifiedPrompt);
-            f1Score = evaluateF1(sourceStore, targetStore, modifiedPrompt);
+            oldF1Score = evaluateF1(sourceStore, targetStore, modifiedPrompt);
+            f1Score = this.scorer
+                    .sequentialCall(List.of(modifiedPrompt), examples)
+                    .getFirst();
+            if (f1Score != oldF1Score) {
+                logger.warn(
+                        "Iteration {}: Different F1 score calculated by scorer ({} vs. {}).", i, f1Score, oldF1Score);
+                f1Score = oldF1Score;
+            }
             logger.debug("Iteration {}: F1-Score = {}", i, f1Score);
             f1Scores[i] = f1Score;
             String request = template.replace(ORIGINAL_PROMPT_KEY, optimizationPrompt);

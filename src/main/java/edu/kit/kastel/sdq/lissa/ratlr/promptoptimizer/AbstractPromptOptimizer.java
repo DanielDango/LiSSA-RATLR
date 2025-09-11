@@ -10,15 +10,18 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import edu.kit.kastel.sdq.lissa.ratlr.classifier.ClassificationTask;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.Classifier;
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
 import edu.kit.kastel.sdq.lissa.ratlr.elementstore.SourceElementStore;
 import edu.kit.kastel.sdq.lissa.ratlr.elementstore.TargetElementStore;
 import edu.kit.kastel.sdq.lissa.ratlr.evaluator.AbstractEvaluator;
+import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
 import edu.kit.kastel.sdq.lissa.ratlr.postprocessor.TraceLinkIdPostprocessor;
 import edu.kit.kastel.sdq.lissa.ratlr.resultaggregator.ResultAggregator;
 import edu.kit.kastel.sdq.lissa.ratlr.scorer.AbstractScorer;
+import edu.kit.kastel.sdq.lissa.ratlr.utils.Pair;
 
 /**
  * Abstract base class for prompt optimizers in the LiSSA framework.
@@ -50,7 +53,7 @@ public abstract class AbstractPromptOptimizer {
      */
     protected static final String PROMPT_KEY = "prompt";
 
-    protected static final Logger staticLogger = LoggerFactory.getLogger(AbstractPromptOptimizer.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(AbstractPromptOptimizer.class);
 
     /**
      * Logger for the prompt optimizer.
@@ -98,10 +101,11 @@ public abstract class AbstractPromptOptimizer {
             case "mock" -> new MockOptimizer();
             case "simple" -> new SimpleOptimizer(configuration);
             case "iterative" ->
-                new IterativeOptimizer(configuration, goldStandard, aggregator, traceLinkIdPostProcessor, classifier);
+                new IterativeOptimizer(
+                        configuration, goldStandard, aggregator, traceLinkIdPostProcessor, classifier, scorer);
             case "feedback" ->
                 new IterativeFeedbackOptimizer(
-                        configuration, goldStandard, aggregator, traceLinkIdPostProcessor, classifier);
+                        configuration, goldStandard, aggregator, traceLinkIdPostProcessor, classifier, scorer);
             case "gradient" ->
                 new AutomaticPromptOptimizer(
                         configuration,
@@ -151,12 +155,12 @@ public abstract class AbstractPromptOptimizer {
         if (matcher.find()) {
             prompt = matcher.group(1).strip().replaceAll("((^[\"']+)|([\"']+$))", "");
         } else {
-            staticLogger.warn("No prompt found in response: {}", response);
+            LOGGER.warn("No prompt found in response: {}", response);
         }
 
         String result = parseTaggedTextFirst(prompt, PROMPT_START, PROMPT_END);
         if (!result.equals(prompt)) {
-            staticLogger.warn("parseTaggedTextSingle found a different prompt than extractPromptFromResponse.");
+            LOGGER.warn("parseTaggedTextSingle found a different prompt than extractPromptFromResponse.");
         }
         return result;
     }
@@ -174,10 +178,10 @@ public abstract class AbstractPromptOptimizer {
     protected static String parseTaggedTextFirst(String text, String startTag, String endTag) {
         List<String> taggedTexts = parseTaggedText(text, startTag, endTag);
         if (taggedTexts.size() > 1) {
-            staticLogger.warn("Multiple tagged texts found, using the first one.");
+            LOGGER.warn("Multiple tagged texts found, using the first one.");
         }
         if (taggedTexts.isEmpty()) {
-            staticLogger.warn("No tagged text found, returning the original text.");
+            LOGGER.warn("No tagged text found, returning the original text.");
         }
         return parseTaggedText(text, startTag, endTag).stream().findFirst().orElse(text);
     }
@@ -213,5 +217,34 @@ public abstract class AbstractPromptOptimizer {
     protected static String sanitizePrompt(String prompt) {
         // Remove leading and trailing quotes and whitespace
         return prompt.trim().replaceAll("((^[\"']+)|([\"']+$))", "").trim();
+    }
+
+    /**
+     * Generates a list of classification tasks based on the provided source and target element stores,
+     * and a set of valid trace links. For each source element, it finds similar target elements and creates
+     * a classification task for each source-target pair. The task is marked as positive if the pair exists
+     * in the set of valid trace links.
+     * <br>
+     * Note that not all possible source-target pairs are generated, only those where the target is similar to the source.
+     * Some actual Traceability Links thus might not be part of the generated tasks.
+     *
+     * @param sourceStore The store containing source elements.
+     * @param targetStore The store containing target elements.
+     * @param validTraceLinks A set of valid trace links used to determine positive classification tasks.
+     * @return A list of classification tasks generated from the source and target elements.
+     */
+    protected static List<ClassificationTask> getClassificationTasks(
+            SourceElementStore sourceStore, TargetElementStore targetStore, Set<TraceLink> validTraceLinks) {
+        List<ClassificationTask> tasks = new ArrayList<>();
+        for (Pair<Element, float[]> source : sourceStore.getAllElements(true)) {
+            for (Element target : targetStore.findSimilar(source)) {
+                tasks.add(new ClassificationTask(
+                        source.first(),
+                        target,
+                        validTraceLinks.contains(
+                                TraceLink.of(source.first().getIdentifier(), target.getIdentifier()))));
+            }
+        }
+        return tasks;
     }
 }

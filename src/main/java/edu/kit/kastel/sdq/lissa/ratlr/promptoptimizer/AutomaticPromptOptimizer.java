@@ -146,7 +146,7 @@ public class AutomaticPromptOptimizer extends IterativeFeedbackOptimizer {
             Classifier classifier,
             AbstractScorer scorer,
             AbstractEvaluator evaluator) {
-        super(configuration, goldStandard, aggregator, traceLinkIdPostProcessor, classifier);
+        super(configuration, goldStandard, aggregator, traceLinkIdPostProcessor, classifier, scorer);
         this.numberOfGradients = configuration.argumentAsInt(NUMBER_OF_GRADIENTS_KEY, DEFAULT_NUMBER_OF_GRADIENTS);
         this.numberOfErrors = configuration.argumentAsInt(NUMBER_OF_ERRORS_KEY, DEFAULT_NUMBER_OF_ERRORS);
         this.numberOfGradientsPerError =
@@ -210,7 +210,7 @@ public class AutomaticPromptOptimizer extends IterativeFeedbackOptimizer {
 
     @Override
     public String optimize(SourceElementStore sourceStore, TargetElementStore targetStore) {
-        List<ClassificationTask> tasks = getAllClassificationTasks(sourceStore, targetStore);
+        List<ClassificationTask> tasks = getClassificationTasks(sourceStore, targetStore, validTraceLinks);
         return optimizeInternal(tasks);
     }
     /**
@@ -457,21 +457,6 @@ public class AutomaticPromptOptimizer extends IterativeFeedbackOptimizer {
             }
         }
         return allLinks;
-    }
-
-    private List<ClassificationTask> getAllClassificationTasks(
-            SourceElementStore sourceStore, TargetElementStore targetStore) {
-        List<ClassificationTask> tasks = new ArrayList<>();
-        for (Pair<Element, float[]> source : sourceStore.getAllElements(true)) {
-            for (Element target : targetStore.findSimilar(source)) {
-                tasks.add(new ClassificationTask(
-                        source.first(),
-                        target,
-                        validTraceLinks.contains(
-                                TraceLink.of(source.first().getIdentifier(), target.getIdentifier()))));
-            }
-        }
-        return tasks;
     }
 
     /**

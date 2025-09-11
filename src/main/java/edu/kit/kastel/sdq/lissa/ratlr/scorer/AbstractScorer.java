@@ -60,6 +60,7 @@ public abstract class AbstractScorer {
         return switch (configuration.name()) {
             case "mock" -> new MockScorer();
             case "binary" -> new BinaryScorer(configuration, classifier);
+            case "fBeta" -> new BinaryFBetaScorer(configuration, classifier);
             default -> throw new IllegalStateException("Unexpected value: " + configuration.name());
         };
     }

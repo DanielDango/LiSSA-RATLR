@@ -25,6 +25,6 @@ public class MockScorer extends AbstractScorer {
 
     @Override
     protected List<Double> computeScores(List<Pair<String, ClassificationTask>> promptExamplesToCompute) {
-        return Collections.nCopies(promptExamplesToCompute.size(), 1.0);
+        return Collections.nCopies(promptExamplesToCompute.size(), 0.0);
     }
 }
