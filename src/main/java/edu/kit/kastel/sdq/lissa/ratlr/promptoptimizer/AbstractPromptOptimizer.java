@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import edu.kit.kastel.sdq.lissa.ratlr.scorer.Scorer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,7 +93,7 @@ public abstract class AbstractPromptOptimizer {
             ResultAggregator aggregator,
             TraceLinkIdPostprocessor traceLinkIdPostProcessor,
             Classifier classifier,
-            AbstractScorer scorer,
+            Scorer scorer,
             AbstractEvaluator evaluator) {
         if (configuration == null) {
             return new MockOptimizer();

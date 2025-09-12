@@ -7,6 +7,7 @@ import java.util.List;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.ClassificationTask;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.Classifier;
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
+import edu.kit.kastel.sdq.lissa.ratlr.resultaggregator.ResultAggregator;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.Pair;
 
 public class BinaryFBetaScorer extends BinaryScorer {
@@ -25,13 +26,13 @@ public class BinaryFBetaScorer extends BinaryScorer {
      * @param configuration The configuration for the scorer.
      * @param classifier
      */
-    public BinaryFBetaScorer(ModuleConfiguration configuration, Classifier classifier) {
-        super(configuration, classifier);
+    public BinaryFBetaScorer(ModuleConfiguration configuration, Classifier classifier, ResultAggregator aggregator) {
+        super(configuration, classifier, aggregator);
         this.beta = configuration.argumentAsInt(BETA_KEY, DEFAULT_BETA);
     }
 
     @Override
-    public List<Double> sequentialCall(List<String> prompts, List<ClassificationTask> examples) {
+    public List<Double> call(List<String> prompts, List<ClassificationTask> examples) {
         List<Double> fBetaScores = new ArrayList<>();
         for (String prompt : prompts) {
             fBetaScores.add(computeFBetaScore(prompt, examples));
@@ -68,8 +69,8 @@ public class BinaryFBetaScorer extends BinaryScorer {
     }
 
     @Override
-    public List<Double> parallelCall(List<String> prompts, List<ClassificationTask> examples, int threads) {
-        return sequentialCall(prompts, examples);
+    public List<Double> call(List<String> prompts, List<ClassificationTask> examples, int threads) {
+        return call(prompts, examples);
     }
 
     private static double recall(int truePositive, int falseNegative) {

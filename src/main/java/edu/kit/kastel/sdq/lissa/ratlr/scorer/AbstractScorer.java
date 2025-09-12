@@ -11,6 +11,7 @@ import edu.kit.kastel.sdq.lissa.ratlr.classifier.ClassificationResult;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.ClassificationTask;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.Classifier;
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
+import edu.kit.kastel.sdq.lissa.ratlr.resultaggregator.ResultAggregator;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.Pair;
 
 /**
@@ -18,7 +19,7 @@ import edu.kit.kastel.sdq.lissa.ratlr.utils.Pair;
  * This class provides the foundation for implementing different scoring strategies
  * for evaluating prompts in classification tasks.
  */
-public abstract class AbstractScorer {
+public abstract class AbstractScorer implements Scorer {
 
     private static final String CONFIDENCE_THRESHOLD_KEY = "confidence_threshold";
     private static final double DEFAULT_CONFIDENCE_THRESHOLD = 1.0;
@@ -30,15 +31,18 @@ public abstract class AbstractScorer {
      */
     protected final Classifier classifier;
 
+    private final ResultAggregator aggregator;
+
     /**
      * Creates a new scorer with the specified configuration.
      * The configuration can include parameters such as confidence threshold.
      *
      * @param configuration The configuration for the scorer.
      */
-    protected AbstractScorer(ModuleConfiguration configuration, Classifier classifier) {
+    protected AbstractScorer(ModuleConfiguration configuration, Classifier classifier, ResultAggregator aggregator) {
         this.cache = new HashMap<>();
         this.classifier = classifier;
+        this.aggregator = aggregator;
         this.confidenceThreshold =
                 configuration.argumentAsDouble(CONFIDENCE_THRESHOLD_KEY, DEFAULT_CONFIDENCE_THRESHOLD);
     }
@@ -53,14 +57,15 @@ public abstract class AbstractScorer {
      * @return An instance of a concrete scorer implementation.
      * @throws IllegalStateException If the configuration name does not match any known scorer types.
      */
-    public static AbstractScorer createScorer(ModuleConfiguration configuration, Classifier classifier) {
+    public static Scorer createScorer(ModuleConfiguration configuration, Classifier classifier,
+                                              ResultAggregator aggregator) {
         if (configuration == null) {
             return new MockScorer();
         }
         return switch (configuration.name()) {
             case "mock" -> new MockScorer();
-            case "binary" -> new BinaryScorer(configuration, classifier);
-            case "fBeta" -> new BinaryFBetaScorer(configuration, classifier);
+            case "binary" -> new BinaryScorer(configuration, classifier, aggregator);
+            case "fBeta" -> new BinaryFBetaScorer(configuration, classifier, aggregator);
             default -> throw new IllegalStateException("Unexpected value: " + configuration.name());
         };
     }
@@ -75,7 +80,8 @@ public abstract class AbstractScorer {
      * @param examples A list of classification task examples.
      * @return A list of computed scores corresponding to each prompt.
      */
-    public List<Double> sequentialCall(List<String> prompts, List<ClassificationTask> examples) {
+    @Override
+    public List<Double> call(List<String> prompts, List<ClassificationTask> examples) {
         Map<String, List<Double>> cachedScores = new HashMap<>();
         for (String prompt : prompts) {
             cachedScores.put(prompt, new ArrayList<>());
@@ -117,8 +123,9 @@ public abstract class AbstractScorer {
      * @param threads The number of threads to use for parallel processing.
      * @return A list of computed scores corresponding to each prompt.
      */
-    public List<Double> parallelCall(List<String> prompts, List<ClassificationTask> examples, int threads) {
-        return sequentialCall(prompts, examples);
+    @Override
+    public List<Double> call(List<String> prompts, List<ClassificationTask> examples, int threads) {
+        return call(prompts, examples);
     }
 
     /**

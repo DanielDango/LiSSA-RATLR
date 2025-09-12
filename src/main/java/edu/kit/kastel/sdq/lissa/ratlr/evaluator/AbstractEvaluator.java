@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.random.RandomGenerator;
 
+import edu.kit.kastel.sdq.lissa.ratlr.scorer.Scorer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,5 +80,5 @@ public abstract class AbstractEvaluator {
      * @param scorer The scorer instance to use for scoring the prompts.
      * @return A list of scores corresponding to each prompt.
      */
-    public abstract List<Double> call(List<String> prompts, List<ClassificationTask> examples, AbstractScorer scorer);
+    public abstract List<Double> call(List<String> prompts, List<ClassificationTask> examples, Scorer scorer);
 }

@@ -29,6 +29,7 @@ import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
 import edu.kit.kastel.sdq.lissa.ratlr.postprocessor.TraceLinkIdPostprocessor;
 import edu.kit.kastel.sdq.lissa.ratlr.resultaggregator.ResultAggregator;
 import edu.kit.kastel.sdq.lissa.ratlr.scorer.AbstractScorer;
+import edu.kit.kastel.sdq.lissa.ratlr.scorer.Scorer;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.Pair;
 
 /**
@@ -135,7 +136,7 @@ public class AutomaticPromptOptimizer extends IterativeFeedbackOptimizer {
     private final String synonymPrompt;
 
     private final AbstractEvaluator evaluator;
-    private final AbstractScorer scorer;
+    private final Scorer scorer;
     private final RandomGenerator random;
 
     public AutomaticPromptOptimizer(
@@ -144,7 +145,7 @@ public class AutomaticPromptOptimizer extends IterativeFeedbackOptimizer {
             ResultAggregator aggregator,
             TraceLinkIdPostprocessor traceLinkIdPostProcessor,
             Classifier classifier,
-            AbstractScorer scorer,
+            Scorer scorer,
             AbstractEvaluator evaluator) {
         super(configuration, goldStandard, aggregator, traceLinkIdPostProcessor, classifier, scorer);
         this.numberOfGradients = configuration.argumentAsInt(NUMBER_OF_GRADIENTS_KEY, DEFAULT_NUMBER_OF_GRADIENTS);

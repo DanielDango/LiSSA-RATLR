@@ -23,6 +23,7 @@ import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
 import edu.kit.kastel.sdq.lissa.ratlr.postprocessor.TraceLinkIdPostprocessor;
 import edu.kit.kastel.sdq.lissa.ratlr.resultaggregator.ResultAggregator;
 import edu.kit.kastel.sdq.lissa.ratlr.scorer.AbstractScorer;
+import edu.kit.kastel.sdq.lissa.ratlr.scorer.Scorer;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.ChatLanguageModelUtils;
 
 import dev.langchain4j.model.chat.ChatModel;
@@ -84,7 +85,7 @@ public class IterativeOptimizer extends AbstractPromptOptimizer {
     private final TraceLinkIdPostprocessor traceLinkIdPostProcessor;
     protected final Set<TraceLink> validTraceLinks;
     private final ClassificationMetricsCalculator cmc;
-    private final AbstractScorer scorer;
+    private final Scorer scorer;
     /**
      * Creates a new iterative optimizer with the specified configuration.
      *
@@ -101,7 +102,7 @@ public class IterativeOptimizer extends AbstractPromptOptimizer {
             ResultAggregator aggregator,
             TraceLinkIdPostprocessor traceLinkIdPostProcessor,
             Classifier classifier,
-            AbstractScorer scorer) {
+            Scorer scorer) {
         super(ChatLanguageModelProvider.threads(configuration));
         this.provider = new ChatLanguageModelProvider(configuration);
         this.template = configuration.argumentAsString(PROMPT_OPTIMIZATION_TEMPLATE_KEY, DEFAULT_OPTIMIZATION_TEMPLATE);
@@ -128,7 +129,7 @@ public class IterativeOptimizer extends AbstractPromptOptimizer {
             ResultAggregator aggregator,
             TraceLinkIdPostprocessor traceLinkIdPostProcessor,
             Classifier classifier,
-            AbstractScorer scorer) {
+            Scorer scorer) {
         super(threads);
         this.cache = cache;
         this.provider = provider;
@@ -176,7 +177,7 @@ public class IterativeOptimizer extends AbstractPromptOptimizer {
             logger.debug("Iteration {}: RequestPrompt = {}", i, modifiedPrompt);
             oldF1Score = evaluateF1(sourceStore, targetStore, modifiedPrompt);
             f1Score = this.scorer
-                    .sequentialCall(List.of(modifiedPrompt), examples)
+                    .call(List.of(modifiedPrompt), examples)
                     .getFirst();
             if (f1Score != oldF1Score) {
                 logger.warn(

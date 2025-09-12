@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.util.Objects;
 import java.util.Set;
 
+import edu.kit.kastel.sdq.lissa.ratlr.scorer.Scorer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -147,7 +148,7 @@ public class Optimization {
                 configuration.traceLinkIdPostprocessor(), contextStore);
         Set<TraceLink> goldStandard = getTraceLinksFromGoldStandard(configuration.goldStandardConfiguration());
 
-        AbstractScorer scorer = AbstractScorer.createScorer(configuration.scorer(), classifier);
+        Scorer scorer = AbstractScorer.createScorer(configuration.scorer(), classifier, aggregator);
         AbstractEvaluator evaluator = AbstractEvaluator.createEvaluator(configuration.evaluator());
 
         promptOptimizer = AbstractPromptOptimizer.createOptimizer(

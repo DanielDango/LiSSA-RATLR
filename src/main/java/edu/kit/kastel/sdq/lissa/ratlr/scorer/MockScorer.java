@@ -20,7 +20,8 @@ public class MockScorer extends AbstractScorer {
      * Creates a new instance of MockScorer with an empty configuration and a MockClassifier.
      */
     public MockScorer() {
-        super(new ModuleConfiguration("", Collections.emptyMap()), new MockClassifier(new ContextStore()));
+        // TODO dont pass null
+        super(new ModuleConfiguration("", Collections.emptyMap()), new MockClassifier(new ContextStore()), null);
     }
 
     @Override

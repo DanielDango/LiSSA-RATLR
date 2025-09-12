@@ -3,6 +3,7 @@ package edu.kit.kastel.sdq.lissa.ratlr.scorer;
 
 import java.util.List;
 
+import edu.kit.kastel.sdq.lissa.ratlr.resultaggregator.ResultAggregator;
 import org.jetbrains.annotations.NotNull;
 
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.ClassificationTask;
@@ -23,8 +24,8 @@ public class BinaryScorer extends AbstractScorer {
      *
      * @param configuration The configuration for the scorer.
      */
-    public BinaryScorer(ModuleConfiguration configuration, Classifier classifier) {
-        super(configuration, classifier);
+    public BinaryScorer(ModuleConfiguration configuration, Classifier classifier, ResultAggregator aggregator) {
+        super(configuration, classifier, aggregator);
     }
 
     /**

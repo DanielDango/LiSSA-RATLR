@@ -20,7 +20,7 @@ import edu.kit.kastel.sdq.lissa.cli.command.OptimizeCommand;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheKey;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.Classifier;
 import edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.AbstractPromptOptimizer;
-import edu.kit.kastel.sdq.lissa.ratlr.scorer.AbstractScorer;
+import edu.kit.kastel.sdq.lissa.ratlr.scorer.Scorer;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.Environment;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.Futures;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.KeyGenerator;
@@ -116,7 +116,7 @@ class ArchitectureTest {
             .that()
             .areNotAssignableTo(AbstractPromptOptimizer.class)
             .and()
-            .areNotAssignableTo(AbstractScorer.class)
+            .areNotAssignableTo(Scorer.class)
             .should()
             .callMethod(Classifier.class, "setClassificationPrompt", String.class);
 

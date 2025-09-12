@@ -7,6 +7,7 @@ import java.util.List;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.ClassificationTask;
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
 import edu.kit.kastel.sdq.lissa.ratlr.scorer.AbstractScorer;
+import edu.kit.kastel.sdq.lissa.ratlr.scorer.Scorer;
 
 public class MockEvaluator extends AbstractEvaluator {
 
@@ -15,7 +16,7 @@ public class MockEvaluator extends AbstractEvaluator {
     }
 
     @Override
-    public List<Double> call(List<String> prompts, List<ClassificationTask> examples, AbstractScorer scorer) {
+    public List<Double> call(List<String> prompts, List<ClassificationTask> examples, Scorer scorer) {
         return Collections.nCopies(prompts.size(), 1.0);
     }
 }

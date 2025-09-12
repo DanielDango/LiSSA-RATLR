@@ -8,6 +8,7 @@ import java.util.List;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.ClassificationTask;
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
 import edu.kit.kastel.sdq.lissa.ratlr.scorer.AbstractScorer;
+import edu.kit.kastel.sdq.lissa.ratlr.scorer.Scorer;
 
 /**
  * An evaluator that performs a brute-force evaluation of all provided prompts
@@ -43,11 +44,11 @@ public class BruteForceEvaluator extends AbstractEvaluator {
      */
     @Override
     public List<Double> call(
-            List<String> prompts, List<ClassificationTask> classificationTasks, AbstractScorer scorer) {
+            List<String> prompts, List<ClassificationTask> classificationTasks, Scorer scorer) {
         int sampleSize = Math.min(classificationTasks.size(), (this.evaluationBudget / prompts.size()));
         List<ClassificationTask> classificationExamples = new ArrayList<>(classificationTasks);
         Collections.shuffle(classificationExamples, this.random);
         classificationExamples = classificationExamples.subList(0, sampleSize);
-        return scorer.sequentialCall(prompts, classificationExamples);
+        return scorer.call(prompts, classificationExamples);
     }
 }
