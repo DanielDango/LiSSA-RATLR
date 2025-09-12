@@ -47,39 +47,6 @@ public abstract class AbstractScorer implements Scorer {
                 configuration.argumentAsDouble(CONFIDENCE_THRESHOLD_KEY, DEFAULT_CONFIDENCE_THRESHOLD);
     }
 
-    /**
-     * Factory method to create a scorer based on the provided configuration.
-     * The name field indicates the type of scorer to create.
-     * If the configuration is null, a MockScorer is returned by default.
-     *
-     * @param configuration The configuration specifying the type of scorer to create.
-     * @param classifier The classifier to be used by the scorer.
-     * @return An instance of a concrete scorer implementation.
-     * @throws IllegalStateException If the configuration name does not match any known scorer types.
-     */
-    public static Scorer createScorer(ModuleConfiguration configuration, Classifier classifier,
-                                              ResultAggregator aggregator) {
-        if (configuration == null) {
-            return new MockScorer();
-        }
-        return switch (configuration.name()) {
-            case "mock" -> new MockScorer();
-            case "binary" -> new BinaryScorer(configuration, classifier, aggregator);
-            case "fBeta" -> new BinaryFBetaScorer(configuration, classifier, aggregator);
-            default -> throw new IllegalStateException("Unexpected value: " + configuration.name());
-        };
-    }
-
-    /**
-     * Sequentially computes scores for a list of prompts and classification task examples
-     * using the provided classifier.
-     * Each prompt is evaluated against all examples, and the mean score amongst them is returned.
-     * It utilizes caching to avoid redundant computations. <br>
-     *
-     * @param prompts A list of prompts to evaluate.
-     * @param examples A list of classification task examples.
-     * @return A list of computed scores corresponding to each prompt.
-     */
     @Override
     public List<Double> call(List<String> prompts, List<ClassificationTask> examples) {
         Map<String, List<Double>> cachedScores = new HashMap<>();
@@ -113,18 +80,8 @@ public abstract class AbstractScorer implements Scorer {
         return meanScores;
     }
 
-    /**
-     * Placeholder for parallel call implementation.
-     * Currently, it calls the sequential implementation. <br>
-     * Todo: implement parallel call?
-     *
-     * @param prompts A list of prompts to evaluate.
-     * @param examples A list of classification task examples.
-     * @param threads The number of threads to use for parallel processing.
-     * @return A list of computed scores corresponding to each prompt.
-     */
     @Override
-    public List<Double> call(List<String> prompts, List<ClassificationTask> examples, int threads) {
+    public List<Double> call(List<String> prompts, List<ClassificationTask> examples, int maximumThreads) {
         return call(prompts, examples);
     }
 
