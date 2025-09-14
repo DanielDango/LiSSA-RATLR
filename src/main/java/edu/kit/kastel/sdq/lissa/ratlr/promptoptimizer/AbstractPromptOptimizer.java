@@ -7,7 +7,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import edu.kit.kastel.sdq.lissa.ratlr.scorer.Scorer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,8 +19,8 @@ import edu.kit.kastel.sdq.lissa.ratlr.evaluator.AbstractEvaluator;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
 import edu.kit.kastel.sdq.lissa.ratlr.postprocessor.TraceLinkIdPostprocessor;
+import edu.kit.kastel.sdq.lissa.ratlr.promptmetric.Metric;
 import edu.kit.kastel.sdq.lissa.ratlr.resultaggregator.ResultAggregator;
-import edu.kit.kastel.sdq.lissa.ratlr.scorer.AbstractScorer;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.Pair;
 
 /**
@@ -93,7 +92,7 @@ public abstract class AbstractPromptOptimizer {
             ResultAggregator aggregator,
             TraceLinkIdPostprocessor traceLinkIdPostProcessor,
             Classifier classifier,
-            Scorer scorer,
+            Metric metric,
             AbstractEvaluator evaluator) {
         if (configuration == null) {
             return new MockOptimizer();
@@ -103,10 +102,10 @@ public abstract class AbstractPromptOptimizer {
             case "simple" -> new SimpleOptimizer(configuration);
             case "iterative" ->
                 new IterativeOptimizer(
-                        configuration, goldStandard, aggregator, traceLinkIdPostProcessor, classifier, scorer);
+                        configuration, goldStandard, aggregator, traceLinkIdPostProcessor, classifier, metric);
             case "feedback" ->
                 new IterativeFeedbackOptimizer(
-                        configuration, goldStandard, aggregator, traceLinkIdPostProcessor, classifier, scorer);
+                        configuration, goldStandard, aggregator, traceLinkIdPostProcessor, classifier, metric);
             case "gradient" ->
                 new AutomaticPromptOptimizer(
                         configuration,
@@ -114,7 +113,7 @@ public abstract class AbstractPromptOptimizer {
                         aggregator,
                         traceLinkIdPostProcessor,
                         classifier,
-                        scorer,
+                        metric,
                         evaluator);
             default -> throw new IllegalStateException("Unexpected value: " + configuration.name());
         };

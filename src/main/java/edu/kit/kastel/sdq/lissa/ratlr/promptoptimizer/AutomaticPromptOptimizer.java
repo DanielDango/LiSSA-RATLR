@@ -27,9 +27,8 @@ import edu.kit.kastel.sdq.lissa.ratlr.evaluator.BruteForceEvaluator;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
 import edu.kit.kastel.sdq.lissa.ratlr.postprocessor.TraceLinkIdPostprocessor;
+import edu.kit.kastel.sdq.lissa.ratlr.promptmetric.Metric;
 import edu.kit.kastel.sdq.lissa.ratlr.resultaggregator.ResultAggregator;
-import edu.kit.kastel.sdq.lissa.ratlr.scorer.AbstractScorer;
-import edu.kit.kastel.sdq.lissa.ratlr.scorer.Scorer;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.Pair;
 
 /**
@@ -136,7 +135,7 @@ public class AutomaticPromptOptimizer extends IterativeFeedbackOptimizer {
     private final String synonymPrompt;
 
     private final AbstractEvaluator evaluator;
-    private final Scorer scorer;
+    private final Metric metric;
     private final RandomGenerator random;
 
     public AutomaticPromptOptimizer(
@@ -145,9 +144,9 @@ public class AutomaticPromptOptimizer extends IterativeFeedbackOptimizer {
             ResultAggregator aggregator,
             TraceLinkIdPostprocessor traceLinkIdPostProcessor,
             Classifier classifier,
-            Scorer scorer,
+            Metric metric,
             AbstractEvaluator evaluator) {
-        super(configuration, goldStandard, aggregator, traceLinkIdPostProcessor, classifier, scorer);
+        super(configuration, goldStandard, aggregator, traceLinkIdPostProcessor, classifier, metric);
         this.numberOfGradients = configuration.argumentAsInt(NUMBER_OF_GRADIENTS_KEY, DEFAULT_NUMBER_OF_GRADIENTS);
         this.numberOfErrors = configuration.argumentAsInt(NUMBER_OF_ERRORS_KEY, DEFAULT_NUMBER_OF_ERRORS);
         this.numberOfGradientsPerError =
@@ -169,7 +168,7 @@ public class AutomaticPromptOptimizer extends IterativeFeedbackOptimizer {
         this.synonymPrompt = configuration.argumentAsString(SYNONYM_PROMPT_KEY, DEFAULT_SYNONYM_PROMPT);
 
         this.evaluator = evaluator;
-        this.scorer = scorer;
+        this.metric = metric;
         this.random = new Random(configuration.argumentAsInt(SEED_KEY, DEFAULT_SEED));
     }
 
@@ -256,7 +255,7 @@ public class AutomaticPromptOptimizer extends IterativeFeedbackOptimizer {
         if (prompts.size() == 1) {
             return List.of(1.0);
         }
-        return evaluator.call(prompts, tasks, scorer);
+        return evaluator.call(prompts, tasks, metric);
     }
 
     /**
@@ -377,7 +376,7 @@ public class AutomaticPromptOptimizer extends IterativeFeedbackOptimizer {
                             .limit(maxExpansionFactor * 2)
                             .toList();
                     AbstractEvaluator bruteForceEvaluator = new BruteForceEvaluator(evaluationBudget);
-                    List<Double> errorScores = bruteForceEvaluator.call(tempNewPrompts, errorExamples, scorer);
+                    List<Double> errorScores = bruteForceEvaluator.call(tempNewPrompts, errorExamples, metric);
                     List<Integer> sortedIdxs = errorScores.stream()
                             .sorted()
                             // TODO Check if this is correct

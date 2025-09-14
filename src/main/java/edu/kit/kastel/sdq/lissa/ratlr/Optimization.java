@@ -8,8 +8,6 @@ import java.nio.file.Path;
 import java.util.Objects;
 import java.util.Set;
 
-import edu.kit.kastel.sdq.lissa.ratlr.scorer.Scorer;
-import edu.kit.kastel.sdq.lissa.ratlr.scorer.ScorerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,9 +25,10 @@ import edu.kit.kastel.sdq.lissa.ratlr.evaluator.AbstractEvaluator;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
 import edu.kit.kastel.sdq.lissa.ratlr.postprocessor.TraceLinkIdPostprocessor;
 import edu.kit.kastel.sdq.lissa.ratlr.preprocessor.Preprocessor;
+import edu.kit.kastel.sdq.lissa.ratlr.promptmetric.Metric;
+import edu.kit.kastel.sdq.lissa.ratlr.promptmetric.MetricFactory;
 import edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.AbstractPromptOptimizer;
 import edu.kit.kastel.sdq.lissa.ratlr.resultaggregator.ResultAggregator;
-import edu.kit.kastel.sdq.lissa.ratlr.scorer.AbstractScorer;
 
 /**
  * Represents a single prompt optimization run of the LiSSA framework.
@@ -149,7 +148,7 @@ public class Optimization {
                 configuration.traceLinkIdPostprocessor(), contextStore);
         Set<TraceLink> goldStandard = getTraceLinksFromGoldStandard(configuration.goldStandardConfiguration());
 
-        Scorer scorer = ScorerFactory.createScorer(configuration.scorer(), classifier, aggregator);
+        Metric metric = MetricFactory.createScorer(configuration.scorer(), classifier, aggregator);
         AbstractEvaluator evaluator = AbstractEvaluator.createEvaluator(configuration.evaluator());
 
         promptOptimizer = AbstractPromptOptimizer.createOptimizer(
@@ -158,7 +157,7 @@ public class Optimization {
                 aggregator,
                 traceLinkIdPostProcessor,
                 classifier,
-                scorer,
+                metric,
                 evaluator);
         configuration.serializeAndDestroyConfiguration();
     }

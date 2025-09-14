@@ -19,8 +19,8 @@ import com.tngtech.archunit.lang.ArchRule;
 import edu.kit.kastel.sdq.lissa.cli.command.OptimizeCommand;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheKey;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.Classifier;
+import edu.kit.kastel.sdq.lissa.ratlr.promptmetric.Metric;
 import edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.AbstractPromptOptimizer;
-import edu.kit.kastel.sdq.lissa.ratlr.scorer.Scorer;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.Environment;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.Futures;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.KeyGenerator;
@@ -116,7 +116,7 @@ class ArchitectureTest {
             .that()
             .areNotAssignableTo(AbstractPromptOptimizer.class)
             .and()
-            .areNotAssignableTo(Scorer.class)
+            .areNotAssignableTo(Metric.class)
             .should()
             .callMethod(Classifier.class, "setClassificationPrompt", String.class);
 

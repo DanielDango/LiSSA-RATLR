@@ -8,8 +8,7 @@ import java.util.Random;
 
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.ClassificationTask;
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
-import edu.kit.kastel.sdq.lissa.ratlr.scorer.AbstractScorer;
-import edu.kit.kastel.sdq.lissa.ratlr.scorer.Scorer;
+import edu.kit.kastel.sdq.lissa.ratlr.promptmetric.Metric;
 
 /**
  * An evaluator that uses the Upper Confidence Bound (UCB) algorithm to select prompts
@@ -64,7 +63,7 @@ public class UCBanditEvaluator extends AbstractEvaluator {
     }
 
     @Override
-    public List<Double> call(List<String> prompts, List<ClassificationTask> examples, Scorer scorer) {
+    public List<Double> call(List<String> prompts, List<ClassificationTask> examples, Metric metric) {
         UCBBandits banditAlgo = new UCBBandits(prompts.size(), this.samplesPerEval, this.c, this.mode);
         int numPromptsPerRound = Math.min(this.numberOfPromptsPerRound, prompts.size());
         for (int ri = 1; ri <= this.rounds; ri++) {
@@ -78,7 +77,8 @@ public class UCBanditEvaluator extends AbstractEvaluator {
             List<Double> scores;
             while (true) {
                 try {
-                    scores = scorer.call(sampledPrompts, sampledData, this.maxThreads);
+                    // TODO: Pryzant et al. used multiple threads here
+                    scores = metric.getMetrics(sampledPrompts, sampledData);
                     break;
                 } catch (Exception e) {
                     logger.warn("Exception during scoring: {}. Retrying...", e.getMessage());

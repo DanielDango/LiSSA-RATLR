@@ -4,9 +4,9 @@ package edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer;
 import static edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.SimpleOptimizer.DEFAULT_OPTIMIZATION_TEMPLATE;
 import static edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.SimpleOptimizer.ORIGINAL_PROMPT_KEY;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import edu.kit.kastel.mcse.ardoco.metrics.ClassificationMetricsCalculator;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.Cache;
@@ -21,9 +21,8 @@ import edu.kit.kastel.sdq.lissa.ratlr.elementstore.TargetElementStore;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
 import edu.kit.kastel.sdq.lissa.ratlr.postprocessor.TraceLinkIdPostprocessor;
+import edu.kit.kastel.sdq.lissa.ratlr.promptmetric.Metric;
 import edu.kit.kastel.sdq.lissa.ratlr.resultaggregator.ResultAggregator;
-import edu.kit.kastel.sdq.lissa.ratlr.scorer.AbstractScorer;
-import edu.kit.kastel.sdq.lissa.ratlr.scorer.Scorer;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.ChatLanguageModelUtils;
 
 import dev.langchain4j.model.chat.ChatModel;
@@ -85,7 +84,7 @@ public class IterativeOptimizer extends AbstractPromptOptimizer {
     private final TraceLinkIdPostprocessor traceLinkIdPostProcessor;
     protected final Set<TraceLink> validTraceLinks;
     private final ClassificationMetricsCalculator cmc;
-    private final Scorer scorer;
+    private final Metric metric;
     /**
      * Creates a new iterative optimizer with the specified configuration.
      *
@@ -94,7 +93,7 @@ public class IterativeOptimizer extends AbstractPromptOptimizer {
      * @param aggregator The result aggregator to collect and process classification results
      * @param traceLinkIdPostProcessor The postprocessor for trace link IDs
      * @param classifier The classifier used for classification tasks
-     * @param scorer The scorer used to score prompt classification
+     * @param metric The metric used to score prompt classification
      */
     public IterativeOptimizer(
             ModuleConfiguration configuration,
@@ -102,7 +101,7 @@ public class IterativeOptimizer extends AbstractPromptOptimizer {
             ResultAggregator aggregator,
             TraceLinkIdPostprocessor traceLinkIdPostProcessor,
             Classifier classifier,
-            Scorer scorer) {
+            Metric metric) {
         super(ChatLanguageModelProvider.threads(configuration));
         this.provider = new ChatLanguageModelProvider(configuration);
         this.template = configuration.argumentAsString(PROMPT_OPTIMIZATION_TEMPLATE_KEY, DEFAULT_OPTIMIZATION_TEMPLATE);
@@ -115,7 +114,7 @@ public class IterativeOptimizer extends AbstractPromptOptimizer {
         this.traceLinkIdPostProcessor = traceLinkIdPostProcessor;
         this.classifier = classifier;
         this.cmc = ClassificationMetricsCalculator.getInstance();
-        this.scorer = scorer;
+        this.metric = metric;
     }
 
     private IterativeOptimizer(
@@ -129,7 +128,7 @@ public class IterativeOptimizer extends AbstractPromptOptimizer {
             ResultAggregator aggregator,
             TraceLinkIdPostprocessor traceLinkIdPostProcessor,
             Classifier classifier,
-            Scorer scorer) {
+            Metric metric) {
         super(threads);
         this.cache = cache;
         this.provider = provider;
@@ -142,7 +141,7 @@ public class IterativeOptimizer extends AbstractPromptOptimizer {
         this.traceLinkIdPostProcessor = traceLinkIdPostProcessor;
         this.classifier = classifier;
         this.cmc = ClassificationMetricsCalculator.getInstance();
-        this.scorer = scorer;
+        this.metric = metric;
     }
 
     @Override
@@ -176,12 +175,10 @@ public class IterativeOptimizer extends AbstractPromptOptimizer {
         do {
             logger.debug("Iteration {}: RequestPrompt = {}", i, modifiedPrompt);
             oldF1Score = evaluateF1(sourceStore, targetStore, modifiedPrompt);
-            f1Score = this.scorer
-                    .call(List.of(modifiedPrompt), examples)
-                    .getFirst();
-            if (f1Score != oldF1Score) {
+            f1Score = this.metric.getMetrics(List.of(modifiedPrompt), examples).getFirst();
+            if (Math.abs(f1Score - oldF1Score) < 1e-6) {
                 logger.warn(
-                        "Iteration {}: Different F1 score calculated by scorer ({} vs. {}).", i, f1Score, oldF1Score);
+                        "Iteration {}: Different F1 score calculated by metric ({} vs. {}).", i, f1Score, oldF1Score);
                 f1Score = oldF1Score;
             }
             logger.debug("Iteration {}: F1-Score = {}", i, f1Score);
@@ -220,6 +217,10 @@ public class IterativeOptimizer extends AbstractPromptOptimizer {
         Set<TraceLink> traceLinks = getTraceLinks(sourceStore, targetStore, prompt);
         Set<TraceLink> possibleTraceLinks = getReducedGoldStandardLinks(sourceStore, targetStore);
         var classification = cmc.calculateMetrics(traceLinks, possibleTraceLinks, null);
+        int tp = classification.getTruePositives().size();
+        int fp = classification.getFalsePositives().size();
+        int fn = classification.getFalseNegatives().size();
+        logger.debug("TP: {}, FP: {}, FN: {}", tp, fp, fn);
         return classification.getF1();
     }
 
@@ -252,6 +253,17 @@ public class IterativeOptimizer extends AbstractPromptOptimizer {
      */
     protected Set<TraceLink> getReducedGoldStandardLinks(
             SourceElementStore sourceStore, TargetElementStore targetStore) {
+        Set<TraceLink> reducedGoldStandard = new HashSet<>();
+        for (var source : sourceStore.getAllElements(true)) {
+            for (Element target : targetStore.findSimilar(source)) {
+                TraceLink traceLink = TraceLink.of(source.first().getIdentifier(), target.getIdentifier());
+                if (validTraceLinks.contains(traceLink)) {
+                    reducedGoldStandard.add(traceLink);
+                }
+            }
+        }
+        return reducedGoldStandard;
+        /*
         List<String> sourceTraceLinkIds = sourceStore.getAllElements().stream()
                 .map(Element::getIdentifier)
                 .toList();
@@ -262,6 +274,7 @@ public class IterativeOptimizer extends AbstractPromptOptimizer {
                 .filter(tl -> sourceTraceLinkIds.contains(tl.sourceId()))
                 .filter(tl -> targetTraceLinkIds.contains(tl.targetId()))
                 .collect(Collectors.toSet());
+         */
     }
 
     @Override

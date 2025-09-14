@@ -14,9 +14,8 @@ import edu.kit.kastel.sdq.lissa.ratlr.elementstore.TargetElementStore;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
 import edu.kit.kastel.sdq.lissa.ratlr.postprocessor.TraceLinkIdPostprocessor;
+import edu.kit.kastel.sdq.lissa.ratlr.promptmetric.Metric;
 import edu.kit.kastel.sdq.lissa.ratlr.resultaggregator.ResultAggregator;
-import edu.kit.kastel.sdq.lissa.ratlr.scorer.AbstractScorer;
-import edu.kit.kastel.sdq.lissa.ratlr.scorer.Scorer;
 
 /**
  * An optimizer that uses iterative feedback to refine the prompt based on classification results.
@@ -79,8 +78,8 @@ public class IterativeFeedbackOptimizer extends IterativeOptimizer {
             ResultAggregator aggregator,
             TraceLinkIdPostprocessor traceLinkIdPostProcessor,
             Classifier classifier,
-            Scorer scorer) {
-        super(configuration, goldStandard, aggregator, traceLinkIdPostProcessor, classifier, scorer);
+            Metric metric) {
+        super(configuration, goldStandard, aggregator, traceLinkIdPostProcessor, classifier, metric);
         this.feedbackPrompt = configuration.argumentAsString(FEEDBACK_PROMPT_KEY, FEEDBACK_PROMPT_TEMPLATE);
         this.feedbackSize = configuration.argumentAsInt(FEEDBACK_SIZE_KEY, FEEDBACK_SIZE);
     }

@@ -2,11 +2,13 @@
 package edu.kit.kastel.sdq.lissa.ratlr.classifier;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.*;
 
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,8 +65,11 @@ public abstract class Classifier {
      * @return A list of classification results
      */
     public List<ClassificationResult> classify(SourceElementStore sourceStore, TargetElementStore targetStore) {
-        var tasks = createClassificationTasks(sourceStore, targetStore);
+        return classify(createClassificationTasks(sourceStore, targetStore));
+    }
 
+    @NotNull
+    private List<ClassificationResult> classify(List<Pair<Element, Element>> tasks) {
         if (threads <= 1) {
             return sequentialClassify(tasks);
         }
@@ -157,6 +162,18 @@ public abstract class Classifier {
     }
 
     /**
+     * Classifies a collection of classification tasks.
+     * This method can process the classification either sequentially or in parallel
+     * depending on the number of threads configured.
+     *
+     * @param classificationTasks The collection of classification tasks to classify
+     * @return A list of classification results
+     */
+    public List<ClassificationResult> classify(Collection<ClassificationTask> classificationTasks) {
+        return classify(createClassificationTasks(classificationTasks));
+    }
+
+    /**
      * Classifies a pair of elements.
      * This method must be implemented by concrete classifier implementations to define
      * their specific classification logic.
@@ -200,6 +217,15 @@ public abstract class Classifier {
             for (Element target : targetCandidates) {
                 tasks.add(new Pair<>(source.first(), target));
             }
+        }
+        return tasks;
+    }
+
+    private static List<Pair<Element, Element>> createClassificationTasks(
+            Collection<ClassificationTask> classificationTasks) {
+        List<Pair<Element, Element>> tasks = new ArrayList<>();
+        for (ClassificationTask task : classificationTasks) {
+            tasks.add(new Pair<>(task.source(), task.target()));
         }
         return tasks;
     }
