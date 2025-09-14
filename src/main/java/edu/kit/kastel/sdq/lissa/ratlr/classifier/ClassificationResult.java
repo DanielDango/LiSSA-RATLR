@@ -7,23 +7,12 @@ import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
  * Represents the result of a trace link classification between two elements.
  * This record stores the source and target elements involved in the classification,
  * along with a confidence score indicating the strength of the relationship.
+ * @param source The source element in the trace link relationship
+ * @param target The target element in the trace link relationship
+ * @param confidence The confidence score of the classification, ranging from 0.0 to 1.0
+ *                   A score of 1.0 indicates maximum confidence in the relationship
  */
-public record ClassificationResult(
-        /**
-         * The source element in the trace link relationship.
-         */
-        Element source,
-
-        /**
-         * The target element in the trace link relationship.
-         */
-        Element target,
-
-        /**
-         * The confidence score of the classification, ranging from 0.0 to 1.0.
-         * A score of 1.0 indicates maximum confidence in the relationship.
-         */
-        double confidence) {
+public record ClassificationResult(Element source, Element target, double confidence) {
     /**
      * Validates the confidence score during record construction.
      *
