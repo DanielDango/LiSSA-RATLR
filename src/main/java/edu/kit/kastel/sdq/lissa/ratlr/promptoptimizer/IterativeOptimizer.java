@@ -175,7 +175,7 @@ public class IterativeOptimizer extends AbstractPromptOptimizer {
         do {
             logger.debug("Iteration {}: RequestPrompt = {}", i, modifiedPrompt);
             oldF1Score = evaluateF1(sourceStore, targetStore, modifiedPrompt);
-            f1Score = this.metric.getMetrics(List.of(modifiedPrompt), examples).getFirst();
+            f1Score = this.metric.getMetric(modifiedPrompt, examples);
             if (Math.abs(f1Score - oldF1Score) < 1e-6) {
                 logger.warn(
                         "Iteration {}: Different F1 score calculated by metric ({} vs. {}).", i, f1Score, oldF1Score);

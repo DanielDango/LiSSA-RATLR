@@ -17,7 +17,7 @@ public class MockMetric implements Metric {
     }
 
     @Override
-    public List<Double> getMetrics(List<String> prompts, List<ClassificationTask> examples) {
+    public List<Double> getMetric(List<String> prompts, List<ClassificationTask> examples) {
         return Collections.nCopies(prompts.size(), 0.0);
     }
 

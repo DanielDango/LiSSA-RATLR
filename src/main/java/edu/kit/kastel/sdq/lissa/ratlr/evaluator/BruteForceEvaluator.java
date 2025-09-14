@@ -47,6 +47,6 @@ public class BruteForceEvaluator extends AbstractEvaluator {
         List<ClassificationTask> classificationExamples = new ArrayList<>(classificationTasks);
         Collections.shuffle(classificationExamples, this.random);
         classificationExamples = classificationExamples.subList(0, sampleSize);
-        return metric.getMetrics(prompts, classificationExamples);
+        return metric.getMetric(prompts, classificationExamples);
     }
 }

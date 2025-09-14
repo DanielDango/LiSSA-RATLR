@@ -41,7 +41,7 @@ public abstract class GlobalMetric implements Metric {
      * Each prompt is delegated to the {@link #getMetric(String, List)} method for scoring with the entire example set.
      */
     @Override
-    public List<Double> getMetrics(List<String> prompts, List<ClassificationTask> examples) {
+    public List<Double> getMetric(List<String> prompts, List<ClassificationTask> examples) {
         List<Double> scores = new ArrayList<>();
         for (String prompt : prompts) {
             scores.add(getMetric(prompt, examples));

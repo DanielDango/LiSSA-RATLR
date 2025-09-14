@@ -78,7 +78,7 @@ public class UCBanditEvaluator extends AbstractEvaluator {
             while (true) {
                 try {
                     // TODO: Pryzant et al. used multiple threads here
-                    scores = metric.getMetrics(sampledPrompts, sampledData);
+                    scores = metric.getMetric(sampledPrompts, sampledData);
                     break;
                 } catch (Exception e) {
                     logger.warn("Exception during scoring: {}. Retrying...", e.getMessage());

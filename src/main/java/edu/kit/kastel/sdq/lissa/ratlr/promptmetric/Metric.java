@@ -21,7 +21,7 @@ public interface Metric {
      * @param examples The list of classification tasks to evaluate against
      * @return A list of metric values corresponding to each prompt
      */
-    List<Double> getMetrics(List<String> prompts, List<ClassificationTask> examples);
+    List<Double> getMetric(List<String> prompts, List<ClassificationTask> examples);
 
     /**
      * Computes the metric for a single prompt against a list of classification tasks.
