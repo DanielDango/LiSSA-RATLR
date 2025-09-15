@@ -7,6 +7,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.ClassificationResult;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.ClassificationTask;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.Classifier;
@@ -19,8 +22,6 @@ import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
 import edu.kit.kastel.sdq.lissa.ratlr.postprocessor.TraceLinkIdPostprocessor;
 import edu.kit.kastel.sdq.lissa.ratlr.promptmetric.Metric;
 import edu.kit.kastel.sdq.lissa.ratlr.resultaggregator.ResultAggregator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * An optimizer that uses iterative feedback to refine the prompt based on classification results.
@@ -120,7 +121,7 @@ public class IterativeFeedbackOptimizer extends IterativeOptimizer {
             promptScore = this.metric.getMetric(modifiedPrompt, examples);
             LOGGER.debug("Iteration {}: {} = {}", i, this.metric.getName(), promptScore);
             promptScores[i] = promptScore;
-            String request = template.replace(ORIGINAL_PROMPT_PLACEHOLDER, optimizationPrompt);
+            String request = formattedTemplate.replace(ORIGINAL_PROMPT_PLACEHOLDER, optimizationPrompt);
             request = generateFeedbackPrompt(traceLinks, possibleTraceLinks, sourceStore, targetStore) + request;
             modifiedPrompt = cachedSanitizedRequest(request);
             optimizationPrompt = modifiedPrompt;
@@ -184,7 +185,7 @@ public class IterativeFeedbackOptimizer extends IterativeOptimizer {
      * @param prompt        The prompt to use for classification
      * @return A set of trace links that were classified based on the prompt
      */
-    protected Set<TraceLink> getTraceLinks(
+    private Set<TraceLink> getTraceLinks(
             SourceElementStore sourceStore, TargetElementStore targetStore, String prompt) {
         classifier.setClassificationPrompt(prompt);
         List<ClassificationResult> results = classifier.classify(sourceStore, targetStore);
@@ -192,5 +193,26 @@ public class IterativeFeedbackOptimizer extends IterativeOptimizer {
         Set<TraceLink> traceLinks =
                 aggregator.aggregate(sourceStore.getAllElements(), targetStore.getAllElements(), results);
         return traceLinkIdPostProcessor.postprocess(traceLinks);
+    }
+
+    /**
+     * Finds all trace links that can be created between the source and target stores which are included in the local
+     * gold standard.
+     *
+     * @param sourceStore The store containing source elements
+     * @param targetStore The store containing target elements
+     * @return A subset of the gold standard trace links that can be created between the source and target stores
+     */
+    private Set<TraceLink> getReducedGoldStandardLinks(SourceElementStore sourceStore, TargetElementStore targetStore) {
+        Set<TraceLink> reducedGoldStandard = new HashSet<>();
+        for (var source : sourceStore.getAllElements(true)) {
+            for (Element target : targetStore.findSimilar(source)) {
+                TraceLink traceLink = TraceLink.of(source.first().getIdentifier(), target.getIdentifier());
+                if (validTraceLinks.contains(traceLink)) {
+                    reducedGoldStandard.add(traceLink);
+                }
+            }
+        }
+        return reducedGoldStandard;
     }
 }

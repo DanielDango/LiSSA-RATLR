@@ -5,7 +5,6 @@ import static edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.PromptOptimizationU
 import static edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.PromptOptimizationUtils.parseTaggedTextFirst;
 import static edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.PromptOptimizationUtils.sanitizePrompt;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -49,6 +48,9 @@ public class IterativeOptimizer implements AbstractPromptOptimizer {
      */
     protected static final String ORIGINAL_PROMPT_PLACEHOLDER = "{original_prompt}";
 
+    private static final String SOURCE_TYPE_PLACEHOLDER = "{source_type}";
+    private static final String TARGET_TYPE_PLACEHOLDER = "{target_type}";
+
     /**
      * Start marker for the prompt in the optimization template.
      */
@@ -61,7 +63,8 @@ public class IterativeOptimizer implements AbstractPromptOptimizer {
     /**
      * The default template for optimization requests.
      * This template presents two artifacts and asks if they are related.
-     * Custom optimization prompts can also use the placeholders {source_type}, {target_type} and should use {@value ORIGINAL_PROMPT_PLACEHOLDER}.
+     * Custom optimization prompts can also use the placeholders {@value SOURCE_TYPE_PLACEHOLDER},
+     * {@value TARGET_TYPE_PLACEHOLDER} and should use {@value ORIGINAL_PROMPT_PLACEHOLDER}.
      * The optimized prompt should be enclosed between {@value PROMPT_START} and {@value PROMPT_END}.
      */
     private static final String DEFAULT_OPTIMIZATION_TEMPLATE =
@@ -98,7 +101,6 @@ public class IterativeOptimizer implements AbstractPromptOptimizer {
      * Logger for the prompt optimizer.
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(IterativeOptimizer.class);
-
     /**
      * The cache used to store and retrieve prompt optimization LLM requests.
      */
@@ -117,7 +119,9 @@ public class IterativeOptimizer implements AbstractPromptOptimizer {
     /**
      * The template used for classification requests.
      */
-    protected String template;
+    private final String template;
+
+    protected String formattedTemplate;
 
     /**
      * The prompt used for optimization.
@@ -174,8 +178,8 @@ public class IterativeOptimizer implements AbstractPromptOptimizer {
         Element target = targetStore
                 .findSimilar(sourceStore.getAllElements(true).getFirst())
                 .getFirst();
-        // TODO consider going back to final instead of using a mutable variable
-        template = template.replace("{source_type}", source.getType()).replace("{target_type}", target.getType());
+        formattedTemplate = template.replace(SOURCE_TYPE_PLACEHOLDER, source.getType())
+                .replace(TARGET_TYPE_PLACEHOLDER, target.getType());
         SourceElementStore trainingSourceStore = sourceStore.reduceSourceElementStore(trainingDataSize);
         TargetElementStore trainingTargetStore = targetStore.reduceTargetElementStore(trainingSourceStore);
         return optimizeIntern(trainingSourceStore, trainingTargetStore);
@@ -200,7 +204,7 @@ public class IterativeOptimizer implements AbstractPromptOptimizer {
             promptScore = this.metric.getMetric(modifiedPrompt, examples);
             LOGGER.debug("Iteration {}: {} = {}", i, metric.getName(), promptScore);
             promptScores[i] = promptScore;
-            String request = template.replace(ORIGINAL_PROMPT_PLACEHOLDER, optimizationPrompt);
+            String request = formattedTemplate.replace(ORIGINAL_PROMPT_PLACEHOLDER, optimizationPrompt);
             modifiedPrompt = cachedSanitizedRequest(request);
             optimizationPrompt = modifiedPrompt;
             i++;
@@ -219,27 +223,5 @@ public class IterativeOptimizer implements AbstractPromptOptimizer {
     protected String cachedSanitizedRequest(String request) {
         String response = ChatLanguageModelUtils.cachedRequest(request, provider, llm, cache);
         return sanitizePrompt(parseTaggedTextFirst(response, PROMPT_START, PROMPT_END));
-    }
-
-    /**
-     * Finds all trace links that can be created between the source and target stores which are included in the local
-     * gold standard.
-     *
-     * @param sourceStore The store containing source elements
-     * @param targetStore The store containing target elements
-     * @return A subset of the gold standard trace links that can be created between the source and target stores
-     */
-    protected Set<TraceLink> getReducedGoldStandardLinks(
-            SourceElementStore sourceStore, TargetElementStore targetStore) {
-        Set<TraceLink> reducedGoldStandard = new HashSet<>();
-        for (var source : sourceStore.getAllElements(true)) {
-            for (Element target : targetStore.findSimilar(source)) {
-                TraceLink traceLink = TraceLink.of(source.first().getIdentifier(), target.getIdentifier());
-                if (validTraceLinks.contains(traceLink)) {
-                    reducedGoldStandard.add(traceLink);
-                }
-            }
-        }
-        return reducedGoldStandard;
     }
 }
