@@ -14,7 +14,8 @@ import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
  * @param target The target element in the trace link relationship.
  * @param label  The label indicating whether a trace link exists between the source and target elements.
  */
-public record ClassificationTask(Element source, Element target, boolean label) {
+public record ClassificationTask(Element source, Element target, boolean label)
+        implements Comparable<ClassificationTask> {
     @NotNull
     @Override
     public String toString() {
@@ -22,5 +23,17 @@ public record ClassificationTask(Element source, Element target, boolean label) 
                 + source.getIdentifier() + ", target="
                 + target.getIdentifier() + ", label="
                 + label + '}';
+    }
+
+    @Override
+    public int compareTo(@NotNull ClassificationTask other) {
+        if (this.source.getIdentifier().equals(other.source.getIdentifier())) {
+            if (this.target.getIdentifier().equals(other.target.getIdentifier())) {
+                return Boolean.compare(this.label, other.label);
+            } else {
+                return this.target.getIdentifier().compareTo(other.target.getIdentifier());
+            }
+        }
+        return this.source.getIdentifier().compareTo(other.source.getIdentifier());
     }
 }

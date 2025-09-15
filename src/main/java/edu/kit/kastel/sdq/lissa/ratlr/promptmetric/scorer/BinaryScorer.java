@@ -1,38 +1,28 @@
 /* Licensed under MIT 2025. */
 package edu.kit.kastel.sdq.lissa.ratlr.promptmetric.scorer;
 
+import static edu.kit.kastel.sdq.lissa.ratlr.promptmetric.MetricUtils.MAXIMUM_SCORE;
+import static edu.kit.kastel.sdq.lissa.ratlr.promptmetric.MetricUtils.MINIMUM_SCORE;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.ClassificationResult;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.ClassificationTask;
-import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
 
 /**
- * This scorer assigns a fixed score for correct and incorrect classifications.
+ * This metric assigns a fixed score for correct and incorrect classifications.
  * The presence of a classification result indicates a correct classification.
  * If no result is provided, the classification is considered incorrect.
  */
 public class BinaryScorer implements Scorer {
 
-    private static final double DEFAULT_CORRECT_CLASSIFICATION_SCORE = 1.0;
-    private static final String CORRECT_CLASSIFICATION_SCORE_CONFIGURATION_KEY = "correct_classification_score";
-    private static final double DEFAULT_INCORRECT_CLASSIFICATION_SCORE = 0.0;
-    private static final String INCORRECT_CLASSIFICATION_SCORE_CONFIGURATION_KEY = "incorrect_classification_score";
-
     private final double correctClassificationScore;
     private final double incorrectClassificationScore;
 
-    public BinaryScorer(ModuleConfiguration configuration) {
-        this.correctClassificationScore = configuration.argumentAsDouble(
-                CORRECT_CLASSIFICATION_SCORE_CONFIGURATION_KEY, DEFAULT_CORRECT_CLASSIFICATION_SCORE);
-        this.incorrectClassificationScore = configuration.argumentAsDouble(
-                INCORRECT_CLASSIFICATION_SCORE_CONFIGURATION_KEY, DEFAULT_INCORRECT_CLASSIFICATION_SCORE);
-    }
-
     public BinaryScorer() {
-        this.correctClassificationScore = DEFAULT_CORRECT_CLASSIFICATION_SCORE;
-        this.incorrectClassificationScore = DEFAULT_INCORRECT_CLASSIFICATION_SCORE;
+        this.correctClassificationScore = MAXIMUM_SCORE;
+        this.incorrectClassificationScore = MINIMUM_SCORE;
     }
 
     /**

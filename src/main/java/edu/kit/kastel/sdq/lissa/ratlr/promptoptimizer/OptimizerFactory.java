@@ -7,9 +7,7 @@ import edu.kit.kastel.sdq.lissa.ratlr.classifier.Classifier;
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
 import edu.kit.kastel.sdq.lissa.ratlr.evaluator.AbstractEvaluator;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
-import edu.kit.kastel.sdq.lissa.ratlr.postprocessor.TraceLinkIdPostprocessor;
 import edu.kit.kastel.sdq.lissa.ratlr.promptmetric.Metric;
-import edu.kit.kastel.sdq.lissa.ratlr.resultaggregator.ResultAggregator;
 
 /**
  * Factory class for creating instances of AbstractPromptOptimizer based on the provided configuration.
@@ -33,16 +31,14 @@ public final class OptimizerFactory {
      *
      * @param configuration The configuration for the optimizer
      * @param goldStandard The gold standard trace links for evaluation
-     * @param aggregator The result aggregator for collecting optimization results
-     * @param traceLinkIdPostProcessor Postprocessor for trace link IDs
      * @param classifier The classifier used in the optimization process
+     * @param metric The metric used to evaluate the prompt performance
+     * @param evaluator The evaluator used to assess the optimization results
      * @return An instance of AbstractPromptOptimizer based on the configuration
      */
     public static AbstractPromptOptimizer createOptimizer(
             ModuleConfiguration configuration,
             Set<TraceLink> goldStandard,
-            ResultAggregator aggregator,
-            TraceLinkIdPostprocessor traceLinkIdPostProcessor,
             Classifier classifier,
             Metric metric,
             AbstractEvaluator evaluator) {
@@ -53,9 +49,7 @@ public final class OptimizerFactory {
             case "mock" -> new MockOptimizer();
             case "simple" -> new IterativeOptimizer(configuration, goldStandard, metric, 1);
             case "iterative" -> new IterativeOptimizer(configuration, goldStandard, metric);
-            case "feedback" ->
-                new IterativeFeedbackOptimizer(
-                        configuration, goldStandard, aggregator, traceLinkIdPostProcessor, classifier, metric);
+            case "feedback" -> new IterativeFeedbackOptimizer(configuration, goldStandard, metric);
             case "gradient" -> new AutomaticPromptOptimizer(configuration, goldStandard, classifier, metric, evaluator);
             default -> throw new IllegalStateException("Unexpected value: " + configuration.name());
         };

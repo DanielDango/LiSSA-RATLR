@@ -113,9 +113,9 @@ public record OptimizerConfiguration(
         @JsonProperty("tracelinkid_postprocessor") ModuleConfiguration traceLinkIdPostprocessor,
 
         /**
-         * Configuration for the scorer used in optimization
+         * Configuration for the metric used in optimization
          */
-        @JsonProperty("scorer") ModuleConfiguration scorer,
+        @JsonProperty("metric") ModuleConfiguration metric,
         /**
          * Configuration for the evaluator used in optimization
          */
@@ -139,7 +139,7 @@ public record OptimizerConfiguration(
         sourceStore.finalizeForSerialization();
         targetStore.finalizeForSerialization();
         promptOptimizer.finalizeForSerialization();
-        scorer.finalizeForSerialization();
+        metric.finalizeForSerialization();
         evaluator.finalizeForSerialization();
         if (classifier != null) {
             classifier.finalizeForSerialization();
@@ -182,8 +182,8 @@ public record OptimizerConfiguration(
                 + targetPreprocessor + ", embeddingCreator="
                 + embeddingCreator + ", sourceStore="
                 + sourceStore + ", targetStore="
-                + targetStore + ", scorer="
-                + scorer + ", evaluator="
+                + targetStore + ", metric="
+                + metric + ", evaluator="
                 + evaluator + ", promptOptimizer="
                 + promptOptimizer + ", classifier="
                 + classifier + ", classifiers="

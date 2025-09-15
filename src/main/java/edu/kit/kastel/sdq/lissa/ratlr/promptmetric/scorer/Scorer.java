@@ -43,9 +43,9 @@ public interface Scorer {
     double score(ClassificationTask task);
 
     /**
-     * Returns the name of the scorer.
+     * Returns the name of the metric.
      *
-     * @return The name of the scorer
+     * @return The name of the metric
      */
     String getName();
 }

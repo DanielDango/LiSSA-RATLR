@@ -47,8 +47,13 @@ public class IterativeOptimizer implements AbstractPromptOptimizer {
      * The placeholder used in the optimization prompt to insert the prompt which should be optimized.
      */
     protected static final String ORIGINAL_PROMPT_PLACEHOLDER = "{original_prompt}";
-
+    /**
+     * The placeholder used in the optimization prompt to insert the source element type.
+     */
     private static final String SOURCE_TYPE_PLACEHOLDER = "{source_type}";
+    /**
+     * The placeholder used in the optimization prompt to insert the target element type.
+     */
     private static final String TARGET_TYPE_PLACEHOLDER = "{target_type}";
 
     /**
@@ -66,7 +71,7 @@ public class IterativeOptimizer implements AbstractPromptOptimizer {
      * Custom optimization prompts can also use the placeholders {@value SOURCE_TYPE_PLACEHOLDER},
      * {@value TARGET_TYPE_PLACEHOLDER} and should use {@value ORIGINAL_PROMPT_PLACEHOLDER}.
      * The optimized prompt should be enclosed between {@value PROMPT_START} and {@value PROMPT_END}.
-     * TODO: There should probably be spaces around the brackets :upsidedown:.
+     * TODO: There should probably be spaces around the prompt tags :upsidedown:.
      */
     private static final String DEFAULT_OPTIMIZATION_TEMPLATE =
             """
@@ -97,7 +102,7 @@ public class IterativeOptimizer implements AbstractPromptOptimizer {
      * Key for the original prompt in the configuration.
      * This key is used to retrieve the original prompt from the configuration.
      */
-    protected static final String PROMPT_CONFIGURATION_KEY = "prompt";
+    protected static final String BASE_PROMPT_CONFIGURATION_KEY = "prompt";
 
     /**
      * Logger for the prompt optimizer.
@@ -118,18 +123,19 @@ public class IterativeOptimizer implements AbstractPromptOptimizer {
      */
     protected final ChatModel llm;
 
-    /**
-     * The template used for classification requests.
-     */
     private final String template;
 
+    /**
+     * The template used for classification requests with domain specific placeholders replaced in the
+     * {@link IterativeOptimizer#optimize(SourceElementStore, TargetElementStore)} method.
+     */
     protected String formattedTemplate;
 
     /**
      * The prompt used for optimization.
      * This is the initial prompt that will be optimized iteratively.
      */
-    protected String optimizationPrompt;
+    protected final String optimizationPrompt;
 
     /**
      * The maximum number of iterations for the optimization process.
@@ -163,7 +169,7 @@ public class IterativeOptimizer implements AbstractPromptOptimizer {
                 configuration.argumentAsString(OPTIMIZATION_TEMPLATE_CONFIGURATION_KEY, DEFAULT_OPTIMIZATION_TEMPLATE);
         configuration.setArgument(MAXIMUM_ITERATIONS_CONFIGURATION_KEY, maximumIterations);
         this.maximumIterations = maximumIterations;
-        this.optimizationPrompt = configuration.argumentAsString(PROMPT_CONFIGURATION_KEY, "");
+        this.optimizationPrompt = configuration.argumentAsString(BASE_PROMPT_CONFIGURATION_KEY, "");
         this.thresholdScore =
                 configuration.argumentAsDouble(THRESHOLD_SCORE_CONFIGURATION_KEY, DEFAULT_THRESHOLD_SCORE);
         this.cache = CacheManager.getDefaultInstance().getCache(this, provider.getCacheParameters());
@@ -176,48 +182,46 @@ public class IterativeOptimizer implements AbstractPromptOptimizer {
 
     @Override
     public String optimize(SourceElementStore sourceStore, TargetElementStore targetStore) {
-        Element source = sourceStore.getAllElements(true).getFirst().first();
-        Element target = targetStore
-                .findSimilar(sourceStore.getAllElements(true).getFirst())
-                .getFirst();
-        formattedTemplate = template.replace(SOURCE_TYPE_PLACEHOLDER, source.getType())
+        var source = sourceStore.getAllElements(false).getFirst();
+        Element target = targetStore.findSimilar(source).getFirst();
+        formattedTemplate = template.replace(
+                        SOURCE_TYPE_PLACEHOLDER, source.first().getType())
                 .replace(TARGET_TYPE_PLACEHOLDER, target.getType());
         SourceElementStore trainingSourceStore = sourceStore.reduceSourceElementStore(trainingDataSize);
         TargetElementStore trainingTargetStore = targetStore.reduceTargetElementStore(trainingSourceStore);
-        return optimizeIntern(trainingSourceStore, trainingTargetStore);
+        List<ClassificationTask> examples =
+                getClassificationTasks(trainingSourceStore, trainingTargetStore, validTraceLinks);
+        return optimizeIntern(examples);
     }
 
     /**
-     * Optimizes the prompt by iteratively sending requests to the language model.
-     * The optimization continues until the F1 score reaches a threshold or the maximum number of iterations is reached.
+     * Optimizes the prompt on the source and target stores by iteratively sending requests to the language model.
+     * The optimization continues until the prompts score reaches a threshold or the maximum number of iterations is
+     * reached.
      *
-     * @param sourceStore The store containing source elements
-     * @param targetStore The store containing target elements
+     * @param examples The classification tasks used to evaluate the prompts performance
      * @return The optimized prompt after the iterative process
      */
-    protected String optimizeIntern(SourceElementStore sourceStore, TargetElementStore targetStore) {
+    protected String optimizeIntern(List<ClassificationTask> examples) {
         double[] promptScores = new double[maximumIterations];
         int i = 0;
         double promptScore;
-        List<ClassificationTask> examples = getClassificationTasks(sourceStore, targetStore, validTraceLinks);
         String modifiedPrompt = optimizationPrompt;
         do {
             LOGGER.debug("Iteration {}: RequestPrompt = {}", i, modifiedPrompt);
             promptScore = this.metric.getMetric(modifiedPrompt, examples);
             LOGGER.debug("Iteration {}: {} = {}", i, metric.getName(), promptScore);
             promptScores[i] = promptScore;
-            String request = formattedTemplate.replace(ORIGINAL_PROMPT_PLACEHOLDER, optimizationPrompt);
-            modifiedPrompt = cachedSanitizedRequest(request);
-            optimizationPrompt = modifiedPrompt;
+            modifiedPrompt = cachedSanitizedRequest(generateOptimizationPrompt(modifiedPrompt));
             i++;
         } while (i < maximumIterations && promptScore < thresholdScore);
         LOGGER.info("Iterations {}: {} = {}", i, metric.getName(), promptScores);
-        return optimizationPrompt;
+        return modifiedPrompt;
     }
 
     /**
-     * Optimizes the prompt by sending a request to the language model.
-     * The response is cached to avoid redundant calls.
+     * Sends a cached request to the language model and extracts the sanitized prompt from the response between the
+     * {@value PROMPT_START} and {@value PROMPT_END} tags.
      *
      * @param request The request to send to the language model
      * @return The optimized prompt extracted from the response
@@ -225,5 +229,9 @@ public class IterativeOptimizer implements AbstractPromptOptimizer {
     protected String cachedSanitizedRequest(String request) {
         String response = ChatLanguageModelUtils.cachedRequest(request, provider, llm, cache);
         return sanitizePrompt(parseTaggedTextFirst(response, PROMPT_START, PROMPT_END));
+    }
+
+    protected String generateOptimizationPrompt(String basePrompt) {
+        return formattedTemplate.replace(ORIGINAL_PROMPT_PLACEHOLDER, basePrompt);
     }
 }

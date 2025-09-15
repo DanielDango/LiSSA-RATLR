@@ -66,8 +66,8 @@
     "name" : "identity",
     "args" : {}
   },
-  "scorer" : {
-    "name" : "mock",
+  "metric" : {
+    "name" : "f1",
     "args" : {}
   },
   "evaluator" : {

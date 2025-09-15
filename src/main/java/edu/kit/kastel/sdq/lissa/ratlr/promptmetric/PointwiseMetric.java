@@ -12,10 +12,10 @@ import edu.kit.kastel.sdq.lissa.ratlr.classifier.ClassificationResult;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.ClassificationTask;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.Classifier;
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
-import edu.kit.kastel.sdq.lissa.ratlr.promptmetric.reductor.MeanReductor;
 import edu.kit.kastel.sdq.lissa.ratlr.promptmetric.reductor.Reductor;
-import edu.kit.kastel.sdq.lissa.ratlr.promptmetric.scorer.BinaryScorer;
+import edu.kit.kastel.sdq.lissa.ratlr.promptmetric.reductor.ReductorFactory;
 import edu.kit.kastel.sdq.lissa.ratlr.promptmetric.scorer.Scorer;
+import edu.kit.kastel.sdq.lissa.ratlr.promptmetric.scorer.ScorerFactory;
 
 /**
  * A pointwise metric that evaluates each classification task individually with a {@link Scorer} and then aggregates the
@@ -23,16 +23,23 @@ import edu.kit.kastel.sdq.lissa.ratlr.promptmetric.scorer.Scorer;
  * It uses a caching mechanism to avoid redundant computations for the same task and prompt combination.
  */
 public class PointwiseMetric implements Metric {
+
+    private static final String DEFAULT_SCORER = "binary";
+    private static final String SCORER_CONFIGURATION_KEY = "metric";
+    private static final String DEFAULT_REDUCTOR = "mean";
+    private static final String REDUCTOR_CONFIGURATION_KEY = "reductor";
+
     private final Map<String, Double> cache;
     private final Scorer scorer;
     private final Reductor reductor;
     private final Classifier classifier;
 
-    // TODO: Load scorer and reductor from configuration
     public PointwiseMetric(ModuleConfiguration configuration, Classifier classifier) {
         this.cache = new HashMap<>();
-        this.scorer = new BinaryScorer();
-        this.reductor = new MeanReductor();
+        this.scorer =
+                ScorerFactory.createScorer(configuration.argumentAsString(SCORER_CONFIGURATION_KEY, DEFAULT_SCORER));
+        this.reductor = ReductorFactory.createReductor(
+                configuration.argumentAsString(REDUCTOR_CONFIGURATION_KEY, DEFAULT_REDUCTOR));
         this.classifier = classifier;
     }
 

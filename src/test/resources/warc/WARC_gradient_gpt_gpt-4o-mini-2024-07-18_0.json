@@ -69,8 +69,8 @@
     "name" : "identity",
     "args" : {}
   },
-  "scorer" : {
-    "name" : "binary",
+  "metric" : {
+    "name" : "pointwise",
     "args" : {}
   },
   "evaluator" : {

@@ -65,7 +65,7 @@
     "name" : "identity",
     "args" : {}
   },
-  "scorer" : {
+  "metric" : {
     "name" : "mock",
     "args" : {}
   },

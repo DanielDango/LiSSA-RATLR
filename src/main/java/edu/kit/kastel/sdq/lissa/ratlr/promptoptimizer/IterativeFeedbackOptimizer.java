@@ -1,27 +1,20 @@
 /* Licensed under MIT 2025. */
 package edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer;
 
-import static edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.PromptOptimizationUtils.getClassificationTasks;
+import static edu.kit.kastel.sdq.lissa.ratlr.promptmetric.MetricUtils.MINIMUM_SCORE;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import edu.kit.kastel.sdq.lissa.ratlr.classifier.ClassificationResult;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.ClassificationTask;
-import edu.kit.kastel.sdq.lissa.ratlr.classifier.Classifier;
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
-import edu.kit.kastel.sdq.lissa.ratlr.elementstore.ElementStore;
-import edu.kit.kastel.sdq.lissa.ratlr.elementstore.SourceElementStore;
-import edu.kit.kastel.sdq.lissa.ratlr.elementstore.TargetElementStore;
-import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
-import edu.kit.kastel.sdq.lissa.ratlr.postprocessor.TraceLinkIdPostprocessor;
 import edu.kit.kastel.sdq.lissa.ratlr.promptmetric.Metric;
-import edu.kit.kastel.sdq.lissa.ratlr.resultaggregator.ResultAggregator;
 
 /**
  * An optimizer that uses iterative feedback to refine the prompt based on classification results.
@@ -74,145 +67,85 @@ public class IterativeFeedbackOptimizer extends IterativeOptimizer {
     private final String feedbackPrompt;
     private final String feedbackExampleBlock;
     private final int feedbackSize;
-
-    private final Classifier classifier;
-    private final ResultAggregator aggregator;
-    private final TraceLinkIdPostprocessor traceLinkIdPostProcessor;
     /**
      * Creates a new instance of the iterative feedback optimizer.
      * This optimizer uses iterative feedback to refine the prompt based on classification results.
      *
      * @param configuration The module configuration containing optimizer settings
      * @param goldStandard The set of trace links that represent the gold standard for evaluation
-     * @param aggregator The result aggregator to collect and process classification results
-     * @param traceLinkIdPostProcessor The postprocessor for trace link IDs
-     * @param classifier The classifier used for classification tasks
      */
-    public IterativeFeedbackOptimizer(
-            ModuleConfiguration configuration,
-            Set<TraceLink> goldStandard,
-            ResultAggregator aggregator,
-            TraceLinkIdPostprocessor traceLinkIdPostProcessor,
-            Classifier classifier,
-            Metric metric) {
+    public IterativeFeedbackOptimizer(ModuleConfiguration configuration, Set<TraceLink> goldStandard, Metric metric) {
         super(configuration, goldStandard, metric);
         this.feedbackPrompt =
                 configuration.argumentAsString(FEEDBACK_PROMPT_CONFIGURATION_KEY, FEEDBACK_PROMPT_TEMPLATE);
         this.feedbackSize = configuration.argumentAsInt(FEEDBACK_SIZE_CONFIGURATION_KEY, FEEDBACK_SIZE);
         this.feedbackExampleBlock = configuration.argumentAsString(
                 FEEDBACK_EXAMPLE_BLOCK_CONFIGURATION_KEY, DEFAULT_FEEDBACK_EXAMPLE_BLOCK);
-        this.aggregator = aggregator;
-        this.traceLinkIdPostProcessor = traceLinkIdPostProcessor;
-        this.classifier = classifier;
     }
 
     @Override
-    protected String optimizeIntern(SourceElementStore sourceStore, TargetElementStore targetStore) {
+    protected String optimizeIntern(List<ClassificationTask> examples) {
         double[] promptScores = new double[maximumIterations];
-        Set<TraceLink> possibleTraceLinks = getReducedGoldStandardLinks(sourceStore, targetStore);
         int i = 0;
         double promptScore;
-        List<ClassificationTask> examples = getClassificationTasks(sourceStore, targetStore, possibleTraceLinks);
-        Set<TraceLink> traceLinks;
         String modifiedPrompt = optimizationPrompt;
         do {
             LOGGER.debug("Iteration {}: RequestPrompt = {}", i, modifiedPrompt);
-            traceLinks = getTraceLinks(sourceStore, targetStore, modifiedPrompt);
             promptScore = this.metric.getMetric(modifiedPrompt, examples);
             LOGGER.debug("Iteration {}: {} = {}", i, this.metric.getName(), promptScore);
             promptScores[i] = promptScore;
-            String request = formattedTemplate.replace(ORIGINAL_PROMPT_PLACEHOLDER, optimizationPrompt);
-            request = generateFeedbackPrompt(traceLinks, possibleTraceLinks, sourceStore, targetStore) + request;
+            String request = generateOptimizationPrompt(modifiedPrompt);
+            if (feedbackSize > 0) {
+                request = generateFeedbackPrompt(modifiedPrompt, examples) + request;
+            }
             modifiedPrompt = cachedSanitizedRequest(request);
-            optimizationPrompt = modifiedPrompt;
             i++;
         } while (i < maximumIterations && promptScore < thresholdScore);
         LOGGER.info("Iterations {}: {}s = {}", i, this.metric.getName(), promptScores);
-        return optimizationPrompt;
+        return modifiedPrompt;
     }
 
     /**
      * Fills the feedback prompt with examples of misclassified trace links using the FEEDBACK_EXAMPLE_BLOCK template.
      *
-     * @param foundTraceLinks the trace links found by the classifier for the current prompt
-     * @param validTraceLinks the trace links that are considered valid according to the gold standard reduced to the
-     *                        training set
-     * @param sourceStore     the store containing source elements
-     * @param targetStore     the store containing target elements
+     * @param prompt The prompt for which to generate feedback
+     * @param tasks  The classification tasks on which the prompt should be evaluated
      * @return a formatted feedback prompt containing examples of misclassified trace links
      */
-    private String generateFeedbackPrompt(
-            Set<TraceLink> foundTraceLinks,
-            Set<TraceLink> validTraceLinks,
-            ElementStore sourceStore,
-            ElementStore targetStore) {
-
+    private String generateFeedbackPrompt(String prompt, Collection<ClassificationTask> tasks) {
         StringBuilder feedback = new StringBuilder();
-        int count = 1;
 
-        Set<TraceLink> correctlyClassifiedTraceLinks = new HashSet<>(validTraceLinks);
-        correctlyClassifiedTraceLinks.retainAll(foundTraceLinks);
-
-        Set<TraceLink> misclassifiedTraceLinks = new HashSet<>(validTraceLinks);
-        misclassifiedTraceLinks.addAll(foundTraceLinks);
-        misclassifiedTraceLinks.removeAll(correctlyClassifiedTraceLinks);
-
-        for (TraceLink traceLink : misclassifiedTraceLinks.stream().sorted().toList()) {
-            if (count > feedbackSize) {
-                break;
+        List<ClassificationTask> misclassifiedTasks = new ArrayList<>();
+        for (ClassificationTask task : tasks) {
+            double taskScore = metric.getMetric(prompt, List.of(task));
+            if (Math.abs(taskScore - MINIMUM_SCORE) < 1e-6) {
+                misclassifiedTasks.add(task);
             }
-            LOGGER.debug("Example {}: TraceLink {} was misclassified", count, traceLink);
-            Element source = sourceStore.getById(traceLink.sourceId()).first();
-            Element target = targetStore.getById(traceLink.targetId()).first();
-            feedback.append(feedbackExampleBlock
-                    .replace("{identifier}", count + ".")
-                    .replace("{source_type}", source.getType())
-                    .replace("{target_type}", target.getType())
-                    .replace("{source_content}", source.getContent())
-                    .replace("{target_content}", target.getContent())
-                    .replace("{classification}", foundTraceLinks.contains(traceLink) ? "Yes" : "No"));
-            count++;
+        }
+        misclassifiedTasks = misclassifiedTasks.stream().sorted().distinct().toList();
+        for (int exampleNumber = 0; exampleNumber < Math.min(feedbackSize, misclassifiedTasks.size()); exampleNumber++) {
+            ClassificationTask task = misclassifiedTasks.get(exampleNumber);
+            LOGGER.debug("Example {}: TraceLink ({} -> {}) was misclassified", exampleNumber, task.source(), task.target());
+            feedback.append(generateMisclassifiedFeedbackBlock(task).replace("{identifier}", exampleNumber + 1 + "."));
         }
         return feedbackPrompt.replace("{examples}", feedback.toString());
     }
 
     /**
-     * Utilizes the internal classifier to determine existing trace links between the source and target stores using the
-     * provided prompt.
-     * The results are aggregated and post-processed.
-     * @param sourceStore   The store containing source elements
-     * @param targetStore   The store containing target elements
-     * @param prompt        The prompt to use for classification
-     * @return A set of trace links that were classified based on the prompt
-     */
-    private Set<TraceLink> getTraceLinks(
-            SourceElementStore sourceStore, TargetElementStore targetStore, String prompt) {
-        classifier.setClassificationPrompt(prompt);
-        List<ClassificationResult> results = classifier.classify(sourceStore, targetStore);
-
-        Set<TraceLink> traceLinks =
-                aggregator.aggregate(sourceStore.getAllElements(), targetStore.getAllElements(), results);
-        return traceLinkIdPostProcessor.postprocess(traceLinks);
-    }
-
-    /**
-     * Finds all trace links that can be created between the source and target stores which are included in the local
-     * gold standard.
+     * Generates a feedback block for a misclassified trace link using the feedback example block template.
+     * The placeholders in the template are replaced with the corresponding values from the classification task.
+     * As this method is for misclassified trace links, the classification result is implicitly the inverted value of the
+     * task label (correct classification).
      *
-     * @param sourceStore The store containing source elements
-     * @param targetStore The store containing target elements
-     * @return A subset of the gold standard trace links that can be created between the source and target stores
+     * @param task The classification task that was misclassified
+     * @return A formatted feedback block for the misclassified trace link
      */
-    private Set<TraceLink> getReducedGoldStandardLinks(SourceElementStore sourceStore, TargetElementStore targetStore) {
-        Set<TraceLink> reducedGoldStandard = new HashSet<>();
-        for (var source : sourceStore.getAllElements(true)) {
-            for (Element target : targetStore.findSimilar(source)) {
-                TraceLink traceLink = TraceLink.of(source.first().getIdentifier(), target.getIdentifier());
-                if (validTraceLinks.contains(traceLink)) {
-                    reducedGoldStandard.add(traceLink);
-                }
-            }
-        }
-        return reducedGoldStandard;
+    private String generateMisclassifiedFeedbackBlock(ClassificationTask task) {
+        return feedbackExampleBlock
+                .replace("{source_type}", task.source().getType())
+                .replace("{target_type}", task.target().getType())
+                .replace("{source_content}", task.source().getContent())
+                .replace("{target_content}", task.target().getContent())
+                .replace("{classification}", task.label() ? "No" : "Yes");
     }
 }

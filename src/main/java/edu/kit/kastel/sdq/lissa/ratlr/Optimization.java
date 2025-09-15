@@ -149,17 +149,12 @@ public class Optimization {
                 configuration.traceLinkIdPostprocessor(), contextStore);
         Set<TraceLink> goldStandard = getTraceLinksFromGoldStandard(configuration.goldStandardConfiguration());
 
-        Metric metric = MetricFactory.createScorer(configuration.scorer(), classifier, aggregator);
+        Metric metric =
+                MetricFactory.createScorer(configuration.metric(), classifier, aggregator, traceLinkIdPostProcessor);
         AbstractEvaluator evaluator = AbstractEvaluator.createEvaluator(configuration.evaluator());
 
         promptOptimizer = OptimizerFactory.createOptimizer(
-                configuration.promptOptimizer(),
-                goldStandard,
-                aggregator,
-                traceLinkIdPostProcessor,
-                classifier,
-                metric,
-                evaluator);
+                configuration.promptOptimizer(), goldStandard, classifier, metric, evaluator);
         configuration.serializeAndDestroyConfiguration();
     }
 

@@ -11,9 +11,9 @@ import java.util.stream.Collectors;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.ClassificationResult;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.ClassificationTask;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.Classifier;
-import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
+import edu.kit.kastel.sdq.lissa.ratlr.postprocessor.TraceLinkIdPostprocessor;
 import edu.kit.kastel.sdq.lissa.ratlr.resultaggregator.ResultAggregator;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.Pair;
 
@@ -29,11 +29,16 @@ public abstract class GlobalMetric implements Metric {
     private final Classifier classifier;
     private final ResultAggregator aggregator;
     private final boolean usesCustomAggregator;
+    private final TraceLinkIdPostprocessor postprocessor;
 
-    protected GlobalMetric(ModuleConfiguration configuration, Classifier classifier, ResultAggregator aggregator) {
+    protected GlobalMetric(
+            Classifier classifier,
+            ResultAggregator aggregator,
+            TraceLinkIdPostprocessor postprocessor) {
         this.classifier = classifier;
         this.aggregator = aggregator;
         this.usesCustomAggregator = aggregator != null;
+        this.postprocessor = postprocessor;
     }
 
     /**
@@ -87,19 +92,20 @@ public abstract class GlobalMetric implements Metric {
      */
     private Pair<Set<TraceLink>, Set<TraceLink>> classify(String prompt, Collection<ClassificationTask> tasks) {
         classifier.setClassificationPrompt(prompt);
-        Pair<List<ClassificationResult>, List<ClassificationResult>> classificationResults =
-                new Pair<>(new ArrayList<>(), new ArrayList<>());
+        List<ClassificationResult> acceptedTraceLinks = new ArrayList<>();
+        List<ClassificationResult> rejectedTraceLinks = new ArrayList<>();
+        new Pair<>(new ArrayList<>(), new ArrayList<>());
 
         for (ClassificationTask task : tasks) {
             Optional<ClassificationResult> result = classifier.classify(task);
             if (result.isPresent()) {
-                classificationResults.first().add(result.get());
+                acceptedTraceLinks.add(result.get());
             } else {
                 // TODO: Is there a constant for use instead of 0.0?
-                classificationResults.second().add(new ClassificationResult(task.source(), task.target(), 0.0));
+                rejectedTraceLinks.add(new ClassificationResult(task.source(), task.target(), 0.0));
             }
         }
-        return new Pair<>(aggregate(classificationResults.first()), aggregate(classificationResults.second()));
+        return new Pair<>(aggregate(acceptedTraceLinks), aggregate(rejectedTraceLinks));
     }
 
     /**
@@ -118,7 +124,9 @@ public abstract class GlobalMetric implements Metric {
             sourceElements.add(result.source());
             targetElements.add(result.target());
         }
-        return aggregator.aggregate(sourceElements, targetElements, classificationResults);
+        Set<TraceLink> aggregatedTraceLinks =
+                aggregator.aggregate(sourceElements, targetElements, classificationResults);
+        return postprocessor.postprocess(aggregatedTraceLinks);
     }
 
     /**

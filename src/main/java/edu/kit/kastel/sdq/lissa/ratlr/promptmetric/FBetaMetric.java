@@ -5,6 +5,7 @@ import java.util.Collection;
 
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.Classifier;
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
+import edu.kit.kastel.sdq.lissa.ratlr.postprocessor.TraceLinkIdPostprocessor;
 import edu.kit.kastel.sdq.lissa.ratlr.resultaggregator.ResultAggregator;
 
 /**
@@ -25,13 +26,17 @@ public class FBetaMetric extends GlobalMetric {
     private final int beta;
 
     /**
-     * Creates a new binary scorer instance with the given configuration.
+     * Creates a new binary metric instance with the given configuration.
      *
-     * @param configuration The configuration for the scorer.
+     * @param configuration The configuration for the metric.
      * @param classifier    The classifier to use for scoring.
      */
-    public FBetaMetric(ModuleConfiguration configuration, Classifier classifier, ResultAggregator aggregator) {
-        super(configuration, classifier, aggregator);
+    public FBetaMetric(
+            ModuleConfiguration configuration,
+            Classifier classifier,
+            ResultAggregator aggregator,
+            TraceLinkIdPostprocessor postprocessor) {
+        super(classifier, aggregator, postprocessor);
         this.beta = configuration.argumentAsInt(BETA_CONFIGURATION_KEY, DEFAULT_BETA);
     }
 
@@ -40,13 +45,10 @@ public class FBetaMetric extends GlobalMetric {
      */
     @Override
     public <T> double reduce(Collection<T> items, Collection<T> rejectedItems, Collection<T> groundTruth) {
-        if (items.isEmpty() && rejectedItems.isEmpty()) {
-            return 0.0;
-        }
-
         int truePositive = 0;
         int falsePositive = 0;
         int falseNegative = 0;
+        int trueNegative = 0;
 
         for (T item : items) {
             if (groundTruth.contains(item)) {
@@ -58,7 +60,16 @@ public class FBetaMetric extends GlobalMetric {
         for (T item : rejectedItems) {
             if (groundTruth.contains(item)) {
                 falseNegative++;
+            } else {
+                trueNegative++;
             }
+        }
+
+        if (truePositive + trueNegative == 0) {
+            return 0.0;
+        }
+        if (falsePositive + falseNegative == 0) {
+            return 1.0;
         }
 
         return fBeta(truePositive, falsePositive, falseNegative, beta);

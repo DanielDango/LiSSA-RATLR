@@ -10,7 +10,8 @@ import edu.kit.kastel.sdq.lissa.ratlr.classifier.ClassificationTask;
  * Implementations of this interface should provide mechanisms to compute metrics for
  * single prompts as well as batches of prompts.
  * <br>
- * The computed metrics should be in the range [0.0, 1.0], where higher values indicate better performance.
+ * The computed metrics should be in the range [{@value MetricUtils#MINIMUM_SCORE}, {@value MetricUtils#MAXIMUM_SCORE}],
+ * where higher values indicate better performance.
  */
 public interface Metric {
 
