@@ -66,20 +66,22 @@ public class IterativeOptimizer implements AbstractPromptOptimizer {
      * Custom optimization prompts can also use the placeholders {@value SOURCE_TYPE_PLACEHOLDER},
      * {@value TARGET_TYPE_PLACEHOLDER} and should use {@value ORIGINAL_PROMPT_PLACEHOLDER}.
      * The optimized prompt should be enclosed between {@value PROMPT_START} and {@value PROMPT_END}.
+     * TODO: There should probably be spaces around the brackets :upsidedown:.
      */
     private static final String DEFAULT_OPTIMIZATION_TEMPLATE =
             """
                     Optimize the following prompt to achieve better classification results for traceability link recovery.
-                    Traceability links are to be found in the domain of {source_type} to {target_type}.
+                    Traceability links are to be found in the domain of %s to %s.
                     Do not modify the input and output formats specified by the original prompt.
-                    Enclose your optimized prompt with"""
-                    + PROMPT_START
-                    + PROMPT_END
-                    + """
-                    brackets.
+                    Enclose your optimized prompt with%sbrackets.
                     The original prompt is provided below:
-                    '''{original_prompt}'''
-                    """;
+                    '''%s'''
+                    """
+                    .formatted(
+                            SOURCE_TYPE_PLACEHOLDER,
+                            TARGET_TYPE_PLACEHOLDER,
+                            PROMPT_START + PROMPT_END,
+                            ORIGINAL_PROMPT_PLACEHOLDER);
 
     private static final String OPTIMIZATION_TEMPLATE_CONFIGURATION_KEY = "optimization_template";
 
