@@ -10,7 +10,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import java.util.random.RandomGenerator;
@@ -20,9 +19,7 @@ import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import edu.kit.kastel.sdq.lissa.ratlr.classifier.ClassificationResult;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.ClassificationTask;
-import edu.kit.kastel.sdq.lissa.ratlr.classifier.Classifier;
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
 import edu.kit.kastel.sdq.lissa.ratlr.elementstore.SourceElementStore;
 import edu.kit.kastel.sdq.lissa.ratlr.elementstore.TargetElementStore;
@@ -137,15 +134,11 @@ public class AutomaticPromptOptimizer extends IterativeOptimizer {
     private final String synonymPrompt;
 
     private final AbstractEvaluator evaluator;
-    private final RandomGenerator random;
     private final SampleStrategy sampleStrategy;
-
-    private final Classifier classifier;
 
     public AutomaticPromptOptimizer(
             ModuleConfiguration configuration,
             Set<TraceLink> goldStandard,
-            Classifier classifier,
             Metric metric,
             AbstractEvaluator evaluator) {
         super(configuration, goldStandard, metric);
@@ -170,8 +163,7 @@ public class AutomaticPromptOptimizer extends IterativeOptimizer {
         this.synonymPrompt = configuration.argumentAsString(SYNONYM_PROMPT_KEY, DEFAULT_SYNONYM_PROMPT);
 
         this.evaluator = evaluator;
-        this.random = new Random(configuration.argumentAsInt(SEED_KEY, DEFAULT_SEED));
-        this.classifier = classifier;
+        RandomGenerator random = new Random(configuration.argumentAsInt(SEED_KEY, DEFAULT_SEED));
         this.sampleStrategy = new ShuffledFirstSampler(random);
     }
 
@@ -397,35 +389,20 @@ public class AutomaticPromptOptimizer extends IterativeOptimizer {
         return tempNewPrompts;
     }
 
-    /*
+    /**
+     * Evaluate a prompt on a list of classification tasks, returning detailed results.
+     */
     private List<EvaluationResult<Boolean>> evaluatePrompt(
             List<ClassificationTask> classificationTasks, String prompt) {
         List<EvaluationResult<Boolean>> evaluation = new ArrayList<>();
         for (ClassificationTask task : classificationTasks) {
-            if (classifiedAsTraceLink(prompt, task)) {
-                evaluation.add(new EvaluationResult<>(task.source(), task.target(), task.label(), true));
+            if (isClassifiedCorrectly(prompt, task)) {
+                evaluation.add(new EvaluationResult<>(task.source(), task.target(), task.label(), task.label()));
             } else {
-                evaluation.add(new EvaluationResult<>(task.source(), task.target(), task.label(), false));
+                evaluation.add(new EvaluationResult<>(task.source(), task.target(), task.label(), !task.label()));
             }
         }
         return evaluation;
-    }
-     */
-    // TODO: This looks like bad practice
-    private List<EvaluationResult<Boolean>> evaluatePrompt(
-            List<ClassificationTask> classificationTasks, String prompt) {
-        List<EvaluationResult<Boolean>> evaluation2 = new ArrayList<>();
-        classifier.setClassificationPrompt(prompt);
-        for (ClassificationTask task : classificationTasks) {
-            Optional<ClassificationResult> result = classifier.classify(task);
-            if (result.isPresent()) {
-                evaluation2.add(new EvaluationResult<>(
-                        task.source(), task.target(), task.label(), result.get().confidence() > 0.0));
-            } else {
-                evaluation2.add(new EvaluationResult<>(task.source(), task.target(), task.label(), false));
-            }
-        }
-        return evaluation2;
     }
 
     /**

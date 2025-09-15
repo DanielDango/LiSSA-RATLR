@@ -244,7 +244,7 @@ public class IterativeOptimizer implements PromptOptimizer {
      * @param task   The classification task to evaluate
      * @return true if the task is classified as a trace link, false otherwise
      */
-    protected boolean classifiedAsTraceLink(String prompt, ClassificationTask task) {
+    protected boolean isClassifiedCorrectly(String prompt, ClassificationTask task) {
         double taskScore = metric.getMetric(prompt, List.of(task));
         return Math.abs(taskScore - MAXIMUM_SCORE) < 1e-6;
     }

@@ -131,7 +131,7 @@ public class IterativeFeedbackOptimizer extends IterativeOptimizer {
 
     /**
      * Identifies misclassified tasks based on the current prompt.
-     * A task is considered misclassified based on the {@link #classifiedAsTraceLink(String, ClassificationTask)}
+     * A task is considered misclassified based on the {@link #isClassifiedCorrectly(String, ClassificationTask)}
      * method.
      *
      * @param prompt The prompt used for classification
@@ -141,7 +141,7 @@ public class IterativeFeedbackOptimizer extends IterativeOptimizer {
     private Set<ClassificationTask> getMisclassifiedTasks(String prompt, Collection<ClassificationTask> tasks) {
         Set<ClassificationTask> misclassifiedTasks = new HashSet<>();
         for (ClassificationTask task : tasks) {
-            if (!classifiedAsTraceLink(prompt, task)) {
+            if (!isClassifiedCorrectly(prompt, task)) {
                 misclassifiedTasks.add(task);
             }
         }
