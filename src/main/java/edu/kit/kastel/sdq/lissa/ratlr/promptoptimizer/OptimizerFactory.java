@@ -10,7 +10,7 @@ import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
 import edu.kit.kastel.sdq.lissa.ratlr.promptmetric.Metric;
 
 /**
- * Factory class for creating instances of AbstractPromptOptimizer based on the provided configuration.
+ * Factory class for creating instances of PromptOptimizer based on the provided configuration.
  * This class uses the factory design pattern to encapsulate the instantiation logic for different
  * prompt optimizer implementations.
  */
@@ -26,7 +26,7 @@ public final class OptimizerFactory {
     }
 
     /**
-     * Factory method to create an instance of AbstractPromptOptimizer based on the provided configuration.
+     * Factory method to create an instance of PromptOptimizer based on the provided configuration.
      * This method uses the configuration name to determine which specific optimizer implementation to instantiate.
      *
      * @param configuration The configuration for the optimizer
@@ -34,9 +34,9 @@ public final class OptimizerFactory {
      * @param classifier The classifier used in the optimization process
      * @param metric The metric used to evaluate the prompt performance
      * @param evaluator The evaluator used to assess the optimization results
-     * @return An instance of AbstractPromptOptimizer based on the configuration
+     * @return An instance of PromptOptimizer based on the configuration
      */
-    public static AbstractPromptOptimizer createOptimizer(
+    public static PromptOptimizer createOptimizer(
             ModuleConfiguration configuration,
             Set<TraceLink> goldStandard,
             Classifier classifier,

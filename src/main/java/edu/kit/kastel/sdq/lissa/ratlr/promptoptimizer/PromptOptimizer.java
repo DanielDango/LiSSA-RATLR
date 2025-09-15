@@ -9,7 +9,7 @@ import edu.kit.kastel.sdq.lissa.ratlr.elementstore.TargetElementStore;
  * This class provides the foundation for implementing different prompt optimization strategies
  * for trace link analysis.
  */
-public interface AbstractPromptOptimizer {
+public interface PromptOptimizer {
 
     /**
      * Runs the optimization process.

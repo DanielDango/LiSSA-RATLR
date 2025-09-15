@@ -20,7 +20,7 @@ import edu.kit.kastel.sdq.lissa.cli.command.OptimizeCommand;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheKey;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.Classifier;
 import edu.kit.kastel.sdq.lissa.ratlr.promptmetric.Metric;
-import edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.AbstractPromptOptimizer;
+import edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.PromptOptimizer;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.Environment;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.Futures;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.KeyGenerator;
@@ -114,7 +114,7 @@ class ArchitectureTest {
     @ArchTest
     static final ArchRule classifierPromptsShouldOnlyBeModifiedByOptimizers = noClasses()
             .that()
-            .areNotAssignableTo(AbstractPromptOptimizer.class)
+            .areNotAssignableTo(PromptOptimizer.class)
             .and()
             .areNotAssignableTo(Metric.class)
             .should()

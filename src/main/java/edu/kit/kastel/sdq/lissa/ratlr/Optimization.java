@@ -27,7 +27,7 @@ import edu.kit.kastel.sdq.lissa.ratlr.postprocessor.TraceLinkIdPostprocessor;
 import edu.kit.kastel.sdq.lissa.ratlr.preprocessor.Preprocessor;
 import edu.kit.kastel.sdq.lissa.ratlr.promptmetric.Metric;
 import edu.kit.kastel.sdq.lissa.ratlr.promptmetric.MetricFactory;
-import edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.AbstractPromptOptimizer;
+import edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.PromptOptimizer;
 import edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.OptimizerFactory;
 import edu.kit.kastel.sdq.lissa.ratlr.resultaggregator.ResultAggregator;
 
@@ -88,7 +88,7 @@ public class Optimization {
     /**
      * Optimizer for prompt used in classification
      */
-    private AbstractPromptOptimizer promptOptimizer;
+    private PromptOptimizer promptOptimizer;
 
     /**
      * Creates a new evaluation instance with the specified configuration file.

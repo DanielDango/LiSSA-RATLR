@@ -5,10 +5,10 @@ import edu.kit.kastel.sdq.lissa.ratlr.elementstore.SourceElementStore;
 import edu.kit.kastel.sdq.lissa.ratlr.elementstore.TargetElementStore;
 
 /**
- * A mock implementation of the AbstractPromptOptimizer interface for testing purposes.
+ * A mock implementation of the PromptOptimizer interface for testing purposes.
  * This optimizer does not perform any actual optimization and returns an empty string.
  */
-public class MockOptimizer implements AbstractPromptOptimizer {
+public class MockOptimizer implements PromptOptimizer {
 
     public MockOptimizer() {
         // No specific initialization required

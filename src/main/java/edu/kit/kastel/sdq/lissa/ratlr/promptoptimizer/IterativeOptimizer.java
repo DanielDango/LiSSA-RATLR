@@ -25,7 +25,7 @@ import edu.kit.kastel.sdq.lissa.ratlr.utils.ChatLanguageModelUtils;
 
 import dev.langchain4j.model.chat.ChatModel;
 
-public class IterativeOptimizer implements AbstractPromptOptimizer {
+public class IterativeOptimizer implements PromptOptimizer {
 
     /**
      * The default threshold for the score to determine when to stop the optimization process early.
