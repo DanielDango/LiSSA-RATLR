@@ -1,10 +1,10 @@
 /* Licensed under MIT 2025. */
 package edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer;
 
-import static edu.kit.kastel.sdq.lissa.ratlr.promptmetric.MetricUtils.MINIMUM_SCORE;
+import static edu.kit.kastel.sdq.lissa.ratlr.promptmetric.MetricUtils.MAXIMUM_SCORE;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -115,20 +115,48 @@ public class IterativeFeedbackOptimizer extends IterativeOptimizer {
     private String generateFeedbackPrompt(String prompt, Collection<ClassificationTask> tasks) {
         StringBuilder feedback = new StringBuilder();
 
-        List<ClassificationTask> misclassifiedTasks = new ArrayList<>();
+        Set<ClassificationTask> misclassifiedTasks = getMisclassifiedTasks(prompt, tasks);
+        List<ClassificationTask> sortedMisclassifiedTasks =
+                misclassifiedTasks.stream().sorted().limit(feedbackSize).toList();
+        int exampleNumber = 1;
+        for (ClassificationTask task : sortedMisclassifiedTasks) {
+            LOGGER.debug("Misclassified TraceLink ({} -> {})", task.source(), task.target());
+            feedback.append(generateMisclassifiedFeedbackBlock(task).replace("{identifier}", exampleNumber + "."));
+            exampleNumber++;
+        }
+        return feedbackPrompt.replace("{examples}", feedback.toString());
+    }
+
+    /**
+     * Identifies misclassified tasks based on the current prompt.
+     * A task is considered misclassified based on the {@link #classifiedAsTraceLink(String, ClassificationTask)}
+     * method.
+     *
+     * @param prompt The prompt used for classification
+     * @param tasks  The collection of classification tasks to evaluate
+     * @return A set of misclassified classification tasks
+     */
+    private Set<ClassificationTask> getMisclassifiedTasks(String prompt, Collection<ClassificationTask> tasks) {
+        Set<ClassificationTask> misclassifiedTasks = new HashSet<>();
         for (ClassificationTask task : tasks) {
-            double taskScore = metric.getMetric(prompt, List.of(task));
-            if (Math.abs(taskScore - MINIMUM_SCORE) < 1e-6) {
+            if (!classifiedAsTraceLink(prompt, task)) {
                 misclassifiedTasks.add(task);
             }
         }
-        misclassifiedTasks = misclassifiedTasks.stream().sorted().distinct().toList();
-        for (int exampleNumber = 0; exampleNumber < Math.min(feedbackSize, misclassifiedTasks.size()); exampleNumber++) {
-            ClassificationTask task = misclassifiedTasks.get(exampleNumber);
-            LOGGER.debug("Example {}: TraceLink ({} -> {}) was misclassified", exampleNumber, task.source(), task.target());
-            feedback.append(generateMisclassifiedFeedbackBlock(task).replace("{identifier}", exampleNumber + 1 + "."));
-        }
-        return feedbackPrompt.replace("{examples}", feedback.toString());
+        return misclassifiedTasks;
+    }
+
+    /**
+     * Determines if a classification task is classified as a trace link based on the metric score.
+     * A task is classified as a trace link if the metric score only deviates from the maximum score by a negligible amount (1e-6).
+     *
+     * @param prompt The prompt used for classification
+     * @param task   The classification task to evaluate
+     * @return true if the task is classified as a trace link, false otherwise
+     */
+    private boolean classifiedAsTraceLink(String prompt, ClassificationTask task) {
+        double taskScore = metric.getMetric(prompt, List.of(task));
+        return Math.abs(taskScore - MAXIMUM_SCORE) < 1e-6;
     }
 
     /**
