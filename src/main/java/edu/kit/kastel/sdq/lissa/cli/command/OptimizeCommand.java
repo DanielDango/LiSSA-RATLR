@@ -3,6 +3,7 @@ package edu.kit.kastel.sdq.lissa.cli.command;
 
 import static edu.kit.kastel.sdq.lissa.cli.command.EvaluateCommand.loadConfigs;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -26,7 +27,7 @@ import picocli.CommandLine;
         description = "Optimizes a prompt for usage in the pipeline")
 public class OptimizeCommand implements Runnable {
 
-    private static final Logger logger = LoggerFactory.getLogger(OptimizeCommand.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OptimizeCommand.class);
 
     /**
      * Array of optimization configuration file paths to be processed.
@@ -66,45 +67,43 @@ public class OptimizeCommand implements Runnable {
     public void run() {
         List<Path> configsToOptimize = loadConfigs(optimizationConfigs);
         List<Path> configsToEvaluate = loadConfigs(evaluationConfigs);
-        logger.info(
+        LOGGER.info(
                 "Found {} optimization config files and {} evaluation config files to invoke",
                 configsToOptimize.size(),
                 configsToEvaluate.size());
 
         for (Path evaluationConfig : configsToEvaluate) {
-            logger.info("Invoking the baseline evaluation pipeline with '{}'", evaluationConfig);
-            try {
-                var evaluation = new Evaluation(evaluationConfig);
-                evaluation.run();
-            } catch (Exception e) {
-                logger.warn(
-                        "Baseline evaluation configuration '{}' threw an exception: {}",
-                        evaluationConfig,
-                        e.getMessage());
-            }
+            runEvaluation(evaluationConfig, "");
         }
 
         for (Path optimizationConfig : configsToOptimize) {
-            logger.info("Invoking the optimization pipeline with '{}'", optimizationConfig);
+            LOGGER.info("Invoking the optimization pipeline with '{}'", optimizationConfig);
             String optimizedPrompt = "";
             try {
                 var optimization = new Optimization(optimizationConfig);
                 optimizedPrompt = optimization.run();
-            } catch (Exception e) {
-                logger.warn("Exception details", e);
-                logger.warn(
-                        "Optimization configuration '{}' threw an exception: {}", optimizationConfig, e.getMessage());
+            } catch (IOException e) {
+                LOGGER.warn(
+                        "Optimization configuration '{}' threw an exception: {} \n Maybe the file does not exist?",
+                        optimizationConfig,
+                        e.getMessage());
             }
             for (Path evaluationConfig : configsToEvaluate) {
-                logger.info("Invoking the evaluation pipeline with '{}'", evaluationConfig);
-                try {
-                    var evaluation = new Evaluation(evaluationConfig, optimizedPrompt);
-                    evaluation.run();
-                } catch (Exception e) {
-                    logger.warn(
-                            "Evaluation configuration '{}' threw an exception: {}", evaluationConfig, e.getMessage());
-                }
+                runEvaluation(evaluationConfig, optimizedPrompt);
             }
+        }
+    }
+
+    private static void runEvaluation(Path evaluationConfig, String optimizedPrompt) {
+        LOGGER.info("Invoking the evaluation pipeline with '{}'", evaluationConfig);
+        try {
+            var evaluation = new Evaluation(evaluationConfig, optimizedPrompt);
+            evaluation.run();
+        } catch (IOException e) {
+            LOGGER.warn(
+                    "Baseline evaluation configuration '{}' threw an exception: {} \n Maybe the file does not exist?",
+                    evaluationConfig,
+                    e.getMessage());
         }
     }
 }
