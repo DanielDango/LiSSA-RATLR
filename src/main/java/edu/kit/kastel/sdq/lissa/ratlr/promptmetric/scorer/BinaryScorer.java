@@ -84,4 +84,9 @@ public class BinaryScorer implements Scorer {
     public double score(ClassificationTask task) {
         return task.label() ? incorrectClassificationScore : correctClassificationScore;
     }
+
+    @Override
+    public String getName() {
+        return "binary";
+    }
 }

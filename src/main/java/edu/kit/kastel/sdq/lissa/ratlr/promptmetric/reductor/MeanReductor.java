@@ -20,4 +20,9 @@ public class MeanReductor implements Reductor {
     public double reduce(Collection<Double> values) {
         return values.stream().mapToDouble(Double::doubleValue).average().orElse(0.0);
     }
+
+    @Override
+    public String getName() {
+        return "mean";
+    }
 }

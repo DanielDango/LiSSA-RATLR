@@ -1,12 +1,13 @@
 /* Licensed under MIT 2025. */
 package edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer;
 
+import static edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.PromptOptimizationUtils.getClassificationTasks;
+import static edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.PromptOptimizationUtils.parseTaggedText;
 import static edu.kit.kastel.sdq.lissa.ratlr.utils.ChatLanguageModelUtils.nCachedRequest;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -24,11 +25,8 @@ import edu.kit.kastel.sdq.lissa.ratlr.elementstore.SourceElementStore;
 import edu.kit.kastel.sdq.lissa.ratlr.elementstore.TargetElementStore;
 import edu.kit.kastel.sdq.lissa.ratlr.evaluator.AbstractEvaluator;
 import edu.kit.kastel.sdq.lissa.ratlr.evaluator.BruteForceEvaluator;
-import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
-import edu.kit.kastel.sdq.lissa.ratlr.postprocessor.TraceLinkIdPostprocessor;
 import edu.kit.kastel.sdq.lissa.ratlr.promptmetric.Metric;
-import edu.kit.kastel.sdq.lissa.ratlr.resultaggregator.ResultAggregator;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.Pair;
 
 /**
@@ -39,7 +37,7 @@ import edu.kit.kastel.sdq.lissa.ratlr.utils.Pair;
  * @author Daniel Schwab
  *
  */
-public class AutomaticPromptOptimizer extends IterativeFeedbackOptimizer {
+public class AutomaticPromptOptimizer extends IterativeOptimizer {
 
     public static final String START_TAG = "<START>";
     public static final String END_TAG = "<END>";
@@ -135,18 +133,17 @@ public class AutomaticPromptOptimizer extends IterativeFeedbackOptimizer {
     private final String synonymPrompt;
 
     private final AbstractEvaluator evaluator;
-    private final Metric metric;
     private final RandomGenerator random;
+
+    private final Classifier classifier;
 
     public AutomaticPromptOptimizer(
             ModuleConfiguration configuration,
             Set<TraceLink> goldStandard,
-            ResultAggregator aggregator,
-            TraceLinkIdPostprocessor traceLinkIdPostProcessor,
             Classifier classifier,
             Metric metric,
             AbstractEvaluator evaluator) {
-        super(configuration, goldStandard, aggregator, traceLinkIdPostProcessor, classifier, metric);
+        super(configuration, goldStandard, metric);
         this.numberOfGradients = configuration.argumentAsInt(NUMBER_OF_GRADIENTS_KEY, DEFAULT_NUMBER_OF_GRADIENTS);
         this.numberOfErrors = configuration.argumentAsInt(NUMBER_OF_ERRORS_KEY, DEFAULT_NUMBER_OF_ERRORS);
         this.numberOfGradientsPerError =
@@ -168,8 +165,8 @@ public class AutomaticPromptOptimizer extends IterativeFeedbackOptimizer {
         this.synonymPrompt = configuration.argumentAsString(SYNONYM_PROMPT_KEY, DEFAULT_SYNONYM_PROMPT);
 
         this.evaluator = evaluator;
-        this.metric = metric;
         this.random = new Random(configuration.argumentAsInt(SEED_KEY, DEFAULT_SEED));
+        this.classifier = classifier;
     }
 
     /**
@@ -241,11 +238,6 @@ public class AutomaticPromptOptimizer extends IterativeFeedbackOptimizer {
             logger.info("Scores: {}", scores);
         }
         return candidatePrompts.getFirst();
-    }
-
-    @Override
-    protected AbstractPromptOptimizer copyOf(AbstractPromptOptimizer original) {
-        return null;
     }
 
     /**
@@ -443,29 +435,12 @@ public class AutomaticPromptOptimizer extends IterativeFeedbackOptimizer {
     }
 
     /**
-     * Get all possible combinations the source and target store. This includes trace links that are not in the gold standard.
-     *
-     * @param sourceStore the source element store
-     * @param targetStore the target element store
-     * @return a set of all possible trace links between the source and target store, of which the gold standard is a subset
-     */
-    private static Set<TraceLink> getAllTraceLinks(SourceElementStore sourceStore, TargetElementStore targetStore) {
-        Set<TraceLink> allLinks = new HashSet<>();
-        for (var source : sourceStore.getAllElements(true)) {
-            for (Element target : targetStore.findSimilar(source)) {
-                allLinks.add(TraceLink.of(source.first().getIdentifier(), target.getIdentifier()));
-            }
-        }
-        return allLinks;
-    }
-
-    /**
-     * Apply the {@link AbstractPromptOptimizer#sanitizePrompt(String)} method to a list of prompts.
+     * Apply the {@link PromptOptimizationUtils#sanitizePrompt(String)} method to a list of prompts.
      *
      * @param prompts the list of prompts to sanitize
      * @return        a list of sanitized prompts
      */
     private static List<String> sanitizePrompts(List<String> prompts) {
-        return prompts.stream().map(AbstractPromptOptimizer::sanitizePrompt).toList();
+        return prompts.stream().map(PromptOptimizationUtils::sanitizePrompt).toList();
     }
 }

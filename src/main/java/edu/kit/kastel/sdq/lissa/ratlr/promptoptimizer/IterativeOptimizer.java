@@ -1,6 +1,9 @@
 /* Licensed under MIT 2025. */
 package edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer;
 
+import static edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.PromptOptimizationUtils.getClassificationTasks;
+import static edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.PromptOptimizationUtils.parseTaggedTextFirst;
+import static edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.PromptOptimizationUtils.sanitizePrompt;
 import static edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.SimpleOptimizer.DEFAULT_OPTIMIZATION_TEMPLATE;
 import static edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.SimpleOptimizer.ORIGINAL_PROMPT_KEY;
 
@@ -8,21 +11,16 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import edu.kit.kastel.mcse.ardoco.metrics.ClassificationMetricsCalculator;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.Cache;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheManager;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.ChatLanguageModelProvider;
-import edu.kit.kastel.sdq.lissa.ratlr.classifier.ClassificationResult;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.ClassificationTask;
-import edu.kit.kastel.sdq.lissa.ratlr.classifier.Classifier;
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
 import edu.kit.kastel.sdq.lissa.ratlr.elementstore.SourceElementStore;
 import edu.kit.kastel.sdq.lissa.ratlr.elementstore.TargetElementStore;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
-import edu.kit.kastel.sdq.lissa.ratlr.postprocessor.TraceLinkIdPostprocessor;
 import edu.kit.kastel.sdq.lissa.ratlr.promptmetric.Metric;
-import edu.kit.kastel.sdq.lissa.ratlr.resultaggregator.ResultAggregator;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.ChatLanguageModelUtils;
 
 import dev.langchain4j.model.chat.ChatModel;
@@ -32,7 +30,9 @@ public class IterativeOptimizer extends AbstractPromptOptimizer {
     /**
      * The default threshold for the F1 score to determine when to stop the optimization process early.
      */
-    protected static final double THRESHOLD_F1_SCORE = 1.0;
+    private static final double DEFAULT_THRESHOLD_SCORE = 1.0;
+
+    private static final String THRESHOLD_SCORE_CONFIGURATION_KEY = "threshold_score";
 
     /**
      * The default maximum number of iterations/requests for the optimization process.
@@ -79,68 +79,27 @@ public class IterativeOptimizer extends AbstractPromptOptimizer {
      */
     protected final int maximumIterations;
 
-    protected final Classifier classifier;
-    private final ResultAggregator aggregator;
-    private final TraceLinkIdPostprocessor traceLinkIdPostProcessor;
     protected final Set<TraceLink> validTraceLinks;
-    private final ClassificationMetricsCalculator cmc;
-    private final Metric metric;
+    protected final Metric metric;
+    protected final double thresholdScore;
     /**
      * Creates a new iterative optimizer with the specified configuration.
      *
      * @param configuration The module configuration containing optimizer settings
      * @param goldStandard The set of trace links that represent the gold standard for evaluation
-     * @param aggregator The result aggregator to collect and process classification results
-     * @param traceLinkIdPostProcessor The postprocessor for trace link IDs
-     * @param classifier The classifier used for classification tasks
      * @param metric The metric used to score prompt classification
      */
-    public IterativeOptimizer(
-            ModuleConfiguration configuration,
-            Set<TraceLink> goldStandard,
-            ResultAggregator aggregator,
-            TraceLinkIdPostprocessor traceLinkIdPostProcessor,
-            Classifier classifier,
-            Metric metric) {
+    public IterativeOptimizer(ModuleConfiguration configuration, Set<TraceLink> goldStandard, Metric metric) {
         super(ChatLanguageModelProvider.threads(configuration));
         this.provider = new ChatLanguageModelProvider(configuration);
         this.template = configuration.argumentAsString(PROMPT_OPTIMIZATION_TEMPLATE_KEY, DEFAULT_OPTIMIZATION_TEMPLATE);
         this.maximumIterations = configuration.argumentAsInt(MAXIMUM_ITERATIONS_KEY, MAXIMUM_ITERATIONS);
         this.optimizationPrompt = configuration.argumentAsString(PROMPT_KEY, "");
+        this.thresholdScore =
+                configuration.argumentAsDouble(THRESHOLD_SCORE_CONFIGURATION_KEY, DEFAULT_THRESHOLD_SCORE);
         this.cache = CacheManager.getDefaultInstance().getCache(this, provider.getCacheParameters());
         this.llm = provider.createChatModel();
         this.validTraceLinks = goldStandard;
-        this.aggregator = aggregator;
-        this.traceLinkIdPostProcessor = traceLinkIdPostProcessor;
-        this.classifier = classifier;
-        this.cmc = ClassificationMetricsCalculator.getInstance();
-        this.metric = metric;
-    }
-
-    private IterativeOptimizer(
-            int threads,
-            Cache cache,
-            ChatLanguageModelProvider provider,
-            String template,
-            String optimizationPrompt,
-            int maximumIterations,
-            Set<TraceLink> validTraceLinks,
-            ResultAggregator aggregator,
-            TraceLinkIdPostprocessor traceLinkIdPostProcessor,
-            Classifier classifier,
-            Metric metric) {
-        super(threads);
-        this.cache = cache;
-        this.provider = provider;
-        this.template = template;
-        this.optimizationPrompt = optimizationPrompt;
-        this.llm = provider.createChatModel();
-        this.maximumIterations = maximumIterations;
-        this.validTraceLinks = validTraceLinks;
-        this.aggregator = aggregator;
-        this.traceLinkIdPostProcessor = traceLinkIdPostProcessor;
-        this.classifier = classifier;
-        this.cmc = ClassificationMetricsCalculator.getInstance();
         this.metric = metric;
     }
 
@@ -166,29 +125,22 @@ public class IterativeOptimizer extends AbstractPromptOptimizer {
      * @return The optimized prompt after the iterative process
      */
     protected String optimizeIntern(SourceElementStore sourceStore, TargetElementStore targetStore) {
-        double[] f1Scores = new double[maximumIterations];
+        double[] promptScores = new double[maximumIterations];
         int i = 0;
-        double f1Score;
-        double oldF1Score;
+        double promptScore;
         List<ClassificationTask> examples = getClassificationTasks(sourceStore, targetStore, validTraceLinks);
         String modifiedPrompt = optimizationPrompt;
         do {
             logger.debug("Iteration {}: RequestPrompt = {}", i, modifiedPrompt);
-            oldF1Score = evaluateF1(sourceStore, targetStore, modifiedPrompt);
-            f1Score = this.metric.getMetric(modifiedPrompt, examples);
-            if (Math.abs(f1Score - oldF1Score) < 1e-6) {
-                logger.warn(
-                        "Iteration {}: Different F1 score calculated by metric ({} vs. {}).", i, f1Score, oldF1Score);
-                f1Score = oldF1Score;
-            }
-            logger.debug("Iteration {}: F1-Score = {}", i, f1Score);
-            f1Scores[i] = f1Score;
+            promptScore = this.metric.getMetric(modifiedPrompt, examples);
+            logger.debug("Iteration {}: {} = {}", i, metric.getName(), promptScore);
+            promptScores[i] = promptScore;
             String request = template.replace(ORIGINAL_PROMPT_KEY, optimizationPrompt);
             modifiedPrompt = cachedSanitizedRequest(request);
             optimizationPrompt = modifiedPrompt;
             i++;
-        } while (i < maximumIterations && f1Score < THRESHOLD_F1_SCORE);
-        logger.info("Iterations {}: F1-Scores = {}", i, f1Scores);
+        } while (i < maximumIterations && promptScore < thresholdScore);
+        logger.info("Iterations {}: {} = {}", i, metric.getName(), promptScores);
         return optimizationPrompt;
     }
 
@@ -202,45 +154,6 @@ public class IterativeOptimizer extends AbstractPromptOptimizer {
     protected String cachedSanitizedRequest(String request) {
         String response = ChatLanguageModelUtils.cachedRequest(request, provider, llm, cache);
         return sanitizePrompt(parseTaggedTextFirst(response, PROMPT_START, PROMPT_END));
-    }
-
-    /**
-     * Evaluates the F1 score of the prompt by classifying trace links between the source and target stores using the
-     * provided prompt.
-     * @param sourceStore The store containing source elements
-     * @param targetStore   The store containing target elements
-     * @param prompt        The prompt to use for classification
-     * @return The F1 score of the classification results
-     */
-    protected double evaluateF1(SourceElementStore sourceStore, TargetElementStore targetStore, String prompt) {
-
-        Set<TraceLink> traceLinks = getTraceLinks(sourceStore, targetStore, prompt);
-        Set<TraceLink> possibleTraceLinks = getReducedGoldStandardLinks(sourceStore, targetStore);
-        var classification = cmc.calculateMetrics(traceLinks, possibleTraceLinks, null);
-        int tp = classification.getTruePositives().size();
-        int fp = classification.getFalsePositives().size();
-        int fn = classification.getFalseNegatives().size();
-        logger.debug("TP: {}, FP: {}, FN: {}", tp, fp, fn);
-        return classification.getF1();
-    }
-
-    /**
-     * Utilizes the internal classifier to determine existing trace links between the source and target stores using the
-     * provided prompt.
-     * The results are aggregated and post-processed.
-     * @param sourceStore   The store containing source elements
-     * @param targetStore   The store containing target elements
-     * @param prompt        The prompt to use for classification
-     * @return A set of trace links that were classified based on the prompt
-     */
-    protected Set<TraceLink> getTraceLinks(
-            SourceElementStore sourceStore, TargetElementStore targetStore, String prompt) {
-        classifier.setClassificationPrompt(prompt);
-        List<ClassificationResult> results = classifier.classify(sourceStore, targetStore);
-
-        Set<TraceLink> traceLinks =
-                aggregator.aggregate(sourceStore.getAllElements(), targetStore.getAllElements(), results);
-        return traceLinkIdPostProcessor.postprocess(traceLinks);
     }
 
     /**
@@ -263,22 +176,5 @@ public class IterativeOptimizer extends AbstractPromptOptimizer {
             }
         }
         return reducedGoldStandard;
-        /*
-        List<String> sourceTraceLinkIds = sourceStore.getAllElements().stream()
-                .map(Element::getIdentifier)
-                .toList();
-        List<String> targetTraceLinkIds = targetStore.getAllElements().stream()
-                .map(Element::getIdentifier)
-                .toList();
-        return validTraceLinks.stream()
-                .filter(tl -> sourceTraceLinkIds.contains(tl.sourceId()))
-                .filter(tl -> targetTraceLinkIds.contains(tl.targetId()))
-                .collect(Collectors.toSet());
-         */
-    }
-
-    @Override
-    protected AbstractPromptOptimizer copyOf(AbstractPromptOptimizer original) {
-        return null;
     }
 }

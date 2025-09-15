@@ -1,27 +1,11 @@
 /* Licensed under MIT 2025. */
 package edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import edu.kit.kastel.sdq.lissa.ratlr.classifier.ClassificationTask;
-import edu.kit.kastel.sdq.lissa.ratlr.classifier.Classifier;
-import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
 import edu.kit.kastel.sdq.lissa.ratlr.elementstore.SourceElementStore;
 import edu.kit.kastel.sdq.lissa.ratlr.elementstore.TargetElementStore;
-import edu.kit.kastel.sdq.lissa.ratlr.evaluator.AbstractEvaluator;
-import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
-import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
-import edu.kit.kastel.sdq.lissa.ratlr.postprocessor.TraceLinkIdPostprocessor;
-import edu.kit.kastel.sdq.lissa.ratlr.promptmetric.Metric;
-import edu.kit.kastel.sdq.lissa.ratlr.resultaggregator.ResultAggregator;
-import edu.kit.kastel.sdq.lissa.ratlr.utils.Pair;
 
 /**
  * Abstract base class for prompt optimizers in the LiSSA framework.
@@ -29,10 +13,6 @@ import edu.kit.kastel.sdq.lissa.ratlr.utils.Pair;
  * for trace link analysis.
  */
 public abstract class AbstractPromptOptimizer {
-    /**
-     * Separator used in configuration names.
-     */
-    public static final String CONFIG_NAME_SEPARATOR = "_";
     /**
      * Start marker for the prompt in the optimization template.
      */
@@ -52,8 +32,6 @@ public abstract class AbstractPromptOptimizer {
      * This key is used to retrieve the original prompt from the configuration.
      */
     protected static final String PROMPT_KEY = "prompt";
-
-    protected static final Logger LOGGER = LoggerFactory.getLogger(AbstractPromptOptimizer.class);
 
     /**
      * Logger for the prompt optimizer.
@@ -76,50 +54,6 @@ public abstract class AbstractPromptOptimizer {
     }
 
     /**
-     * Factory method to create an instance of AbstractPromptOptimizer based on the provided configuration.
-     * This method uses the configuration name to determine which specific optimizer implementation to instantiate.
-     *
-     * @param configuration The configuration for the optimizer
-     * @param goldStandard The gold standard trace links for evaluation
-     * @param aggregator The result aggregator for collecting optimization results
-     * @param traceLinkIdPostProcessor Postprocessor for trace link IDs
-     * @param classifier The classifier used in the optimization process
-     * @return An instance of AbstractPromptOptimizer based on the configuration
-     */
-    public static AbstractPromptOptimizer createOptimizer(
-            ModuleConfiguration configuration,
-            Set<TraceLink> goldStandard,
-            ResultAggregator aggregator,
-            TraceLinkIdPostprocessor traceLinkIdPostProcessor,
-            Classifier classifier,
-            Metric metric,
-            AbstractEvaluator evaluator) {
-        if (configuration == null) {
-            return new MockOptimizer();
-        }
-        return switch (configuration.name().split(CONFIG_NAME_SEPARATOR)[0]) {
-            case "mock" -> new MockOptimizer();
-            case "simple" -> new SimpleOptimizer(configuration);
-            case "iterative" ->
-                new IterativeOptimizer(
-                        configuration, goldStandard, aggregator, traceLinkIdPostProcessor, classifier, metric);
-            case "feedback" ->
-                new IterativeFeedbackOptimizer(
-                        configuration, goldStandard, aggregator, traceLinkIdPostProcessor, classifier, metric);
-            case "gradient" ->
-                new AutomaticPromptOptimizer(
-                        configuration,
-                        goldStandard,
-                        aggregator,
-                        traceLinkIdPostProcessor,
-                        classifier,
-                        metric,
-                        evaluator);
-            default -> throw new IllegalStateException("Unexpected value: " + configuration.name());
-        };
-    }
-
-    /**
      * Runs the optimization process.
      * This method should be implemented by subclasses to define the specific optimization logic.
      *
@@ -128,123 +62,4 @@ public abstract class AbstractPromptOptimizer {
      * @return A string representing the optimized prompt
      */
     public abstract String optimize(SourceElementStore sourceStore, TargetElementStore targetStore);
-
-    /**
-     * Creates a copy of the current optimizer instance.
-     * This method is used to create a new instance with the same configuration as the original.
-     *
-     * @param original The original optimizer instance to copy
-     * @return A new instance of the optimizer with the same configuration
-     */
-    protected abstract AbstractPromptOptimizer copyOf(AbstractPromptOptimizer original);
-
-    /**
-     * Extracts the prompt from the response string and removes any surrounding quotes.
-     * The prompt is expected to be enclosed between PROMPT_START and PROMPT_END markers.
-     *
-     * @param response The response string containing the prompt
-     * @return The extracted prompt, or an empty string if no prompt is found
-     * @deprecated Use {@link #parseTaggedTextFirst(String, String, String)} instead.
-     */
-    @Deprecated(forRemoval = true)
-    protected static String extractPromptFromResponse(String response) {
-        String prompt = response;
-        Pattern pattern = Pattern.compile(
-                (PROMPT_START + "((?s).*?)" + PROMPT_END).replace("/", "\\/"), Pattern.CASE_INSENSITIVE);
-        Matcher matcher = pattern.matcher(response);
-        if (matcher.find()) {
-            prompt = matcher.group(1).strip().replaceAll("((^[\"']+)|([\"']+$))", "");
-        } else {
-            LOGGER.warn("No prompt found in response: {}", response);
-        }
-
-        String result = parseTaggedTextFirst(prompt, PROMPT_START, PROMPT_END);
-        if (!result.equals(prompt)) {
-            LOGGER.warn("parseTaggedTextSingle found a different prompt than extractPromptFromResponse.");
-        }
-        return result;
-    }
-
-    /**
-     * Parses and extracts a single substring from the input text that is enclosed between the specified start and end tags.
-     * If multiple tagged substrings are found, a warning is logged and the first one is returned.
-     * If no tagged substrings are found, a warning is logged and the original text is returned.
-     *
-     * @param text     The input text to parse
-     * @param startTag The starting tag to look for
-     * @param endTag   The ending tag to look for
-     * @return         The extracted substring found between the specified tags, or the original text if none are found
-     */
-    protected static String parseTaggedTextFirst(String text, String startTag, String endTag) {
-        List<String> taggedTexts = parseTaggedText(text, startTag, endTag);
-        if (taggedTexts.size() > 1) {
-            LOGGER.warn("Multiple tagged texts found, using the first one.");
-        }
-        if (taggedTexts.isEmpty()) {
-            LOGGER.warn("No tagged text found, returning the original text.");
-        }
-        return parseTaggedText(text, startTag, endTag).stream().findFirst().orElse(text);
-    }
-
-    /**
-     * Parses and extracts all substrings from the input text that are enclosed between the specified start and end tags.
-     * The method uses regular expressions to identify and extract the tagged substrings, allowing for multi-line
-     * content and case-insensitive matching of the tags.
-     *
-     * @param text     The input text to parse
-     * @param startTag The starting tag to look for
-     * @param endTag   The ending tag to look for
-     * @return         A list possibly empty list of extracted substrings found between the specified tags
-     */
-    protected static List<String> parseTaggedText(String text, String startTag, String endTag) {
-        List<String> texts = new ArrayList<>();
-        // TODO Hat das Fragezeichen eine Bedeutung?
-        Pattern pattern =
-                Pattern.compile("%s(.*?)%s".formatted(startTag, endTag), Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
-        Matcher matcher = pattern.matcher(text);
-        while (matcher.find()) {
-            texts.add(matcher.group(1));
-        }
-        return texts;
-    }
-
-    /**
-     * Sanitizes the given prompt string by removing leading and trailing quotes and whitespace.
-     *
-     * @param prompt The prompt string to sanitize
-     * @return The prompt string without leading/trailing quotes and whitespace
-     */
-    protected static String sanitizePrompt(String prompt) {
-        // Remove leading and trailing quotes and whitespace
-        return prompt.trim().replaceAll("((^[\"']+)|([\"']+$))", "").trim();
-    }
-
-    /**
-     * Generates a list of classification tasks based on the provided source and target element stores,
-     * and a set of valid trace links. For each source element, it finds similar target elements and creates
-     * a classification task for each source-target pair. The task is marked as positive if the pair exists
-     * in the set of valid trace links.
-     * <br>
-     * Note that not all possible source-target pairs are generated, only those where the target is similar to the source.
-     * Some actual Traceability Links thus might not be part of the generated tasks.
-     *
-     * @param sourceStore The store containing source elements.
-     * @param targetStore The store containing target elements.
-     * @param validTraceLinks A set of valid trace links used to determine positive classification tasks.
-     * @return A list of classification tasks generated from the source and target elements.
-     */
-    protected static List<ClassificationTask> getClassificationTasks(
-            SourceElementStore sourceStore, TargetElementStore targetStore, Set<TraceLink> validTraceLinks) {
-        List<ClassificationTask> tasks = new ArrayList<>();
-        for (Pair<Element, float[]> source : sourceStore.getAllElements(true)) {
-            for (Element target : targetStore.findSimilar(source)) {
-                tasks.add(new ClassificationTask(
-                        source.first(),
-                        target,
-                        validTraceLinks.contains(
-                                TraceLink.of(source.first().getIdentifier(), target.getIdentifier()))));
-            }
-        }
-        return tasks;
-    }
 }

@@ -15,4 +15,11 @@ public interface Reductor {
      * @return A single Double value representing the reduction of the input values.
      */
     double reduce(Collection<Double> values);
+
+    /**
+     * Returns the name of the Reductor implementation.
+     *
+     * @return The name of the Reductor.
+     */
+    String getName();
 }

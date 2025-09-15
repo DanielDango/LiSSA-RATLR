@@ -64,6 +64,11 @@ public class FBetaMetric extends GlobalMetric {
         return fBeta(truePositive, falsePositive, falseNegative, beta);
     }
 
+    @Override
+    public String getName() {
+        return "F%s-Score".formatted(beta);
+    }
+
     private static double recall(int truePositive, int falseNegative) {
         return (double) truePositive / (truePositive + falseNegative);
     }

@@ -41,4 +41,11 @@ public interface Scorer {
      * @return A double score representing the quality of the classification result absence
      */
     double score(ClassificationTask task);
+
+    /**
+     * Returns the name of the scorer.
+     *
+     * @return The name of the scorer
+     */
+    String getName();
 }

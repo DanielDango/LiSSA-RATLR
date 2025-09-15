@@ -1,11 +1,15 @@
 /* Licensed under MIT 2025. */
 package edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer;
 
+import static edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.PromptOptimizationUtils.getClassificationTasks;
 import static edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.SimpleOptimizer.ORIGINAL_PROMPT_KEY;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
+import edu.kit.kastel.sdq.lissa.ratlr.classifier.ClassificationResult;
+import edu.kit.kastel.sdq.lissa.ratlr.classifier.ClassificationTask;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.Classifier;
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
 import edu.kit.kastel.sdq.lissa.ratlr.elementstore.ElementStore;
@@ -29,7 +33,7 @@ public class IterativeFeedbackOptimizer extends IterativeOptimizer {
      * The {examples} placeholder will be replaced with specific examples of misclassified trace links, so this key
      * should be included in the prompt.
      */
-    public static final String FEEDBACK_PROMPT_TEMPLATE =
+    private static final String FEEDBACK_PROMPT_TEMPLATE =
             """
             The current prompt is not performing well in classifying the following trace links. To help you improve the
             prompt, I will provide examples of misclassified trace links. Please analyze these examples and adjust the
@@ -37,7 +41,7 @@ public class IterativeFeedbackOptimizer extends IterativeOptimizer {
             {examples}
             """;
 
-    public static final String FEEDBACK_PROMPT_KEY = "feedback_prompt";
+    private static final String FEEDBACK_PROMPT_CONFIGURATION_KEY = "feedback_prompt";
 
     /**
      * The template for the feedback example block.
@@ -45,23 +49,31 @@ public class IterativeFeedbackOptimizer extends IterativeOptimizer {
      * The placeholders {identifier}, {source_type}, {source_content}, {target_type}, {target_content}, and {classification}
      * will be replaced with specific values for each trace link.
      */
-    private static final String FEEDBACK_EXAMPLE_BLOCK =
+    private static final String DEFAULT_FEEDBACK_EXAMPLE_BLOCK =
             """
             {identifier}
             {source_type}: '''{source_content}'''
             {target_type}: '''{target_content}'''
             Classification result: {classification}
             """;
+
+    private static final String FEEDBACK_EXAMPLE_BLOCK_CONFIGURATION_KEY = "feedback_example_block";
+
     /**
      * The default number of feedback examples to include in the prompt.
      * This value determines how many misclassified trace links will be shown in the feedback prompt.
      */
-    public static final int FEEDBACK_SIZE = 5;
+    private static final int FEEDBACK_SIZE = 5;
 
-    public static final String FEEDBACK_SIZE_KEY = "feedback_size";
+    private static final String FEEDBACK_SIZE_CONFIGURATION_KEY = "feedback_size";
 
     private final String feedbackPrompt;
+    private final String feedbackExampleBlock;
     private final int feedbackSize;
+
+    private final Classifier classifier;
+    private final ResultAggregator aggregator;
+    private final TraceLinkIdPostprocessor traceLinkIdPostProcessor;
     /**
      * Creates a new instance of the iterative feedback optimizer.
      * This optimizer uses iterative feedback to refine the prompt based on classification results.
@@ -79,37 +91,39 @@ public class IterativeFeedbackOptimizer extends IterativeOptimizer {
             TraceLinkIdPostprocessor traceLinkIdPostProcessor,
             Classifier classifier,
             Metric metric) {
-        super(configuration, goldStandard, aggregator, traceLinkIdPostProcessor, classifier, metric);
-        this.feedbackPrompt = configuration.argumentAsString(FEEDBACK_PROMPT_KEY, FEEDBACK_PROMPT_TEMPLATE);
-        this.feedbackSize = configuration.argumentAsInt(FEEDBACK_SIZE_KEY, FEEDBACK_SIZE);
-    }
-
-    @Override
-    protected AbstractPromptOptimizer copyOf(AbstractPromptOptimizer original) {
-        throw new UnsupportedOperationException("This feature is not implemented yet.");
+        super(configuration, goldStandard, metric);
+        this.feedbackPrompt =
+                configuration.argumentAsString(FEEDBACK_PROMPT_CONFIGURATION_KEY, FEEDBACK_PROMPT_TEMPLATE);
+        this.feedbackSize = configuration.argumentAsInt(FEEDBACK_SIZE_CONFIGURATION_KEY, FEEDBACK_SIZE);
+        this.feedbackExampleBlock = configuration.argumentAsString(
+                FEEDBACK_EXAMPLE_BLOCK_CONFIGURATION_KEY, DEFAULT_FEEDBACK_EXAMPLE_BLOCK);
+        this.aggregator = aggregator;
+        this.traceLinkIdPostProcessor = traceLinkIdPostProcessor;
+        this.classifier = classifier;
     }
 
     @Override
     protected String optimizeIntern(SourceElementStore sourceStore, TargetElementStore targetStore) {
-        double[] f1Scores = new double[maximumIterations];
+        double[] promptScores = new double[maximumIterations];
         Set<TraceLink> possibleTraceLinks = getReducedGoldStandardLinks(sourceStore, targetStore);
         int i = 0;
-        double f1Score;
+        double promptScore;
+        List<ClassificationTask> examples = getClassificationTasks(sourceStore, targetStore, possibleTraceLinks);
         Set<TraceLink> traceLinks;
         String modifiedPrompt = optimizationPrompt;
         do {
             logger.debug("Iteration {}: RequestPrompt = {}", i, modifiedPrompt);
             traceLinks = getTraceLinks(sourceStore, targetStore, modifiedPrompt);
-            f1Score = evaluateF1(sourceStore, targetStore, modifiedPrompt);
-            logger.debug("Iteration {}: F1-Score = {}", i, f1Score);
-            f1Scores[i] = f1Score;
+            promptScore = this.metric.getMetric(modifiedPrompt, examples);
+            logger.debug("Iteration {}: {} = {}", i, this.metric.getName(), promptScore);
+            promptScores[i] = promptScore;
             String request = template.replace(ORIGINAL_PROMPT_KEY, optimizationPrompt);
             request = generateFeedbackPrompt(traceLinks, possibleTraceLinks, sourceStore, targetStore) + request;
             modifiedPrompt = cachedSanitizedRequest(request);
             optimizationPrompt = modifiedPrompt;
             i++;
-        } while (i < maximumIterations && f1Score < THRESHOLD_F1_SCORE);
-        logger.info("Iterations {}: F1-Scores = {}", i, f1Scores);
+        } while (i < maximumIterations && promptScore < thresholdScore);
+        logger.info("Iterations {}: {}s = {}", i, this.metric.getName(), promptScores);
         return optimizationPrompt;
     }
 
@@ -146,7 +160,7 @@ public class IterativeFeedbackOptimizer extends IterativeOptimizer {
             logger.debug("Example {}: TraceLink {} was misclassified", count, traceLink);
             Element source = sourceStore.getById(traceLink.sourceId()).first();
             Element target = targetStore.getById(traceLink.targetId()).first();
-            feedback.append(FEEDBACK_EXAMPLE_BLOCK
+            feedback.append(feedbackExampleBlock
                     .replace("{identifier}", count + ".")
                     .replace("{source_type}", source.getType())
                     .replace("{target_type}", target.getType())
@@ -156,5 +170,24 @@ public class IterativeFeedbackOptimizer extends IterativeOptimizer {
             count++;
         }
         return feedbackPrompt.replace("{examples}", feedback.toString());
+    }
+
+    /**
+     * Utilizes the internal classifier to determine existing trace links between the source and target stores using the
+     * provided prompt.
+     * The results are aggregated and post-processed.
+     * @param sourceStore   The store containing source elements
+     * @param targetStore   The store containing target elements
+     * @param prompt        The prompt to use for classification
+     * @return A set of trace links that were classified based on the prompt
+     */
+    protected Set<TraceLink> getTraceLinks(
+            SourceElementStore sourceStore, TargetElementStore targetStore, String prompt) {
+        classifier.setClassificationPrompt(prompt);
+        List<ClassificationResult> results = classifier.classify(sourceStore, targetStore);
+
+        Set<TraceLink> traceLinks =
+                aggregator.aggregate(sourceStore.getAllElements(), targetStore.getAllElements(), results);
+        return traceLinkIdPostProcessor.postprocess(traceLinks);
     }
 }

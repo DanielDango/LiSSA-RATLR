@@ -77,6 +77,11 @@ public class PointwiseMetric implements Metric {
         return reductor.reduce(scores);
     }
 
+    @Override
+    public String getName() {
+        return "%s %s".formatted(scorer.getName(), reductor.getName());
+    }
+
     /**
      * Classifies the given examples using the specified prompt.
      * The results are returned in the same order as the input examples.

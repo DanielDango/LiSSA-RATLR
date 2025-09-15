@@ -25,4 +25,9 @@ public class MockMetric implements Metric {
     public Double getMetric(String prompt, List<ClassificationTask> examples) {
         return 0.0;
     }
+
+    @Override
+    public String getName() {
+        return "mock";
+    }
 }

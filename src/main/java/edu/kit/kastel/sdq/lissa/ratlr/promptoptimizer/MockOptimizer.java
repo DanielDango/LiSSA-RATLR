@@ -20,9 +20,4 @@ public class MockOptimizer extends AbstractPromptOptimizer {
     public String optimize(SourceElementStore sourceStore, TargetElementStore targetStore) {
         return optimizationPrompt;
     }
-
-    @Override
-    protected AbstractPromptOptimizer copyOf(AbstractPromptOptimizer original) {
-        return new MockOptimizer();
-    }
 }

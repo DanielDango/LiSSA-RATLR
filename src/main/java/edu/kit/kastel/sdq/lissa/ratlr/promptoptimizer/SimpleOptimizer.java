@@ -1,6 +1,9 @@
 /* Licensed under MIT 2025. */
 package edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer;
 
+import static edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.PromptOptimizationUtils.parseTaggedTextFirst;
+import static edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.PromptOptimizationUtils.sanitizePrompt;
+
 import edu.kit.kastel.sdq.lissa.ratlr.cache.Cache;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheManager;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.ChatLanguageModelProvider;
@@ -75,16 +78,6 @@ public class SimpleOptimizer extends AbstractPromptOptimizer {
         this.llm = provider.createChatModel();
     }
 
-    private SimpleOptimizer(
-            int threads, Cache cache, ChatLanguageModelProvider provider, String optimizationPrompt, String template) {
-        super(threads);
-        this.cache = cache;
-        this.provider = provider;
-        this.optimizationPrompt = optimizationPrompt;
-        this.template = template;
-        this.llm = provider.createChatModel();
-    }
-
     @Override
     public String optimize(SourceElementStore sourceStore, TargetElementStore targetStore) {
         Element source = sourceStore.getAllElements(true).getFirst().first();
@@ -97,10 +90,5 @@ public class SimpleOptimizer extends AbstractPromptOptimizer {
         String response = ChatLanguageModelUtils.cachedRequest(request, provider, llm, cache);
         response = sanitizePrompt(parseTaggedTextFirst(response, PROMPT_START, PROMPT_END));
         return response;
-    }
-
-    @Override
-    protected AbstractPromptOptimizer copyOf(AbstractPromptOptimizer original) {
-        return new SimpleOptimizer(threads, cache, provider, optimizationPrompt, template);
     }
 }

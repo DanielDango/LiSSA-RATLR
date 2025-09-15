@@ -32,4 +32,11 @@ public interface Metric {
      * @return A double value representing the metric for the given prompt
      */
     Double getMetric(String prompt, List<ClassificationTask> examples);
+
+    /**
+     * Returns the name of the metric.
+     *
+     * @return The name of the metric
+     */
+    String getName();
 }

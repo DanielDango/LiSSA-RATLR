@@ -28,6 +28,7 @@ import edu.kit.kastel.sdq.lissa.ratlr.preprocessor.Preprocessor;
 import edu.kit.kastel.sdq.lissa.ratlr.promptmetric.Metric;
 import edu.kit.kastel.sdq.lissa.ratlr.promptmetric.MetricFactory;
 import edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.AbstractPromptOptimizer;
+import edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.OptimizerFactory;
 import edu.kit.kastel.sdq.lissa.ratlr.resultaggregator.ResultAggregator;
 
 /**
@@ -151,7 +152,7 @@ public class Optimization {
         Metric metric = MetricFactory.createScorer(configuration.scorer(), classifier, aggregator);
         AbstractEvaluator evaluator = AbstractEvaluator.createEvaluator(configuration.evaluator());
 
-        promptOptimizer = AbstractPromptOptimizer.createOptimizer(
+        promptOptimizer = OptimizerFactory.createOptimizer(
                 configuration.promptOptimizer(),
                 goldStandard,
                 aggregator,
