@@ -16,6 +16,7 @@ import edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.KeyGenerator;
 
 import io.soabase.recordbuilder.core.RecordBuilder;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Represents the complete configuration for a trace link analysis run.
@@ -31,94 +32,33 @@ import io.soabase.recordbuilder.core.RecordBuilder;
  * @param embeddingCreator Configuration for the embedding creator
  * @param sourceStore Configuration for the source element store
  * @param targetStore Configuration for the target element store
- * @param promptOptimizer Configuration for the prompt optimizer
- * @param classifier Configuration for a single classifier (either this or classifiers must be set)
- * @param classifiers Configuration for a multi-stage classifier pipeline (either this or classifier must be set)
+ * @param promptOptimizer Configuration for the prompt optimizer.
+ *                        This is used to optimize prompts for better classification results.
+ * @param classifier Configuration for a single classifier.Either this or {@link #classifiers} must be set, but not both.
+ * @param classifiers Configuration for a multi-stage classifier pipeline. Either this or {@link #classifier} must be set,
+ *                    but not both.
  * @param resultAggregator Configuration for the result aggregator
  * @param traceLinkIdPostprocessor Configuration for the trace link ID postprocessor
+ * @param metric Configuration for the metric used in optimization to assign a score to a prompt for a set of examples
+ * @param evaluator Configuration for the evaluator used in optimization
  */
 @RecordBuilder()
 public record OptimizerConfiguration(
-        /**
-         * Directory for caching intermediate results.
-         */
         @JsonProperty("cache_dir") String cacheDir,
-
-        /**
-         * Configuration for gold standard evaluation.
-         */
         @JsonProperty("gold_standard_configuration") GoldStandardConfiguration goldStandardConfiguration,
-
-        /**
-         * Configuration for the source artifact provider.
-         */
         @JsonProperty("source_artifact_provider") ModuleConfiguration sourceArtifactProvider,
-
-        /**
-         * Configuration for the target artifact provider.
-         */
         @JsonProperty("target_artifact_provider") ModuleConfiguration targetArtifactProvider,
-
-        /**
-         * Configuration for the source artifact preprocessor.
-         */
         @JsonProperty("source_preprocessor") ModuleConfiguration sourcePreprocessor,
-
-        /**
-         * Configuration for the target artifact preprocessor.
-         */
         @JsonProperty("target_preprocessor") ModuleConfiguration targetPreprocessor,
-
-        /**
-         * Configuration for the embedding creator.
-         */
         @JsonProperty("embedding_creator") ModuleConfiguration embeddingCreator,
-
-        /**
-         * Configuration for the source element store.
-         */
         @JsonProperty("source_store") ModuleConfiguration sourceStore,
-
-        /**
-         * Configuration for the target element store.
-         */
         @JsonProperty("target_store") ModuleConfiguration targetStore,
-
-        /**
-         * Configuration for the prompt optimizer.
-         * This is used to optimize prompts for better classification results.
-         */
         @JsonProperty("prompt_optimizer") ModuleConfiguration promptOptimizer,
-
-        /**
-         * Configuration for a single classifier.
-         * Either this or {@link #classifiers} must be set, but not both.
-         */
         @JsonProperty("classifier") ModuleConfiguration classifier,
-
-        /**
-         * Configuration for a multi-stage classifier pipeline.
-         * Either this or {@link #classifier} must be set, but not both.
-         */
         @JsonProperty("classifiers") List<List<ModuleConfiguration>> classifiers,
-
-        /**
-         * Configuration for the result aggregator.
-         */
         @JsonProperty("result_aggregator") ModuleConfiguration resultAggregator,
-
-        /**
-         * Configuration for the trace link ID postprocessor.
-         */
         @JsonProperty("tracelinkid_postprocessor") ModuleConfiguration traceLinkIdPostprocessor,
-
-        /**
-         * Configuration for the metric used in optimization
-         */
         @JsonProperty("metric") ModuleConfiguration metric,
-        /**
-         * Configuration for the evaluator used in optimization
-         */
         @JsonProperty("evaluator") ModuleConfiguration evaluator)
         implements ConfigurationBuilder.With {
 
@@ -174,6 +114,7 @@ public record OptimizerConfiguration(
      * @return A string representation of this configuration
      */
     @Override
+    @NotNull
     public String toString() {
         return "Configuration{" + "sourceArtifactProvider="
                 + sourceArtifactProvider + ", targetArtifactProvider="
