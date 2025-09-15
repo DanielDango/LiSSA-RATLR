@@ -103,6 +103,21 @@ public class IterativeOptimizer extends AbstractPromptOptimizer {
         this.metric = metric;
     }
 
+    public IterativeOptimizer(ModuleConfiguration configuration, Set<TraceLink> goldStandard, Metric metric,
+                              int maximumIterations) {
+        super(ChatLanguageModelProvider.threads(configuration));
+        this.provider = new ChatLanguageModelProvider(configuration);
+        this.template = configuration.argumentAsString(PROMPT_OPTIMIZATION_TEMPLATE_KEY, DEFAULT_OPTIMIZATION_TEMPLATE);
+        this.maximumIterations = configuration.argumentAsInt(MAXIMUM_ITERATIONS_KEY, maximumIterations);
+        this.optimizationPrompt = configuration.argumentAsString(PROMPT_KEY, "");
+        this.thresholdScore =
+                configuration.argumentAsDouble(THRESHOLD_SCORE_CONFIGURATION_KEY, DEFAULT_THRESHOLD_SCORE);
+        this.cache = CacheManager.getDefaultInstance().getCache(this, provider.getCacheParameters());
+        this.llm = provider.createChatModel();
+        this.validTraceLinks = goldStandard;
+        this.metric = metric;
+    }
+
     @Override
     public String optimize(SourceElementStore sourceStore, TargetElementStore targetStore) {
         Element source = sourceStore.getAllElements(true).getFirst().first();

@@ -164,8 +164,8 @@ public class Evaluation {
                 case "mock" -> {
                     // MockClassifier does not use prompts
                 }
-                case "simple" -> configuration.classifier().argumentFromString(PROMPT_TEMPLATE_KEY, prompt);
-                case "reasoning" -> configuration.classifier().argumentFromString("prompt", prompt);
+                case "simple" -> configuration.classifier().setArgument(PROMPT_TEMPLATE_KEY, prompt);
+                case "reasoning" -> configuration.classifier().setArgument("prompt", prompt);
                 default ->
                     throw new IllegalStateException(
                             "Unexpected value: " + configuration.classifier().name());

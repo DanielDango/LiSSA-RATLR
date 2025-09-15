@@ -138,7 +138,7 @@ public final class ModuleConfiguration {
      * @throws IllegalStateException If the configuration has been finalized
      * @throws IllegalArgumentException If the value conflicts with a previously retrieved value
      */
-    public void argumentFromString(String key, String value) {
+    public void setArgument(String key, String value) {
         if (finalized) {
             throw new IllegalStateException(ALREADY_FINALIZED_FOR_SERIALIZATION);
         }
@@ -171,6 +171,19 @@ public final class ModuleConfiguration {
      */
     public int argumentAsInt(String key, int defaultValue) {
         return Integer.parseInt(argumentAsString(key, String.valueOf(defaultValue)));
+    }
+
+    /**
+     * Sets an argument from an integer value.
+     * This method allows overwriting the value of an argument specified in the configuration.
+     *
+     * @param key The key of the argument to set
+     * @param value The integer value to set for the argument
+     * @throws IllegalStateException If the configuration has been finalized
+     * @throws IllegalArgumentException If the value conflicts with a previously retrieved value
+     */
+    public void setArgument(String key, int value) {
+        setArgument(key, String.valueOf(value));
     }
 
     /**

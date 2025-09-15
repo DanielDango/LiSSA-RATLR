@@ -51,7 +51,7 @@ public final class OptimizerFactory {
         }
         return switch (configuration.name().split(CONFIG_NAME_SEPARATOR)[0]) {
             case "mock" -> new MockOptimizer();
-            case "simple" -> new SimpleOptimizer(configuration);
+            case "simple" -> new IterativeOptimizer(configuration, goldStandard, metric, 1);
             case "iterative" -> new IterativeOptimizer(configuration, goldStandard, metric);
             case "feedback" ->
                 new IterativeFeedbackOptimizer(
