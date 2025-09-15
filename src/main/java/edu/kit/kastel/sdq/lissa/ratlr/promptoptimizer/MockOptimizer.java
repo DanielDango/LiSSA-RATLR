@@ -4,20 +4,18 @@ package edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer;
 import edu.kit.kastel.sdq.lissa.ratlr.elementstore.SourceElementStore;
 import edu.kit.kastel.sdq.lissa.ratlr.elementstore.TargetElementStore;
 
-public class MockOptimizer extends AbstractPromptOptimizer {
-    /**
-     * The prompt used for optimization.
-     * This is the initial prompt that will not be optimized.
-     */
-    private final String optimizationPrompt;
+/**
+ * A mock implementation of the AbstractPromptOptimizer interface for testing purposes.
+ * This optimizer does not perform any actual optimization and returns an empty string.
+ */
+public class MockOptimizer implements AbstractPromptOptimizer {
 
     public MockOptimizer() {
-        super(1);
-        this.optimizationPrompt = "";
+        // No specific initialization required
     }
 
     @Override
     public String optimize(SourceElementStore sourceStore, TargetElementStore targetStore) {
-        return optimizationPrompt;
+        return "";
     }
 }

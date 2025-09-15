@@ -9,6 +9,8 @@ import edu.kit.kastel.sdq.lissa.ratlr.classifier.ClassificationTask;
  * The Metric interface defines methods for evaluating prompts based on classification tasks.
  * Implementations of this interface should provide mechanisms to compute metrics for
  * single prompts as well as batches of prompts.
+ * <br>
+ * The computed metrics should be in the range [0.0, 1.0], where higher values indicate better performance.
  */
 public interface Metric {
 

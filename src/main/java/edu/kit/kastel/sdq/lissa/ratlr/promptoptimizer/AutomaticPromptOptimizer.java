@@ -28,6 +28,8 @@ import edu.kit.kastel.sdq.lissa.ratlr.evaluator.BruteForceEvaluator;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
 import edu.kit.kastel.sdq.lissa.ratlr.promptmetric.Metric;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class implements an automatic prompt optimizer based on the approach by Pryzant et al. (2023).
@@ -113,6 +115,8 @@ public class AutomaticPromptOptimizer extends IterativeOptimizer {
     private static final int BEAM_SIZE = 4;
     private static final String SEED_KEY = "seed";
     private static final int DEFAULT_SEED = 133742243;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AutomaticPromptOptimizer.class);
 
     private final int numberOfGradients;
     private final int numberOfErrors;
@@ -215,11 +219,11 @@ public class AutomaticPromptOptimizer extends IterativeOptimizer {
     private String optimizeInternal(List<ClassificationTask> tasks) {
         List<String> candidatePrompts = new ArrayList<>(Collections.singleton(optimizationPrompt));
         for (int round = 0; round < maximumIterations; round++) {
-            logger.info("Starting apo iteration {}/{}", round + 1, maximumIterations);
+            LOGGER.info("Starting apo iteration {}/{}", round + 1, maximumIterations);
             // expand candidates
             if (round > 0) {
                 candidatePrompts = expandCandidates(candidatePrompts, tasks);
-                logger.info("Expanded to {} candidates", candidatePrompts.size());
+                LOGGER.info("Expanded to {} candidates", candidatePrompts.size());
             }
             // score candidates
             List<Double> scores = scoreCandidates(candidatePrompts, tasks);
@@ -235,7 +239,7 @@ public class AutomaticPromptOptimizer extends IterativeOptimizer {
                     scorePromptPairs.stream().map(Pair::second).limit(beamSize).toList();
             scores = scorePromptPairs.stream().map(Pair::first).limit(beamSize).toList();
             // record candidates, estimated scores, and true scores
-            logger.info("Scores: {}", scores);
+            LOGGER.info("Scores: {}", scores);
         }
         return candidatePrompts.getFirst();
     }

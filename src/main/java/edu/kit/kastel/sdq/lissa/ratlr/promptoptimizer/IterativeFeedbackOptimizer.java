@@ -2,7 +2,6 @@
 package edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer;
 
 import static edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.PromptOptimizationUtils.getClassificationTasks;
-import static edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.SimpleOptimizer.ORIGINAL_PROMPT_KEY;
 
 import java.util.HashSet;
 import java.util.List;
@@ -20,6 +19,8 @@ import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
 import edu.kit.kastel.sdq.lissa.ratlr.postprocessor.TraceLinkIdPostprocessor;
 import edu.kit.kastel.sdq.lissa.ratlr.promptmetric.Metric;
 import edu.kit.kastel.sdq.lissa.ratlr.resultaggregator.ResultAggregator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An optimizer that uses iterative feedback to refine the prompt based on classification results.
@@ -67,6 +68,8 @@ public class IterativeFeedbackOptimizer extends IterativeOptimizer {
 
     private static final String FEEDBACK_SIZE_CONFIGURATION_KEY = "feedback_size";
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(IterativeFeedbackOptimizer.class);
+
     private final String feedbackPrompt;
     private final String feedbackExampleBlock;
     private final int feedbackSize;
@@ -112,18 +115,18 @@ public class IterativeFeedbackOptimizer extends IterativeOptimizer {
         Set<TraceLink> traceLinks;
         String modifiedPrompt = optimizationPrompt;
         do {
-            logger.debug("Iteration {}: RequestPrompt = {}", i, modifiedPrompt);
+            LOGGER.debug("Iteration {}: RequestPrompt = {}", i, modifiedPrompt);
             traceLinks = getTraceLinks(sourceStore, targetStore, modifiedPrompt);
             promptScore = this.metric.getMetric(modifiedPrompt, examples);
-            logger.debug("Iteration {}: {} = {}", i, this.metric.getName(), promptScore);
+            LOGGER.debug("Iteration {}: {} = {}", i, this.metric.getName(), promptScore);
             promptScores[i] = promptScore;
-            String request = template.replace(ORIGINAL_PROMPT_KEY, optimizationPrompt);
+            String request = template.replace(ORIGINAL_PROMPT_PLACEHOLDER, optimizationPrompt);
             request = generateFeedbackPrompt(traceLinks, possibleTraceLinks, sourceStore, targetStore) + request;
             modifiedPrompt = cachedSanitizedRequest(request);
             optimizationPrompt = modifiedPrompt;
             i++;
         } while (i < maximumIterations && promptScore < thresholdScore);
-        logger.info("Iterations {}: {}s = {}", i, this.metric.getName(), promptScores);
+        LOGGER.info("Iterations {}: {}s = {}", i, this.metric.getName(), promptScores);
         return optimizationPrompt;
     }
 
@@ -157,7 +160,7 @@ public class IterativeFeedbackOptimizer extends IterativeOptimizer {
             if (count > feedbackSize) {
                 break;
             }
-            logger.debug("Example {}: TraceLink {} was misclassified", count, traceLink);
+            LOGGER.debug("Example {}: TraceLink {} was misclassified", count, traceLink);
             Element source = sourceStore.getById(traceLink.sourceId()).first();
             Element target = targetStore.getById(traceLink.targetId()).first();
             feedback.append(feedbackExampleBlock

@@ -4,12 +4,13 @@ package edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer;
 import static edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.PromptOptimizationUtils.getClassificationTasks;
 import static edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.PromptOptimizationUtils.parseTaggedTextFirst;
 import static edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.PromptOptimizationUtils.sanitizePrompt;
-import static edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.SimpleOptimizer.DEFAULT_OPTIMIZATION_TEMPLATE;
-import static edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.SimpleOptimizer.ORIGINAL_PROMPT_KEY;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import edu.kit.kastel.sdq.lissa.ratlr.cache.Cache;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheManager;
@@ -25,10 +26,12 @@ import edu.kit.kastel.sdq.lissa.ratlr.utils.ChatLanguageModelUtils;
 
 import dev.langchain4j.model.chat.ChatModel;
 
-public class IterativeOptimizer extends AbstractPromptOptimizer {
+public class IterativeOptimizer implements AbstractPromptOptimizer {
 
     /**
-     * The default threshold for the F1 score to determine when to stop the optimization process early.
+     * The default threshold for the score to determine when to stop the optimization process early.
+     * The score is based on the metric used for evaluation and only computed on the training data.
+     * @see Metric Metric interface for its valid range
      */
     private static final double DEFAULT_THRESHOLD_SCORE = 1.0;
 
@@ -37,15 +40,64 @@ public class IterativeOptimizer extends AbstractPromptOptimizer {
     /**
      * The default maximum number of iterations/requests for the optimization process.
      */
-    private static final int MAXIMUM_ITERATIONS = 5;
+    private static final int DEFAULT_MAXIMUM_ITERATIONS = 5;
 
-    private static final String MAXIMUM_ITERATIONS_KEY = "maximum_iterations";
+    private static final String MAXIMUM_ITERATIONS_CONFIGURATION_KEY = "maximum_iterations";
+
+    /**
+     * The placeholder used in the optimization prompt to insert the prompt which should be optimized.
+     */
+    protected static final String ORIGINAL_PROMPT_PLACEHOLDER = "{original_prompt}";
+
+    /**
+     * Start marker for the prompt in the optimization template.
+     */
+    private static final String PROMPT_START = "<prompt>";
+    /**
+     * End marker for the prompt in the optimization template.
+     */
+    private static final String PROMPT_END = "</prompt>";
+
+    /**
+     * The default template for optimization requests.
+     * This template presents two artifacts and asks if they are related.
+     * Custom optimization prompts can also use the placeholders {source_type}, {target_type} and should use {@value ORIGINAL_PROMPT_PLACEHOLDER}.
+     * The optimized prompt should be enclosed between {@value PROMPT_START} and {@value PROMPT_END}.
+     */
+    private static final String DEFAULT_OPTIMIZATION_TEMPLATE =
+            """
+                    Optimize the following prompt to achieve better classification results for traceability link recovery.
+                    Traceability links are to be found in the domain of {source_type} to {target_type}.
+                    Do not modify the input and output formats specified by the original prompt.
+                    Enclose your optimized prompt with"""
+                    + PROMPT_START
+                    + PROMPT_END
+                    + """
+                    brackets.
+                    The original prompt is provided below:
+                    '''{original_prompt}'''
+                    """;
+
+    private static final String OPTIMIZATION_TEMPLATE_CONFIGURATION_KEY = "optimization_template";
 
     /**
      * The default size of the training data used for optimization.
      * This is the number of elements in the source store.
      */
-    protected static final int TRAINING_DATA_SIZE = 3;
+    private static final int DEFAULT_TRAINING_DATA_SIZE = 3;
+
+    private static final String TRAINING_DATA_SIZE_CONFIGURATION_KEY = "training_data_size";
+
+    /**
+     * Key for the original prompt in the configuration.
+     * This key is used to retrieve the original prompt from the configuration.
+     */
+    protected static final String PROMPT_CONFIGURATION_KEY = "prompt";
+
+    /**
+     * Logger for the prompt optimizer.
+     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(IterativeOptimizer.class);
 
     /**
      * The cache used to store and retrieve prompt optimization LLM requests.
@@ -82,6 +134,7 @@ public class IterativeOptimizer extends AbstractPromptOptimizer {
     protected final Set<TraceLink> validTraceLinks;
     protected final Metric metric;
     protected final double thresholdScore;
+    private final int trainingDataSize;
     /**
      * Creates a new iterative optimizer with the specified configuration.
      *
@@ -90,32 +143,29 @@ public class IterativeOptimizer extends AbstractPromptOptimizer {
      * @param metric The metric used to score prompt classification
      */
     public IterativeOptimizer(ModuleConfiguration configuration, Set<TraceLink> goldStandard, Metric metric) {
-        super(ChatLanguageModelProvider.threads(configuration));
-        this.provider = new ChatLanguageModelProvider(configuration);
-        this.template = configuration.argumentAsString(PROMPT_OPTIMIZATION_TEMPLATE_KEY, DEFAULT_OPTIMIZATION_TEMPLATE);
-        this.maximumIterations = configuration.argumentAsInt(MAXIMUM_ITERATIONS_KEY, MAXIMUM_ITERATIONS);
-        this.optimizationPrompt = configuration.argumentAsString(PROMPT_KEY, "");
-        this.thresholdScore =
-                configuration.argumentAsDouble(THRESHOLD_SCORE_CONFIGURATION_KEY, DEFAULT_THRESHOLD_SCORE);
-        this.cache = CacheManager.getDefaultInstance().getCache(this, provider.getCacheParameters());
-        this.llm = provider.createChatModel();
-        this.validTraceLinks = goldStandard;
-        this.metric = metric;
+        this(
+                configuration,
+                goldStandard,
+                metric,
+                configuration.argumentAsInt(MAXIMUM_ITERATIONS_CONFIGURATION_KEY, DEFAULT_MAXIMUM_ITERATIONS));
     }
 
-    public IterativeOptimizer(ModuleConfiguration configuration, Set<TraceLink> goldStandard, Metric metric,
-                              int maximumIterations) {
-        super(ChatLanguageModelProvider.threads(configuration));
+    public IterativeOptimizer(
+            ModuleConfiguration configuration, Set<TraceLink> goldStandard, Metric metric, int maximumIterations) {
         this.provider = new ChatLanguageModelProvider(configuration);
-        this.template = configuration.argumentAsString(PROMPT_OPTIMIZATION_TEMPLATE_KEY, DEFAULT_OPTIMIZATION_TEMPLATE);
-        this.maximumIterations = configuration.argumentAsInt(MAXIMUM_ITERATIONS_KEY, maximumIterations);
-        this.optimizationPrompt = configuration.argumentAsString(PROMPT_KEY, "");
+        this.template =
+                configuration.argumentAsString(OPTIMIZATION_TEMPLATE_CONFIGURATION_KEY, DEFAULT_OPTIMIZATION_TEMPLATE);
+        configuration.setArgument(MAXIMUM_ITERATIONS_CONFIGURATION_KEY, maximumIterations);
+        this.maximumIterations = maximumIterations;
+        this.optimizationPrompt = configuration.argumentAsString(PROMPT_CONFIGURATION_KEY, "");
         this.thresholdScore =
                 configuration.argumentAsDouble(THRESHOLD_SCORE_CONFIGURATION_KEY, DEFAULT_THRESHOLD_SCORE);
         this.cache = CacheManager.getDefaultInstance().getCache(this, provider.getCacheParameters());
         this.llm = provider.createChatModel();
         this.validTraceLinks = goldStandard;
         this.metric = metric;
+        this.trainingDataSize =
+                configuration.argumentAsInt(TRAINING_DATA_SIZE_CONFIGURATION_KEY, DEFAULT_TRAINING_DATA_SIZE);
     }
 
     @Override
@@ -126,7 +176,7 @@ public class IterativeOptimizer extends AbstractPromptOptimizer {
                 .getFirst();
         // TODO consider going back to final instead of using a mutable variable
         template = template.replace("{source_type}", source.getType()).replace("{target_type}", target.getType());
-        SourceElementStore trainingSourceStore = sourceStore.reduceSourceElementStore(TRAINING_DATA_SIZE);
+        SourceElementStore trainingSourceStore = sourceStore.reduceSourceElementStore(trainingDataSize);
         TargetElementStore trainingTargetStore = targetStore.reduceTargetElementStore(trainingSourceStore);
         return optimizeIntern(trainingSourceStore, trainingTargetStore);
     }
@@ -146,16 +196,16 @@ public class IterativeOptimizer extends AbstractPromptOptimizer {
         List<ClassificationTask> examples = getClassificationTasks(sourceStore, targetStore, validTraceLinks);
         String modifiedPrompt = optimizationPrompt;
         do {
-            logger.debug("Iteration {}: RequestPrompt = {}", i, modifiedPrompt);
+            LOGGER.debug("Iteration {}: RequestPrompt = {}", i, modifiedPrompt);
             promptScore = this.metric.getMetric(modifiedPrompt, examples);
-            logger.debug("Iteration {}: {} = {}", i, metric.getName(), promptScore);
+            LOGGER.debug("Iteration {}: {} = {}", i, metric.getName(), promptScore);
             promptScores[i] = promptScore;
-            String request = template.replace(ORIGINAL_PROMPT_KEY, optimizationPrompt);
+            String request = template.replace(ORIGINAL_PROMPT_PLACEHOLDER, optimizationPrompt);
             modifiedPrompt = cachedSanitizedRequest(request);
             optimizationPrompt = modifiedPrompt;
             i++;
         } while (i < maximumIterations && promptScore < thresholdScore);
-        logger.info("Iterations {}: {} = {}", i, metric.getName(), promptScores);
+        LOGGER.info("Iterations {}: {} = {}", i, metric.getName(), promptScores);
         return optimizationPrompt;
     }
 
