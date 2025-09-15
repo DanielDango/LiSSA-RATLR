@@ -31,10 +31,7 @@ public abstract class GlobalMetric implements Metric {
     private final boolean usesCustomAggregator;
     private final TraceLinkIdPostprocessor postprocessor;
 
-    protected GlobalMetric(
-            Classifier classifier,
-            ResultAggregator aggregator,
-            TraceLinkIdPostprocessor postprocessor) {
+    protected GlobalMetric(Classifier classifier, ResultAggregator aggregator, TraceLinkIdPostprocessor postprocessor) {
         this.classifier = classifier;
         this.aggregator = aggregator;
         this.usesCustomAggregator = aggregator != null;

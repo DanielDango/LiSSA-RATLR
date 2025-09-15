@@ -30,6 +30,8 @@ import edu.kit.kastel.sdq.lissa.ratlr.evaluator.AbstractEvaluator;
 import edu.kit.kastel.sdq.lissa.ratlr.evaluator.BruteForceEvaluator;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
 import edu.kit.kastel.sdq.lissa.ratlr.promptmetric.Metric;
+import edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.samplestrategy.SampleStrategy;
+import edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.samplestrategy.ShuffledFirstSampler;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.Pair;
 
 /**
@@ -126,9 +128,6 @@ public class AutomaticPromptOptimizer extends IterativeOptimizer {
     private final int mcSamplesPerStep;
     private final int maxExpansionFactor;
     private final boolean rejectOnErrors;
-    private final int samplesPerEval;
-    private final int evalRounds;
-    private final int evalPromptsPerRound;
     private final int evaluationBudget;
     private final int minibatchSize;
     private final int beamSize;
@@ -139,6 +138,7 @@ public class AutomaticPromptOptimizer extends IterativeOptimizer {
 
     private final AbstractEvaluator evaluator;
     private final RandomGenerator random;
+    private final SampleStrategy sampleStrategy;
 
     private final Classifier classifier;
 
@@ -157,10 +157,10 @@ public class AutomaticPromptOptimizer extends IterativeOptimizer {
         this.mcSamplesPerStep = configuration.argumentAsInt(MC_SAMPLES_PER_STEP_KEY, MC_SAMPLES_PER_STEP);
         this.maxExpansionFactor = configuration.argumentAsInt(MAX_EXPANSION_FACTOR_KEY, MAX_EXPANSION_FACTOR);
         this.rejectOnErrors = configuration.argumentAsBoolean(REJECT_ON_ERRORS_KEY, REJECT_ON_ERRORS);
-        this.samplesPerEval = configuration.argumentAsInt(SAMPLES_PER_EVAL_KEY, SAMPLES_PER_EVAL);
-        this.evalRounds = configuration.argumentAsInt(EVAL_ROUNDS_KEY, EVAL_ROUNDS);
-        this.evalPromptsPerRound = configuration.argumentAsInt(EVAL_PROMPTS_PER_ROUND_KEY, EVAL_PROMPTS_PER_ROUND);
-        this.evaluationBudget = this.samplesPerEval * this.evalRounds * this.evalPromptsPerRound;
+        int samplesPerEval = configuration.argumentAsInt(SAMPLES_PER_EVAL_KEY, SAMPLES_PER_EVAL);
+        int evalRounds = configuration.argumentAsInt(EVAL_ROUNDS_KEY, EVAL_ROUNDS);
+        int evalPromptsPerRound = configuration.argumentAsInt(EVAL_PROMPTS_PER_ROUND_KEY, EVAL_PROMPTS_PER_ROUND);
+        this.evaluationBudget = samplesPerEval * evalRounds * evalPromptsPerRound;
         this.minibatchSize = configuration.argumentAsInt(MINIBATCH_SIZE_KEY, DEFAULT_MINIBATCH_SIZE);
         this.beamSize = configuration.argumentAsInt(BEAM_SIZE_KEY, BEAM_SIZE);
 
@@ -172,6 +172,7 @@ public class AutomaticPromptOptimizer extends IterativeOptimizer {
         this.evaluator = evaluator;
         this.random = new Random(configuration.argumentAsInt(SEED_KEY, DEFAULT_SEED));
         this.classifier = classifier;
+        this.sampleStrategy = new ShuffledFirstSampler(random);
     }
 
     /**
@@ -324,77 +325,92 @@ public class AutomaticPromptOptimizer extends IterativeOptimizer {
      */
     private List<String> expandCandidates(List<String> prompts, List<ClassificationTask> tasks) {
         // minibatch
-        List<ClassificationTask> reducedTasks = new ArrayList<>(tasks);
-        Collections.shuffle(reducedTasks, random);
-        reducedTasks = reducedTasks.stream().limit(minibatchSize).toList();
+        List<ClassificationTask> reducedTasks = sampleStrategy.sample(tasks, minibatchSize);
 
-        List<String> newPrompts = new ArrayList<>();
+        List<String> candidatePrompts = new ArrayList<>();
         for (String prompt : prompts) {
-            String taskSection = parseSectionedPrompt(prompt).get(TASK_SECTION).strip();
-            // evaluate prompt on minibatch
-            List<EvaluationResult<Boolean>> evaluation = evaluatePrompt(reducedTasks, prompt);
-            // get gradients
-            List<Pair<String, String>> gradients = getGradients(taskSection, evaluation);
-            List<String> newTaskSections = new ArrayList<>();
-            for (Pair<String, String> feedbackAndError : gradients) {
-                newTaskSections.addAll(applyGradient(taskSection, feedbackAndError.second(), feedbackAndError.first()));
-            }
-            // generate synonyms
-            // TODO Find out what MC is
-            List<String> mcSampledTaskSections = new ArrayList<>();
-            if (mcSamplesPerStep > 0) {
-                for (String section : Stream.concat(newTaskSections.stream(), Stream.of(taskSection))
-                        .toList()) {
-                    mcSampledTaskSections.addAll(generateSynonyms(section, mcSamplesPerStep));
-                }
-            }
-            // combine
-            List<String> combinedTaskSections = Stream.concat(newTaskSections.stream(), mcSampledTaskSections.stream())
-                    .distinct()
-                    .toList();
-            List<String> tempNewPrompts = new ArrayList<>();
-            for (String section : combinedTaskSections) {
-                tempNewPrompts.add(prompt.replace(taskSection, section));
-            }
-            // filter a little
-            if (combinedTaskSections.size() > maxExpansionFactor) {
-                if (rejectOnErrors) {
-                    List<ClassificationTask> errorExamples = new ArrayList<>();
-                    for (EvaluationResult<Boolean> result : evaluation) {
-                        if (!result.isCorrect()) {
-                            errorExamples.add(
-                                    new ClassificationTask(result.source(), result.target(), result.groundTruth()));
-                        }
-                    }
-                    errorExamples =
-                            errorExamples.stream().limit(MAX_ERROR_SAMPLES_TODO).toList();
-                    // speed up a little
-                    tempNewPrompts = tempNewPrompts.stream()
-                            .limit(maxExpansionFactor * 2)
-                            .toList();
-                    AbstractEvaluator bruteForceEvaluator = new BruteForceEvaluator(evaluationBudget);
-                    List<Double> errorScores = bruteForceEvaluator.call(tempNewPrompts, errorExamples, metric);
-                    List<Integer> sortedIdxs = errorScores.stream()
-                            .sorted()
-                            // TODO Check if this is correct
-                            .mapToInt(errorScores::indexOf)
-                            .boxed()
-                            .toList();
-                    tempNewPrompts = sortedIdxs.stream()
-                            .skip(Math.max(0, sortedIdxs.size() - maxExpansionFactor))
-                            .map(tempNewPrompts::get)
-                            .toList();
-                } else {
-                    tempNewPrompts =
-                            tempNewPrompts.stream().limit(maxExpansionFactor).toList();
-                }
-            }
-            newPrompts.addAll(tempNewPrompts);
+            candidatePrompts.addAll(expandCandidates(prompt, reducedTasks));
         }
-        newPrompts.addAll(prompts);
-        return newPrompts.stream().distinct().toList();
+        candidatePrompts.addAll(prompts);
+        return candidatePrompts.stream().distinct().toList();
     }
 
+    private List<String> expandCandidates(String prompt, List<ClassificationTask> tasks) {
+        String taskSection = parseSectionedPrompt(prompt).get(TASK_SECTION).strip();
+        // evaluate prompt on minibatch
+        List<EvaluationResult<Boolean>> evaluation = evaluatePrompt(tasks, prompt);
+        // get gradients
+        List<Pair<String, String>> gradients = getGradients(taskSection, evaluation);
+        List<String> newTaskSections = new ArrayList<>();
+        for (Pair<String, String> feedbackAndError : gradients) {
+            newTaskSections.addAll(applyGradient(taskSection, feedbackAndError.second(), feedbackAndError.first()));
+        }
+        // generate synonyms
+        // TODO Find out what MC is
+        List<String> mcSampledTaskSections = new ArrayList<>();
+        if (mcSamplesPerStep > 0) {
+            for (String section : Stream.concat(newTaskSections.stream(), Stream.of(taskSection))
+                    .toList()) {
+                mcSampledTaskSections.addAll(generateSynonyms(section, mcSamplesPerStep));
+            }
+        }
+        // combine
+        List<String> combinedTaskSections = Stream.concat(newTaskSections.stream(), mcSampledTaskSections.stream())
+                .distinct()
+                .toList();
+        List<String> tempNewPrompts = new ArrayList<>();
+        for (String section : combinedTaskSections) {
+            tempNewPrompts.add(prompt.replace(taskSection, section));
+        }
+        // filter a little
+        if (combinedTaskSections.size() > maxExpansionFactor) {
+            if (rejectOnErrors) {
+                List<ClassificationTask> errorExamples = new ArrayList<>();
+                for (EvaluationResult<Boolean> result : evaluation) {
+                    if (!result.isCorrect()) {
+                        errorExamples.add(
+                                new ClassificationTask(result.source(), result.target(), result.groundTruth()));
+                    }
+                }
+                errorExamples =
+                        errorExamples.stream().limit(MAX_ERROR_SAMPLES_TODO).toList();
+                // speed up a little
+                tempNewPrompts =
+                        tempNewPrompts.stream().limit(maxExpansionFactor * 2).toList();
+                AbstractEvaluator bruteForceEvaluator = new BruteForceEvaluator(evaluationBudget);
+                List<Double> errorScores = bruteForceEvaluator.call(tempNewPrompts, errorExamples, metric);
+                List<Integer> sortedIdxs = errorScores.stream()
+                        .sorted()
+                        // TODO Check if this is correct
+                        .mapToInt(errorScores::indexOf)
+                        .boxed()
+                        .toList();
+                tempNewPrompts = sortedIdxs.stream()
+                        .skip(Math.max(0, sortedIdxs.size() - maxExpansionFactor))
+                        .map(tempNewPrompts::get)
+                        .toList();
+            } else {
+                tempNewPrompts =
+                        tempNewPrompts.stream().limit(maxExpansionFactor).toList();
+            }
+        }
+        return tempNewPrompts;
+    }
+
+    /*
+    private List<EvaluationResult<Boolean>> evaluatePrompt(
+            List<ClassificationTask> classificationTasks, String prompt) {
+        List<EvaluationResult<Boolean>> evaluation = new ArrayList<>();
+        for (ClassificationTask task : classificationTasks) {
+            if (classifiedAsTraceLink(prompt, task)) {
+                evaluation.add(new EvaluationResult<>(task.source(), task.target(), task.label(), true));
+            } else {
+                evaluation.add(new EvaluationResult<>(task.source(), task.target(), task.label(), false));
+            }
+        }
+        return evaluation;
+    }
+     */
     // TODO: This looks like bad practice
     private List<EvaluationResult<Boolean>> evaluatePrompt(
             List<ClassificationTask> classificationTasks, String prompt) {
@@ -421,6 +437,14 @@ public class AutomaticPromptOptimizer extends IterativeOptimizer {
         return cachedSanitizedPromptRequest(stepsPerGradient, formattedTransformationPrompt);
     }
 
+    /**
+     * Generate synonyms for a prompt section.
+     */
+    private List<String> generateSynonyms(String promptSection, int n) {
+        String formattedSynonymPrompt = String.format(synonymPrompt, promptSection);
+        return cachedSanitizedPromptRequest(n, formattedSynonymPrompt);
+    }
+
     private List<String> cachedSanitizedPromptRequest(int n, String prompt) {
         prompt = String.join("\n", prompt.lines().map(String::stripLeading).toList());
         List<String> responses = nCachedRequest(prompt, provider, llm, cache, n);
@@ -429,14 +453,6 @@ public class AutomaticPromptOptimizer extends IterativeOptimizer {
             newPrompts.addAll(parseTaggedText(result, START_TAG, END_TAG));
         }
         return sanitizePrompts(newPrompts);
-    }
-
-    /**
-     * Generate synonyms for a prompt section.
-     */
-    private List<String> generateSynonyms(String promptSection, int n) {
-        String formattedSynonymPrompt = String.format(synonymPrompt, promptSection);
-        return cachedSanitizedPromptRequest(n, formattedSynonymPrompt);
     }
 
     /**

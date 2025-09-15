@@ -1,6 +1,7 @@
 /* Licensed under MIT 2025. */
 package edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer;
 
+import static edu.kit.kastel.sdq.lissa.ratlr.promptmetric.MetricUtils.MAXIMUM_SCORE;
 import static edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.PromptOptimizationUtils.getClassificationTasks;
 import static edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.PromptOptimizationUtils.parseTaggedTextFirst;
 import static edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.PromptOptimizationUtils.sanitizePrompt;
@@ -233,5 +234,18 @@ public class IterativeOptimizer implements PromptOptimizer {
 
     protected String generateOptimizationPrompt(String basePrompt) {
         return formattedTemplate.replace(ORIGINAL_PROMPT_PLACEHOLDER, basePrompt);
+    }
+
+    /**
+     * Determines if a classification task is classified as a trace link based on the metric score.
+     * A task is classified as a trace link if the metric score only deviates from the maximum score by a negligible amount (1e-6).
+     *
+     * @param prompt The prompt used for classification
+     * @param task   The classification task to evaluate
+     * @return true if the task is classified as a trace link, false otherwise
+     */
+    protected boolean classifiedAsTraceLink(String prompt, ClassificationTask task) {
+        double taskScore = metric.getMetric(prompt, List.of(task));
+        return Math.abs(taskScore - MAXIMUM_SCORE) < 1e-6;
     }
 }

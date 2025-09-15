@@ -27,8 +27,8 @@ import edu.kit.kastel.sdq.lissa.ratlr.postprocessor.TraceLinkIdPostprocessor;
 import edu.kit.kastel.sdq.lissa.ratlr.preprocessor.Preprocessor;
 import edu.kit.kastel.sdq.lissa.ratlr.promptmetric.Metric;
 import edu.kit.kastel.sdq.lissa.ratlr.promptmetric.MetricFactory;
-import edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.PromptOptimizer;
 import edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.OptimizerFactory;
+import edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.PromptOptimizer;
 import edu.kit.kastel.sdq.lissa.ratlr.resultaggregator.ResultAggregator;
 
 /**

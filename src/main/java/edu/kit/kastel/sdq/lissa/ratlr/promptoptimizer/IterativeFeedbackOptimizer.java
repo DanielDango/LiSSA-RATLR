@@ -1,8 +1,6 @@
 /* Licensed under MIT 2025. */
 package edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer;
 
-import static edu.kit.kastel.sdq.lissa.ratlr.promptmetric.MetricUtils.MAXIMUM_SCORE;
-
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -15,6 +13,8 @@ import edu.kit.kastel.sdq.lissa.ratlr.classifier.ClassificationTask;
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
 import edu.kit.kastel.sdq.lissa.ratlr.promptmetric.Metric;
+import edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.samplestrategy.OrderedFirstSampler;
+import edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.samplestrategy.SampleStrategy;
 
 /**
  * An optimizer that uses iterative feedback to refine the prompt based on classification results.
@@ -64,6 +64,8 @@ public class IterativeFeedbackOptimizer extends IterativeOptimizer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IterativeFeedbackOptimizer.class);
 
+    private final SampleStrategy sampleStrategy;
+
     private final String feedbackPrompt;
     private final String feedbackExampleBlock;
     private final int feedbackSize;
@@ -81,6 +83,7 @@ public class IterativeFeedbackOptimizer extends IterativeOptimizer {
         this.feedbackSize = configuration.argumentAsInt(FEEDBACK_SIZE_CONFIGURATION_KEY, FEEDBACK_SIZE);
         this.feedbackExampleBlock = configuration.argumentAsString(
                 FEEDBACK_EXAMPLE_BLOCK_CONFIGURATION_KEY, DEFAULT_FEEDBACK_EXAMPLE_BLOCK);
+        this.sampleStrategy = new OrderedFirstSampler();
     }
 
     @Override
@@ -116,10 +119,9 @@ public class IterativeFeedbackOptimizer extends IterativeOptimizer {
         StringBuilder feedback = new StringBuilder();
 
         Set<ClassificationTask> misclassifiedTasks = getMisclassifiedTasks(prompt, tasks);
-        List<ClassificationTask> sortedMisclassifiedTasks =
-                misclassifiedTasks.stream().sorted().limit(feedbackSize).toList();
+        List<ClassificationTask> sampledTasks = sampleStrategy.sample(misclassifiedTasks, feedbackSize);
         int exampleNumber = 1;
-        for (ClassificationTask task : sortedMisclassifiedTasks) {
+        for (ClassificationTask task : sampledTasks) {
             LOGGER.debug("Misclassified TraceLink ({} -> {})", task.source(), task.target());
             feedback.append(generateMisclassifiedFeedbackBlock(task).replace("{identifier}", exampleNumber + "."));
             exampleNumber++;
@@ -144,19 +146,6 @@ public class IterativeFeedbackOptimizer extends IterativeOptimizer {
             }
         }
         return misclassifiedTasks;
-    }
-
-    /**
-     * Determines if a classification task is classified as a trace link based on the metric score.
-     * A task is classified as a trace link if the metric score only deviates from the maximum score by a negligible amount (1e-6).
-     *
-     * @param prompt The prompt used for classification
-     * @param task   The classification task to evaluate
-     * @return true if the task is classified as a trace link, false otherwise
-     */
-    private boolean classifiedAsTraceLink(String prompt, ClassificationTask task) {
-        double taskScore = metric.getMetric(prompt, List.of(task));
-        return Math.abs(taskScore - MAXIMUM_SCORE) < 1e-6;
     }
 
     /**

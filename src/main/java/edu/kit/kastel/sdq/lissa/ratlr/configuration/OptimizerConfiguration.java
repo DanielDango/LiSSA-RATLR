@@ -5,6 +5,8 @@ import java.io.UncheckedIOException;
 import java.util.List;
 import java.util.Objects;
 
+import org.jetbrains.annotations.NotNull;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -16,7 +18,6 @@ import edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.KeyGenerator;
 
 import io.soabase.recordbuilder.core.RecordBuilder;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Represents the complete configuration for a trace link analysis run.
