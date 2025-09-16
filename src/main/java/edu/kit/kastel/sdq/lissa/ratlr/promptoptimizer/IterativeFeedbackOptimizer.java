@@ -52,7 +52,8 @@ public class IterativeFeedbackOptimizer extends IterativeOptimizer {
             Classification result: {classification}
             """;
 
-    private static final String FEEDBACK_EXAMPLE_BLOCK_CONFIGURATION_KEY = "feedback_example_block";
+    // TODO Not public!
+    public static final String FEEDBACK_EXAMPLE_BLOCK_CONFIGURATION_KEY = "feedback_example_block";
 
     /**
      * The default number of feedback examples to include in the prompt.

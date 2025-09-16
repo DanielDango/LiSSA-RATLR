@@ -6,13 +6,14 @@ import static edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.PromptOptimizationU
 import static edu.kit.kastel.sdq.lissa.ratlr.utils.ChatLanguageModelUtils.nCachedRequest;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +26,7 @@ import edu.kit.kastel.sdq.lissa.ratlr.evaluator.AbstractEvaluator;
 import edu.kit.kastel.sdq.lissa.ratlr.evaluator.BruteForceEvaluator;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
 import edu.kit.kastel.sdq.lissa.ratlr.promptmetric.Metric;
+import edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.samplestrategy.OrderedFirstSampler;
 import edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.samplestrategy.SampleStrategy;
 import edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.samplestrategy.ShuffledFirstSampler;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.Pair;
@@ -51,6 +53,7 @@ public class AutomaticPromptOptimizer extends IterativeOptimizer {
     private final GradientOptimizerConfig config;
     private final AbstractEvaluator evaluator;
     private final SampleStrategy sampleStrategy;
+    private final SampleStrategy orderedSampleStrategy;
 
     public AutomaticPromptOptimizer(
             ModuleConfiguration configuration,
@@ -61,6 +64,7 @@ public class AutomaticPromptOptimizer extends IterativeOptimizer {
         this.config = new GradientOptimizerConfig(configuration);
         this.evaluator = evaluator;
         this.sampleStrategy = new ShuffledFirstSampler(config.random());
+        this.orderedSampleStrategy = new OrderedFirstSampler();
     }
 
     /**
@@ -99,14 +103,26 @@ public class AutomaticPromptOptimizer extends IterativeOptimizer {
         return sections;
     }
 
+    /**
+     * Optimize the prompt using the gradient descent based automatic prompt optimization strategy by Pryzant et al.
+     * (2023).
+     * This method iteratively refines the prompt by generating candidate prompts,
+     * scoring them, and selecting the best ones for further refinement.
+     * <br>
+     * The candidate generation involves:
+     * <ul>
+     *     <li>Expanding candidates using textual gradients derived from error analysis</li>
+     *     <li>Generating synonyms for prompts to explore variations</li>
+     * </ul>
+     * The scoring of candidates is performed using the provided evaluator and metric.
+     *
+     * @param sourceStore The source element store
+     * @param targetStore The target element store
+     * @return The optimized prompt after the specified number of iterations
+     */
     @Override
     public String optimize(SourceElementStore sourceStore, TargetElementStore targetStore) {
         List<ClassificationTask> tasks = getClassificationTasks(sourceStore, targetStore, validTraceLinks);
-        return optimizeInternal(tasks);
-    }
-    /**
-     */
-    private String optimizeInternal(List<ClassificationTask> tasks) {
         List<String> candidatePrompts = new ArrayList<>(Collections.singleton(optimizationPrompt));
         for (int round = 0; round < maximumIterations; round++) {
             LOGGER.info("Starting apo iteration {}/{}", round + 1, maximumIterations);
@@ -116,23 +132,9 @@ public class AutomaticPromptOptimizer extends IterativeOptimizer {
                 LOGGER.info("Expanded to {} candidates", candidatePrompts.size());
             }
             // score candidates
-            List<Double> scores = scoreCandidates(candidatePrompts, tasks);
-            List<Pair<Double, String>> scorePromptPairs = new ArrayList<>();
-            for (int i = 0; i < scores.size(); i++) {
-                scorePromptPairs.add(new Pair<>(scores.get(i), candidatePrompts.get(i)));
-            }
-            // sort by score descending and select top beam size
-            scorePromptPairs = scorePromptPairs.stream()
-                    .sorted((a, b) -> Double.compare(b.first(), a.first()))
-                    .toList();
-            candidatePrompts = scorePromptPairs.stream()
-                    .map(Pair::second)
-                    .limit(config.beamSize())
-                    .toList();
-            scores = scorePromptPairs.stream()
-                    .map(Pair::first)
-                    .limit(config.beamSize())
-                    .toList();
+            var candidatesAndScores = scoreAndFilterCandidates(candidatePrompts, tasks);
+            candidatePrompts = candidatesAndScores.first();
+            List<Double> scores = candidatesAndScores.second();
             // record candidates, estimated scores, and true scores
             LOGGER.info("Scores: {}", scores);
         }
@@ -140,9 +142,42 @@ public class AutomaticPromptOptimizer extends IterativeOptimizer {
     }
 
     /**
-     * Score a list of prompts
+     * Score a list of prompts using the {@link #scorePrompts(List, List)} function and limit them to the
+     * {@link GradientOptimizerConfig#beamSize()} size according to their scores in descending order.
+     *
+     * @return A pair of (filtered prompts, their scores)
      */
-    private List<Double> scoreCandidates(List<String> prompts, List<ClassificationTask> tasks) {
+    private Pair<List<String>, List<Double>> scoreAndFilterCandidates(
+            List<String> prompts, List<ClassificationTask> tasks) {
+        List<Double> scores = scorePrompts(prompts, tasks);
+        List<Pair<Double, String>> scorePromptPairs = new ArrayList<>();
+        for (int i = 0; i < scores.size(); i++) {
+            scorePromptPairs.add(new Pair<>(scores.get(i), prompts.get(i)));
+        }
+        // sort by score descending and select top beam size
+        scorePromptPairs = scorePromptPairs.stream()
+                .sorted((a, b) -> Double.compare(b.first(), a.first()))
+                .toList();
+        List<String> candidatePrompts = scorePromptPairs.stream()
+                .map(Pair::second)
+                .limit(config.beamSize())
+                .toList();
+        scores = scorePromptPairs.stream()
+                .map(Pair::first)
+                .limit(config.beamSize())
+                .toList();
+        return new Pair<>(candidatePrompts, scores);
+    }
+
+    /**
+     * Score a list of prompts using the provided evaluator and metric.
+     * If there is only one prompt, it is assigned a perfect score of 1.0.
+     *
+     * @param prompts The list of prompts to score
+     * @param tasks The classification tasks to use for scoring
+     * @return A list of scores corresponding to each prompt
+     */
+    private List<Double> scorePrompts(List<String> prompts, List<ClassificationTask> tasks) {
         if (prompts.size() == 1) {
             return List.of(1.0);
         }
@@ -150,10 +185,11 @@ public class AutomaticPromptOptimizer extends IterativeOptimizer {
     }
 
     /**
-     * Get textual "gradients" for a prompt based on an error string that indicate why the prompt might yielded the error.
+     * Get textual "gradients" for a prompt based on an error string that indicate why classification with the prompt
+     * might have yielded the error.
      *
      * @param prompt The prompt section to improve
-     * @param errorString The error string indicating the errors made by the prompt
+     * @param errorString The error string indicating the errors present with the prompt
      * @param numberOfResponses The number of gradient responses to generate
      * @return A list of textual gradients suggesting improvements to the prompt
      */
@@ -165,21 +201,32 @@ public class AutomaticPromptOptimizer extends IterativeOptimizer {
 
     /**
      * Get "gradients" for a prompt based on sampled error strings.
-     * @return Pairs of (feedback, error string)
+     *
+     * @param prompt The prompt to improve
+     * @param evaluation The evaluation results to sample errors from
+     * @return A list of pairs where each pair contains a feedback string and the corresponding error string
      */
-    private List<Pair<String, String>> getGradients(String taskSection, List<EvaluationResult<Boolean>> evaluation) {
+    private List<Pair<String, String>> getGradients(String prompt, List<EvaluationResult<Boolean>> evaluation) {
         List<Pair<String, String>> feedbacks = new ArrayList<>();
         for (int i = 0; i < config.numberOfGradients(); i++) {
             String errorString = sampleErrorString(evaluation);
-            List<String> gradients = getTextualGradients(taskSection, errorString, 1);
-            feedbacks.addAll(
-                    gradients.stream().map(x -> new Pair<>(x, errorString)).collect(Collectors.toSet()));
+            List<String> gradients = getTextualGradients(prompt, errorString, 1);
+            feedbacks.addAll(gradients.stream()
+                    .map(gradient -> new Pair<>(gradient, errorString))
+                    .collect(Collectors.toSet()));
         }
         return feedbacks;
     }
 
     /**
      * Sample n error strings from the given texts, labels, and preds
+     */
+    /**
+     * Sample error strings from evaluation results.
+     * This method selects a subset of misclassified examples and formats them into a single error string.
+     *
+     * @param evaluationResults The list of evaluation results to sample errors from
+     * @return A formatted string containing sampled error examples
      */
     private String sampleErrorString(List<EvaluationResult<Boolean>> evaluationResults) {
         List<Integer> errorIDxs = new ArrayList<>();
@@ -188,11 +235,7 @@ public class AutomaticPromptOptimizer extends IterativeOptimizer {
                 errorIDxs.add(evaluationResults.indexOf(result));
             }
         }
-        int[] sampleIdxs = errorIDxs.stream()
-                .sorted()
-                .mapToInt(Integer::intValue)
-                .limit(config.numberOfErrors())
-                .toArray();
+        List<Integer> sampleIdxs = orderedSampleStrategy.sample(errorIDxs, config.numberOfErrors());
         StringBuilder errorString = new StringBuilder();
         for (int i : sampleIdxs) {
             errorString.append("## Example ").append(i + 1).append(System.lineSeparator());
@@ -203,22 +246,30 @@ public class AutomaticPromptOptimizer extends IterativeOptimizer {
         return errorString.toString();
     }
 
-    private static String generateErrorString(EvaluationResult<Boolean> evaluationResult) {
-        return "Text: \""
-                + evaluationResult.getTextualRepresentation().strip()
-                + "\""
-                + System.lineSeparator()
-                + "Ground Truth: " + evaluationResult.groundTruth() + System.lineSeparator()
-                + "Classification Result: "
-                + evaluationResult.classification()
-                + System.lineSeparator();
+    /**
+     * Generate an error string for a given evaluation result using the feedback example block template.
+     *
+     * @param evaluationResult The evaluation result to generate the error string for
+     * @return A formatted error string
+     */
+    private String generateErrorString(EvaluationResult<Boolean> evaluationResult) {
+        return config.feedbackExampleBlock()
+                .formatted(
+                        evaluationResult.getTextualRepresentation().strip(),
+                        evaluationResult.groundTruth(),
+                        evaluationResult.classification());
     }
 
     /**
-     * Expand a list of prompts by generating gradient-based successors and synonyms for each section.
+     * Expand a list of prompts into a larger list of candidate prompts using gradient-based modifications and synonym
+     * generation on a subset of the tasks.
+     * This method processes each prompt individually, by delegating to {@link #expandCandidates(String, List)}.
+     *
+     * @param prompts The list of prompts to expand
+     * @param tasks The classification tasks to use for generating gradients and evaluating prompts
+     * @return A distinct list of expanded candidate prompts
      */
     private List<String> expandCandidates(List<String> prompts, List<ClassificationTask> tasks) {
-        // minibatch
         List<ClassificationTask> reducedTasks = sampleStrategy.sample(tasks, config.minibatchSize());
 
         List<String> candidatePrompts = new ArrayList<>();
@@ -229,29 +280,36 @@ public class AutomaticPromptOptimizer extends IterativeOptimizer {
         return candidatePrompts.stream().distinct().toList();
     }
 
+    /**
+     * Expand a single prompt into a larger list of candidate prompts using gradient-based modifications and synonym
+     * generation on all provided tasks.
+     * This includes the following steps:
+     * <ul>
+     *     <li>Evaluate the prompt on all tasks to identify misclassifications</li>
+     *     <li>Generate textual gradients based on the errors found</li
+     *     <li>Apply the gradients to create new prompt variations</li>
+     *     <li>Generate synonyms for the task section of the prompt to explore variations</li>
+     *     <li>Combine the new task sections with the original prompt to form new candidate prompts</li>
+     *     <li>Filter the candidate prompts to limit the total number based on configuration settings</li>
+     * </ul>
+     *
+     * @param prompt The prompt to expand
+     * @param tasks The classification tasks to use for generating gradients and evaluating the prompt
+     * @return A distinct list of expanded candidate prompts
+     */
     private List<String> expandCandidates(String prompt, List<ClassificationTask> tasks) {
         String taskSection = parseSectionedPrompt(prompt).get(TASK_SECTION).strip();
-        // evaluate prompt on minibatch
+
         List<EvaluationResult<Boolean>> evaluation = evaluatePrompt(tasks, prompt);
-        // get gradients
-        List<Pair<String, String>> gradients = getGradients(taskSection, evaluation);
-        List<String> newTaskSections = new ArrayList<>();
-        for (Pair<String, String> feedbackAndError : gradients) {
-            newTaskSections.addAll(applyGradient(taskSection, feedbackAndError.second(), feedbackAndError.first()));
-        }
-        // generate synonyms
-        // TODO Find out what MC is
-        List<String> mcSampledTaskSections = new ArrayList<>();
-        if (config.mcSamplesPerStep() > 0) {
-            for (String section : Stream.concat(newTaskSections.stream(), Stream.of(taskSection))
-                    .toList()) {
-                mcSampledTaskSections.addAll(generateSynonyms(section, config.mcSamplesPerStep()));
-            }
-        }
+
+        Collection<String> promptVariations = applyGradient(taskSection, evaluation);
+        Collection<String> synonyms = generateSynonyms(promptVariations, config.mcSamplesPerStep());
+        synonyms.addAll(generateSynonyms(taskSection, config.mcSamplesPerStep()));
         // combine
-        List<String> combinedTaskSections = Stream.concat(newTaskSections.stream(), mcSampledTaskSections.stream())
-                .distinct()
-                .toList();
+        promptVariations.addAll(synonyms);
+
+        Collection<String> combinedTaskSections = promptVariations;
+
         List<String> tempNewPrompts = new ArrayList<>();
         for (String section : combinedTaskSections) {
             tempNewPrompts.add(prompt.replace(taskSection, section));
@@ -294,7 +352,66 @@ public class AutomaticPromptOptimizer extends IterativeOptimizer {
     }
 
     /**
-     * Evaluate a prompt on a list of classification tasks, returning detailed results.
+     * Gets and applies a list of textual gradients to a prompt section to generate new prompt variations.
+     * This method processes each gradient individually with the {@link #applyGradient(String, String, String)} method
+     * and aggregates the resulting prompt variations.
+     *
+     * @param originalPrompt The original prompt section to modify
+     * @param evaluationResults The evaluation results used to derive the gradients
+     * @return A distinct collection of new prompt sections generated by applying the gradients
+     */
+    private Collection<String> applyGradient(String originalPrompt, List<EvaluationResult<Boolean>> evaluationResults) {
+        Collection<Pair<String, String>> gradients = getGradients(originalPrompt, evaluationResults);
+        Set<String> promptVariations = new HashSet<>();
+        for (Pair<String, String> feedbackAndError : gradients) {
+            String feedback = feedbackAndError.first();
+            String error = feedbackAndError.second();
+            promptVariations.addAll(applyGradient(originalPrompt, error, feedback));
+        }
+        return promptVariations;
+    }
+
+    /**
+     * Generate synonyms for a list of prompts to explore variations.
+     * This method applies the {@link #generateSynonyms(String, int)} method to each prompt in the list
+     * and aggregates the results.
+     * If the number of synonyms per prompt is less than 1, an empty list is returned.
+     *
+     * @param prompts The list of prompts to generate synonyms for
+     * @param numberOfSynonymsPerPrompt The number of synonym variations to generate per prompt
+     * @return A distinct list of synonym variations for the prompt sections
+     */
+    private Collection<String> generateSynonyms(Collection<String> prompts, int numberOfSynonymsPerPrompt) {
+        if (numberOfSynonymsPerPrompt < 1) {
+            return List.of();
+        }
+        List<String> synonyms = new ArrayList<>();
+        for (String prompt : prompts) {
+            synonyms.addAll(generateSynonyms(prompt, numberOfSynonymsPerPrompt));
+        }
+        return synonyms;
+    }
+
+    /**
+     * Generate synonyms for a given prompt to explore variations.
+     *
+     * @param prompt The prompt to generate synonyms for
+     * @param numberOfSynonyms The number of synonym variations to generate
+     * @return A list of synonym variations for the prompt section
+     */
+    private Collection<String> generateSynonyms(String prompt, int numberOfSynonyms) {
+        String formattedSynonymPrompt = String.format(config.synonymPrompt(), prompt);
+        return cachedSanitizedPromptRequest(numberOfSynonyms, formattedSynonymPrompt);
+    }
+
+    /**
+     * Evaluate a prompt on a list of classification tasks.
+     * This method checks each task to see if it is classified correctly by the prompt using the
+     * {@link #isClassifiedCorrectly(String, ClassificationTask)} method.
+     *
+     * @param classificationTasks The list of classification tasks to evaluate against
+     * @param prompt The prompt to evaluate
+     * @return A list of evaluation results indicating correctness for each task
      */
     private List<EvaluationResult<Boolean>> evaluatePrompt(
             List<ClassificationTask> classificationTasks, String prompt) {
@@ -310,7 +427,12 @@ public class AutomaticPromptOptimizer extends IterativeOptimizer {
     }
 
     /**
-     * Incorporate feedback gradient into a prompt.
+     * Apply a textual gradient to a prompt section to generate new prompt variations.
+     *
+     * @param prompt The prompt section to modify
+     * @param errorString The error string indicating the errors present with the prompt
+     * @param feedbackString The textual gradient suggesting improvements to the prompt
+     * @return A list of new prompt sections generated by applying the gradient
      */
     private List<String> applyGradient(String prompt, String errorString, String feedbackString) {
         String formattedTransformationPrompt = String.format(
@@ -324,13 +446,14 @@ public class AutomaticPromptOptimizer extends IterativeOptimizer {
     }
 
     /**
-     * Generate synonyms for a prompt section.
+     * Send a cached request to the language model and parse the response for text between {@value #START_TAG} and
+     * {@value #END_TAG} tags.
+     * The prompts are sanitized using the {@link PromptOptimizationUtils#sanitizePrompt(String)} method.
+     *
+     * @param n The number of responses to request from the language model
+     * @param prompt The prompt to send to the language model
+     * @return A list of sanitized prompts extracted from the language model responses
      */
-    private List<String> generateSynonyms(String promptSection, int n) {
-        String formattedSynonymPrompt = String.format(config.synonymPrompt(), promptSection);
-        return cachedSanitizedPromptRequest(n, formattedSynonymPrompt);
-    }
-
     private List<String> cachedSanitizedPromptRequest(int n, String prompt) {
         prompt = String.join("\n", prompt.lines().map(String::stripLeading).toList());
         List<String> responses = nCachedRequest(prompt, provider, llm, cache, n);

@@ -1,6 +1,8 @@
 /* Licensed under MIT 2025. */
 package edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer;
 
+import static edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.IterativeFeedbackOptimizer.FEEDBACK_EXAMPLE_BLOCK_CONFIGURATION_KEY;
+
 import java.util.Random;
 import java.util.random.RandomGenerator;
 
@@ -20,8 +22,8 @@ public record GradientOptimizerConfig(
         String gradientPrompt,
         String transformationPrompt,
         String synonymPrompt,
+        String feedbackExampleBlock,
         RandomGenerator random) {
-
 
     // Default prompts from the original implementation
 
@@ -63,6 +65,12 @@ public record GradientOptimizerConfig(
     private static final String DEFAULT_SYNONYM_PROMPT =
             "Generate a variation of the following instruction while keeping the semantic meaning.%n%nInput: %s%n%nOutput:";
 
+    private static final String DEFAULT_FEEDBACK_EXAMPLE_BLOCK =
+            """
+            Text: "%s"
+            Ground Truth: %s
+            Classification Result: %s
+            """;
 
     private static final String NUMBER_OF_GRADIENTS_KEY = "number_of_gradients";
     private static final int DEFAULT_NUMBER_OF_GRADIENTS = 4;
@@ -108,6 +116,8 @@ public record GradientOptimizerConfig(
                 configuration.argumentAsString(GRADIENT_PROMPT_KEY, DEFAULT_GRADIENT_PROMPT),
                 configuration.argumentAsString(TRANSFORMATION_PROMPT_KEY, DEFAULT_TRANSFORMATION_PROMPT),
                 configuration.argumentAsString(SYNONYM_PROMPT_KEY, DEFAULT_SYNONYM_PROMPT),
+                configuration.argumentAsString(
+                        FEEDBACK_EXAMPLE_BLOCK_CONFIGURATION_KEY, DEFAULT_FEEDBACK_EXAMPLE_BLOCK),
                 new Random(configuration.argumentAsInt(SEED_KEY, DEFAULT_SEED)));
     }
 }
