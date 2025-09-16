@@ -6,6 +6,7 @@ import static edu.kit.kastel.sdq.lissa.ratlr.classifier.SimpleClassifier.PROMPT_
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -22,10 +23,13 @@ import edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore;
 import edu.kit.kastel.sdq.lissa.ratlr.elementstore.SourceElementStore;
 import edu.kit.kastel.sdq.lissa.ratlr.elementstore.TargetElementStore;
 import edu.kit.kastel.sdq.lissa.ratlr.embeddingcreator.EmbeddingCreator;
+import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
 import edu.kit.kastel.sdq.lissa.ratlr.postprocessor.TraceLinkIdPostprocessor;
 import edu.kit.kastel.sdq.lissa.ratlr.preprocessor.Preprocessor;
 import edu.kit.kastel.sdq.lissa.ratlr.resultaggregator.ResultAggregator;
+
+import lombok.Getter;
 
 /**
  * Represents a single evaluation run of the LiSSA framework.
@@ -58,10 +62,11 @@ import edu.kit.kastel.sdq.lissa.ratlr.resultaggregator.ResultAggregator;
  */
 public class Evaluation {
 
-    private static final Logger logger = LoggerFactory.getLogger(Evaluation.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Evaluation.class);
     private final Path configFile;
 
-    private Configuration configuration;
+    @Getter
+    private final Configuration configuration;
 
     /** Provider for source artifacts */
     private ArtifactProvider sourceArtifactProvider;
@@ -74,15 +79,26 @@ public class Evaluation {
     /** Creator for element embeddings */
     private EmbeddingCreator embeddingCreator;
     /** Store for source elements */
+    @Getter
     private SourceElementStore sourceStore;
     /** Store for target elements */
+    @Getter
     private TargetElementStore targetStore;
     /** Classifier for trace link analysis */
+    @Getter
     private Classifier classifier;
     /** Aggregator for classification results */
+    @Getter
     private ResultAggregator aggregator;
+
     /** Postprocessor for trace link IDs */
+    @Getter
     private TraceLinkIdPostprocessor traceLinkIdPostProcessor;
+
+    private List<Element> sourceElements;
+    private List<Element> targetElements;
+    private int sourceArtifcatsSize;
+    private int targetArtifactsSize;
 
     /**
      * Creates a new evaluation instance with the specified configuration file.
@@ -99,6 +115,7 @@ public class Evaluation {
      */
     public Evaluation(Path configFile) throws IOException {
         this.configFile = Objects.requireNonNull(configFile);
+        configuration = new ObjectMapper().readValue(configFile.toFile(), Configuration.class);
         setup("");
     }
 
@@ -120,7 +137,25 @@ public class Evaluation {
      */
     public Evaluation(Path configFile, String prompt) throws IOException {
         this.configFile = Objects.requireNonNull(configFile);
+        configuration = new ObjectMapper().readValue(configFile.toFile(), Configuration.class);
         setup(prompt);
+    }
+
+    /**
+     * Creates a new evaluation instance with the specified configuration object.
+     * This constructor:
+     * <ol>
+     *     <li>Initializes the configuration</li>
+     *     <li>Sets up all required components for the pipeline, sharing a {@link ContextStore}</li>
+     * </ol>
+     * @param config The configuration object
+     * @throws IOException If there are issues setting up the cache
+     */
+    public Evaluation(Configuration config) throws IOException {
+        this.configuration = config;
+        // TODO maybe dont?
+        this.configFile = null;
+        setup("");
     }
 
     /**
@@ -141,7 +176,6 @@ public class Evaluation {
      * @throws IOException If there are issues reading the configuration
      */
     private void setup(String prompt) throws IOException {
-        configuration = new ObjectMapper().readValue(configFile.toFile(), Configuration.class);
         CacheManager.setCacheDir(configuration.cacheDir());
 
         ContextStore contextStore = new ContextStore();
@@ -158,7 +192,7 @@ public class Evaluation {
         sourceStore = new SourceElementStore(configuration.sourceStore());
         targetStore = new TargetElementStore(configuration.targetStore());
         // TODO: careful, this is a hack to allow the optimization to overwrite the prompt and store it to the config
-        // for serialization.
+        //  for serialization. Maybe you can utilize ModuleConfiguration.with() instead?
         if (!prompt.isEmpty()) {
             switch (configuration.classifier().name().split(CONFIG_NAME_SEPARATOR)[0]) {
                 case "mock" -> {
@@ -181,15 +215,6 @@ public class Evaluation {
     }
 
     /**
-     * Gets the configuration used for this evaluation.
-     *
-     * @return The configuration object
-     */
-    public Configuration getConfiguration() {
-        return configuration;
-    }
-
-    /**
      * Runs the complete trace link analysis pipeline.
      * This method:
      * <ol>
@@ -206,38 +231,44 @@ public class Evaluation {
      * @return Set of identified trace links
      */
     public Set<TraceLink> run() {
-        // RUN
-        logger.info("Loading artifacts");
-        var sourceArtifacts = sourceArtifactProvider.getArtifacts();
-        var targetArtifacts = targetArtifactProvider.getArtifacts();
+        setupSourceAndTargetStores();
 
-        logger.info("Preprocessing artifacts");
-        var sourceElements = sourcePreprocessor.preprocess(sourceArtifacts);
-        var targetElements = targetPreprocessor.preprocess(targetArtifacts);
-
-        logger.info("Calculating embeddings");
-        var sourceEmbeddings = embeddingCreator.calculateEmbeddings(sourceElements);
-        var targetEmbeddings = embeddingCreator.calculateEmbeddings(targetElements);
-
-        logger.info("Building element stores");
-        sourceStore.setup(sourceElements, sourceEmbeddings);
-        targetStore.setup(targetElements, targetEmbeddings);
-
-        logger.info("Classifying Tracelinks");
+        LOGGER.info("Classifying Tracelinks");
         var llmResults = classifier.classify(sourceStore, targetStore);
         var traceLinks = aggregator.aggregate(sourceElements, targetElements, llmResults);
 
-        logger.info("Postprocessing Tracelinks");
+        LOGGER.info("Postprocessing Tracelinks");
         traceLinks = traceLinkIdPostProcessor.postprocess(traceLinks);
 
-        logger.info("Evaluating Results");
+        LOGGER.info("Evaluating Results");
         Statistics.generateStatistics(
-                traceLinks, configFile.toFile(), configuration, sourceArtifacts.size(), targetArtifacts.size());
+                traceLinks, configFile.toFile(), configuration, sourceArtifcatsSize, targetArtifactsSize);
         Statistics.saveTraceLinks(traceLinks, configFile.toFile(), configuration);
 
         CacheManager.getDefaultInstance().flush();
 
         return traceLinks;
+    }
+
+    public void setupSourceAndTargetStores() {
+        LOGGER.info("Loading artifacts");
+        var sourceArtifacts = sourceArtifactProvider.getArtifacts();
+        var targetArtifacts = targetArtifactProvider.getArtifacts();
+
+        sourceArtifcatsSize = sourceArtifacts.size();
+        targetArtifactsSize = targetArtifacts.size();
+
+        LOGGER.info("Preprocessing artifacts");
+        sourceElements = sourcePreprocessor.preprocess(sourceArtifacts);
+        targetElements = targetPreprocessor.preprocess(targetArtifacts);
+
+        LOGGER.info("Calculating embeddings");
+        var sourceEmbeddings = embeddingCreator.calculateEmbeddings(sourceElements);
+        var targetEmbeddings = embeddingCreator.calculateEmbeddings(targetElements);
+
+        LOGGER.info("Building element stores");
+        sourceStore.setup(sourceElements, sourceEmbeddings);
+        targetStore.setup(targetElements, targetEmbeddings);
     }
 
     /**

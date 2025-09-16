@@ -13,40 +13,20 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import edu.kit.kastel.sdq.lissa.ratlr.artifactprovider.ArtifactProvider;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheManager;
-import edu.kit.kastel.sdq.lissa.ratlr.classifier.Classifier;
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.OptimizerConfiguration;
-import edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore;
-import edu.kit.kastel.sdq.lissa.ratlr.elementstore.SourceElementStore;
-import edu.kit.kastel.sdq.lissa.ratlr.elementstore.TargetElementStore;
-import edu.kit.kastel.sdq.lissa.ratlr.embeddingcreator.EmbeddingCreator;
 import edu.kit.kastel.sdq.lissa.ratlr.evaluator.AbstractEvaluator;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
-import edu.kit.kastel.sdq.lissa.ratlr.postprocessor.TraceLinkIdPostprocessor;
-import edu.kit.kastel.sdq.lissa.ratlr.preprocessor.Preprocessor;
 import edu.kit.kastel.sdq.lissa.ratlr.promptmetric.Metric;
 import edu.kit.kastel.sdq.lissa.ratlr.promptmetric.MetricFactory;
 import edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.OptimizerFactory;
 import edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.PromptOptimizer;
-import edu.kit.kastel.sdq.lissa.ratlr.resultaggregator.ResultAggregator;
 
 /**
  * Represents a single prompt optimization run of the LiSSA framework.
- * This class utilised part of the trace link analysis pipeline for a given configuration,
- * including:
- * <ul>
- *     <li>Artifact loading from source and target providers</li>
- *     <li>Preprocessing of artifacts into elements</li>
- *     <li>Embedding calculation for elements</li>
- * </ul>
- * <p>
- * The pipeline follows these steps:
+ * This class utilised the general {@link Evaluation} pipeline and extends it by an optimization step at the end.
+ * The pipeline adds these steps:
  * <ol>
- *     <li>Load artifacts from configured providers</li>
- *     <li>Preprocess artifacts into elements</li>
- *     <li>Calculate embeddings for elements</li>
- *     <li>Build element stores for efficient access</li>
  *     <li>Optimizes the prompt</li>
  * </ol>
  */
@@ -58,33 +38,10 @@ public class Optimization {
     private OptimizerConfiguration configuration;
 
     /**
-     * Provider for source artifacts
+     * The evaluation pipeline used for the optimization.
+     * This pipeline includes all steps from artifact provision to trace link classification.
      */
-    private ArtifactProvider sourceArtifactProvider;
-    /**
-     * Provider for target artifacts
-     */
-    private ArtifactProvider targetArtifactProvider;
-    /**
-     * Preprocessor for source artifacts
-     */
-    private Preprocessor sourcePreprocessor;
-    /**
-     * Preprocessor for target artifacts
-     */
-    private Preprocessor targetPreprocessor;
-    /**
-     * Creator for element embeddings
-     */
-    private EmbeddingCreator embeddingCreator;
-    /**
-     * Store for source elements
-     */
-    private SourceElementStore sourceStore;
-    /**
-     * Store for target elements
-     */
-    private TargetElementStore targetStore;
+    private Evaluation evaluationPipeline;
     /**
      * Optimizer for prompt used in classification
      */
@@ -109,96 +66,52 @@ public class Optimization {
     }
 
     /**
-     * Sets up the evaluation pipeline components.
+     * Sets up the optimization pipeline by loading the configuration and initializing all required components.
      * This method:
      * <ol>
-     *     <li>Loads the configuration from file</li>
-     *     <li>Initializes the cache manager</li>
-     *     <li>Creates artifact providers</li>
-     *     <li>Creates preprocessors</li>
-     *     <li>Creates embedding creator</li>
-     *     <li>Creates element stores</li>
-     *     <li>Optimizes the prompt</li>
+     *     <li>Loads the configuration from the specified file</li>
+     *     <li>Initializes the evaluation pipeline</li>
+     *     <li>Creates the Metric, Evaluator and Optimizer</li>
      * </ol>
      *
      * @throws IOException If there are issues reading the configuration
      */
     private void setup() throws IOException {
         configuration = new ObjectMapper().readValue(configFile.toFile(), OptimizerConfiguration.class);
-        CacheManager.setCacheDir(configuration.cacheDir());
+        evaluationPipeline = new Evaluation(configuration.evaluationConfiguration());
+        Set<TraceLink> goldStandard = getTraceLinksFromGoldStandard(
+                configuration.evaluationConfiguration().goldStandardConfiguration());
 
-        ContextStore contextStore = new ContextStore();
-
-        sourceArtifactProvider =
-                ArtifactProvider.createArtifactProvider(configuration.sourceArtifactProvider(), contextStore);
-        targetArtifactProvider =
-                ArtifactProvider.createArtifactProvider(configuration.targetArtifactProvider(), contextStore);
-
-        sourcePreprocessor = Preprocessor.createPreprocessor(configuration.sourcePreprocessor(), contextStore);
-        targetPreprocessor = Preprocessor.createPreprocessor(configuration.targetPreprocessor(), contextStore);
-
-        embeddingCreator = EmbeddingCreator.createEmbeddingCreator(configuration.embeddingCreator(), contextStore);
-        sourceStore = new SourceElementStore(configuration.sourceStore());
-        targetStore = new TargetElementStore(configuration.targetStore());
-
-        Classifier classifier = configuration.createClassifier(contextStore);
-        ResultAggregator aggregator =
-                ResultAggregator.createResultAggregator(configuration.resultAggregator(), contextStore);
-
-        TraceLinkIdPostprocessor traceLinkIdPostProcessor = TraceLinkIdPostprocessor.createTraceLinkIdPostprocessor(
-                configuration.traceLinkIdPostprocessor(), contextStore);
-        Set<TraceLink> goldStandard = getTraceLinksFromGoldStandard(configuration.goldStandardConfiguration());
-
-        Metric metric =
-                MetricFactory.createScorer(configuration.metric(), classifier, aggregator, traceLinkIdPostProcessor);
+        Metric metric = MetricFactory.createScorer(
+                configuration.metric(),
+                evaluationPipeline.getClassifier(),
+                evaluationPipeline.getAggregator(),
+                evaluationPipeline.getTraceLinkIdPostProcessor());
         AbstractEvaluator evaluator = AbstractEvaluator.createEvaluator(configuration.evaluator());
 
         promptOptimizer = OptimizerFactory.createOptimizer(
-                configuration.promptOptimizer(), goldStandard, classifier, metric, evaluator);
+                configuration.promptOptimizer(), goldStandard, evaluationPipeline.getClassifier(), metric, evaluator);
         configuration.serializeAndDestroyConfiguration();
     }
 
     /**
-     * Gets the configuration used for this evaluation.
-     *
-     * @return The configuration object
-     */
-    public OptimizerConfiguration getConfiguration() {
-        return configuration;
-    }
-
-    /**
-     * Runs the complete trace link analysis pipeline.
+     * Runs the optimization pipeline.
      * This method:
      * <ol>
-     *     <li>Loads artifacts from providers</li>
-     *     <li>Preprocesses artifacts into elements</li>
-     *     <li>Calculates embeddings for elements</li>
-     *     <li>Builds element stores</li>
-     *     <li>Optimizes the prompt</li>
+     *     <li>Sets up the source and target stores</li>
+     *     <li>Optimizes the prompt using the configured optimizer</li>
+     *     <li>Generates and saves optimization statistics</li>
+     *     <li>Flushes the cache to persist changes</li>
      * </ol>
      *
-     * @return Set of identified trace links
+     * @return The optimized prompt as a String
      */
     public String run() {
-        LOGGER.info("Loading artifacts");
-        var sourceArtifacts = sourceArtifactProvider.getArtifacts();
-        var targetArtifacts = targetArtifactProvider.getArtifacts();
-
-        LOGGER.info("Preprocessing artifacts");
-        var sourceElements = sourcePreprocessor.preprocess(sourceArtifacts);
-        var targetElements = targetPreprocessor.preprocess(targetArtifacts);
-
-        LOGGER.info("Calculating embeddings");
-        var sourceEmbeddings = embeddingCreator.calculateEmbeddings(sourceElements);
-        var targetEmbeddings = embeddingCreator.calculateEmbeddings(targetElements);
-
-        LOGGER.info("Building element stores");
-        sourceStore.setup(sourceElements, sourceEmbeddings);
-        targetStore.setup(targetElements, targetEmbeddings);
+        evaluationPipeline.setupSourceAndTargetStores();
 
         LOGGER.info("Optimizing Prompt");
-        String result = promptOptimizer.optimize(sourceStore, targetStore);
+        String result =
+                promptOptimizer.optimize(evaluationPipeline.getSourceStore(), evaluationPipeline.getTargetStore());
         LOGGER.info("Optimized Prompt: {}", result);
 
         Statistics.generateOptimizationStatistics(configFile.toFile(), configuration, result);

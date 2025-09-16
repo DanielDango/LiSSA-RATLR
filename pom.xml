@@ -19,6 +19,7 @@
     <picocli.version>4.7.7</picocli.version>
     <record-builder.version>48</record-builder.version>
     <metrics.version>0.1.2</metrics.version>
+    <lombok.version>1.18.40</lombok.version>
   </properties>
 
   <dependencyManagement>
@@ -122,6 +123,12 @@
       <artifactId>junit-jupiter-params</artifactId>
       <version>${junit.version}</version>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>${lombok.version}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -246,6 +253,11 @@
               <groupId>io.soabase.record-builder</groupId>
               <artifactId>record-builder-processor</artifactId>
               <version>${record-builder.version}</version>
+            </path>
+            <path>
+              <groupId>org.projectlombok</groupId>
+              <artifactId>lombok</artifactId>
+              <version>${lombok.version}</version>
             </path>
           </annotationProcessorPaths>
           <compilerArgs>

@@ -2,19 +2,17 @@
 package edu.kit.kastel.sdq.lissa.ratlr.configuration;
 
 import java.io.UncheckedIOException;
-import java.util.List;
 import java.util.Objects;
 
 import org.jetbrains.annotations.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
-import edu.kit.kastel.sdq.lissa.ratlr.classifier.Classifier;
-import edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.KeyGenerator;
 
 import io.soabase.recordbuilder.core.RecordBuilder;
@@ -24,44 +22,20 @@ import io.soabase.recordbuilder.core.RecordBuilder;
  * This record contains all necessary configurations for artifact providers,
  * preprocessors, embedding creators, stores, classifiers, and postprocessors.
  * It supports both single-classifier and multi-stage classifier configurations.
- * @param cacheDir Directory for caching intermediate results
- * @param goldStandardConfiguration Configuration for gold standard evaluation
- * @param sourceArtifactProvider Configuration for the source artifact provider
- * @param targetArtifactProvider Configuration for the target artifact provider
- * @param sourcePreprocessor Configuration for the source artifact preprocessor
- * @param targetPreprocessor Configuration for the target artifact preprocessor
- * @param embeddingCreator Configuration for the embedding creator
- * @param sourceStore Configuration for the source element store
- * @param targetStore Configuration for the target element store
+ *
+ * @param evaluationConfiguration Configuration for the evaluation setup.
  * @param promptOptimizer Configuration for the prompt optimizer.
  *                        This is used to optimize prompts for better classification results.
- * @param classifier Configuration for a single classifier.Either this or {@link #classifiers} must be set, but not both.
- * @param classifiers Configuration for a multi-stage classifier pipeline. Either this or {@link #classifier} must be set,
- *                    but not both.
- * @param resultAggregator Configuration for the result aggregator
- * @param traceLinkIdPostprocessor Configuration for the trace link ID postprocessor
  * @param metric Configuration for the metric used in optimization to assign a score to a prompt for a set of examples
  * @param evaluator Configuration for the evaluator used in optimization
  */
 @RecordBuilder()
 public record OptimizerConfiguration(
-        @JsonProperty("cache_dir") String cacheDir,
-        @JsonProperty("gold_standard_configuration") GoldStandardConfiguration goldStandardConfiguration,
-        @JsonProperty("source_artifact_provider") ModuleConfiguration sourceArtifactProvider,
-        @JsonProperty("target_artifact_provider") ModuleConfiguration targetArtifactProvider,
-        @JsonProperty("source_preprocessor") ModuleConfiguration sourcePreprocessor,
-        @JsonProperty("target_preprocessor") ModuleConfiguration targetPreprocessor,
-        @JsonProperty("embedding_creator") ModuleConfiguration embeddingCreator,
-        @JsonProperty("source_store") ModuleConfiguration sourceStore,
-        @JsonProperty("target_store") ModuleConfiguration targetStore,
+        @JsonUnwrapped Configuration evaluationConfiguration,
         @JsonProperty("prompt_optimizer") ModuleConfiguration promptOptimizer,
-        @JsonProperty("classifier") ModuleConfiguration classifier,
-        @JsonProperty("classifiers") List<List<ModuleConfiguration>> classifiers,
-        @JsonProperty("result_aggregator") ModuleConfiguration resultAggregator,
-        @JsonProperty("tracelinkid_postprocessor") ModuleConfiguration traceLinkIdPostprocessor,
         @JsonProperty("metric") ModuleConfiguration metric,
         @JsonProperty("evaluator") ModuleConfiguration evaluator)
-        implements ConfigurationBuilder.With {
+        implements OptimizerConfigurationBuilder.With {
 
     /**
      * Serializes this configuration to JSON and finalizes all module configurations.
@@ -72,30 +46,10 @@ public record OptimizerConfiguration(
      * @throws UncheckedIOException If the configuration cannot be serialized
      */
     public String serializeAndDestroyConfiguration() throws UncheckedIOException {
-        sourceArtifactProvider.finalizeForSerialization();
-        targetArtifactProvider.finalizeForSerialization();
-        sourcePreprocessor.finalizeForSerialization();
-        targetPreprocessor.finalizeForSerialization();
-        embeddingCreator.finalizeForSerialization();
-        sourceStore.finalizeForSerialization();
-        targetStore.finalizeForSerialization();
+        evaluationConfiguration.serializeAndDestroyConfiguration();
         promptOptimizer.finalizeForSerialization();
         metric.finalizeForSerialization();
         evaluator.finalizeForSerialization();
-        if (classifier != null) {
-            classifier.finalizeForSerialization();
-        }
-        if (classifiers != null) {
-            for (var group : classifiers) {
-                for (var classifier : group) {
-                    classifier.finalizeForSerialization();
-                }
-            }
-        }
-        resultAggregator.finalizeForSerialization();
-        if (traceLinkIdPostprocessor != null) {
-            traceLinkIdPostprocessor.finalizeForSerialization();
-        }
 
         try {
             return new ObjectMapper()
@@ -117,21 +71,11 @@ public record OptimizerConfiguration(
     @Override
     @NotNull
     public String toString() {
-        return "Configuration{" + "sourceArtifactProvider="
-                + sourceArtifactProvider + ", targetArtifactProvider="
-                + targetArtifactProvider + ", sourcePreprocessor="
-                + sourcePreprocessor + ", targetPreprocessor="
-                + targetPreprocessor + ", embeddingCreator="
-                + embeddingCreator + ", sourceStore="
-                + sourceStore + ", targetStore="
-                + targetStore + ", metric="
+        return "Configuration{" + "evaluationConfiguration="
+                + evaluationConfiguration + ", metric="
                 + metric + ", evaluator="
                 + evaluator + ", promptOptimizer="
-                + promptOptimizer + ", classifier="
-                + classifier + ", classifiers="
-                + classifiers + ", resultAggregator="
-                + resultAggregator + ", traceLinkIdPostprocessor="
-                + traceLinkIdPostprocessor + '}';
+                + promptOptimizer + '}';
     }
 
     /**
@@ -145,24 +89,5 @@ public record OptimizerConfiguration(
      */
     public String getConfigurationIdentifierForFile(String prefix) {
         return Objects.requireNonNull(prefix) + "_" + KeyGenerator.generateKey(this.toString());
-    }
-
-    /**
-     * Creates a classifier instance based on this configuration.
-     * Either a single classifier or a multi-stage classifier pipeline is created,
-     * depending on which configuration is set. The shared {@link ContextStore} is passed to all classifiers.
-     *
-     * @param contextStore The shared context store for pipeline components
-     * @return A classifier instance
-     * @throws IllegalStateException If neither or both classifier configurations are set
-     */
-    public Classifier createClassifier(ContextStore contextStore) {
-        if ((classifier == null) == (classifiers == null)) {
-            throw new IllegalStateException("Either 'classifier' or 'classifiers' must be set, but not both.");
-        }
-
-        return classifier != null
-                ? Classifier.createClassifier(classifier, contextStore)
-                : Classifier.createMultiStageClassifier(classifiers, contextStore);
     }
 }
