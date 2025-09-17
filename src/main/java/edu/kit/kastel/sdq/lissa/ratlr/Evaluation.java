@@ -250,7 +250,7 @@ public class Evaluation {
         return traceLinks;
     }
 
-    public void setupSourceAndTargetStores() {
+    /*package-private*/ void setupSourceAndTargetStores() {
         LOGGER.info("Loading artifacts");
         var sourceArtifacts = sourceArtifactProvider.getArtifacts();
         var targetArtifacts = targetArtifactProvider.getArtifacts();
