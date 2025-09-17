@@ -4,6 +4,7 @@ package edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -13,8 +14,8 @@ import edu.kit.kastel.sdq.lissa.ratlr.classifier.ClassificationTask;
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
 import edu.kit.kastel.sdq.lissa.ratlr.promptmetric.Metric;
-import edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.samplestrategy.OrderedFirstSampler;
 import edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.samplestrategy.SampleStrategy;
+import edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.samplestrategy.SamplerFactory;
 
 /**
  * An optimizer that uses iterative feedback to refine the prompt based on classification results.
@@ -52,8 +53,7 @@ public class IterativeFeedbackOptimizer extends IterativeOptimizer {
             Classification result: {classification}
             """;
 
-    // TODO Not public!
-    public static final String FEEDBACK_EXAMPLE_BLOCK_CONFIGURATION_KEY = "feedback_example_block";
+    private static final String DEFAULT_SAMPLER = SamplerFactory.ORDERED_SAMPLER;
 
     /**
      * The default number of feedback examples to include in the prompt.
@@ -62,7 +62,6 @@ public class IterativeFeedbackOptimizer extends IterativeOptimizer {
     private static final int FEEDBACK_SIZE = 5;
 
     private static final String FEEDBACK_SIZE_CONFIGURATION_KEY = "feedback_size";
-
     private static final Logger LOGGER = LoggerFactory.getLogger(IterativeFeedbackOptimizer.class);
 
     private final SampleStrategy sampleStrategy;
@@ -84,7 +83,9 @@ public class IterativeFeedbackOptimizer extends IterativeOptimizer {
         this.feedbackSize = configuration.argumentAsInt(FEEDBACK_SIZE_CONFIGURATION_KEY, FEEDBACK_SIZE);
         this.feedbackExampleBlock = configuration.argumentAsString(
                 FEEDBACK_EXAMPLE_BLOCK_CONFIGURATION_KEY, DEFAULT_FEEDBACK_EXAMPLE_BLOCK);
-        this.sampleStrategy = new OrderedFirstSampler();
+        String samplerName = configuration.argumentAsString(SAMPLER_CONFIGURATION_KEY, DEFAULT_SAMPLER);
+        int randomSeed = configuration.argumentAsInt(SAMPLER_SEED_CONFIGURATION_KEY, DEFAULT_SAMPLER_SEED);
+        this.sampleStrategy = SamplerFactory.createSampler(samplerName, new Random(randomSeed));
     }
 
     @Override

@@ -31,7 +31,6 @@ import edu.kit.kastel.sdq.lissa.ratlr.promptmetric.Metric;
 import edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.samplestrategy.FirstSampler;
 import edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.samplestrategy.OrderedFirstSampler;
 import edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.samplestrategy.SampleStrategy;
-import edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.samplestrategy.ShuffledFirstSampler;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.Pair;
 
 /**
@@ -72,7 +71,7 @@ public class AutomaticPromptOptimizer extends IterativeOptimizer {
         super(configuration, goldStandard, metric);
         this.config = new GradientOptimizerConfig(configuration);
         this.evaluator = evaluator;
-        this.sampleStrategy = new ShuffledFirstSampler(config.random());
+        this.sampleStrategy = config.sampleStrategy();
         this.orderedSampleStrategy = new OrderedFirstSampler();
         this.firstSampleStrategy = new FirstSampler();
         this.bruteForceEvaluator = new BruteForceEvaluator(new ModuleConfiguration("", Collections.emptyMap()));
@@ -289,7 +288,7 @@ public class AutomaticPromptOptimizer extends IterativeOptimizer {
         if (config.rejectOnErrors()) {
             return filterCandidatePrompts(promptCandidates, evaluation);
         }
-        return firstSampleStrategy.sample(promptCandidates, config.maxExpansionFactor());
+        return sampleStrategy.sample(promptCandidates, config.maxExpansionFactor());
     }
 
     /**

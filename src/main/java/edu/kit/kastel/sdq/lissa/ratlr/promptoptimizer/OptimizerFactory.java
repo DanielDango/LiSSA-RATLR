@@ -3,7 +3,6 @@ package edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer;
 
 import java.util.Set;
 
-import edu.kit.kastel.sdq.lissa.ratlr.classifier.Classifier;
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
 import edu.kit.kastel.sdq.lissa.ratlr.evaluator.AbstractEvaluator;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
@@ -39,7 +38,6 @@ public final class OptimizerFactory {
     public static PromptOptimizer createOptimizer(
             ModuleConfiguration configuration,
             Set<TraceLink> goldStandard,
-            Classifier classifier,
             Metric metric,
             AbstractEvaluator evaluator) {
         if (configuration == null) {

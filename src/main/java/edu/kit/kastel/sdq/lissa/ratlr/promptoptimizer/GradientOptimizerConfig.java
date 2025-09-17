@@ -2,11 +2,13 @@
 package edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer;
 
 import static edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.IterativeFeedbackOptimizer.FEEDBACK_EXAMPLE_BLOCK_CONFIGURATION_KEY;
+import static edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.IterativeOptimizer.SAMPLER_CONFIGURATION_KEY;
 
 import java.util.Random;
-import java.util.random.RandomGenerator;
 
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
+import edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.samplestrategy.SampleStrategy;
+import edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.samplestrategy.SamplerFactory;
 
 public record GradientOptimizerConfig(
         int numberOfGradients,
@@ -24,7 +26,7 @@ public record GradientOptimizerConfig(
         String transformationPrompt,
         String synonymPrompt,
         String feedbackExampleBlock,
-        RandomGenerator random) {
+        SampleStrategy sampleStrategy) {
 
     // Default prompts from the original implementation
 
@@ -83,8 +85,8 @@ public record GradientOptimizerConfig(
      * providing enough feedback to guide the selection of better prompts.
      */
     private static final int DEFAULT_MAX_ERROR_EXAMPLES = 16;
-    private static final String MAX_ERROR_EXAMPLES_CONFIGURATION_KEY = "max_error_examples";
 
+    private static final String MAX_ERROR_EXAMPLES_CONFIGURATION_KEY = "max_error_examples";
 
     private static final String NUMBER_OF_ERRORS_CONFIGURATION_KEY = "number_of_errors";
     private static final int DEFAULT_NUMBER_OF_ERRORS = 1;
@@ -111,12 +113,15 @@ public record GradientOptimizerConfig(
     private static final String SEED_CONFIGURATION_KEY = "seed";
     private static final int DEFAULT_SEED = 133742243;
 
+    private static final String DEFAULT_SAMPLER = SamplerFactory.SHUFFLED_SAMPLER;
+
     public GradientOptimizerConfig(ModuleConfiguration configuration) {
         this(
                 configuration.argumentAsInt(NUMBER_OF_GRADIENTS_CONFIGURATION_KEY, DEFAULT_NUMBER_OF_GRADIENTS),
                 configuration.argumentAsInt(MAX_ERROR_EXAMPLES_CONFIGURATION_KEY, DEFAULT_MAX_ERROR_EXAMPLES),
                 configuration.argumentAsInt(NUMBER_OF_ERRORS_CONFIGURATION_KEY, DEFAULT_NUMBER_OF_ERRORS),
-                configuration.argumentAsInt(NUMBER_OF_GRADIENTS_PER_ERROR_CONFIGURATION_KEY, DEFAULT_NUMBER_OF_GRADIENTS_PER_ERROR),
+                configuration.argumentAsInt(
+                        NUMBER_OF_GRADIENTS_PER_ERROR_CONFIGURATION_KEY, DEFAULT_NUMBER_OF_GRADIENTS_PER_ERROR),
                 configuration.argumentAsInt(STEPS_PER_GRADIENT_CONFIGURATION_KEY, STEPS_PER_GRADIENT),
                 configuration.argumentAsInt(MC_SAMPLES_PER_STEP_CONFIGURATION_KEY, MC_SAMPLES_PER_STEP),
                 configuration.argumentAsInt(MAX_EXPANSION_FACTOR_CONFIGURATION_KEY, MAX_EXPANSION_FACTOR),
@@ -131,6 +136,8 @@ public record GradientOptimizerConfig(
                 configuration.argumentAsString(SYNONYM_PROMPT_CONFIGURATION_KEY, DEFAULT_SYNONYM_PROMPT),
                 configuration.argumentAsString(
                         FEEDBACK_EXAMPLE_BLOCK_CONFIGURATION_KEY, DEFAULT_FEEDBACK_EXAMPLE_BLOCK),
-                new Random(configuration.argumentAsInt(SEED_CONFIGURATION_KEY, DEFAULT_SEED)));
+                SamplerFactory.createSampler(
+                        configuration.argumentAsString(SAMPLER_CONFIGURATION_KEY, DEFAULT_SAMPLER),
+                        new Random(configuration.argumentAsInt(SEED_CONFIGURATION_KEY, DEFAULT_SEED))));
     }
 }

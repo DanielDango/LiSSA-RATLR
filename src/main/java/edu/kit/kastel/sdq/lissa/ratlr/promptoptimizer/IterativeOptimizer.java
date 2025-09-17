@@ -9,6 +9,7 @@ import static edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.PromptOptimizationU
 import java.util.List;
 import java.util.Set;
 
+import edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.samplestrategy.SamplerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -104,6 +105,13 @@ public class IterativeOptimizer implements PromptOptimizer {
      * This key is used to retrieve the original prompt from the configuration.
      */
     protected static final String BASE_PROMPT_CONFIGURATION_KEY = "prompt";
+
+    protected static final String FEEDBACK_EXAMPLE_BLOCK_CONFIGURATION_KEY = "feedback_example_block";
+
+    protected static final String SAMPLER_CONFIGURATION_KEY = "sampler";
+    protected static final int DEFAULT_SAMPLER_SEED = 42;
+    protected static final String SAMPLER_SEED_CONFIGURATION_KEY = "sampler_seed";
+
 
     /**
      * Logger for the prompt optimizer.
