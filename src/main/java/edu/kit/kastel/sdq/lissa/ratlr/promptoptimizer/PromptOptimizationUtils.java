@@ -85,6 +85,19 @@ public final class PromptOptimizationUtils {
                 .trim();
     }
 
+
+
+    /**
+     * Apply the {@link #sanitizePrompt(String)} method to a list of prompts.
+     *
+     * @param prompts the list of prompts to sanitize
+     * @return        a list of sanitized prompts
+     */
+    @NotNull
+    public static List<String> sanitizePrompts(Collection<String> prompts) {
+        return prompts.stream().map(PromptOptimizationUtils::sanitizePrompt).toList();
+    }
+
     /**
      * Generates a list of classification tasks based on the provided source and target element stores,
      * and a set of valid trace links. For each source element, it finds similar target elements and creates

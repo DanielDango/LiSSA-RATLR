@@ -15,19 +15,6 @@ import edu.kit.kastel.sdq.lissa.ratlr.promptmetric.Metric;
 public class BruteForceEvaluator extends AbstractEvaluator {
 
     /**
-     * Deprecated constructor that only takes an evaluation budget.
-     * This constructor is deprecated and will be removed in future versions.
-     * Use {@link #BruteForceEvaluator(ModuleConfiguration)} instead.
-     *
-     * @param evaluationBudget The total number of evaluations to perform.
-     * @deprecated Use {@link #BruteForceEvaluator(ModuleConfiguration)} instead.
-     */
-    @Deprecated(forRemoval = true)
-    public BruteForceEvaluator(int evaluationBudget) {
-        super(new ModuleConfiguration("", Collections.emptyMap()));
-    }
-
-    /**
      * Creates a new brute-force evaluator instance with the given configuration.
      *
      * @param configuration The configuration for the evaluator.

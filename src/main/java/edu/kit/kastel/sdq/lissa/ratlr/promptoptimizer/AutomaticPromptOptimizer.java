@@ -3,6 +3,7 @@ package edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer;
 
 import static edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.PromptOptimizationUtils.getClassificationTasks;
 import static edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.PromptOptimizationUtils.parseTaggedText;
+import static edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.PromptOptimizationUtils.sanitizePrompts;
 import static edu.kit.kastel.sdq.lissa.ratlr.utils.ChatLanguageModelUtils.nCachedRequest;
 
 import java.util.ArrayList;
@@ -13,6 +14,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -26,6 +28,7 @@ import edu.kit.kastel.sdq.lissa.ratlr.evaluator.AbstractEvaluator;
 import edu.kit.kastel.sdq.lissa.ratlr.evaluator.BruteForceEvaluator;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
 import edu.kit.kastel.sdq.lissa.ratlr.promptmetric.Metric;
+import edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.samplestrategy.FirstSampler;
 import edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.samplestrategy.OrderedFirstSampler;
 import edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.samplestrategy.SampleStrategy;
 import edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.samplestrategy.ShuffledFirstSampler;
@@ -45,15 +48,21 @@ public class AutomaticPromptOptimizer extends IterativeOptimizer {
     private static final String END_TAG = "<END>";
     private static final String SECTION_HEADER_PREFIX = "# ";
     private static final String TASK_SECTION = "task";
-    // TODO add to config
-    private static final int MAX_ERROR_SAMPLES_TODO = 16;
 
+    private static final Pattern SECTION_HEADER_NORMALIZATION_PATTERN =
+            Pattern.compile("\\p{Punct}", Pattern.UNICODE_CHARACTER_CLASS);
     private static final Logger LOGGER = LoggerFactory.getLogger(AutomaticPromptOptimizer.class);
+    // TODO add to config
+    public static final int TODO_JUSTIFY_AND_NAME = 2;
 
     private final GradientOptimizerConfig config;
     private final AbstractEvaluator evaluator;
+    // TODO Unify
+    private final AbstractEvaluator bruteForceEvaluator;
     private final SampleStrategy sampleStrategy;
+    // TODO Unify
     private final SampleStrategy orderedSampleStrategy;
+    private final SampleStrategy firstSampleStrategy;
 
     public AutomaticPromptOptimizer(
             ModuleConfiguration configuration,
@@ -65,42 +74,8 @@ public class AutomaticPromptOptimizer extends IterativeOptimizer {
         this.evaluator = evaluator;
         this.sampleStrategy = new ShuffledFirstSampler(config.random());
         this.orderedSampleStrategy = new OrderedFirstSampler();
-    }
-
-    /**
-     * Parses a sectioned prompt into a map of section headers to their corresponding content.
-     * Sections are identified by lines starting with "# " as in the Markdown syntax.
-     * If no sections are found, the entire prompt is treated as a single {@value TASK_SECTION} section.
-     *
-     * @param prompt The sectioned prompt string
-     * @return A map where keys are section headers (in lowercase, without punctuation) and values are the section content
-     */
-    private static Map<String, String> parseSectionedPrompt(String prompt) {
-        Map<String, String> sections = new HashMap<>();
-        String currentHeader = "";
-        StringBuilder currentSection = new StringBuilder();
-        for (String line : prompt.split(System.lineSeparator())) {
-            line = line.strip();
-            if (line.startsWith(SECTION_HEADER_PREFIX)) {
-                // save previous section
-                if (!currentHeader.isEmpty()) {
-                    sections.put(currentHeader, currentSection.toString().trim());
-                    currentSection = new StringBuilder();
-                }
-                // first word without punctuation as new header
-                currentHeader = line.substring(SECTION_HEADER_PREFIX.length())
-                        .strip()
-                        .toLowerCase()
-                        .split(" ")[0]
-                        .replaceAll("\\p{Punct}", "");
-            } else {
-                currentSection.append(line).append(System.lineSeparator());
-            }
-        }
-        if (sections.isEmpty()) {
-            sections.put(TASK_SECTION, prompt);
-        }
-        return sections;
+        this.firstSampleStrategy = new FirstSampler();
+        this.bruteForceEvaluator = new BruteForceEvaluator(new ModuleConfiguration("", Collections.emptyMap()));
     }
 
     /**
@@ -128,7 +103,8 @@ public class AutomaticPromptOptimizer extends IterativeOptimizer {
             LOGGER.info("Starting apo iteration {}/{}", round + 1, maximumIterations);
             // expand candidates
             if (round > 0) {
-                candidatePrompts = expandCandidates(candidatePrompts, tasks);
+                List<ClassificationTask> reducedTasks = sampleStrategy.sample(tasks, config.minibatchSize());
+                candidatePrompts = expandCandidates(candidatePrompts, reducedTasks);
                 LOGGER.info("Expanded to {} candidates", candidatePrompts.size());
             }
             // score candidates
@@ -219,9 +195,6 @@ public class AutomaticPromptOptimizer extends IterativeOptimizer {
     }
 
     /**
-     * Sample n error strings from the given texts, labels, and preds
-     */
-    /**
      * Sample error strings from evaluation results.
      * This method selects a subset of misclassified examples and formats them into a single error string.
      *
@@ -231,7 +204,7 @@ public class AutomaticPromptOptimizer extends IterativeOptimizer {
     private String sampleErrorString(List<EvaluationResult<Boolean>> evaluationResults) {
         List<Integer> errorIDxs = new ArrayList<>();
         for (EvaluationResult<Boolean> result : evaluationResults) {
-            if (!result.isCorrect()) {
+            if (result.isIncorrect()) {
                 errorIDxs.add(evaluationResults.indexOf(result));
             }
         }
@@ -262,7 +235,7 @@ public class AutomaticPromptOptimizer extends IterativeOptimizer {
 
     /**
      * Expand a list of prompts into a larger list of candidate prompts using gradient-based modifications and synonym
-     * generation on a subset of the tasks.
+     * generation on the tasks.
      * This method processes each prompt individually, by delegating to {@link #expandCandidates(String, List)}.
      *
      * @param prompts The list of prompts to expand
@@ -270,11 +243,10 @@ public class AutomaticPromptOptimizer extends IterativeOptimizer {
      * @return A distinct list of expanded candidate prompts
      */
     private List<String> expandCandidates(List<String> prompts, List<ClassificationTask> tasks) {
-        List<ClassificationTask> reducedTasks = sampleStrategy.sample(tasks, config.minibatchSize());
 
         List<String> candidatePrompts = new ArrayList<>();
         for (String prompt : prompts) {
-            candidatePrompts.addAll(expandCandidates(prompt, reducedTasks));
+            candidatePrompts.addAll(expandCandidates(prompt, tasks));
         }
         candidatePrompts.addAll(prompts);
         return candidatePrompts.stream().distinct().toList();
@@ -293,62 +265,66 @@ public class AutomaticPromptOptimizer extends IterativeOptimizer {
      *     <li>Filter the candidate prompts to limit the total number based on configuration settings</li>
      * </ul>
      *
-     * @param prompt The prompt to expand
-     * @param tasks The classification tasks to use for generating gradients and evaluating the prompt
+     * @param originalPrompt The prompt to expand, if it is sectioned (see {@link #parseSectionedPrompt(String)}),
+     *                       only the {@value #TASK_SECTION} section is modified
+     * @param classificationTasks The classification tasks to use for generating gradients and evaluating the prompt
      * @return A distinct list of expanded candidate prompts
      */
-    private List<String> expandCandidates(String prompt, List<ClassificationTask> tasks) {
-        String taskSection = parseSectionedPrompt(prompt).get(TASK_SECTION).strip();
+    private List<String> expandCandidates(String originalPrompt, List<ClassificationTask> classificationTasks) {
+        String taskSection =
+                parseSectionedPrompt(originalPrompt).get(TASK_SECTION).strip();
 
-        List<EvaluationResult<Boolean>> evaluation = evaluatePrompt(tasks, prompt);
+        List<EvaluationResult<Boolean>> evaluation = evaluatePrompt(classificationTasks, originalPrompt);
 
-        Collection<String> promptVariations = applyGradient(taskSection, evaluation);
-        Collection<String> synonyms = generateSynonyms(promptVariations, config.mcSamplesPerStep());
-        synonyms.addAll(generateSynonyms(taskSection, config.mcSamplesPerStep()));
-        // combine
-        promptVariations.addAll(synonyms);
+        Collection<String> taskVariations = applyGradient(taskSection, evaluation);
+        taskVariations.addAll(generateSynonyms(taskVariations, config.mcSamplesPerStep()));
+        taskVariations.addAll(generateSynonyms(taskSection, config.mcSamplesPerStep()));
 
-        Collection<String> combinedTaskSections = promptVariations;
-
-        List<String> tempNewPrompts = new ArrayList<>();
-        for (String section : combinedTaskSections) {
-            tempNewPrompts.add(prompt.replace(taskSection, section));
+        List<String> promptCandidates = new ArrayList<>();
+        for (String section : taskVariations) {
+            promptCandidates.add(originalPrompt.replace(taskSection, section));
         }
-        // filter a little
-        if (combinedTaskSections.size() > config.maxExpansionFactor()) {
-            if (config.rejectOnErrors()) {
-                List<ClassificationTask> errorExamples = new ArrayList<>();
-                for (EvaluationResult<Boolean> result : evaluation) {
-                    if (!result.isCorrect()) {
-                        errorExamples.add(
-                                new ClassificationTask(result.source(), result.target(), result.groundTruth()));
-                    }
-                }
-                errorExamples =
-                        errorExamples.stream().limit(MAX_ERROR_SAMPLES_TODO).toList();
-                // speed up a little
-                tempNewPrompts = tempNewPrompts.stream()
-                        .limit(config.maxExpansionFactor() * 2)
-                        .toList();
-                AbstractEvaluator bruteForceEvaluator = new BruteForceEvaluator(config.evaluationBudget());
-                List<Double> errorScores = bruteForceEvaluator.call(tempNewPrompts, errorExamples, metric);
-                List<Integer> sortedIdxs = errorScores.stream()
-                        .sorted()
-                        // TODO Check if this is correct
-                        .mapToInt(errorScores::indexOf)
-                        .boxed()
-                        .toList();
-                tempNewPrompts = sortedIdxs.stream()
-                        .skip(Math.max(0, sortedIdxs.size() - config.maxExpansionFactor()))
-                        .map(tempNewPrompts::get)
-                        .toList();
-            } else {
-                tempNewPrompts = tempNewPrompts.stream()
-                        .limit(config.maxExpansionFactor())
-                        .toList();
+        assert taskVariations.size() == promptCandidates.size();
+
+        if (config.rejectOnErrors()) {
+            return filterCandidatePrompts(promptCandidates, evaluation);
+        }
+        return firstSampleStrategy.sample(promptCandidates, config.maxExpansionFactor());
+    }
+
+    /**
+     * Filter a list of candidate prompts to limit the total number based on configuration settings.
+     * This method evaluates each candidate prompt on the misclassified examples from the provided evaluation results
+     * and selects the top candidates that best address the errors.
+     *
+     * @param promptCandidates The list of candidate prompts to filter
+     * @param evaluation The evaluation results used to identify misclassified examples
+     * @return A filtered list of candidate prompts limited to {@link GradientOptimizerConfig#maxExpansionFactor()}
+     */
+    private List<String> filterCandidatePrompts(
+            List<String> promptCandidates, List<EvaluationResult<Boolean>> evaluation) {
+        if (promptCandidates.size() <= config.maxExpansionFactor()) {
+            return promptCandidates;
+        }
+        List<ClassificationTask> missclassifiedTasks = new ArrayList<>();
+        for (EvaluationResult<Boolean> result : evaluation) {
+            if (result.isIncorrect()) {
+                missclassifiedTasks.add(new ClassificationTask(result.source(), result.target(), result.groundTruth()));
             }
         }
-        return tempNewPrompts;
+        missclassifiedTasks = firstSampleStrategy.sample(missclassifiedTasks, config.maxErrorExamples());
+        List<String> sampledPromptCandidates =
+                firstSampleStrategy.sample(promptCandidates, config.maxExpansionFactor() * TODO_JUSTIFY_AND_NAME);
+        List<Double> errorScores = bruteForceEvaluator.call(sampledPromptCandidates, missclassifiedTasks, metric);
+        List<Integer> sortedIdxs = errorScores.stream()
+                .sorted()
+                .mapToInt(errorScores::indexOf)
+                .boxed()
+                .toList();
+        return sortedIdxs.stream()
+                .skip(Math.max(0, sortedIdxs.size() - config.maxExpansionFactor()))
+                .map(sampledPromptCandidates::get)
+                .toList();
     }
 
     /**
@@ -369,6 +345,25 @@ public class AutomaticPromptOptimizer extends IterativeOptimizer {
             promptVariations.addAll(applyGradient(originalPrompt, error, feedback));
         }
         return promptVariations;
+    }
+
+    /**
+     * Apply a textual gradient to a prompt section to generate new prompt variations.
+     *
+     * @param prompt The prompt section to modify
+     * @param errorString The error string indicating the errors present with the prompt
+     * @param feedbackString The textual gradient suggesting improvements to the prompt
+     * @return A list of new prompt sections generated by applying the gradient
+     */
+    private List<String> applyGradient(String prompt, String errorString, String feedbackString) {
+        String formattedTransformationPrompt = String.format(
+                config.transformationPrompt(),
+                prompt,
+                errorString,
+                feedbackString,
+                config.stepsPerGradient(),
+                config.stepsPerGradient());
+        return cachedSanitizedPromptRequest(config.stepsPerGradient(), formattedTransformationPrompt);
     }
 
     /**
@@ -427,25 +422,6 @@ public class AutomaticPromptOptimizer extends IterativeOptimizer {
     }
 
     /**
-     * Apply a textual gradient to a prompt section to generate new prompt variations.
-     *
-     * @param prompt The prompt section to modify
-     * @param errorString The error string indicating the errors present with the prompt
-     * @param feedbackString The textual gradient suggesting improvements to the prompt
-     * @return A list of new prompt sections generated by applying the gradient
-     */
-    private List<String> applyGradient(String prompt, String errorString, String feedbackString) {
-        String formattedTransformationPrompt = String.format(
-                config.transformationPrompt(),
-                prompt,
-                errorString,
-                feedbackString,
-                config.stepsPerGradient(),
-                config.stepsPerGradient());
-        return cachedSanitizedPromptRequest(config.stepsPerGradient(), formattedTransformationPrompt);
-    }
-
-    /**
      * Send a cached request to the language model and parse the response for text between {@value #START_TAG} and
      * {@value #END_TAG} tags.
      * The prompts are sanitized using the {@link PromptOptimizationUtils#sanitizePrompt(String)} method.
@@ -465,12 +441,39 @@ public class AutomaticPromptOptimizer extends IterativeOptimizer {
     }
 
     /**
-     * Apply the {@link PromptOptimizationUtils#sanitizePrompt(String)} method to a list of prompts.
+     * Parses a sectioned prompt into a map of section headers to their corresponding content.
+     * Sections are identified by lines starting with "# " as in the Markdown syntax.
+     * If no sections are found, the entire prompt is treated as a single {@value TASK_SECTION} section.
      *
-     * @param prompts the list of prompts to sanitize
-     * @return        a list of sanitized prompts
+     * @param prompt The sectioned prompt string
+     * @return A map where keys are section headers (in lowercase, without punctuation) and values are the section content
      */
-    private static List<String> sanitizePrompts(List<String> prompts) {
-        return prompts.stream().map(PromptOptimizationUtils::sanitizePrompt).toList();
+    private static Map<String, String> parseSectionedPrompt(String prompt) {
+        Map<String, String> sections = new HashMap<>();
+        String currentHeader = "";
+        StringBuilder currentSection = new StringBuilder();
+        for (String line : prompt.split(System.lineSeparator())) {
+            line = line.strip();
+            if (line.startsWith(SECTION_HEADER_PREFIX)) {
+                // save previous section
+                if (!currentHeader.isEmpty()) {
+                    sections.put(currentHeader, currentSection.toString().trim());
+                    currentSection = new StringBuilder();
+                }
+                // first word without punctuation as new header
+                currentHeader = SECTION_HEADER_NORMALIZATION_PATTERN
+                        .matcher(line.substring(SECTION_HEADER_PREFIX.length())
+                                .strip()
+                                .toLowerCase()
+                                .split(" ")[0])
+                        .replaceAll("");
+            } else {
+                currentSection.append(line).append(System.lineSeparator());
+            }
+        }
+        if (sections.isEmpty()) {
+            sections.put(TASK_SECTION, prompt);
+        }
+        return sections;
     }
 }
