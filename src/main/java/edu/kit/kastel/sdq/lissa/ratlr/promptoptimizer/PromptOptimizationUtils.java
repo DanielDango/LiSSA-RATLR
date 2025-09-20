@@ -85,8 +85,6 @@ public final class PromptOptimizationUtils {
                 .trim();
     }
 
-
-
     /**
      * Apply the {@link #sanitizePrompt(String)} method to a list of prompts.
      *

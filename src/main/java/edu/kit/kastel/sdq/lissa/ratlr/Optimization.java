@@ -89,8 +89,8 @@ public class Optimization {
                 evaluationPipeline.getTraceLinkIdPostProcessor());
         AbstractEvaluator evaluator = AbstractEvaluator.createEvaluator(configuration.evaluator());
 
-        promptOptimizer = OptimizerFactory.createOptimizer(
-                configuration.promptOptimizer(), goldStandard, metric, evaluator);
+        promptOptimizer =
+                OptimizerFactory.createOptimizer(configuration.promptOptimizer(), goldStandard, metric, evaluator);
         configuration.serializeAndDestroyConfiguration();
     }
 
