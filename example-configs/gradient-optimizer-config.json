@@ -45,8 +45,8 @@
       "max_results" : "4"
     }
   },
-  "scorer" : {
-    "name" : "binary",
+  "metric" : {
+    "name" : "pointwise",
     "args" : {}
   },
   "evaluator" : {
