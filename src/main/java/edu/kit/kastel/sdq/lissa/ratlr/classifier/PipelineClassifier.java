@@ -141,13 +141,24 @@ public class PipelineClassifier extends Classifier {
     }
 
     @Override
-    protected Classifier copyOf() {
+    public Classifier copyOf() {
         return new PipelineClassifier(classifiers, this.threads, this.contextStore);
     }
 
     @Override
     public void setClassificationPrompt(String prompt) {
         throw new UnsupportedOperationException("PipelineClassifier does not support setting a classification prompt.");
+    }
+
+    @Override
+    public String[] getCacheParameters() {
+        List<String> params = new ArrayList<>();
+        for (List<Classifier> classifierStage : classifiers) {
+            for (Classifier classifier : classifierStage) {
+                params.addAll(Arrays.asList(classifier.getCacheParameters()));
+            }
+        }
+        return params.toArray(new String[0]);
     }
 
     /**

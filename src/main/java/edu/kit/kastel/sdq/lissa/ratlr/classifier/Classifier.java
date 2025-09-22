@@ -1,6 +1,9 @@
 /* Licensed under MIT 2025. */
 package edu.kit.kastel.sdq.lissa.ratlr.classifier;
 
+import static edu.kit.kastel.sdq.lissa.ratlr.classifier.ReasoningClassifier.REASONING_CLASSIFIER_NAME;
+import static edu.kit.kastel.sdq.lissa.ratlr.classifier.SimpleClassifier.SIMPLE_CLASSIFIER_NAME;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -190,7 +193,7 @@ public abstract class Classifier {
      *
      * @return A new instance of the same classifier type
      */
-    protected abstract Classifier copyOf();
+    public abstract Classifier copyOf();
 
     /**
      * Sets the prompt used for classification.
@@ -242,8 +245,8 @@ public abstract class Classifier {
     public static Classifier createClassifier(ModuleConfiguration configuration, ContextStore contextStore) {
         return switch (configuration.name().split(CONFIG_NAME_SEPARATOR)[0]) {
             case "mock" -> new MockClassifier(contextStore);
-            case "simple" -> new SimpleClassifier(configuration, contextStore);
-            case "reasoning" -> new ReasoningClassifier(configuration, contextStore);
+            case SIMPLE_CLASSIFIER_NAME -> new SimpleClassifier(configuration, contextStore);
+            case REASONING_CLASSIFIER_NAME -> new ReasoningClassifier(configuration, contextStore);
             default -> throw new IllegalStateException("Unexpected value: " + configuration.name());
         };
     }
@@ -260,4 +263,6 @@ public abstract class Classifier {
             List<List<ModuleConfiguration>> configs, ContextStore contextStore) {
         return new PipelineClassifier(configs, contextStore);
     }
+
+    public abstract String[] getCacheParameters();
 }

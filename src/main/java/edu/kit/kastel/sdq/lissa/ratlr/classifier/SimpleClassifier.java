@@ -41,6 +41,8 @@ public class SimpleClassifier extends Classifier {
             Answer with 'yes' or 'no'.
             """;
 
+    public static final String SIMPLE_CLASSIFIER_NAME = "simple";
+
     private final Cache cache;
 
     /**
@@ -97,13 +99,22 @@ public class SimpleClassifier extends Classifier {
      * @return A new simple classifier instance with the same configuration
      */
     @Override
-    protected final Classifier copyOf() {
+    public final Classifier copyOf() {
         return new SimpleClassifier(threads, cache, provider, template, contextStore);
     }
 
     @Override
     public void setClassificationPrompt(String prompt) {
         this.template = prompt;
+    }
+
+    @Override
+    public String[] getCacheParameters() {
+        String[] providerParams = provider.getCacheParameters();
+        String[] params = new String[providerParams.length + 1];
+        params[0] = SIMPLE_CLASSIFIER_NAME;
+        System.arraycopy(providerParams, 0, params, 1, providerParams.length);
+        return params;
     }
 
     /**

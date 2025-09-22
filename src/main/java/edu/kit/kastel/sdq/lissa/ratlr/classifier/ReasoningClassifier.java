@@ -26,6 +26,9 @@ import dev.langchain4j.model.chat.response.ChatResponse;
  * using configurable prompts and caching to improve performance.
  */
 public class ReasoningClassifier extends Classifier {
+
+    public static final String REASONING_CLASSIFIER_NAME = "reasoning";
+
     private final Cache cache;
 
     /**
@@ -98,7 +101,7 @@ public class ReasoningClassifier extends Classifier {
     }
 
     @Override
-    protected final Classifier copyOf() {
+    public final Classifier copyOf() {
         return new ReasoningClassifier(
                 threads, cache, provider, prompt, useOriginalArtifacts, useSystemMessage, contextStore);
     }
@@ -106,6 +109,15 @@ public class ReasoningClassifier extends Classifier {
     @Override
     public void setClassificationPrompt(String prompt) {
         this.prompt = prompt;
+    }
+
+    @Override
+    public String[] getCacheParameters() {
+        String[] providerParams = provider.getCacheParameters();
+        String[] params = new String[providerParams.length + 1];
+        params[0] = REASONING_CLASSIFIER_NAME;
+        System.arraycopy(providerParams, 0, params, 1, providerParams.length);
+        return params;
     }
 
     /**
