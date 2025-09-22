@@ -22,6 +22,7 @@ public final class CacheManager {
     private static CacheManager defaultInstanceManager;
     private final Path directoryOfCaches;
     private final Map<String, RedisCache> caches = new HashMap<>();
+    private final boolean replaceLocalCacheOnConflict;
 
     /**
      * Sets the cache directory for the default cache manager instance.
@@ -48,6 +49,7 @@ public final class CacheManager {
             throw new IllegalArgumentException("path is not a directory: " + cacheDir);
         }
         this.directoryOfCaches = cacheDir;
+        this.replaceLocalCacheOnConflict = true;
     }
 
     /**
@@ -99,7 +101,7 @@ public final class CacheManager {
         }
 
         LocalCache localCache = new LocalCache(directoryOfCaches + "/" + name + (appendEnding ? ".json" : ""));
-        RedisCache cache = new RedisCache(localCache);
+        RedisCache cache = new RedisCache(localCache, replaceLocalCacheOnConflict);
         caches.put(name, cache);
         return cache;
     }

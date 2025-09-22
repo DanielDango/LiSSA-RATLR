@@ -39,19 +39,22 @@ class RedisCache implements Cache {
      */
     private UnifiedJedis jedis;
 
+    private boolean replaceLocalCacheOnConflict;
+
     /**
      * Creates a new Redis cache instance with an optional local cache backup.
      *
      * @param localCache The local cache to use as backup, or null if no backup is needed
      * @throws IllegalArgumentException If neither Redis nor local cache can be initialized
      */
-    RedisCache(LocalCache localCache) {
+    RedisCache(LocalCache localCache, boolean replaceLocalCacheOnConflict) {
         this.localCache = localCache == null || !localCache.isReady() ? null : localCache;
         mapper = new ObjectMapper();
         createRedisConnection();
         if (jedis == null && this.localCache == null) {
             throw new IllegalArgumentException("Could not create cache");
         }
+        this.replaceLocalCacheOnConflict = replaceLocalCacheOnConflict;
     }
 
     @Override
@@ -87,7 +90,8 @@ class RedisCache implements Cache {
      * falls back to the local cache.
      * If the value is found in the local cache and Redis is available, it will be synchronized to Redis.
      * If the value is found in Redis and the local cache is available, it will be synchronized to the local cache.
-     * In case of a mismatch between Redis and local cache values, a warning is logged.
+     * In case of a mismatch between Redis and local cache values, a warning is logged and the replacement strategy is
+     * applied.
      *
      * @param <T> The type to deserialize the value to
      * @param key The cache key to look up
@@ -110,8 +114,9 @@ class RedisCache implements Cache {
                 jedis.hset(key.toJsonKey(), "data", jsonData);
             }
         }
-        if (jsonData != null && localData != null && !jsonData.equals(localData)) {
-            logger.warn("Cache inconsistency detected for key {}, using Redis value", key);
+        if (replaceLocalCacheOnConflict && jsonData != null && localData != null && !jsonData.equals(localData)) {
+            logger.info("Cache inconsistency detected for key {}, using Redis value and replacing local one", key);
+            localCache.put(key, jsonData);
         }
 
         return convert(jsonData, clazz);
