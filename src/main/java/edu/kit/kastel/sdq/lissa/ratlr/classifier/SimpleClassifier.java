@@ -1,11 +1,13 @@
 /* Licensed under MIT 2025. */
 package edu.kit.kastel.sdq.lissa.ratlr.classifier;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import edu.kit.kastel.sdq.lissa.ratlr.cache.Cache;
-import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheKey;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheManager;
+import edu.kit.kastel.sdq.lissa.ratlr.cache.ClassifierCacheKey;
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
 import edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
@@ -109,11 +111,10 @@ public class SimpleClassifier extends Classifier {
     }
 
     @Override
-    public String[] getCacheParameters() {
-        String[] providerParams = provider.getCacheParameters();
-        String[] params = new String[providerParams.length + 1];
-        params[0] = SIMPLE_CLASSIFIER_NAME;
-        System.arraycopy(providerParams, 0, params, 1, providerParams.length);
+    public Map<String, String> getCacheParameters() {
+        Map<String, String> providerParams = provider.getCacheParameters();
+        Map<String, String> params = new HashMap<>(providerParams);
+        params.put("classifier", SIMPLE_CLASSIFIER_NAME);
         return params;
     }
 
@@ -159,8 +160,8 @@ public class SimpleClassifier extends Classifier {
                 .replace("{target_type}", target.getType())
                 .replace("{target_content}", target.getContent());
 
-        CacheKey cacheKey =
-                CacheKey.of(provider.modelName(), provider.seed(), provider.temperature(), CacheKey.Mode.CHAT, request);
+        ClassifierCacheKey cacheKey = ClassifierCacheKey.of(
+                provider.modelName(), provider.seed(), provider.temperature(), ClassifierCacheKey.Mode.CHAT, request);
         String cachedResponse = cache.get(cacheKey, String.class);
         if (cachedResponse != null) {
             return cachedResponse;

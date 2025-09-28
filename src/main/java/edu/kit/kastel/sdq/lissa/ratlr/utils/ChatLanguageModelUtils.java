@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import edu.kit.kastel.sdq.lissa.ratlr.cache.Cache;
-import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheKey;
+import edu.kit.kastel.sdq.lissa.ratlr.cache.ClassifierCacheKey;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.ChatLanguageModelProvider;
 
 import dev.langchain4j.model.chat.ChatModel;
@@ -39,11 +39,11 @@ public final class ChatLanguageModelUtils {
         if (numberOfRequests < 1) {
             throw new IllegalArgumentException("Number of requests must be at least 1");
         }
-        CacheKey cacheKey = CacheKey.of(
+        ClassifierCacheKey cacheKey = ClassifierCacheKey.of(
                 provider.modelName(),
                 provider.seed(),
                 provider.temperature(),
-                CacheKey.Mode.CHAT,
+                ClassifierCacheKey.Mode.CHAT,
                 numberOfRequests + " results: \n" + request);
         List<String> responses = cache.get(cacheKey, List.class);
         if (responses == null || responses.size() < numberOfRequests) {

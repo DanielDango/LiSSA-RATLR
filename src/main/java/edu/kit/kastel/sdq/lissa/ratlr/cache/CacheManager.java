@@ -86,6 +86,13 @@ public final class CacheManager {
         return getCache(name, true);
     }
 
+    public Cache getCache(Object origin, Map<String, String> parameters) {
+        if (parameters == null) {
+            throw new IllegalArgumentException("Parameters must not be null");
+        }
+        return getCache(origin, parameters.values().toArray(new String[0]));
+    }
+
     /**
      * Gets a cache instance for the specified name, optionally appending a file extension.
      *

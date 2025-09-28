@@ -266,12 +266,18 @@ public class ChatLanguageModelProvider {
      * @return An array of strings representing the cache parameters
      * @see edu.kit.kastel.sdq.lissa.ratlr.cache.CacheManager#getCache(Object, String[])
      */
-    public String[] getCacheParameters() {
+    public Map<String, String> getCacheParameters() {
         if (temperature == 0.0) {
             // Backwards compatibility with the old mode that did not have temperature
-            return new String[] {modelName(), String.valueOf(seed())};
+            return Map.of("modelName", modelName(), "seed", String.valueOf(seed()));
         } else {
-            return new String[] {modelName(), String.valueOf(seed()), String.valueOf(temperature())};
+            return Map.of(
+                    "modelName",
+                    modelName(),
+                    "seed",
+                    String.valueOf(seed()),
+                    "temperature",
+                    String.valueOf(temperature()));
         }
     }
 }

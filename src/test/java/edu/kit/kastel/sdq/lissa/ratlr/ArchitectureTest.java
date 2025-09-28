@@ -17,7 +17,7 @@ import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.lang.ArchRule;
 
 import edu.kit.kastel.sdq.lissa.cli.command.OptimizeCommand;
-import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheKey;
+import edu.kit.kastel.sdq.lissa.ratlr.cache.ClassifierCacheKey;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.Classifier;
 import edu.kit.kastel.sdq.lissa.ratlr.promptmetric.Metric;
 import edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.PromptOptimizer;
@@ -89,21 +89,21 @@ class ArchitectureTest {
             .because("Lambdas should be functional. ForEach is typically used for side-effects.");
 
     /**
-     * CacheKeys should only be created using the #of method of the CacheKey class.
+     * CacheKeys should only be created using the #of method of the ClassifierCacheKey class.
      */
     @ArchTest
     static final ArchRule cacheKeysShouldBeCreatedUsingKeyGenerator = noClasses()
             .that()
-            .haveNameNotMatching(CacheKey.class.getName())
+            .haveNameNotMatching(ClassifierCacheKey.class.getName())
             .should()
-            .callConstructorWhere(new DescribedPredicate<JavaConstructorCall>("calls CacheKey constructor") {
+            .callConstructorWhere(new DescribedPredicate<JavaConstructorCall>("calls ClassifierCacheKey constructor") {
                 @Override
                 public boolean test(JavaConstructorCall javaConstructorCall) {
                     return javaConstructorCall
                             .getTarget()
                             .getOwner()
                             .getFullName()
-                            .equals(CacheKey.class.getName());
+                            .equals(ClassifierCacheKey.class.getName());
                 }
             });
 

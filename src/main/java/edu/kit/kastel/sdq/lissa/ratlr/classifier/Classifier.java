@@ -7,6 +7,7 @@ import static edu.kit.kastel.sdq.lissa.ratlr.classifier.SimpleClassifier.SIMPLE_
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.*;
@@ -264,5 +265,5 @@ public abstract class Classifier {
         return new PipelineClassifier(configs, contextStore);
     }
 
-    public abstract String[] getCacheParameters();
+    public abstract Map<String, String> getCacheParameters();
 }

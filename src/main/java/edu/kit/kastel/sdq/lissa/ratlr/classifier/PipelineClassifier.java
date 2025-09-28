@@ -147,18 +147,24 @@ public class PipelineClassifier extends Classifier {
 
     @Override
     public void setClassificationPrompt(String prompt) {
-        throw new UnsupportedOperationException("PipelineClassifier does not support setting a classification prompt.");
+        for (List<Classifier> layer : classifiers) {
+            for (Classifier classifier : layer) {
+                classifier.setClassificationPrompt(prompt);
+            }
+        }
     }
 
     @Override
-    public String[] getCacheParameters() {
-        List<String> params = new ArrayList<>();
-        for (List<Classifier> classifierStage : classifiers) {
-            for (Classifier classifier : classifierStage) {
-                params.addAll(Arrays.asList(classifier.getCacheParameters()));
+    public Map<String, String> getCacheParameters() {
+        Map<String, String> result = new HashMap<>();
+        for (int i = 0; i < classifiers.size(); i++) {
+            for (int j = 0; j < classifiers.get(i).size(); j++) {
+                result.put(
+                        "layer_%d_classifier_%d".formatted(i, j),
+                        classifiers.get(i).get(j).getCacheParameters().toString());
             }
         }
-        return params.toArray(new String[0]);
+        return result;
     }
 
     /**

@@ -2,14 +2,16 @@
 package edu.kit.kastel.sdq.lissa.ratlr.classifier;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import edu.kit.kastel.sdq.lissa.ratlr.cache.Cache;
-import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheKey;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheManager;
+import edu.kit.kastel.sdq.lissa.ratlr.cache.ClassifierCacheKey;
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
 import edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
@@ -112,11 +114,10 @@ public class ReasoningClassifier extends Classifier {
     }
 
     @Override
-    public String[] getCacheParameters() {
-        String[] providerParams = provider.getCacheParameters();
-        String[] params = new String[providerParams.length + 1];
-        params[0] = REASONING_CLASSIFIER_NAME;
-        System.arraycopy(providerParams, 0, params, 1, providerParams.length);
+    public Map<String, String> getCacheParameters() {
+        Map<String, String> providerParams = provider.getCacheParameters();
+        Map<String, String> params = new HashMap<>(providerParams);
+        params.put("classifier", REASONING_CLASSIFIER_NAME);
         return params;
     }
 
@@ -194,8 +195,12 @@ public class ReasoningClassifier extends Classifier {
         messages.add(new UserMessage(request));
 
         // TODO Don't rely on messages.toString() as it is not stable
-        CacheKey cacheKey = CacheKey.of(
-                provider.modelName(), provider.seed(), provider.temperature(), CacheKey.Mode.CHAT, messages.toString());
+        ClassifierCacheKey cacheKey = ClassifierCacheKey.of(
+                provider.modelName(),
+                provider.seed(),
+                provider.temperature(),
+                ClassifierCacheKey.Mode.CHAT,
+                messages.toString());
 
         String cachedResponse = cache.get(cacheKey, String.class);
         if (cachedResponse != null) {
