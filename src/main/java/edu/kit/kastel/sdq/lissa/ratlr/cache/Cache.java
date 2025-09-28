@@ -40,4 +40,11 @@ public interface Cache {
      * This method should be called to ensure all cached values are persisted.
      */
     void flush();
+
+    /**
+     * Returns true if this map contains a mapping for the specified key.
+     * More formally, returns true if and only if this map contains a mapping for a key k such that Objects.equals(key, k).
+     * (There can be at most one such mapping.)
+     */
+    boolean containsKey(CacheKey key);
 }

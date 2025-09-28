@@ -8,6 +8,10 @@ import java.util.Map;
 
 import org.jetbrains.annotations.NotNull;
 
+import edu.kit.kastel.sdq.lissa.ratlr.cache.Cache;
+import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheKey;
+import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheManager;
+import edu.kit.kastel.sdq.lissa.ratlr.cache.ScorerCacheKey;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.ClassificationResult;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.ClassificationTask;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.Classifier;
@@ -29,18 +33,18 @@ public class PointwiseMetric implements Metric {
     private static final String DEFAULT_REDUCTOR = "mean";
     private static final String REDUCTOR_CONFIGURATION_KEY = "reductor";
 
-    private final Map<String, Double> cache;
     private final Scorer scorer;
     private final Reductor reductor;
     private final Classifier classifier;
+    private final Cache cache;
 
     public PointwiseMetric(ModuleConfiguration configuration, Classifier classifier) {
-        this.cache = new HashMap<>();
         this.scorer =
                 ScorerFactory.createScorer(configuration.argumentAsString(SCORER_CONFIGURATION_KEY, DEFAULT_SCORER));
         this.reductor = ReductorFactory.createReductor(
                 configuration.argumentAsString(REDUCTOR_CONFIGURATION_KEY, DEFAULT_REDUCTOR));
         this.classifier = classifier;
+        this.cache = CacheManager.getDefaultInstance().getCache(this, getCacheParameters());
     }
 
     /**
@@ -67,9 +71,9 @@ public class PointwiseMetric implements Metric {
         List<Double> scores = new ArrayList<>();
         List<ClassificationTask> examplesToCompute = new ArrayList<>();
         for (ClassificationTask example : examples) {
-            String key = getCacheKey(example, prompt);
+            CacheKey key = ScorerCacheKey.of(prompt, example.toString());
             if (cache.containsKey(key)) {
-                scores.add(cache.get(key));
+                scores.add(cache.get(key, Double.class));
             } else {
                 examplesToCompute.add(example);
             }
@@ -78,7 +82,7 @@ public class PointwiseMetric implements Metric {
         List<Double> computedScores = scorer.score(examplesToCompute, classifications);
         for (int i = 0; i < examplesToCompute.size(); i++) {
             ClassificationTask example = examplesToCompute.get(i);
-            cache.put(getCacheKey(example, prompt), computedScores.get(i));
+            cache.put(ScorerCacheKey.of(prompt, example.toString()), computedScores.get(i));
             scores.add(computedScores.get(i));
         }
         return reductor.reduce(scores);
@@ -125,8 +129,11 @@ public class PointwiseMetric implements Metric {
         return "%s-%s".formatted(first, second);
     }
 
-    @NotNull
-    private static String getCacheKey(ClassificationTask example, String prompt) {
-        return "%s-%s".formatted(example, prompt);
+    public Map<String, String> getCacheParameters() {
+        Map<String, String> providerParams = classifier.getCacheParameters();
+        Map<String, String> params = new HashMap<>(providerParams);
+        params.put(SCORER_CONFIGURATION_KEY, scorer.getName());
+        params.put(REDUCTOR_CONFIGURATION_KEY, reductor.getName());
+        return params;
     }
 }

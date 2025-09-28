@@ -137,4 +137,8 @@ class LocalCache {
             write();
         }
     }
+
+    public boolean containsKey(CacheKey key) {
+        return cache.containsKey(key.localKey());
+    }
 }

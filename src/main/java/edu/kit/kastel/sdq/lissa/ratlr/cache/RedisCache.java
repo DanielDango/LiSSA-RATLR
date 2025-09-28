@@ -64,6 +64,14 @@ class RedisCache implements Cache {
         }
     }
 
+    @Override
+    public boolean containsKey(CacheKey key) {
+        if (jedis != null && jedis.exists(key.toJsonKey())) {
+            return true;
+        }
+        return localCache != null && localCache.containsKey(key);
+    }
+
     /**
      * Establishes a connection to the Redis server.
      * The Redis URL can be configured through the REDIS_URL environment variable.
