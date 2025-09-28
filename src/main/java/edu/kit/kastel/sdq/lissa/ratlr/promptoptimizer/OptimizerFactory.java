@@ -30,7 +30,6 @@ public final class OptimizerFactory {
      *
      * @param configuration The configuration for the optimizer
      * @param goldStandard The gold standard trace links for evaluation
-     * @param classifier The classifier used in the optimization process
      * @param metric The metric used to evaluate the prompt performance
      * @param evaluator The evaluator used to assess the optimization results
      * @return An instance of PromptOptimizer based on the configuration

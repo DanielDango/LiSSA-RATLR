@@ -138,6 +138,12 @@ class LocalCache {
         }
     }
 
+    /**
+     * Returns true if and only if this map contains a mapping for a key
+     *
+     * @param key The cache key to look up
+     * @return true if this map contains a mapping for the specified key
+     */
     public boolean containsKey(CacheKey key) {
         return cache.containsKey(key.localKey());
     }

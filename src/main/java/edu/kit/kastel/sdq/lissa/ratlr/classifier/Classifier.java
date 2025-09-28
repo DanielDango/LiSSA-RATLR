@@ -265,5 +265,11 @@ public abstract class Classifier {
         return new PipelineClassifier(configs, contextStore);
     }
 
+    /**
+     * Gets the parameters that define the uniqueness of this classifier's cache.
+     * These parameters are used to construct a unique cache name for storing classification results.
+     *
+     * @return A map of parameter names to values that define the cache uniqueness
+     */
     public abstract Map<String, String> getCacheParameters();
 }

@@ -19,6 +19,9 @@ public record ScorerCacheKey(String prompt, String content, @JsonIgnore String l
         return new ScorerCacheKey(prompt, content, KeyGenerator.generateKey(prompt + content));
     }
 
+    /**
+     * @throws IllegalArgumentException If the key cannot be serialized to JSON
+     */
     @Override
     public String toJsonKey() {
         try {

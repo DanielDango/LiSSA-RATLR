@@ -129,7 +129,7 @@ public class PointwiseMetric implements Metric {
         return "%s-%s".formatted(first, second);
     }
 
-    public Map<String, String> getCacheParameters() {
+    private Map<String, String> getCacheParameters() {
         Map<String, String> providerParams = classifier.getCacheParameters();
         Map<String, String> params = new HashMap<>(providerParams);
         params.put(SCORER_CONFIGURATION_KEY, scorer.getName());

@@ -86,6 +86,15 @@ public final class CacheManager {
         return getCache(name, true);
     }
 
+    /**
+     * Gets a cache instance for the specified name using a map of parameters.
+     * The cache name will be constructed by concatenating the parameter values with underscores.
+     *
+     * @param origin The class origin (caller, {@code this})
+     * @param parameters a map of parameters that define what makes a cache unique. E.g., the model name, temperature, and seed.
+     * @return A cache instance for the specified name
+     * @throws IllegalArgumentException If parameters is null or contains null values
+     */
     public Cache getCache(Object origin, Map<String, String> parameters) {
         if (parameters == null) {
             throw new IllegalArgumentException("Parameters must not be null");
