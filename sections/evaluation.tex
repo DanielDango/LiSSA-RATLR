@@ -367,9 +367,22 @@ A prevalent issue remains that more iteration steps often do not yield better re
     \end{table}
 \end{landscape}
 
+\section{Gradient Descent Based Automatic Prompt Optimization }
+
+The last pormpt optimization algorithm implemented during this thesis is based on work by \citewithauthor{pryzant2023AutomaticPrompt}.
+They have implemented this algorithm in Python.
+I adapted it to the \LiSSAf for use in the optimization module.
+As this algorithm is the most sophisticated one it is expected to yield the best results.
+The implementation has many configurable parameters.
+In this evaluation, not every parameter will be altered. 
+Instead, the default values as by \citeauthor{pryzant2023AutomaticPrompt}'s implementation will be used.
+
+
+Firstly, we will alter the number of iteration steps performed in the algorithm.
+
 \begin{table}
     \centering
-    \renewcommand{\arraystretch}{1}
+    \renewcommand{\arraystretch}{1.2}
     \input{tables/GradientOptimizationPryzant}
     \renewcommand{\arraystretch}{1}
     \caption{Gradient Descent based Automatic Prompt Optimization}
