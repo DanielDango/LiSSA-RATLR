@@ -55,6 +55,7 @@
 \DeclareAcronym{AI}{short=AI, long=Artifical Intelligence}
 \DeclareAcronym{iter}{short=\ensuremath{i}, long=maximum iteration steps}
 \DeclareAcronym{feed}{short=\ensuremath{n}, long=feedback sample size}
+\DeclareAcronym{ucb}{short=UCB, long=Upper Confidence Bound}
 
 
 
@@ -89,5 +90,17 @@
 \newcommand{\idots}[0]{\ensuremath{[\dots]}}
 \newcommand{\iter}[0]{\acs{iter}\xspace}
 \newcommand{\feed}[0]{\acs{feed}\xspace}
-\newcommand{\tripplequote}[0]{\textquotesingle{}\textquotesingle{}\textquotesingle{}}
+\newcommand{\ubc}[0]{\ac{ucb}\xspace}
 
+
+\newcommand{\tripplequote}[0]{\textquotesingle{}\textquotesingle{}\textquotesingle{}}
+\newcommand{\module}[1]{\texttt{#1}\xspace}
+\newcommand{\metric}[0]{\module{Metric}}
+\newcommand{\evaluator}[0]{\module{Evaluator}}
+\newcommand{\promptoptimizer}[0]{\module{Prompt Optimizer}}
+\newcommand{\elementstore}[0]{\module{Element Store}}
+\newcommand{\samplingstrategy}[0]{\module{Sample Strategy}}
+\newcommand{\reductor}[0]{\module{Reductor}}
+\newcommand{\cache}[0]{\module{Cache}}
+\newcommand{\scorer}[0]{\module{Scorer}}
+\newcommand{\method}[1]{\texttt{#1}\xspace}

@@ -12,4 +12,110 @@
 \chapter{Implementation}
 \label{ch:Implementation}
 
-\dots
+This chapter describes the implementation of the proposed features to the \LiSSAf in order to optimize classification prompts for fixed datasets.
+To achieve this goal, a new \promptoptimizer module is added to the \LiSSA pipeline.
+This module can be combined with further optional \metric and \evaluator modules to enable a flexible and reusable architecture.
+\autoref{fig:component_diagramm} provides an overview of the components involved in this implementation.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.6\linewidth]{graphics/artifact_overview_Fuchß}
+    \caption{TODO: Add component diagramm here}
+    \label{fig:component_diagramm}
+\end{figure}
+
+\section{Prompt Optimizer Module}
+\label{sec:impl:prompt_optimizer_module}
+
+The prompt optimizer module provides implementations for the actual prompt optimization.
+The only method this module is required to implement is the \method{optimize} \Todo{Check if this method is still named the same} method.
+It requires the source and target \elementstore created in previous pipeline steps.
+They contain the artifacts to be linked.
+The module will be instantiated with a set of configuration parameters, again following the format of the \LiSSAf.
+A factory class is used to create the module based on the configuration.
+Furthermore, the \metric and \evaluator modules are provided to the respective constructors if required.
+
+\begin{figure}
+    \centering
+    \includesvg{graphics/class_diagrams/optimizer.svg}
+    \caption{The new \promptoptimizer module and its implementations}
+    \label{fig:optimizer_module_diagramm}
+\end{figure}
+
+As seen in \autoref{fig:optimizer_module_diagramm}, the \promptoptimizer module will typically use the \LLM to evaluate different prompts.
+\Todo{It has not been seen...}
+
+Many implementations of the \promptoptimizer module will require sampling strategies as a heuristic to reduce the number of calls to the \LLM.
+\Todo{Is heuristic the right word here?}
+The \samplingstrategy submodule provides different strategies to select a sublist of comparable elements from a collection.
+The strategies can be instantiated with configuration parameters and are used by the \promptoptimizer module.
+This way sampling strategies can be swapped easily without changing the actual optimization logic.
+The random sampler uses a fixed random seed to ensure reproducibility of results.
+
+\begin{figure}
+    \centering
+    \includesvg{graphics/class_diagrams/sample_strategy.svg}
+    \caption{The new \samplingstrategy submodule and its implementations}
+    \label{fig:sampling_strategy_diagramm}
+\end{figure}
+
+In \autoref{fig:sampling_strategy_diagramm}, the sampling strategy submodule is depicted.
+Currently, three different strategies are implemented.
+\begin{enumitem}
+    \item The \method{ShuffledFirstSampler} will shuffle the input list using the \method{RandomGenerator} and return the first elements.
+    \item The \method{OrderedFirstSampler} will sort the input list and return the first elements.
+    \item The \method{FirstSampler} will return the first elements of the input list.
+\end{enumitem}
+
+\section{Metric Module}
+\label{sec:impl:metric_module}
+The \metric component provides implementations for different metrics to score the quality of a prompt on a given set of tasks.
+Metrics can be divided into two major categories.
+Pointwise metrics will evaluate each individual \TL prediction and return a separate score for each.
+Scoring strategies for pointwise metrics are provided by the \scorer submodule.
+The overall score can then be calculated by reducing the individual scores using a \reductor.
+The \reductor submodule provides different strategies to reduce a collection of scores to a single value.
+In contrast, global metrics will evaluate the entire set of \TL predictions at once and return a single score directly.
+This is because they factor in relationships between different predictions, like whether the correct prediction is a true positive or a true negative.
+
+The scores are cached using \LiSSAs built-in \cache module.
+
+\begin{figure}
+    \centering
+    \includesvg{graphics/class_diagrams/metric.svg}
+    \caption{The new \metric module and its implementations}
+    \label{fig:metric_module_diagramm}
+\end{figure}
+
+Currently only the \fbeta metric is implemented as a global metric.
+The beta parameter can be altered in the module configuration.
+The pointwise metric implementation relies on the \method{Binary}\scorer and the \method{Mean}\reductor.
+
+\begin{figure}
+    \centering
+    \includesvg{graphics/class_diagrams/pointwise_metric.svg}
+    \caption{The submodules utilized by the pointwise metric implementation}
+    \label{fig:scorer_reductor_diagramm}
+\end{figure}
+
+\section{Evaluator Module}
+\label{sec:impl:evaluator_module}
+The \evaluator module provides implementations to evaluate the quality of a prompt on a given set of tasks.
+In contrast to the \metric module, the \evaluator will not use all tasks to compute the prompt score.
+Instead, more complex sampling strategies can be used to select a subset of tasks.
+This is especially useful for larger datasets, where evaluating all tasks would be too costly.
+The \ucb bandit evaluator is the most noteworthy implementation.
+It will use the \ubc algorithm to select a subset of tasks that are expected to provide the most information gain.
+This is achieved by balancing exploration and exploitation.
+The size of the subset can be configured in the module configuration.
+The \ubc evaluator can be configured with a random seed to ensure reproducibility of results.
+
+\begin{figure}
+    \centering
+    \includesvg{graphics/class_diagrams/evaluator.svg}
+    \caption{The new \evaluator module and its implementations}
+    \label{fig:evaluator_module_diagramm}
+\end{figure}
+
+Other implementations seen in \autoref{fig:evaluator_module_diagramm} are the \method{BruteForceEvaluator}, which will use all tasks to evaluate the prompt.
+The \method{MockEvaluator} is used for testing purposes and will return a fixed score.

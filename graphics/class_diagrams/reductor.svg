@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="372px" preserveAspectRatio="none" style="width:227px;height:372px;" version="1.1" viewBox="0 0 227 372" width="227px" zoomAndPan="magnify"><defs><filter height="300%" id="fi2aghg3tbsdl" width="300%" x="-1" y="-1"><feGaussianBlur result="blurOut" stdDeviation="2.0"/><feColorMatrix in="blurOut" result="blurOut2" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .4 0"/><feOffset dx="4.0" dy="4.0" in="blurOut2" result="blurOut3"/><feBlend in="SourceGraphic" in2="blurOut3" mode="normal"/></filter></defs><g><!--MD5=[aa14b99e36cd5aec6c33650a4986e771]
+class Reductor--><rect fill="#FEFECE" filter="url(#fi2aghg3tbsdl)" height="77.9638" id="Reductor" style="stroke: #A80036; stroke-width: 1.5;" width="210" x="6" y="131"/><ellipse cx="82.75" cy="147" fill="#B4A7E5" rx="11" ry="11" style="stroke: #A80036; stroke-width: 1.0;"/><path d="M78.6719,142.7656 L78.6719,140.6094 L86.0625,140.6094 L86.0625,142.7656 L83.5938,142.7656 L83.5938,150.8438 L86.0625,150.8438 L86.0625,153 L78.6719,153 L78.6719,150.8438 L81.1406,150.8438 L81.1406,142.7656 L78.6719,142.7656 Z "/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacingAndGlyphs" textLength="48" x="103.25" y="151.656">Reductor</text><line style="stroke: #A80036; stroke-width: 1.5;" x1="7" x2="215" y1="163" y2="163"/><line style="stroke: #A80036; stroke-width: 1.5;" x1="7" x2="215" y1="171" y2="171"/><polygon fill="#4177AF" points="17,178,13,184,21,184" style="stroke: #1963A0; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="184" x="26" y="186.7589">double reduce(Collection&lt;Double&gt;)</text><polygon fill="#4177AF" points="17,192.9819,13,198.9819,21,198.9819" style="stroke: #1963A0; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="88" x="26" y="201.7408">String getName()</text><!--MD5=[3f30f1e7721b41844566a9d854adda87]
+class ReductorFactory--><rect fill="#FEFECE" filter="url(#fi2aghg3tbsdl)" height="62.9819" id="ReductorFactory" style="stroke: #A80036; stroke-width: 1.5;" width="195" x="13.5" y="8"/><ellipse cx="61.25" cy="24" fill="#ADD1B2" rx="11" ry="11" style="stroke: #A80036; stroke-width: 1.0;"/><path d="M64.2188,29.6406 Q63.6406,29.9375 63,30.0781 Q62.3594,30.2344 61.6563,30.2344 Q59.1563,30.2344 57.8281,28.5938 Q56.5156,26.9375 56.5156,23.8125 Q56.5156,20.6875 57.8281,19.0313 Q59.1563,17.375 61.6563,17.375 Q62.3594,17.375 63,17.5313 Q63.6563,17.6875 64.2188,17.9844 L64.2188,20.7031 Q63.5938,20.125 63,19.8594 Q62.4063,19.5781 61.7813,19.5781 Q60.4375,19.5781 59.75,20.6563 Q59.0625,21.7188 59.0625,23.8125 Q59.0625,25.9063 59.75,26.9844 Q60.4375,28.0469 61.7813,28.0469 Q62.4063,28.0469 63,27.7813 Q63.5938,27.5 64.2188,26.9219 L64.2188,29.6406 Z "/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="91" x="81.75" y="28.656">ReductorFactory</text><line style="stroke: #A80036; stroke-width: 1.5;" x1="14.5" x2="207.5" y1="40" y2="40"/><line style="stroke: #A80036; stroke-width: 1.5;" x1="14.5" x2="207.5" y1="48" y2="48"/><ellipse cx="24.5" cy="59" fill="#84BE84" rx="3" ry="3" style="stroke: #038048; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" text-decoration="underline" textLength="169" x="33.5" y="63.7589">Reductor createReductor(String)</text><!--MD5=[9feb027a311d6e5dc1ebb17a3c8d6f48]
+class MeanReductor--><rect fill="#FEFECE" filter="url(#fi2aghg3tbsdl)" height="92.9457" id="MeanReductor" style="stroke: #A80036; stroke-width: 1.5;" width="210" x="6" y="269"/><ellipse cx="65.75" cy="285" fill="#ADD1B2" rx="11" ry="11" style="stroke: #A80036; stroke-width: 1.0;"/><path d="M68.7188,290.6406 Q68.1406,290.9375 67.5,291.0781 Q66.8594,291.2344 66.1563,291.2344 Q63.6563,291.2344 62.3281,289.5938 Q61.0156,287.9375 61.0156,284.8125 Q61.0156,281.6875 62.3281,280.0313 Q63.6563,278.375 66.1563,278.375 Q66.8594,278.375 67.5,278.5313 Q68.1563,278.6875 68.7188,278.9844 L68.7188,281.7031 Q68.0938,281.125 67.5,280.8594 Q66.9063,280.5781 66.2813,280.5781 Q64.9375,280.5781 64.25,281.6563 Q63.5625,282.7188 63.5625,284.8125 Q63.5625,286.9063 64.25,287.9844 Q64.9375,289.0469 66.2813,289.0469 Q66.9063,289.0469 67.5,288.7813 Q68.0938,288.5 68.7188,287.9219 L68.7188,290.6406 Z "/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="82" x="86.25" y="289.656">MeanReductor</text><line style="stroke: #A80036; stroke-width: 1.5;" x1="7" x2="215" y1="301" y2="301"/><line style="stroke: #A80036; stroke-width: 1.5;" x1="7" x2="215" y1="309" y2="309"/><ellipse cx="17" cy="320" fill="#84BE84" rx="3" ry="3" style="stroke: #038048; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="132" x="26" y="324.7589">«Create» MeanReductor()</text><ellipse cx="17" cy="334.9819" fill="#84BE84" rx="3" ry="3" style="stroke: #038048; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="184" x="26" y="339.7408">double reduce(Collection&lt;Double&gt;)</text><ellipse cx="17" cy="349.9638" fill="#84BE84" rx="3" ry="3" style="stroke: #038048; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="88" x="26" y="354.7227">String getName()</text><!--MD5=[e74660cdefe1dc2a71d06ded092afbf0]
+reverse link ReductorFactory to Reductor--><path d="M111,76.41 C111,93.3 111,113.46 111,130.65 " fill="none" id="ReductorFactory&lt;-Reductor" style="stroke: #A80036; stroke-width: 1.0; stroke-dasharray: 7.0,7.0;"/><polygon fill="#A80036" points="111,71.28,107,80.28,111,76.28,115,80.28,111,71.28" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[7262f71fd66593baf5fe12520b34a826]
+reverse link Reductor to MeanReductor--><path d="M111,229.55 C111,242.64 111,256.35 111,268.83 " fill="none" id="Reductor&lt;-MeanReductor" style="stroke: #A80036; stroke-width: 1.0; stroke-dasharray: 7.0,7.0;"/><polygon fill="none" points="104,229.08,111,209.08,118,229.08,104,229.08" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[c752def76d5a2a7c48df72150c35a589]
+@startuml
+interface Reductor {
+~ double reduce(Collection<Double>)
+~ String getName()
+}
+
+class ReductorFactory {
++ {static} Reductor createReductor(String)
+}
+
+class MeanReductor {
++ <<Create>> MeanReductor()
++ double reduce(Collection<Double>)
++ String getName()
+}
+
+
+ReductorFactory <.. Reductor
+Reductor <|.. MeanReductor
+@enduml
+
+PlantUML version 1.2020.02(Sun Mar 01 11:22:07 CET 2020)
+(GPL source distribution)
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Java Version: 21.0.8+9-Ubuntu-0ubuntu124.04.1
+Operating System: Linux
+Default Encoding: UTF-8
+Language: en
+Country: null
+--></g></svg>
