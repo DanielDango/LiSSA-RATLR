@@ -1,4 +1,4 @@
-OPENWEBUI_URL=https://chat.vdl.sdq.kastel.kit.edu/api
+OPENWEBUI_URL=https://domain.tldr/api
 OPENWEBUI_API_KEY=
 
 OLLAMA_EMBEDDING_HOST=
