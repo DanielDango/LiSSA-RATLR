@@ -60,14 +60,12 @@ I am expecting to improve \TLR rates, especially for larger projects in the \RtR
 \begin{figure}
     \centering
     \includesvg[width=\textwidth]{graphics/LiSSA_pipeline_with_optimization.svg}
-    \caption{Overview of the proposed prompt optimization approach for \TLR tasks in the \LiSSAf. Modified from \citewithauthor{fuchss2025LiSSAGeneric}}
-    \label{fig:intro_prompt_optimization}
+    \caption{Overview of the proposed prompt optimization approach for \TLR tasks in the \LiSSAf. The new prompt optimization module is highlighted in light blue. Modified from \citewithauthor{fuchss2025LiSSAGeneric}. Highlighted in yellow are the actual artifacts. Highlighted in purple are steps using \LLMs for processing. White nodes represent algorithms implemented fully inside the framework.}
+    \label{fig:prompt_optimization_pipeline}
 \end{figure}
 
-The additional step is highlighted in \autoref{fig:intro_prompt_optimization}.
+The additional step is highlighted in \autoref{fig:prompt_optimization_pipeline}.
+\Todo{find out how to add a proper legend}
 It will be placed after the initial preprocessing of the input data.
 The \promptoptimizer module will use the preprocessed data to optimize a given prompt.
 The optimized prompt can then be used in the regular \LLM-based prompting step to classify \TLs.
-
-
-\Todo{Intro sollte länger sein. Figur muss beschrieben sein. ggf beispiel einführen. Problem deutlich hervorheben}

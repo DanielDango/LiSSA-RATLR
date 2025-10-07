@@ -25,9 +25,26 @@ This might thus not be much of a hurdle when a human is looking for \TLs.
 However, for automated trace link recovery, this means that simple string comparisons by name are insufficient.
 While \LLMs can overcome these inconsistencies, finding suitable prompts might be challenging or include tedious manual work in prompt engineering.
 
-\section{\LiSSA}
+\section{Linking Software System Artifacts}
 \label{sec:foundations:lissa}
+\Todo{Möglich hier \acl{LiSSA} zu nutzen ohne das Zitat?}
 \Todo{ggf wäre hier LiSSA als Abschnitt gut, damit man einschätzen kann, wo man prompts jetzt in der TLR verwendet.}
+
+\Todo{Bild hier nochmal platzieren statt auf alte Grafik zu verweisen?}
+
+The \LiSSAf by \citeauthor{fuchss2025LiSSAGeneric} proposes a generic framework for \TLR tasks.
+The framework is organized in a pipeline structure with several different modules used to process \TLs in a modular manner.
+First, the artifacts will be pre-processed into elements.
+This element type is used for all supported domains.
+While the performance of later steps might be diminished or improved with different artifact types, the processing remains the same.
+Using embedding \Todo{What are embeddings?} \LLMs vector representations are created, which in turn will be used to find similar element candidates.
+
+In the classical \LiSSA evaluation pipeline without prompt optimization, the source elements are combined with their target element candidates.
+They will be prompted to an \LLM to determine whether a \TL exists between the source element and the candidate.
+This is done using a so-called classification prompt.
+The classification results are aggregated and post-processed into a set of \TLs. 
+
+The new optimization step, highlighted in light blue in \autoref{fig:prompt_optimization_pipeline}, is an iterative pipeline step to alter the classification prompt. 
 
 \section{Automated Prompt Engineering}
 \label{sec:foundations:ape}
