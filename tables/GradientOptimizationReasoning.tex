@@ -1,0 +1,59 @@
+%! Author = Daniel Schwab
+%! Date = 2025-10-07
+\providecommand{\CMOneNASA}{CMOneNASA}
+\providecommand{\Dronology}{Dronology}
+\providecommand{\GANNT}{GANNT}
+\providecommand{\ModisDataset}{ModisDataset}
+\providecommand{\WARC}{WARC}
+\providecommand{\Avg}{Avg}
+\providecommand{\WeightedAvg}{WeightedAvg}
+
+\begin{tabularx}{\textwidth}{p{1.3em}l Z }
+    \toprule
+    \multirow{2}{1em}[-0.45em]{\rotatebox{90}{Dataset}} & \multirow{2}{*}[-0.9em]{\rotatebox{90}{Metric}}  & \multicolumn{ 1 }{c}{unknown}                                                                                          \\
+    \cmidrule(lr){ 3-3 }
+    &                            & GPT-4o-mini           \\
+    \midrule
+    \multirow{ 3 }{*}{\rotatebox{90}{\CMOneNASA}}
+    & P.    & \textbf{ 0.373 } \\
+    & R.    & \textbf{ 0.622 } \\
+    & F\textsubscript{1}    & \textbf{ 0.467 } \\
+    \arrayrulecolor{kit-gray30} \midrule \arrayrulecolor{black}
+
+    \multirow{ 3 }{*}{\rotatebox{90}{\Dronology}}
+    & P.    & \textbf{ 0.434 } \\
+    & R.    & \textbf{ 0.682 } \\
+    & F\textsubscript{1}    & \textbf{ 0.53 } \\
+    \arrayrulecolor{kit-gray30} \midrule \arrayrulecolor{black}
+
+    \multirow{ 3 }{*}{\rotatebox{90}{\GANNT}}
+    & P.    & \textbf{ 0.569 } \\
+    & R.    & \textbf{ 0.544 } \\
+    & F\textsubscript{1}    & \textbf{ 0.556 } \\
+    \arrayrulecolor{kit-gray30} \midrule \arrayrulecolor{black}
+
+    \multirow{ 3 }{*}{\rotatebox{90}{\ModisDataset}}
+    & P.    & \textbf{ 0.256 } \\
+    & R.    & \textbf{ 0.244 } \\
+    & F\textsubscript{1}    & \textbf{ 0.25 } \\
+    \arrayrulecolor{kit-gray30} \midrule \arrayrulecolor{black}
+
+    \multirow{ 3 }{*}{\rotatebox{90}{\WARC}}
+    & P.    & \textbf{ 0.404 } \\
+    & R.    & \textbf{ 0.684 } \\
+    & F\textsubscript{1}    & \textbf{ 0.508 } \\
+    \arrayrulecolor{kit-gray30} \midrule \arrayrulecolor{black}
+
+    \multirow{ 3 }{*}{\rotatebox{90}{\Avg}}
+    & P.    & \textbf{ 0.407 } \\
+    & R.    & \textbf{ 0.555 } \\
+    & F\textsubscript{1}    & \textbf{ 0.462 } \\
+    \arrayrulecolor{kit-gray30} \midrule \arrayrulecolor{black}
+
+    \multirow{ 3 }{*}{\rotatebox{90}{\WeightedAvg}}
+    & P.    & \textbf{ 0.424 } \\
+    & R.    & \textbf{ 0.624 } \\
+    & F\textsubscript{1}    & \textbf{ 0.5 } \\
+    \arrayrulecolor{kit-gray30} \midrule \arrayrulecolor{black}
+
+\end{tabularx}
