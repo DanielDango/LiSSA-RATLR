@@ -19,8 +19,8 @@ This module can be combined with further optional \metric and \evaluator modules
 
 \begin{figure}
     \centering
-    \includegraphics[width=0.6\linewidth]{graphics/artifact_overview_Fuchß}
-    \caption{TODO: Add component diagramm here}
+    \includegraphics[width=\textwidth]{graphics/class_diagrams/components}
+    \caption{Overview of the major new components involved in the implementation}
     \label{fig:component_diagramm}
 \end{figure}
 
@@ -38,7 +38,7 @@ Furthermore, the \metric and \evaluator modules are provided to the respective c
 \begin{figure}
     \centering
     \fontsize{8}{10}\selectfont
-    \includesvg[width=\textwidth]{graphics/class_diagrams/optimizer.svg}
+    \includegraphics[width=\textwidth]{graphics/class_diagrams/optimizer}
     \caption{The new \promptoptimizer module and its implementations}
     \label{fig:optimizer_module_diagramm}
 \end{figure}
@@ -56,7 +56,7 @@ The random sampler uses a fixed random seed to ensure reproducibility of results
 \begin{figure}
     \centering
     \fontsize{8}{10}\selectfont
-    \includesvg[width=\textwidth]{graphics/class_diagrams/sample_strategy.svg}
+    \includegraphics[width=\textwidth]{graphics/class_diagrams/sample_strategy}
     \caption{The new \samplingstrategy submodule and its implementations}
     \label{fig:sampling_strategy_diagramm}
 \end{figure}
@@ -85,7 +85,7 @@ The scores are cached using \LiSSAs built-in \cache module.
 \begin{figure}
     \centering
     \fontsize{8}{10}\selectfont
-    \includesvg[width=\textwidth]{graphics/class_diagrams/metric.svg}
+    \includegraphics[width=\textwidth]{graphics/class_diagrams/metric}
     \caption{The new \metric module and its implementations}
     \label{fig:metric_module_diagramm}
 \end{figure}
@@ -93,11 +93,16 @@ The scores are cached using \LiSSAs built-in \cache module.
 Currently, only the \fbeta metric is implemented as a global metric.
 The beta parameter can be altered in the module configuration.
 The pointwise metric implementation relies on the \method{Binary}\scorer and the \method{Mean}\reductor.
+This is also portrayed in \autoref{fig:scorer_reductor_diagramm}.
+The \method{Binary}\scorer will return a score of 1.0 for a correct prediction and 0.0 otherwise.
+A correct prediction is defined as predicting a \TL for a pair of artifacts that actually has a \TL in the ground truth or not predicting a \TL for a pair of artifacts that does not have a \TL in the ground truth.
+The \method{Mean}\reductor will then compute the mean of all individual scores to return a single value.
+
 
 \begin{figure}
     \centering
     \fontsize{8}{10}\selectfont
-    \includesvg[width=\textwidth]{graphics/class_diagrams/pointwise_metric.svg}
+    \includegraphics[width=\textwidth]{graphics/class_diagrams/pointwise_metric}
     \caption{The submodules utilized by the pointwise metric implementation}
     \label{fig:scorer_reductor_diagramm}
 \end{figure}
@@ -116,11 +121,18 @@ The \ubc evaluator can be configured with a random seed to ensure reproducibilit
 
 \begin{figure}
     \centering
-    \fontsize{8}{10}\selectfont
-    \includesvg[width=\textwidth]{graphics/class_diagrams/evaluator.svg}
+    \includegraphics[width=\textwidth]{graphics/class_diagrams/evaluator}
     \caption{The new \evaluator module and its implementations}
     \label{fig:evaluator_module_diagramm}
 \end{figure}
 
 Other implementations seen in \autoref{fig:evaluator_module_diagramm} are the \method{BruteForceEvaluator}, which will use all tasks to evaluate the prompt.
 The \method{MockEvaluator} is used for testing purposes and will return a fixed score.
+
+\section{\LiSSA Pipeline Integration}
+\label{sec:impl:lissa_integration}
+The new modules are integrated into the \LiSSA pipeline.
+A new command was added to the \LiSSA command-line interface to run the prompt optimization.
+The command will read the configuration file and create the required modules using their constructors or factories respectively.
+While the optimization pipeline as a standalone is independent of the regular evaluation pipeline, they can be combined.
+This is achieved by feeding the optimized prompt from the optimization pipeline into the evaluation pipeline indicated by a separate configuration.
