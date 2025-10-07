@@ -114,10 +114,10 @@ In contrast to the \metric module, the \evaluator will not use all tasks to comp
 Instead, more complex sampling strategies can be used to select a subset of tasks.
 This is especially useful for larger datasets, where evaluating all tasks would be too costly.
 The \ucb bandit evaluator is the most noteworthy implementation.
-It will use the \ubc algorithm to select a subset of tasks that are expected to provide the most information gain.
+It will use the \ucb algorithm to select a subset of tasks that are expected to provide the most information gain.
 This is achieved by balancing exploration and exploitation.
 The size of the subset can be configured in the module configuration.
-The \ubc evaluator can be configured with a random seed to ensure reproducibility of results.
+The \ucb evaluator can be configured with a random seed to ensure reproducibility of results.
 
 \begin{figure}
     \centering
@@ -129,10 +129,11 @@ The \ubc evaluator can be configured with a random seed to ensure reproducibilit
 Other implementations seen in \autoref{fig:evaluator_module_diagramm} are the \method{BruteForceEvaluator}, which will use all tasks to evaluate the prompt.
 The \method{MockEvaluator} is used for testing purposes and will return a fixed score.
 
-\section{\LiSSA Pipeline Integration}
+\section{LiSSA Pipeline Integration}
 \label{sec:impl:lissa_integration}
+\Todo{Can you use \acs{LiSSA} in the title but without the quote?}
 The new modules are integrated into the \LiSSA pipeline.
 A new command was added to the \LiSSA command-line interface to run the prompt optimization.
-The command will read the configuration file and create the required modules using their constructors or factories respectively.
-While the optimization pipeline as a standalone is independent of the regular evaluation pipeline, they can be combined.
-This is achieved by feeding the optimized prompt from the optimization pipeline into the evaluation pipeline indicated by a separate configuration.
+The command will read the configuration file and create the required modules using their constructors or factories, respectively.
+While the optimization pipeline, as a standalone, is independent of the regular evaluation pipeline, they can be combined.
+This is achieved by feeding the optimized prompt from the optimization pipeline into the evaluation pipeline, indicated by a separate configuration.
