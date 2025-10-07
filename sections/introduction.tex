@@ -16,7 +16,21 @@ During software development, numerous artifacts are created, ranging from the ac
 \Acl{TLR} aims to link these artifacts across different domains or versions.
 Challenges such as inconsistent naming are frequent issues in software projects~\cite{wohlrab2019ImprovingConsistency}.
 \TLR approaches need to be able to deal with such hardships.
+
 \autoref{fig:artifact_overview} provides an overview of what these artifacts might look like.
+We can see various snippets of a larger project, including requirements, source code, architectural diagrams, and documentation.
+For instance, we have the requirement that a \REST \API should be used.
+In the documentation, we can read that \REST is used to process images.
+The source code shows us that the \method{Image} class is used by the \method{\REST Facade}.
+A \TL likely exists between the \method{\REST Facade} and the \REST requirement.
+Furthermore, the documentation snippet likely describes the relation between the \method{\REST Facade} and \method{Image}.
+So a \TL should exist between them as well.
+We can also note naming inconsistencies for the database.
+In the architectural diagram, it is referred to as \method{Database}.
+At the same time, the source code uses the abbreviated \method{Db} identifier.
+Technically, with just the knowledge displayed in \autoref{fig:artifact_overview}, we can not even be certain that \method{Db} is used to abbreviate database.
+It might as well be Deutsche Bahn, and a train driver is dependent on a connection to pick up the image from a remote train station. 
+\Todo{@advisor Is this fine or too absurd?}
 
 \begin{figure}
     \centering
@@ -25,18 +39,22 @@ Challenges such as inconsistent naming are frequent issues in software projects~
     \label{fig:artifact_overview}
 \end{figure}
 
-\Aclp{LLM} have made rapid advancements in recent years.
+This example illustrates that a multitude of factors need to be considered for \TLR. 
+Aside from or rather especially with naming inconsistencies, we need to consider more information to establish \TLs correctly.
+\LLMs have made rapid advancements in recent years.
 They are becoming increasingly popular for dealing with \TLR tasks and have shown auspicious results so far.
 \Todo{This needs proof, sowas sollte belegt werden. du redest hier über trends. LMs wurden schon davor für TLR etc. verwendet :)}
 As they are still unable to reason and think on their own~\cite{shojaee2025IllusionThinking}, prompt engineering is required to extract good results.
 However, manually determining prompts suited for each specific problem is quite a tedious, time- and labor-intensive task.
+The goal is to reduce the effort required for \TLR instead of just shifting the task.
 
-To address this shortcoming, automated prompt engineering tools can be used.
-They will typically use the LLM itself to determine suitable adjustments or generate new prompts based on a description or training data of the problem~\cite{ramnath2025SystematicSurvey}.
+To address this shortcoming, \APO tools can be used.
+They will typically use the \LLM itself to determine suitable adjustments or generate new prompts based on a description or training data of the problem~\cite{ramnath2025SystematicSurvey}.
 
-The LiSSA framework~\cite{fuchss2025LiSSAGeneric} proposes an environment for \TLR tasks, including multiple pipeline steps for preprocessing of input data.
+The \LiSSAf proposes an environment for \TLR tasks, including multiple pipeline steps for preprocessing of input data.
 They rely on the power of \LLMs to extract traceability links from a variety of different artifacts, also across multiple domains.
-My work will contribute an automatic prompt refinement algorithm to this framework.
-I am expecting to improve \TLR, especially for larger projects in the requirements-to-requirements domain.
+My work will contribute an \APO module to this framework.
+It can be used to automatically refine a prompt on a dataset and optionally chain the optimization with the regular evaluation pipeline of the \LiSSAf
+I am expecting to improve \TLR rates, especially for larger projects in the \RtR domain.
 
 \Todo{Intro sollte länger sein. Figur muss beschrieben sein. ggf beispiel einführen. Problem deutlich hervorheben}
