@@ -152,7 +152,7 @@ This very prompt is thus used for all simple \gpt evaluations in \autoref{tab:na
 
 \begin{prompt}{\KISS Single Naive Optimization Step}{yes_no_simple}
     \\
-    \input{prompts/SimpleAndRepeatedOptimization/results-prompt-optimizationWARC_simple_gpt_gpt-4o-2024-08-06_0.json_411c69c3-cec3-3948-ad97-bb474536d21c}
+    \input{prompts/SimpleAndRepeatedOptimization/results-prompt-optimizationWARC_simple_gpt_gpt-4o-2024-08-06_0.json_148ac023-eccc-3665-95ce-1a6f2dfb92ff}
 \end{prompt}
 
 As seen in \autoref{tab:naive_optimization}, application of the optimization prompt in the column \Quote{simple} seems to generally improve the \fone.
@@ -164,21 +164,12 @@ We can see that mostly longer and more detailed instructions are included on how
 
 \begin{prompt}{\KISS Iterative Naive Optimization \gpt}{yes_no_iterative}
     \\
-    \input{prompts/SimpleAndRepeatedOptimization/results-prompt-optimizationWARC_iterative_gpt_gpt-4o-2024-08-06_0.json_e81eaea6-576b-337c-8a98-f2e65913a143}
+    \input{prompts/SimpleAndRepeatedOptimization/results-prompt-optimizationWARC_iterative_gpt_gpt-4o-2024-08-06_0.json_55e9705f-3980-3580-8272-a8333ddeae93}
 \end{prompt}
 
 However, unfortunately, this prompt does not necessarily perform better for our task.
 The performance of this prompt, as seen in the \Quote{iterative} column, seems to be generally worse than just the singular optimization application.
 What is especially noteworthy is that for \llama, the classification fails with this prompt.
-We can see in \autoref{prompt:yes_no_llama} that the prompt successfully modified the output format to accommodate different types of relationships.
-The current classifiers of the \LiSSA project expect the \LLM output to include the classification result clearly as \textquotesingle yes \textquotesingle or \textquotesingle no \textquotesingle.
-Thus, while this more detailed classification of the \LLM might even improve performance, it can not be properly evaluated.
-\Todo{Consider how this might be mitigated}
-
-\begin{prompt}{\KISS Iterative Naive Optimization \llama}{yes_no_llama}
-    \\
-    \input{prompts/SimpleAndRepeatedOptimization/results-prompt-optimizationWARC_iterative_ollama_llama3.1_8b-instruct-fp16_0.json_28d45aa7-dc74-3651-942a-c21f7ab1e001}
-\end{prompt}
 
 \subsection{Systematic Evaluation Results}
 \label{subsec:Evaluation:naive_optimization:systematic-evaluation-results}
