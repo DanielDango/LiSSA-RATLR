@@ -38,7 +38,7 @@ class RedisCache implements Cache {
     /**
      * Redis client instance.
      */
-    private UnifiedJedis jedis;
+    private @Nullable UnifiedJedis jedis;
 
     /**
      * Creates a new Redis cache instance with an optional local cache backup.
@@ -117,7 +117,7 @@ class RedisCache implements Cache {
      * @throws IllegalArgumentException If the JSON cannot be deserialized to the target type
      */
     @SuppressWarnings("unchecked")
-    private <T> T convert(String jsonData, Class<T> clazz) {
+    private <T> @Nullable T convert(@Nullable String jsonData, Class<T> clazz) {
         if (jsonData == null) {
             return null;
         }

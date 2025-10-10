@@ -19,7 +19,7 @@ import edu.kit.kastel.sdq.lissa.ratlr.utils.Pair;
  * This class manages a collection of elements and their associated vector embeddings,
  * providing functionality for similarity search and element retrieval as part of
  * LiSSA's trace link analysis approach.
- *
+ * <p>
  * The store can operate in two distinct roles within the LiSSA pipeline:
  * <ul>
  *     <li><b>Target Store</b> (similarityRetriever = true):

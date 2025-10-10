@@ -8,6 +8,8 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
 
+import org.jspecify.annotations.Nullable;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -115,7 +117,7 @@ class LocalCache {
      * @param key The cache key to look up
      * @return The cached value, or null if not found
      */
-    public synchronized String get(CacheKey key) {
+    public synchronized @Nullable String get(CacheKey key) {
         return cache.get(key.localKey());
     }
 

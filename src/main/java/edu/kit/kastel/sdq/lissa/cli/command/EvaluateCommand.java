@@ -39,7 +39,7 @@ public class EvaluateCommand implements Runnable {
             arity = "1..*",
             description =
                     "Specifies one or more config paths to be invoked by the pipeline iteratively. If the path points to a directory, all files inside are chosen to get invoked.")
-    private @Nullable Path[] configs;
+    private Path @Nullable [] configs;
 
     /**
      * Executes the evaluation command.
@@ -84,6 +84,7 @@ public class EvaluateCommand implements Runnable {
     }
 
     private void addSpecifiedConfigPaths(List<Path> configsToEvaluate) {
+        assert configs != null;
         for (Path configPath : configs) {
             if (Files.notExists(configPath)) {
                 logger.warn("Specified config path '{}' does not exist", configPath);
