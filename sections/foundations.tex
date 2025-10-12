@@ -28,7 +28,6 @@ While \LLMs can overcome these inconsistencies, finding suitable prompts might b
 \section{Linking Software System Artifacts}
 \label{sec:foundations:lissa}
 \Todo{Möglich hier \acl{LiSSA} zu nutzen ohne das Zitat?}
-\Todo{ggf wäre hier LiSSA als Abschnitt gut, damit man einschätzen kann, wo man prompts jetzt in der TLR verwendet.}
 
 \Todo{Bild hier nochmal platzieren statt auf alte Grafik zu verweisen?}
 
@@ -37,14 +36,21 @@ The framework is organized in a pipeline structure with several different module
 First, the artifacts will be pre-processed into elements.
 This element type is used for all supported domains.
 While the performance of later steps might be diminished or improved with different artifact types, the processing remains the same.
-Using embedding \Todo{What are embeddings?} \LLMs vector representations are created, which in turn will be used to find similar element candidates.
+The current \LiSSA evaluation pipeline first retrieves artifacts from the configured providers for the respective source and target domains.
+They will be preprocessed with the configured preprocessor into elements.
+Importantly they contain the content of the artifact as text, which will be used in later steps.
+Next, embeddings for these elements are created.
+Embeddings are vector representations of the textual content held by the elements.
+\Todo{Source?}
+Utilizing the elements and their embeddings, \elementstores are initialized.
+They provide functionality to search for similar elements based on their embeddings.
+This \retrievalstrategy can be configured.
+In the \LiSSA evaluation pipeline, source elements are combined with similar target element candidates in the \classifier module.
+They will be prompted to an \LLM to determine whether a \TL exists between the source element and each candidate.
+This is done using a classification prompt.
+The classification results are then aggregated and post-processed into a set of \TLs.
 
-In the classical \LiSSA evaluation pipeline without prompt optimization, the source elements are combined with their target element candidates.
-They will be prompted to an \LLM to determine whether a \TL exists between the source element and the candidate.
-This is done using a so-called classification prompt.
-The classification results are aggregated and post-processed into a set of \TLs. 
-
-The new optimization step, highlighted in light blue in \autoref{fig:prompt_optimization_pipeline}, is an iterative pipeline step to alter the classification prompt. 
+The new optimization step, highlighted in light blue in \autoref{fig:prompt_optimization_pipeline}, is an iterative pipeline step to alter the classification prompt.
 
 \section{Automated Prompt Engineering}
 \label{sec:foundations:ape}
