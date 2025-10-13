@@ -38,6 +38,7 @@
 % serif type: Linux Libertine
 \RequirePackage{libertine}
 % Linux Libertine in math mode
+\RequirePackage{amssymb}
 \RequirePackage[libertine]{newtxmath}
 
 % grotesque type: Adobe Source Sans Pro
@@ -184,10 +185,10 @@
 \begin{tabular}{l l}
   \ifcurrentbaselanguage{English}{First examiner}{1. Prüfer/Prüferin}: & \thereviewerone\\
   \ifcurrentbaselanguage{English}{Second examiner}{2. Prüfer/Prüferin}: & \thereviewertwo\\[.5em]
-  \ifcurrentbaselanguage{English}{First advisor}{1. Betreuer/Betreuerin}: &  \theadvisorone\\
+  \ifcurrentbaselanguage{English}{First advisor}{1. Betreuer}: &  \theadvisorone\\
   % if there is no second advisor, do not output this line
   \ifthenelse{\equal{\theadvisortwo}{}}{}{%
-  \ifcurrentbaselanguage{English}{Second advisor}{2. Betreuer/Betreuerin}: & \theadvisortwo\\
+  \ifcurrentbaselanguage{English}{Second advisor}{2. Betreuer}: & \theadvisortwo\\
   }
 \end{tabular}
 \vskip2em
