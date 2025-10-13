@@ -1,0 +1,60 @@
+%! Author = Daniel Schwab
+%! Date = 2025-10-13
+\providecommand{\CMOneNASA}{CMOneNASA}
+\providecommand{\Dronology}{Dronology}
+\providecommand{\GANNT}{GANNT}
+\providecommand{\ModisDataset}{ModisDataset}
+\providecommand{\WARC}{WARC}
+\providecommand{\Avg}{Avg}
+\providecommand{\WeightedAvg}{WeightedAvg}
+
+\begin{tabularx}{\textwidth}{p{1.3em}l Z  Z  Z  Z  Z  Z }
+    \toprule
+    \multirow{2}{1em}[-0.45em]{\rotatebox{90}{Dataset}} & \multirow{2}{*}[-0.9em]{\rotatebox{90}{Metric}}  & \multicolumn{ 3 }{c}{KISS-Original}  & \multicolumn{ 3 }{c}{unknown}                                                                                          \\
+    \cmidrule(lr){ 3-5 }
+    \cmidrule(lr){ 6-8 }
+    &                            & GPT-4o        & GPT-4o-mini        & GPT-5-mini        & GPT-4o        & GPT-4o-mini        & GPT-5-mini           \\
+    \midrule
+    \multirow{ 3 }{*}{\rotatebox{90}{\CMOneNASA}}
+    & P.    & 0.349    & 0.341    & 0.358    & 0.414    & \textbf{ 0.415 }    & 0.384 \\
+    & R.    & \textbf{ 0.644 }    & \textbf{ 0.644 }    & \textbf{ 0.644 }    & \textbf{ 0.644 }    & 0.6    & 0.622 \\
+    & F\textsubscript{1}    & 0.453    & 0.446    & 0.46    & \textbf{ 0.504 }    & 0.491    & 0.475 \\
+    \arrayrulecolor{kit-gray30} \midrule \arrayrulecolor{black}
+
+    \multirow{ 3 }{*}{\rotatebox{90}{\Dronology}}
+    & P.    & 0.394    & 0.386    & 0.393    & 0.426    & \textbf{ 0.48 }    & 0.416 \\
+    & R.    & \textbf{ 0.695 }    & \textbf{ 0.695 }    & \textbf{ 0.695 }    & 0.691    & 0.668    & \textbf{ 0.695 } \\
+    & F\textsubscript{1}    & 0.503    & 0.497    & 0.502    & 0.527    & \textbf{ 0.559 }    & 0.52 \\
+    \arrayrulecolor{kit-gray30} \midrule \arrayrulecolor{black}
+
+    \multirow{ 3 }{*}{\rotatebox{90}{\GANNT}}
+    & P.    & 0.552    & 0.544    & 0.544    & 0.578    & \textbf{ 0.627 }    & 0.561 \\
+    & R.    & \textbf{ 0.544 }    & \textbf{ 0.544 }    & \textbf{ 0.544 }    & \textbf{ 0.544 }    & \textbf{ 0.544 }    & \textbf{ 0.544 } \\
+    & F\textsubscript{1}    & 0.548    & 0.544    & 0.544    & 0.561    & \textbf{ 0.583 }    & 0.552 \\
+    \arrayrulecolor{kit-gray30} \midrule \arrayrulecolor{black}
+
+    \multirow{ 3 }{*}{\rotatebox{90}{\ModisDataset}}
+    & P.    & 0.212    & 0.212    & 0.312    & 0.476    & \textbf{ 0.625 }    & 0.455 \\
+    & R.    & \textbf{ 0.268 }    & \textbf{ 0.268 }    & 0.244    & 0.244    & 0.244    & 0.244 \\
+    & F\textsubscript{1}    & 0.237    & 0.237    & 0.274    & 0.323    & \textbf{ 0.351 }    & 0.317 \\
+    \arrayrulecolor{kit-gray30} \midrule \arrayrulecolor{black}
+
+    \multirow{ 3 }{*}{\rotatebox{90}{\WARC}}
+    & P.    & 0.394    & 0.38    & 0.394    & 0.464    & \textbf{ 0.518 }    & 0.442 \\
+    & R.    & \textbf{ 0.699 }    & \textbf{ 0.699 }    & \textbf{ 0.699 }    & 0.669    & 0.647    & \textbf{ 0.699 } \\
+    & F\textsubscript{1}    & 0.504    & 0.492    & 0.504    & 0.548    & \textbf{ 0.575 }    & 0.541 \\
+    \arrayrulecolor{kit-gray30} \midrule \arrayrulecolor{black}
+
+    \multirow{ 3 }{*}{\rotatebox{90}{\Avg}}
+    & P.    & 0.38    & 0.373    & 0.4    & 0.472    & \textbf{ 0.533 }    & 0.452 \\
+    & R.    & \textbf{ 0.57 }    & \textbf{ 0.57 }    & 0.565    & 0.558    & 0.541    & 0.561 \\
+    & F\textsubscript{1}    & 0.449    & 0.443    & 0.457    & 0.493    & \textbf{ 0.512 }    & 0.481 \\
+    \arrayrulecolor{kit-gray30} \midrule \arrayrulecolor{black}
+
+    \multirow{ 3 }{*}{\rotatebox{90}{\WeightedAvg}}
+    & P.    & 0.396    & 0.388    & 0.404    & 0.459    & \textbf{ 0.516 }    & 0.443 \\
+    & R.    & \textbf{ 0.637 }    & \textbf{ 0.637 }    & 0.635    & 0.625    & 0.606    & 0.633 \\
+    & F\textsubscript{1}    & 0.483    & 0.477    & 0.486    & 0.519    & \textbf{ 0.544 }    & 0.51 \\
+    \arrayrulecolor{kit-gray30} \midrule \arrayrulecolor{black}
+
+\end{tabularx}
