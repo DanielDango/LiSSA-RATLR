@@ -38,6 +38,7 @@
 % serif type: Linux Libertine
 \RequirePackage{libertine}
 % Linux Libertine in math mode
+\RequirePackage{amssymb}
 \RequirePackage[libertine]{newtxmath}
 
 % grotesque type: Adobe Source Sans Pro
