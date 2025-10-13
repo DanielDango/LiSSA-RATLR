@@ -12,19 +12,22 @@
 
 \Abstract
 
-\TLR is an important task in software engineering that helps to establish and maintain \TLs between different software artifacts.
+\Ac{TLR} is an important task in software engineering that helps to establish and maintain \TLs between different software artifacts.
 Traditional \TLR methods often rely on \IR techniques to identify candidate links.
 More novel approaches use \LLMs to improve the accuracy and retrieval rates of \TLR.
 However, in order to utilize \LLMs effectively, it is crucial to design appropriate prompts.
 This process of prompt engineering is often manual and time-consuming, requiring significant expertise.
+
 In this work, a \APE approach is proposed to automate the prompt engineering process for \TLR tasks in the \LiSSAF.
-\LLMs are used to iteratively refine prompts with the ability to  consider feedback from previous iterations.
+\Acp{LLM} are used to iteratively refine prompts with the ability to  consider feedback from previous iterations.
 The approach is evaluated on five datasets from the \RtR domain using three different \LLMs.
 As a baseline, current classification prompts from the \LiSSAF are used.
+
 The results show that the proposed approach can slightly improve the performance of \TLR tasks.
 However, the improvements are not as significant as initially expected.
 Furthermore, it is demonstrated, that the singular best performing optimized prompt for a dataset also performs well on other datasets of the same domain.
 Overall, this work contributes to the field of \TLR by proposing an approach to \APE using \LLMs.
 Even if the \APE approach is not applied, in further work, the optimized prompts yielded by this work can be used as fixed classification prompts.
 This process can be chained with evaluations in the \LiSSAF for continuous improvement.
+
 Further research can be conducted to explore further configurable settings and to evaluate the \APE approach on other \TLR domains.
