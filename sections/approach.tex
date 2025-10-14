@@ -9,12 +9,17 @@ This already provides the basic components and data to evaluate the more sophist
 \section{Simple Tree-of-Thought Classifier}
 \label{approach:sec:tot}
 
-\autoref{fig:ToT_visualization} \Todo{was bedeuten die Kästen, die Farben etc. alles erklören; auch was die Pfeile bedeuten. Das ist keine Standard-Darstellung. Was ist die Semantik? Außerdem bild erklären.}
+\autoref{fig:ToT_visualization} \Todo{Außerdem bild erklären im text.}
 
 \begin{figure}
     \centering
     \includesvg[width=\linewidth]{graphics/tree_of_thought}
     \caption{\Ac{ToT} visualization inspired by \citewithauthor{yao2023TreeThoughts}}
+    Highlighted in green are different prompting techniques.
+    Highlighted in yellow is data, with x being the input which is queried with one of the prompting techniques to the \LLM and output representing the returned result of this query.
+    The rounded boxes represent thoughts of the \LLM.
+    Orange thoughts are considered inconsistent and will be disregarded in the next step.
+    Arrows represent the processing flow of data
     \label{fig:ToT_visualization}
 \end{figure}
 
@@ -28,7 +33,7 @@ The \LiSSAf is publicly accessible in a repository using the MIT license. Variou
 They can be used as an inspiration for development.
 The class \verb|classifier| is an abstraction of all classifiers.
 It provides basic functionality to include further classifiers.
-Integration for different \LLM providers, such as Chat-GPT, Ollama, and Blablador, already exists in the framework.
+Integration for different \LLM providers, such as \OAI, Ollama, and Blablador, already exists in the framework.
 The new classifier can be plugged in directly with little more effort than writing the request prompt and implementing the \verb|classify| function to extract the classification result out of the \LLM output.
 
 This work package has two major goals.
@@ -91,3 +96,20 @@ The primary idea of this thesis is to explore automated optimization.
 The naive approach may yield good results already.
 Feeding more information and processing logic into the optimization system is expected to present better results.
 Especially suitable results may be reached faster by doing more processing on the machine instead of expensive API calls to the large language model.
+
+\section{Was auch immer du da getan und nicht mehr umgearbeitet hast seit dem Proposal}
+\begin{figure}
+    \centering
+    \includesvg[width=\textwidth]{graphics/LiSSA_pipeline_with_optimization.svg}
+    \caption{Overview of the proposed prompt optimization approach for \TLR tasks in the \LiSSAf. Modified from \citewithauthor{fuchss2025LiSSAGeneric}}
+    The new prompt optimization component is highlighted in light blue. 
+    Highlighted in yellow are the actual artifacts. 
+    Highlighted in purple are steps prompting \LLMs for processing. 
+    White nodes represent processing inside the framework.
+    \label{fig:prompt_optimization_pipeline}
+\end{figure}
+
+The new optimization step, highlighted in light blue in \autoref{fig:prompt_optimization_pipeline}, is an iterative pipeline step to alter the classification prompt.
+It will be placed after the initial preprocessing of the input data.
+The \promptoptimizer component will use the preprocessed data to optimize a given prompt.
+The optimized prompt can then be used in the regular \LLM-based prompting step to classify \TLs.

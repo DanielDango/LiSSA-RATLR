@@ -1,23 +1,65 @@
 %! Author = Daniel Schwab
-%! Date = 2025-10-13
+%! Date = 2025-10-14
+\providecommand{\CMOneNASA}{CMOneNASA}
+\providecommand{\Dronology}{Dronology}
+\providecommand{\GANNT}{GANNT}
+\providecommand{\ModisDataset}{ModisDataset}
 \providecommand{\WARC}{WARC}
+\providecommand{\Avg}{Avg}
+\providecommand{\WeightedAvg}{WeightedAvg}
 
-\begin{tabularx}{\textwidth}{p{1.3em}l Z  Z  Z  Z  Z  Z  Z }
+\begin{tabularx}{\hsize}{p{1.3em}l Z  Z  Z  Z  Z  Z  Z  Z  Z  Z  Z  Z  Z  Z }
     \toprule
-    \multirow{2}{1em}[-0.45em]{\rotatebox{90}{Dataset}} & \multirow{2}{*}[-0.9em]{\rotatebox{90}{Metric}}  & \multicolumn{ 1 }{c}{KISS-Original}  & \multicolumn{ 1 }{c}{COT-Original}  & \multicolumn{ 1 }{c}{gradient (\iter=2)}  & \multicolumn{ 1 }{c}{gradient (\iter=3)}  & \multicolumn{ 1 }{c}{gradient (\iter=4)}  & \multicolumn{ 1 }{c}{gradient (\iter=5)}  & \multicolumn{ 1 }{c}{unknown}                                                                                          \\
-    \cmidrule(lr){ 3-3 }
-    \cmidrule(lr){ 4-4 }
-    \cmidrule(lr){ 5-5 }
-    \cmidrule(lr){ 6-6 }
-    \cmidrule(lr){ 7-7 }
-    \cmidrule(lr){ 8-8 }
-    \cmidrule(lr){ 9-9 }
-    &                            & GPT-4o-mini        & GPT-4o-mini        & GPT-4o-mini        & GPT-4o-mini        & GPT-4o-mini        & GPT-4o-mini        & GPT-4o-mini           \\
+    \multirow{2}{1em}[-0.45em]{\rotatebox{90}{Dataset}} & \multirow{2}{*}[-0.9em]{\rotatebox{90}{Metric}}  & \multicolumn{ 2 }{c}{KISS-Original}  & \multicolumn{ 2 }{c}{COT-Original}  & \multicolumn{ 2 }{c}{gradient (\iter=2)}  & \multicolumn{ 2 }{c}{gradient (\iter=3)}  & \multicolumn{ 2 }{c}{gradient (\iter=4)}  & \multicolumn{ 2 }{c}{gradient (\iter=5)}  & \multicolumn{ 2 }{c}{unknown}                                                                                          \\
+    \cmidrule(lr){ 3-4 }
+    \cmidrule(lr){ 5-6 }
+    \cmidrule(lr){ 7-8 }
+    \cmidrule(lr){ 9-10 }
+    \cmidrule(lr){ 11-12 }
+    \cmidrule(lr){ 13-14 }
+    \cmidrule(lr){ 15-16 }
+    &                            & reasoning|GPT-4o-mini        & simple|GPT-4o-mini        & reasoning|GPT-4o-mini        & simple|GPT-4o-mini        & reasoning|GPT-4o-mini        & simple|GPT-4o-mini        & reasoning|GPT-4o-mini        & simple|GPT-4o-mini        & reasoning|GPT-4o-mini        & simple|GPT-4o-mini        & reasoning|GPT-4o-mini        & simple|GPT-4o-mini        & reasoning|GPT-4o-mini        & simple|GPT-4o-mini           \\
     \midrule
+    \multirow{ 3 }{*}{\rotatebox{90}{\CMOneNASA}}
+    & P.    & -    & 0.341    & 0.364    & 0.338    & 0.378    & \textbf{ 0.397 }    & 0.378    & \textbf{ 0.397 }    & 0.378    & \textbf{ 0.397 }    & 0.378    & \textbf{ 0.397 }    & 0.373    & - \\
+    & R.    & -    & \textbf{ 0.644 }    & 0.622    & 0.6    & 0.622    & \textbf{ 0.644 }    & 0.622    & \textbf{ 0.644 }    & 0.622    & \textbf{ 0.644 }    & 0.622    & \textbf{ 0.644 }    & 0.622    & - \\
+    & F\textsubscript{1}    & -    & 0.446    & 0.459    & 0.432    & 0.471    & \textbf{ 0.492 }    & 0.471    & \textbf{ 0.492 }    & 0.471    & \textbf{ 0.492 }    & 0.471    & \textbf{ 0.492 }    & 0.467    & - \\
+    \arrayrulecolor{kit-gray30} \midrule \arrayrulecolor{black}
+
+    \multirow{ 3 }{*}{\rotatebox{90}{\Dronology}}
+    & P.    & -    & 0.386    & 0.42    & 0.437    & -    & -    & 0.452    & 0.415    & \textbf{ 0.559 }    & 0.456    & \textbf{ 0.559 }    & 0.456    & 0.43    & - \\
+    & R.    & -    & \textbf{ 0.695 }    & 0.677    & 0.659    & -    & -    & 0.605    & 0.614    & 0.45    & 0.377    & 0.45    & 0.377    & 0.659    & - \\
+    & F\textsubscript{1}    & -    & 0.497    & 0.518    & \textbf{ 0.525 }    & -    & -    & 0.518    & 0.495    & 0.499    & 0.413    & 0.499    & 0.413    & 0.521    & - \\
+    \arrayrulecolor{kit-gray30} \midrule \arrayrulecolor{black}
+
+    \multirow{ 3 }{*}{\rotatebox{90}{\GANNT}}
+    & P.    & -    & 0.544    & 0.561    & 0.569    & -    & -    & -    & -    & \textbf{ 0.621 }    & 0.61    & \textbf{ 0.621 }    & 0.61    & 0.569    & - \\
+    & R.    & -    & \textbf{ 0.544 }    & \textbf{ 0.544 }    & \textbf{ 0.544 }    & -    & -    & -    & -    & 0.529    & 0.529    & 0.529    & 0.529    & \textbf{ 0.544 }    & - \\
+    & F\textsubscript{1}    & -    & 0.544    & 0.552    & 0.556    & -    & -    & -    & -    & \textbf{ 0.571 }    & 0.567    & \textbf{ 0.571 }    & 0.567    & 0.556    & - \\
+    \arrayrulecolor{kit-gray30} \midrule \arrayrulecolor{black}
+
+    \multirow{ 3 }{*}{\rotatebox{90}{\ModisDataset}}
+    & P.    & -    & 0.212    & 0.306    & 0.333    & 0.474    & \textbf{ 0.5 }    & 0.474    & \textbf{ 0.5 }    & 0.474    & \textbf{ 0.5 }    & 0.474    & \textbf{ 0.5 }    & 0.265    & - \\
+    & R.    & -    & \textbf{ 0.268 }    & \textbf{ 0.268 }    & 0.244    & 0.22    & 0.244    & 0.22    & 0.244    & 0.22    & 0.244    & 0.22    & 0.244    & 0.22    & - \\
+    & F\textsubscript{1}    & -    & 0.237    & 0.286    & 0.282    & 0.3    & \textbf{ 0.328 }    & 0.3    & \textbf{ 0.328 }    & 0.3    & \textbf{ 0.328 }    & 0.3    & \textbf{ 0.328 }    & 0.24    & - \\
+    \arrayrulecolor{kit-gray30} \midrule \arrayrulecolor{black}
+
     \multirow{ 3 }{*}{\rotatebox{90}{\WARC}}
-    & P.    & 0.38    & 0.433    & \textbf{ 0.522 }    & \textbf{ 0.522 }    & 0.474    & 0.474    & 0.503 \\
-    & R.    & \textbf{ 0.699 }    & 0.669    & 0.61    & 0.61    & 0.471    & 0.471    & 0.603 \\
-    & F\textsubscript{1}    & 0.492    & 0.526    & \textbf{ 0.563 }    & \textbf{ 0.563 }    & 0.472    & 0.472    & 0.548 \\
+    & P.    & -    & 0.38    & 0.418    & 0.433    & 0.503    & 0.522    & 0.503    & 0.522    & \textbf{ 0.569 }    & 0.474    & \textbf{ 0.569 }    & 0.474    & 0.43    & - \\
+    & R.    & -    & \textbf{ 0.699 }    & 0.676    & 0.669    & 0.603    & 0.61    & 0.603    & 0.61    & 0.456    & 0.471    & 0.456    & 0.471    & 0.676    & - \\
+    & F\textsubscript{1}    & -    & 0.492    & 0.517    & 0.526    & 0.548    & \textbf{ 0.563 }    & 0.548    & \textbf{ 0.563 }    & 0.506    & 0.472    & 0.506    & 0.472    & 0.526    & - \\
+    \arrayrulecolor{kit-gray30} \midrule \arrayrulecolor{black}
+
+    \multirow{ 3 }{*}{\rotatebox{90}{\Avg}}
+    & P.    & -    & 0.373    & 0.414    & 0.422    & 0.452    & 0.473    & 0.452    & 0.459    & \textbf{ 0.52 }    & 0.487    & \textbf{ 0.52 }    & 0.487    & 0.413    & - \\
+    & R.    & -    & \textbf{ 0.57 }    & 0.557    & 0.543    & 0.482    & 0.499    & 0.512    & 0.528    & 0.455    & 0.453    & 0.455    & 0.453    & 0.544    & - \\
+    & F\textsubscript{1}    & -    & 0.443    & 0.466    & 0.464    & 0.44    & 0.461    & 0.459    & \textbf{ 0.47 }    & 0.469    & 0.454    & 0.469    & 0.454    & 0.462    & - \\
+    \arrayrulecolor{kit-gray30} \midrule \arrayrulecolor{black}
+
+    \multirow{ 3 }{*}{\rotatebox{90}{\WeightedAvg}}
+    & P.    & -    & 0.388    & 0.424    & 0.436    & 0.472    & 0.493    & 0.462    & 0.454    & \textbf{ 0.547 }    & 0.48    & \textbf{ 0.547 }    & 0.48    & 0.43    & - \\
+    & R.    & -    & \textbf{ 0.637 }    & 0.621    & 0.608    & 0.536    & 0.549    & 0.57    & 0.582    & 0.459    & 0.435    & 0.459    & 0.435    & 0.61    & - \\
+    & F\textsubscript{1}    & -    & 0.477    & 0.498    & 0.502    & 0.487    & \textbf{ 0.505 }    & 0.502    & 0.5    & 0.492    & 0.449    & 0.492    & 0.449    & 0.5    & - \\
     \arrayrulecolor{kit-gray30} \midrule \arrayrulecolor{black}
 
 \end{tabularx}

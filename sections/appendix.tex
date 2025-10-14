@@ -16,23 +16,45 @@
 \label{chap:appendix}
 
 
-%% -------------------
-%% | Example content |
-%% -------------------
-\section{First Appendix Section}
-\label{sec:appendix:FirstSection}
+\section{Tables}
+\label{sec:appendix:tables}
 		
 \setcounter{figure}{0}
-		
-\begin{figure} [ht]
-  \centering
-  \includegraphics[width=.5\linewidth]{logos/kitlogo_en_cmyk}
-  \caption{A figure}
-  \label{fig:anotherfigure}
-\end{figure}
+\begin{landscape}
+    \begin{table}
+        \centering
+        \renewcommand{\arraystretch}{1.2}
+        \input{tables/GradientOptimizationReasoning}
+        \renewcommand{\arraystretch}{1}
+        \caption{\ProTeGi for the \COT classification of \LiSSA}
+        \label{tab:gradient_reasoning}
+    \end{table}
+\end{landscape}
 
+\setcounter{prompt}{0}
+\section{Prompts}
+\label{sec:appendix:prompts}
 
-\dots
+\begin{prompt}{Opimized WARC prompt \feedl = 3, \iterl = 5}{warc_zandoori_optimized}
+    \\
+    \input{prompts/ZadenooriOptimizationPrompt/results-prompt-optimizationWARC_feedback_gpt_gpt-4o-2024-08-06_0_mi5_fs3.json_9a0778aa-c47f-353e-865c-e3e18cb7417d}
+\end{prompt}
+
+\begin{prompt}{Optimized Prompt \feedl = 5, \iterl = 10}{feedback_optimized_5_10}
+    \\
+    \Todo{This needs a pagebreak inbetween :monkaW:}
+    \input{prompts/FeedbackOptimizer/results-prompt-optimizationWARC_feedback_gpt_gpt-4o-2024-08-06_0_mi10_fs5.json_e448636d-01c3-3a99-a671-bbde85c7efbb}
+\end{prompt}
+
+\begin{prompt}{\citeauthor{zadenoori2025AutomaticPrompt}'s Optimization Prompt}{zadenoori_optimization}
+    \\
+    \input{prompts/ZadenooriOptimizationPrompt}
+\end{prompt}
+
+\begin{prompt}{Optimization Prompt modified from \citeauthor{zadenoori2025AutomaticPrompt}}{zadenoori_optimization_modified}
+    \\
+    \input{prompts/zadenoori_optimization_modified}
+\end{prompt}
 %% ---------------------
 %% | / Example content |
 %% ---------------------

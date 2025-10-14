@@ -18,7 +18,6 @@ As outlined in \autoref{ch:Approach}, the goal is to optimize prompts for a give
 To achieve this goal, a new \promptoptimizer component is added to the \LiSSA pipeline.
 This component can be combined with further optional \metric and \evaluator components to enable a flexible and reusable architecture.
 \Todo{Unklar, das kennen wir ja noch nicht. Ggf. in erster subsecc zusammenhänge aufzeigen}
-\autoref{fig:component_diagramm} provides an overview of the components involved in this implementation.
 
 \begin{figure}
     \centering
@@ -26,6 +25,11 @@ This component can be combined with further optional \metric and \evaluator comp
     \caption{Overview of the major new components involved in the implementation}
     \label{fig:component_diagramm}
 \end{figure}
+
+\autoref{fig:component_diagramm} provides an overview of the components involved in this implementation.
+
+
+
 
 \section{Metric component}
 \label{sec:impl:metric_component}
@@ -100,7 +104,7 @@ A factory class is used to create the object based on the configuration.
 Furthermore, the \metric and \evaluator components are provided to the respective constructors if required.
 The \metric component is used to score the quality of a prompt on a given set of tasks.
 The \evaluator component is used to select a subset of tasks to evaluate the prompt on.
-This compoent is designed to be used in the \LiSSA evaluation pipeline after the preprocessing of artifacts into \elementstore's is completed.
+This component is designed to be used in the \LiSSA evaluation pipeline after the preprocessing of artifacts into \elementstore's is completed.
 These steps are already part of the existing \LiSSA framework for evaluation.
 They are explained in more detail in \autoref{sec:foundations:lissa}.
 \newcommand{\optimizermethod}{\method{optimize}}
@@ -114,7 +118,7 @@ The prompt to be optimized is provided in the component configuration during the
 The method will return the optimized prompt as a string.
 When \promptoptimizer implementations utilize \classifiers, the training data or subsets will be passed on to the classification method.
 Utilizing caching for the \LLM queries, which is implemented for \LiSSAs classifiers, the optimization is deterministic and reproducible.
-All further implmentations should also be deterministic and reproducible.
+All further implementations should also be deterministic and reproducible.
 Configuration parameters such as random seeds can be utilized.
 
 \begin{figure}

@@ -82,7 +82,9 @@
 \renewcommand{\sectionautorefname}{Section}
 \renewcommand{\subsectionautorefname}{Section}
 \renewcommand{\subsubsectionautorefname}{Section}
-\renewcommand{\chapterautorefname}{Chapter}
+\addto\extrasenglish{%
+  \renewcommand{\chapterautorefname}{Chapter}%
+}
 
 %% Set PDF metadata
 \setpdf
@@ -149,8 +151,8 @@
 %% ----------------
 %% |   Appendix   |
 %% ----------------
+\appendix
+\input{sections/appendix}
 \todos
-%\appendix
-%\input{sections/appendix}
 
 \end{document}

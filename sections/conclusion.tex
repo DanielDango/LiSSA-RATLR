@@ -13,10 +13,15 @@
 \chapter{Conclusion}
 \label{ch:Conclusion}
 
-This thesis presented an \APO approach using \LLMs to optimize prompts for \RtR \TLR tasks in the \LiSSAF.
-To realize this, a new prompt optimization model has been developed for the \LiSSAF.
-The approach was evaluated on up to five datasets from the \RtR domain using three distinct \LLMs.
+This thesis presented an \APE approach using \LLMs to optimize prompts for \RtR \TLR tasks in the \LiSSAF.
+To realize this, a new prompt optimization component has been developed for the \LiSSAF.
+The approach was evaluated on up to five datasets from the \RtR domain using four distinct \LLMs.
 The results showed that the proposed approach can slightly improve the performance of \TLR tasks compared to the baseline classification prompts currently used in the \LiSSAF.
 However, the improvements were not as significant as initially expected.
-Importantly, it was demonstrated that the singular best performing optimized prompt for a dataset also performed well on other datasets of the same domain.
-This indicates that the optimized prompts can be used as fixed classification prompts in further work, even if the \APE piepline is not applied.
+Especially the variance between the different \APE algorithms \TLR performances is quite small.
+\Todo{Das kannst du doch ausrechnen oder? Da waren ja mal so Mathemodule... Sollen ja nicht nur absolut verglichen sein nach Augenmaß}
+Importantly, it was demonstrated that the singular best-performing optimized prompt for a dataset also performed well on other datasets of the same domain.
+This indicates that the optimized prompts can be used as fixed classification prompts in further work, even if the \APE pipeline is not applied.
+Further work might include applying the \APE component to different domains and possibly attempting to establish optimized prompts with improved performance on multiple domains.
+The gradient descent based \APO algorithm still has many more parameters that have been introduced during development, but have not been systematically altered during evaluation.
+Exploring configuration variations, for instance utilizing greater optimization budgets, is another possibility to build on this work. 
