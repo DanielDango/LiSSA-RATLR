@@ -18,9 +18,7 @@ import edu.kit.kastel.mcse.ardoco.metrics.ClassificationMetricsCalculator;
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.Configuration;
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.GoldStandardConfiguration;
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.OptimizerConfiguration;
-import edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
-import edu.kit.kastel.sdq.lissa.ratlr.postprocessor.TraceLinkIdPostprocessor;
 
 /**
  * Utility class for generating and saving statistics about trace link analysis results.
@@ -77,9 +75,7 @@ public final class Statistics {
                 traceLinks,
                 configuration.goldStandardConfiguration(),
                 sourceArtifacts,
-                targetArtifacts,
-                TraceLinkIdPostprocessor.createTraceLinkIdPostprocessor(
-                        configuration.traceLinkIdPostprocessor(), new ContextStore()));
+                targetArtifacts);
     }
 
     /**
@@ -107,8 +103,7 @@ public final class Statistics {
             Set<TraceLink> traceLinks,
             GoldStandardConfiguration goldStandardConfiguration,
             int sourceArtifacts,
-            int targetArtifacts,
-            TraceLinkIdPostprocessor traceLinkIdPostprocessor)
+            int targetArtifacts)
             throws UncheckedIOException {
 
         if (goldStandardConfiguration == null || goldStandardConfiguration.path() == null) {
@@ -118,7 +113,6 @@ public final class Statistics {
         }
 
         Set<TraceLink> validTraceLinks = getTraceLinksFromGoldStandard(goldStandardConfiguration);
-        validTraceLinks = traceLinkIdPostprocessor.postprocess(validTraceLinks);
 
         ClassificationMetricsCalculator cmc = ClassificationMetricsCalculator.getInstance();
         var classification = cmc.calculateMetrics(traceLinks, validTraceLinks, null);

@@ -43,6 +43,8 @@ public class ReqReqPostprocessor extends TraceLinkIdPostprocessor {
         for (TraceLink traceLink : traceLinks) {
             String sourceId = traceLink.sourceId();
             String targetId = traceLink.targetId();
+            sourceId = sourceId.substring(0, sourceId.lastIndexOf("."));
+            targetId = targetId.substring(0, targetId.lastIndexOf("."));
             result.add(new TraceLink(sourceId, targetId));
         }
         return result;
