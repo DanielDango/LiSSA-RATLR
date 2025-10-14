@@ -10,24 +10,26 @@
 %%
 %% Version 1.6, 2024-06-07
 %%
-%% Translated from English to German by Claude Sonnet 4.5
-
+%% Translation by Claude Sonnet 4.5
 
 \Abstract
 
-\TLR ist eine wichtige Aufgabe im Software Engineering, die dabei hilft, \TLs zwischen verschiedenen Software-Artefakten herzustellen und zu pflegen.
-Traditionelle \TLR-Methoden basieren häufig auf \IR-Techniken, um Kandidatenlinks zu identifizieren.
-Neuere Ansätze nutzen \LLMs, um die Genauigkeit und Wiederauffindungsraten von \TLR zu verbessern.
-Um \LLMs jedoch effektiv einzusetzen, ist es entscheidend, geeignete Prompts zu gestalten.
-Dieser Prozess des Prompt Engineering ist oft manuell und zeitaufwändig und erfordert erhebliche Expertise.
+\Ac{TLR} ist eine wichtige Aufgabe im Software Engineering, die dabei hilft, \TLs zwischen verschiedenen Software-Artefakten zu etablieren und zu pflegen.
+Traditionelle \TLR-Methoden basieren häufig auf \IR-Techniken, um Kandidaten-Links zu identifizieren.
+Neuere Ansätze nutzen \LLMs, um die Genauigkeit und Abrufrate von \TLR zu verbessern.
+Um \LLMs jedoch effektiv zu nutzen, ist es entscheidend, geeignete Prompts zu entwerfen.
+Dieser Prozess des Prompt Engineerings ist oft manuell und zeitaufwändig und erfordert erhebliche Expertise.
+
 In dieser Arbeit wird ein \APE-Ansatz vorgeschlagen, um den Prompt-Engineering-Prozess für \TLR-Aufgaben im \LiSSAF zu automatisieren.
-\LLMs werden verwendet, um Prompts iterativ zu verfeinern, mit der Fähigkeit, Feedback aus vorherigen Iterationen zu berücksichtigen.
-Der Ansatz wird auf fünf Datensätzen aus der \RtR-Domäne unter Verwendung von drei verschiedenen \LLMs evaluiert.
+\Acp{LLM} werden verwendet, um Prompts iterativ zu verfeinern, mit der Fähigkeit, Feedback aus vorherigen Iterationen zu berücksichtigen.
+Der Ansatz wird auf fünf Datensätzen aus dem \RtR-Bereich unter Verwendung von drei verschiedenen \LLMs evaluiert.
 Als Baseline werden aktuelle Klassifikations-Prompts aus dem \LiSSAF verwendet.
+
 Die Ergebnisse zeigen, dass der vorgeschlagene Ansatz die Leistung von \TLR-Aufgaben leicht verbessern kann.
 Die Verbesserungen sind jedoch nicht so signifikant wie zunächst erwartet.
-Darüber hinaus wird gezeigt, dass der einzelne am besten abschneidende optimierte Prompt für einen Datensatz auch auf anderen Datensätzen derselben Domäne gut funktioniert.
-Insgesamt leistet diese Arbeit einen Beitrag zum Bereich des \TLR, indem sie einen Ansatz für \APE unter Verwendung von \LLMs vorschlägt.
-Selbst wenn der \APE-Ansatz nicht angewendet wird, können in zukünftigen Arbeiten die durch diese Arbeit erzielten optimierten Prompts als feste Klassifikations-Prompts verwendet werden.
-Dieser Prozess kann mit Evaluierungen im \LiSSAF verkettet werden, um eine kontinuierliche Verbesserung zu erreichen.
+Darüber hinaus wird gezeigt, dass der einzelne, am besten abschneidende optimierte Prompt für einen Datensatz auch auf anderen Datensätzen derselben Domäne gut funktioniert.
+Insgesamt trägt diese Arbeit zum Bereich der \TLR bei, indem sie einen Ansatz zum \APE unter Verwendung von \LLMs vorschlägt.
+Auch wenn der \APE-Ansatz nicht angewendet wird, können in weiteren Arbeiten die durch diese Arbeit erzielten optimierten Prompts als feste Klassifikations-Prompts verwendet werden.
+Dieser Prozess kann mit Evaluierungen im \LiSSAF für kontinuierliche Verbesserung verkettet werden.
+
 Weitere Forschung kann durchgeführt werden, um weitere konfigurierbare Einstellungen zu untersuchen und den \APE-Ansatz auf anderen \TLR-Domänen zu evaluieren.
