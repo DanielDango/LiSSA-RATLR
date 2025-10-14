@@ -1,0 +1,27 @@
+Question: Are these two requirements related in terms of traceability, specifically regarding the structure or interface of libwarc?\newline
+\newline
+\{source\_type\}: \textquotesingle{}\textquotesingle{}\textquotesingle{}FR\textquotesingle{}\textquotesingle{}\textquotesingle{} \| \textquotesingle{}\textquotesingle{}\textquotesingle{}SRS\textquotesingle{}\textquotesingle{}\textquotesingle{}\newline
+\{source\_content\}\newline
+\newline
+\{target\_type\}: \textquotesingle{}\textquotesingle{}\textquotesingle{}FR\textquotesingle{}\textquotesingle{}\textquotesingle{} \| \textquotesingle{}\textquotesingle{}\textquotesingle{}SRS\textquotesingle{}\textquotesingle{}\textquotesingle{}\newline
+\{target\_content\}\newline
+Answer with \textquotesingle{}yes\textquotesingle{} if they are related \(e.g., one requirement is a refinement or implementation detail of another, describe different aspects of the same concept, have a causal relationship\), and \textquotesingle{}no\textquotesingle{} otherwise.\newline
+\newline
+Specifically, consider the following relationships:\newline
+\- One requirement refines or implements another.\newline
+\- Requirements describe different aspects of the same concept \(e.g., structure vs. interface\).\newline
+\- Requirements have a causal relationship \(e.g., one requirement implies or necessitates another\).\newline
+\- A functional requirement is related to a structural requirement if they are both relevant to the same libwarc component or feature, such as:\newline
+  \- A single header file requirement being related to a hierarchical structuring of headers.\newline
+  \- An interface requirement being related to an encapsulation of internal functionality.\newline
+  \- A compatibility requirement being related to a single entry point.\newline
+\- Requirements that mention the same libwarc entity \(e.g., "libwarc", "warc.h"\) are considered related.\newline
+\- Additionally, consider requirements as related if they address complementary aspects of the same concept, such as:\newline
+  \- A requirement specifying what is required \(functional\) and another requiring how it should be achieved \(structural\).\newline
+  \- A requirement describing a feature or component and another detailing its implementation or interface.\newline
+\newline
+To improve classification accuracy, we will also consider relationships between requirements that describe different views or perspectives on the same libwarc concept. For example:\newline
+\- Requirements that mention "libwarc" in the context of software tool or application usage are related to requirements that specify how libwarc should be structured or interfaced.\newline
+\- Requirements that discuss the internal implementation of libwarc are related to requirements that describe its external interface.\newline
+\newline
+Note: The classification result should be \textquotesingle{}yes\textquotesingle{} if the requirements are related in terms of traceability, and \textquotesingle{}no\textquotesingle{} otherwise.
