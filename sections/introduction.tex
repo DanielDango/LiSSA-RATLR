@@ -17,6 +17,16 @@ During software development, numerous artifacts are created, ranging from the ac
 Further complications such as inconsistent naming are frequent issues in software projects~\cite{wohlrab2019ImprovingConsistency}.
 \TLR approaches need to be able to deal with all these challenges.
 
+\begin{figure}
+    \centering
+    \includegraphics[width=0.6\linewidth]{graphics/artifact_overview_Fuchß}
+    \caption{Overview of different artifacts during software development, modified from \citewithauthor{fuchss2025LiSSAGeneric}.}
+    Artifacts are presented in white rounded boxes.
+    Existing \TLs between artifacts are highlighted with red dashed arrows.
+    The background colors indicate different domains of artifacts.
+    \label{fig:artifact_overview}
+\end{figure}
+
 \autoref{fig:artifact_overview} provides an overview of what these artifacts might look like.
 We can see various snippets of a larger project, including requirements, source code, architectural diagrams, and documentation.
 For instance, we have the requirement that a \REST \API should be used.
@@ -32,12 +42,6 @@ Technically, with just the knowledge displayed in \autoref{fig:artifact_overview
 The documentation does not mention a database at all.
 However, we can infer that \method{Db} is likely a database because it is used in the \method{\REST Facade} class, which is getting images from somewhere.
 
-\begin{figure}
-    \centering
-    \includegraphics[width=0.6\linewidth]{graphics/artifact_overview_Fuchß}
-    \caption{Overview of different artifacts during software development, modified from \citewithauthor{fuchss2025LiSSAGeneric}}
-    \label{fig:artifact_overview}
-\end{figure}
 
 This example illustrates that a multitude of factors need to be considered for \TLR. 
 Aside from or rather especially with naming inconsistencies, we need to consider more information to establish \TLs correctly.
@@ -49,45 +53,30 @@ Hier mind. Zitate, die aktuell sind und TLR mit LLMs machen
 As they are still unable to reason and think on their own~\cite{shojaee2025IllusionThinking}, prompt engineering is required to extract good results.
 \Todo{Wissen wir das? Quellen?}
 However, manually determining prompts suited for each specific problem is quite a tedious, time- and labor-intensive task.
-The goal is to reduce the effort required for \TLR instead of just shifting the task.
-\Todo{mmh .. wollen wir ja herausfinden; ggf waren ja unsere prompts schon "perfekt" :D}
-
+The goal is to determine, whether the current prompts can be refined further.
+If this proofs to be promising we also want reduce the overall effort required for \TLR instead of just shifting the task from manual classification to prompt engineering.
 To address this shortcoming, \APO tools can be used.
 They typically use the \LLM itself to determine suitable adjustments or generate new prompts based on a description or training data of the problem~\cite{ramnath2025SystematicSurvey}.
 
 The \LiSSAf proposes an environment for \TLR tasks, including multiple pipeline steps for preprocessing of input data.
 They rely on the power of \LLMs to extract traceability links from a variety of different artifacts, also across multiple domains.
-My work contributes an \APO module to this framework.
+My work contributes an \APO component to this framework.
 It can be used to automatically refine a prompt on a dataset and optionally chain the optimization with the regular evaluation pipeline of the \LiSSAf
 I am expecting to improve \TLR rates, especially for larger projects in the \RtR domain.
-
-\begin{figure}
-    \centering
-    \includesvg[width=\textwidth]{graphics/LiSSA_pipeline_with_optimization.svg}
-    \caption[Overview of the proposed prompt optimization approach for \TLR tasks in the \LiSSAf.]{Overview of the proposed prompt optimization approach for \TLR tasks in the \LiSSAf. The new prompt optimization module is highlighted in light blue. Modified from \citewithauthor{fuchss2025LiSSAGeneric}. Highlighted in yellow are the actual artifacts. Highlighted in purple are steps using \LLMs for processing. White nodes represent algorithms implemented fully inside the framework.}
-    \label{fig:prompt_optimization_pipeline}
-\end{figure}
-
-The additional step is highlighted in \autoref{fig:prompt_optimization_pipeline}.
-\Todo{find out how to add a proper legend}
-It will be placed after the initial preprocessing of the input data.
-The \promptoptimizer module will use the preprocessed data to optimize a given prompt.
-The optimized prompt can then be used in the regular \LLM-based prompting step to classify \TLs.
-\Todo{To much detail for intro}
 
 This thesis aims to answer the following research questions:
 \begin{itemize}
     \item[RQ1:] Can \APO be used to improve \TLR performance in the \LiSSAf?
     \item[RQ2:] How does the performance of the optimized prompt compare to the current classification prompts?
+    \item[RQ3:] Can optimized prompts improve \TLR performance for untrained datasets?
 \end{itemize}
 
 The remainder of this thesis is structured as follows:
-\autoref{ch:foundations} introduces the necessary fundamentals and related work.
-\autoref{ch:Approach} describes the concept of the proposed \APO module.
+\autoref{ch:foundations} introduces the necessary fundamentals and related work in \autoref{ch:related_work}.
+\autoref{ch:Approach} describes the concept of the proposed \APO component.
 \autoref{ch:Implementation} details the implementation of the concept.
 \autoref{ch:Evaluation} evaluates the implementation and answers the research questions.
-Finally, \autoref{ch:Conclusion} concludes the thesis and gives an outlook on future work.
+Finally, \autoref{ch:Conclusion} concludes the thesis and gives an outlook on possible future work.
 
 \Todo{
-Die Blöcke sind alle noch relativ lose verbunden; ggf nochmal schauen, dass der Rote faden klar wird. Die Details aus 1.2 sind für die Intro zu viel; das soltle eher in den approach. Du brauchst höchstens High-Level: LiSSA bekommt, Prompt, Artifacts => liefert TLs
-}
+Die Blöcke sind alle noch relativ lose verbunden; ggf nochmal schauen, dass der Rote faden klar wird.}
