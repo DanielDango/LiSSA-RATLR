@@ -70,15 +70,6 @@ The hopefully improved prompt will be taken into the next iteration.
 The act of evaluation and improving will be repeated until a threshold value is passed, meaning the prompt is considered good enough.
 To limit resource usage, a hard limit will also be included to put an upper bound on the optimization attempts.
 
-\autoref{fig:iterative_core_loop} \Todo{Legende einfügen; erklären was die Farben bedeuten etc.}
-
-\begin{figure}
-    \centering
-    \includesvg[width=0.7\linewidth]{graphics/Iterative_core_loop}
-    \caption{Visualization of a simple iterative optimization algorithm}
-    \label{fig:iterative_core_loop}
-\end{figure}
-
 Implementing this naive, iteratively optimized classifier will yield fast results to evaluate later, even if more complicated implementations might fail.
 The core concepts also apply to \Todo{fix ref phase gradient descent} and can be reused.
 

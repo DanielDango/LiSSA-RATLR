@@ -14,8 +14,11 @@
 \label{ch:Introduction}
 During software development, numerous artifacts are created, ranging from the actual project code to documentation and a multitude of formal and informal diagrams.
 \TLR aims to link correlating artifacts across different domains or versions.
+For instance, a requirement might be implemented in a specific class.
+These links are called \TLs.
+However, establishing and maintaining these links manually is often done incompletely and inconsistently~\cite{cleland-huang2007BestPractices}.
 Further complications, such as inconsistent naming, are frequent issues in software projects~\cite{wohlrab2019ImprovingConsistency}.
-\TLR approaches need to be able to deal with all these challenges.
+\TLR approaches need to be able to deal with these challenges.
 
 \begin{figure}
     \centering
@@ -32,52 +35,46 @@ We can see various snippets of a larger project, including requirements, source 
 For instance, we have the requirement that a \REST \API should be used.
 In the documentation, we can read that \REST is used to process images.
 The source code shows us that the \method{Image} class is used by the \method{\REST Facade}.
-A \TL likely exists between the \method{\REST Facade} and the \REST requirement.
-Furthermore, the documentation snippet likely describes the relation between the \method{\REST Facade} and \method{Image}.
-So a \TL should exist between them as well.
+A \TL exists between the \REST documentation and the \REST requirement.
+Furthermore, the documentation snippet describes the relation between the \method{\REST Facade} and \method{Image}.
+So a \TL exist between them as well.
 We can also note naming inconsistencies for the database.
 In the architectural diagram, it is referred to as \method{Database}.
 At the same time, the source code uses the abbreviated \method{Db} identifier.
 Technically, with just the knowledge displayed in \autoref{fig:artifact_overview}, we can not even be certain that \method{Db} is used to abbreviate database.
 The documentation does not mention a database at all.
 However, we can infer that \method{Db} is likely a database because it is used in the \method{\REST Facade} class, which is getting images from somewhere.
+Thus, database is a reasonable assumption.
 
-
-This example illustrates that a multitude of factors need to be considered for \TLR. 
+This example illustrates that a multitude of factors need to be considered for \TLR.
 Aside from or rather especially with naming inconsistencies, we need to consider more information to establish \TLs correctly.
-\Acp{LLM} have made rapid advancements in recent years.
-They are becoming increasingly popular for dealing with various tasks and have shown auspicious results so far.
-\directQuote{LLMs have demonstrated significant potential in automating and enhancing tasks such as
-requirement elicitation, classification, generation, specification
-generation, and quality assessment}{jin2025LLMsLLMbased}
-As they are still unable to reason and think on their own~\cite{shojaee2025IllusionThinking}, prompt engineering is required to extract good results.
-\Todo{Wissen wir das? Quellen?}
+As \LLMs have made rapid advancements in recent years~\cite{zhao2025SurveyLarge}, they have been applied to various tasks in software engineering, including \TLR \cite{fuchss2025LiSSAGeneric, rodriguez2023PromptsMatter}.
+Especially \directQuote{\LLMs have demonstrated significant potential in automating and enhancing tasks such as requirement elicitation, classification, generation, specification  generation, and quality assessment}{jin2025LLMsLLMbased}.
+Yet they are still unable to reason and think on their own~\cite{shojaee2025IllusionThinking}, prompt engineering is required to extract good results~\cite{rodriguez2023PromptsMatter}.
 However, manually determining prompts suited for each specific problem is quite a tedious, time- and labor-intensive task.
-The goal is to determine, whether the current prompts can be refined further.
-If this proofs to be promising we also want reduce the overall effort required for \TLR instead of just shifting the task from manual classification to prompt engineering.
-To address this shortcoming, \APO tools can be used.
+Our goal is to determine, whether current classification prompts can be refined further to improve \TLR rates.
+As this proofs to be promising we also want to reduce the overall effort required for \TLR instead of just shifting the task from manual classification to prompt engineering.
+To address this shortcoming, \APE tools can be used.
 They typically use the \LLM itself to determine suitable adjustments or generate new prompts based on a description or training data of the problem~\cite{ramnath2025SystematicSurvey}.
 
-The \LiSSAf proposes an environment for \TLR tasks, including multiple pipeline steps for preprocessing of input data.
-They rely on the power of \LLMs to extract traceability links from a variety of different artifacts, also across multiple domains.
-My work contributes an \APO component to this framework.
-It can be used to automatically refine a prompt on a dataset and optionally chain the optimization with the regular evaluation pipeline of the \LiSSAf
-I am expecting to improve \TLR rates, especially for larger projects in the \RtR domain.
+The \LiSSAf proposes an environment for \TLR tasks, including multiple pipeline steps for the preprocessing of input data.
+They harnes the power of \LLMs to extract traceability links from a variety of different artifacts, also across multiple domains.
+My work contributes an \APE component to this framework.
+It can be used to automatically refine a prompt on a dataset.
+The refined prompt can improve \TLR rates, for projects in the \RtR domain, compared to the current classification prompts in use by \LiSSA.
 
 This thesis aims to answer the following research questions:
 \begin{itemize}
-    \item[RQ1:] Can \APO be used to improve \TLR performance in the \LiSSAf?
-    \item[RQ2:] How does the performance of the optimized prompt compare to the current classification prompts?
+    \item[RQ1:] Can \APE be used to improve \TLR performance in the \LiSSAf?
+    \item[RQ2:] How does the performance of optimized prompts compare to the current \TLR performance in the \RtR domain?
     \item[RQ3:] Can optimized prompts improve \TLR performance for untrained datasets?
 \end{itemize}
 
-The remainder of this thesis is structured as follows:
-\autoref{ch:foundations} introduces the necessary fundamentals and related work in \autoref{ch:related_work}.
-\autoref{ch:Approach} describes the concept of the proposed \APO component.
+The remainder of my work is structured as follows:
+\autoref{ch:foundations} introduces the necessary fundamentals.
+\autoref{ch:related_work} addresses related work in the fields of \TLR and \APE.
+\autoref{ch:Approach} describes the concept of the proposed \APE component.
 \autoref{ch:Implementation} details the implementation of the concept.
 \autoref{ch:Evaluation} evaluates the implementation and answers the research questions.
 Finally, \autoref{ch:Conclusion} concludes the thesis and gives an outlook on possible future work.
-A replication package for this thesis is also provided \cite{schwab_danieldangoreplication-package-automated-prompt-engineering-for-traceability-link-recovery_2025}.
-
-\Todo{
-Die Blöcke sind alle noch relativ lose verbunden; ggf nochmal schauen, dass der Rote faden klar wird.}
+A replication package for this thesis is also provided~\cite{schwab2025DanielDangoReplicationPackageAutomatedPromptEngineeringforTraceabilityLinkRecovery}.
