@@ -16,18 +16,20 @@
 Traditional \TLR methods often rely on \IR techniques to identify candidate links.
 More novel approaches use \LLMs to improve the accuracy and retrieval rates of \TLR.
 However, to utilize \LLMs effectively, it is crucial to design appropriate prompts.
-This process of prompt engineering is often manual and time-consuming, requiring significant expertise.
+This process of prompt engineering is often done manually and often time-consuming, requiring significant expertise.
 
-In this work, an \APE approach is proposed to automate the prompt engineering process for \TLR tasks in the \LiSSAF.
-\Acp{LLM} are used to iteratively refine prompts, with the ability to consider feedback from previous iterations.
-The approach is evaluated on five datasets from the \RtR domain using three different \LLMs.
+In this work, an \APE approach is proposed to automate this task for \TLR in the \LiSSAF.
+Using feedback form previous iterations, \LLMs are used to refine prompts.
+The approach is evaluated on five datasets from the \RtR task using three different \LLMs.
+\Todo{Generell ncohmal auf domain vs task schauen. Domain ist eher sowas wie Healthcare}
 As a baseline, current classification prompts from the \LiSSAF are used.
 
-The results show that the proposed approach can slightly improve the performance of \TLR tasks.
+The results show that the proposed approach can improve the performance of \TLR tasks.
 However, the improvements are not as significant as initially expected.
-Furthermore, it is demonstrated that the singular best-performing optimized prompt for a dataset also performs well on other datasets of the same domain.
-Overall, this work contributes to the field of \TLR by proposing an approach to \APE using \LLMs.
-Even if the \APE approach is not applied, in further work, the optimized prompts yielded by this work can be used as fixed classification prompts.
-This process can be chained with evaluations in the \LiSSAF for continuous improvement.
+\Todo{Nur signifikant verwenden falls Signifikanztests durchgeführt wurden!}
+Furthermore, it is demonstrated that the best-performing optimized prompt for a dataset, in terms of \fone, also performs well on other datasets of the same task.
+As the optimized prompts yielded by this work can be used as fixed classification prompts, the \APE algorithm is not required to be applied for every evaluation.
+Overall, this work contributes to the field of \TLR by realizing an approach to \APE using \LLMs.
 
-Further research can be conducted to explore further configurable settings and to evaluate the \APE approach on other \TLR domains.
+Further research can be conducted to explore further configurable settings and to investigate the \APE approach on other \TLR domains, with different models and new prompting strategies.
+\Todo{Satzbau/Länge could investigate the APE approach in other TLR domains, with different models, and new prompting strategies .... oder so ähnlich :D}

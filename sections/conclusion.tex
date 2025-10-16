@@ -12,19 +12,21 @@
 
 \chapter{Conclusion}
 \label{ch:Conclusion}
+\Todo{gerne auch hier noch konkrete zahlen; generell hast du ja auch noch ToT gemacht; das sollte im Abstract und der Conclusion als Beitrag glaub auch noch rein. und generell auch die zwei varianten von APE sollten deutlicher in beidem hervorgehoben werden, da das arbeit von dir war.}
 
 This thesis presents an \APE approach using \LLMs to optimize prompts for \RtR \TLR tasks in the \LiSSAF.
-To realize this, a new prompt optimization component is proposed for the \LiSSAF.
+To realize this, a new prompt optimization component is realized for the \LiSSAF.
+\Todo{Ctrl+F "propose"}
 Among other strategies for \APE, the gradient descent-based algorithm \ProTeGi is implemented.
 Utilizing the added \promptoptimizer component, prompts can be refined iteratively to provide better classification results on a training set.
 In addition, the naive strategies of prompting the \LLM to optimize the prompt with or without examples of misclassified \TLs are also presented.
-The approach is evaluated on up to five datasets from the \RtR domain using four distinct \LLMs.
-The results show that the proposed approach can slightly improve the performance of \TLR tasks compared to the baseline classification prompts currently used in the \LiSSAF.
+The approach is evaluated on five datasets from the \RtR task using four \LLMs.
+The results show that the realized approach can improve the performance of \TLR tasks compared to the baseline classification prompts currently used in the \LiSSAF.
 At the same time, the variance between the different \APE algorithms \TLR performances is quite small.
-\Todo{Das kannst du doch ausrechnen oder? Da waren ja mal so Mathemodule... Sollen ja nicht nur absolut verglichen sein nach Augenmaß}
-Importantly, it is demonstrated that the singular best-performing optimized prompt, \autoref{prompt:optimized_classificiation_prompt} for a dataset also performed well on other datasets of the same domain.
-This indicates that the optimized prompts may be used as fixed classification prompts in further work, even if the \APE pipeline is not applied.
-\autoref{prompt:optimized_classificiation_prompt} was optimized with the \ProTeGi implementation of the \APE component with the zero-shot \autoref{prompt:yes_no} as initial prompt.
+\Todo{Das kannst du doch ausrechnen oder? Da waren ja mal so Mathemodule... Sollen ja nicht nur absolut verglichen sein nach Augenmaß. "Ja, ne Zahl wäre gut :D" Stichwort Signifikanztests}
+Importantly, it is demonstrated that the best-performing optimized prompt in terms of \fone, \autoref{prompt:optimized_classificiation_prompt} for the \WARC dataset also performed well on other datasets of the same task.
+This indicates that the optimized prompts may be used as fixed classification prompts in further work or projects, even if the \APE pipeline is not applied.
+\autoref{prompt:optimized_classificiation_prompt} was optimized with the \ProTeGi implementation of the \APE component with the zero-shot \KISS \autoref{prompt:yes_no} as initial prompt.
 Optimized prompts with the \CoT \autoref{prompt:cot} as initial prompt were not able to outperform the optimized \KISS prompts trained on the same dataset.
 \Todo{Check that this statement is still true after adjusting}
 
@@ -35,5 +37,6 @@ Exploring configuration variations, for instance, utilizing greater optimization
 Stepping up from \TLR, the optimization prompts used for optimization in the \promptoptimizer component might also be optimized themselves.
 
 As the \LLMs output is not deterministic, the cached requests and responses are included in the \replicationPackage for this thesis.
-Alongside the cached requests, the used datasets and code are also publicly available in this replication package.
+Alongside the cached requests, the used datasets and code are also publicly available in this replication package as well.
 Small variances in performance are expected when rerunning the requests instead of using the cached values.
+\Todo{hast du das getestet, also dass die small sind: und was heißt small :D}
