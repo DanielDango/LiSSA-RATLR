@@ -1,107 +1,145 @@
 \chapter{Approach}
 \label{ch:Approach}
-In this chapter, I will outline how my thesis will be realized and provide source code that can be merged into the \LiSSA project.
-My work aims to implement three different classifiers into the framework.
-First, I plan to implement a simple \ToT classifier in \autoref{approach:sec:tot} to broaden the baseline to compare later optimized prompts against.
-Next, I expect to work on a reduced iterative optimizer in \autoref{approach:sec:naive_iterative} using a naive approach to optimization.
-This already provides the basic components and data to evaluate the more sophisticated algorithm by \citewithauthor{pryzant2023AutomaticPrompt}, which will be implemented in \autoref{approach:sec:gradient_descent}.
+
+This chapter outlines how the research questions of the thesis are addressed.
+The produced source code can seamlessly integrate into the \LiSSA project.
+In this thesis four different methods are used to test their \TLR performance.
+First, a simple \ToT style prompt is used for classification instead of the existing \zeroshot or \CoT style prompts.
+The usage of this prompting style is presented in \autoref{sec:Approach:tot}.
+Next, naive iterative prompt optimization approaches with and without feedback are be elaborated in \autoref{approach:sec:naive_iterative}.
+They provide basic functionality upon which the more sophisticated \ProTeGi algorithm in \autoref{approach:sec:gradient_descent} is based.
+
 
 \section{Simple Tree-of-Thought Classifier}
-\label{approach:sec:tot}
+\label{sec:Approach:tot}
+\Todo{Is the section name correct?}
 
-\autoref{fig:ToT_visualization} \Todo{Außerdem bild erklären im text.}
+\Ac{ToT} is a prompting technique exploring more different branches of thoughts than typical \CoT prompts.
+\Todo{What are thoughts? Can this be introduced in Foundations maybe?}
+This can be achieved by chaining multiple requests to a \LLM~\cite{long2023LargeLanguage}.
+The prompts by \citewithauthor{hulbert2023UsingTreeofThought} aim to simplify \ToT prompting into a singular request.
+They provide three different prompts to achieve this.
+The full best performing \autoref{prompt:tot} can be found in the appendix.
 
 \begin{figure}
     \centering
     \includesvg[width=\linewidth]{graphics/tree_of_thought}
     \caption{\Ac{ToT} visualization inspired by \citewithauthor{yao2023TreeThoughts}}
+    \label{fig:ToT_visualization}
     Highlighted in green are different prompting techniques.
     Highlighted in yellow is data, with x being the input which is queried with one of the prompting techniques to the \LLM and output representing the returned result of this query.
     The rounded boxes represent thoughts of the \LLM.
     Orange thoughts are considered inconsistent and will be disregarded in the next step.
     Arrows represent the processing flow of data
-    \label{fig:ToT_visualization}
+    \Todo{Add Highlight around prompt processes to illustrate the encolosed model?}
 \end{figure}
 
-\Ac{ToT} is a prompting technique exploring more different branches of thoughts than typical \CoT prompts.
+In \autoref{fig:ToT_visualization} we can see the three different prompting techniques highlighted in green.
+Among them are aside from the \ToT prompt also a zero-shot and \CoT prompt, to visualize the differences.
+The input data, highlighted in yellow, is queried with one of the prompting techniques to the \LLM.
+In our case this can be a pair of requirements, for which the output should state whether a \TL exists between them.
+Examining the three different prompting techniques, we note a varying amount of thoughts before the output is reached.
+Thoughts are represented by white and orange rounded boxes, with orange ones being discarded during the thought process.
+As for the zero-shot prompt the \LLM reaches their conclusion without a thought process.
+The \CoT style prompt results in a linear thought path.
+Thus, if any thought deviates, the \LLM might be led to a false conclusion.
+\Todo{Source? I made it up, is not a valid source...}
+Prompting with \ToT addresses this, as we can see multiple thoughts explorer per level independently.
+This concrete number is chosen just for illustrative purposes.
+If and only if the \LLM identifies them as wrong, they will be discarded.
+The output is then reached as a consensus of these multiple paths.
+
+\begin{prompt}{Excerpt of a \ToT prompt by \citewithauthor{hulbert2023UsingTreeofThought}}{tot-1-short}
+    \label{prompt:tot_short}
+    \\
+    Identify and behave as three different experts that are appropriate to answering this question. \\
+    \omitt \\
+    If any expert is judged to be wrong at any point then they leave. \\
+    \omitt
+\end{prompt}
+
 As illustrated in \autoref{fig:ToT_visualization}, many branches are explored concurrently instead of following a single strain of thoughts like \CoT prompting.
-The prompts by \citewithauthor{hulbert2023UsingTreeofThought} aim to simplify \ToT prompting into a singular request, instead of chaining multiple calls.
-I will use one of their prompts.
-The benchmark data to compare \ToT prompting with the existing zero-shot and \CoT classifiers also exists in public repositories~\cite{fuchss2022ArDoCoBenchmark, hey2025ReplicationPackage}.
+We can see this instruction in \autoref{prompt:tot}.
+The \LLM is instructed to act as multiple experts to initiate multiple thought processes concurrently.
+Discarding misleading thoughts, symbolised by orange boxes in \autoref{fig:ToT_visualization} is instructed by removing the experts from the simulated discussion.
+The benchmark data to compare \ToT prompting with the existing zero-shot and \CoT classifiers in the \LiSSAF for \RtR also exists in public repositories~\cite{fuchss2022ArDoCoBenchmark, hey2025ReplicationPackage}.
+Adding this prompting style to the \LiSSAf will broaden the baseline to compare later results and possible improvements against.
 
 The \LiSSAf is publicly accessible in a repository using the MIT license.
 Various classifiers are already included there.
-They can be used as an inspiration for development.
-The class \verb|classifier| is an abstraction of all classifiers.
-It provides basic functionality to include further classifiers.
-Integration for different \LLM providers, such as \OAI, Ollama, and Blablador, already exists in the framework.
-The new classifier can be plugged in directly with little more effort than writing the request prompt and implementing the \verb|classify| function to extract the classification result out of the \LLM output.
-
-This work package has two major goals.
-\Todo{lieber nicht über WPs reden; das ist teil von deinen untersuchungen; rede am besten einfach über den ToT classifier .}
+To apply the \ToT prompting technique, existing classifiers can be modified in their classification prompt to utilize \autoref{prompt:tot} instead.
+Of course the relevant question for \RtR \TLR will be included in the actual prompt as well.
+This \ToT classification has two major goals.
 Foremost, to get confident and set up with the general project structure and benchmark data.
-This will be a prerequisite for all future work in the \LiSSA framework.
-Second, this will broaden the baseline to compare later results and possible improvements against.
+This is a prerequisite for my future work in the \LiSSA framework.
+Second, this broadens the baseline to compare later results and possible improvements against.
 
+\section{\APE in the \LiSSAF}
+\label{sec:Approach:ape_in_lissa}
 
-
-
-\section{Naive Iterative Optimizing Classifier}
-\label{approach:sec:naive_iterative}
-Another classifier implementation will be the simplest automatic iterative prompt optimization algorithm.
-The same existing abstract \verb|classifier| class can be used as in \Todo{fix ref phase initial overview} to provide basic functionality for the iteratively optimized classifier.
-
-Next, a function $f$ will be required to quantify the result, also referred to as performance, of the current prompt $p$ iteration, called to a large language model $llm$ using a set of training data $X$.
-The simple approach here is to use the successful retrieval rate by dividing the number of correctly classified trace links by the total number of recoverable trace links.
-The function $f$ will need to have the same range for any set of training data to ensure the threshold value $t$ will always be viable.
-
-\begin{align}
-        f: llm(p, X) \rightarrow [0, 1] \\
-        t \in [0, 1]
-\end{align}
-
-The benchmark data by \citewithauthor{hey2025ReplicationPackage} also provides the gold standard for each given problem.
-The total amount of recoverable trace links is thus already available. 
-%\textit{to-do: how can the task set be divided into training and testing data? Use one entire TLR problem for training, the remaining for testing?}
-
-To improve the performance, an optimization prompt is used.
-As visualized in \autoref{fig:iterative_core_loop} the expected outputs for training data may also be used to improve the prompt.
-The most naive approach is to simply ask the LLM to improve the prompt without providing further direction or information about why the prompt did not meet the requirements.
-The hopefully improved prompt will be taken into the next iteration.
-The act of evaluation and improving will be repeated until a threshold value is passed, meaning the prompt is considered good enough.
-To limit resource usage, a hard limit will also be included to put an upper bound on the optimization attempts.
-
-Implementing this naive, iteratively optimized classifier will yield fast results to evaluate later, even if more complicated implementations might fail.
-The core concepts also apply to \Todo{fix ref phase gradient descent} and can be reused.
-
-
-\section{Automatic Prompt Optimization with Gradient Descent}
-\label{approach:sec:gradient_descent}
-The existing iterative optimization implementation from~\Todo{fix ref phase naive iterative} can be used as a foundation for the implementation, as the core concepts remain the same.
-Refer to~\autoref{sec:gradient_descent} for details of the gradient-descent-based optimization algorithm.
-
-\citewithauthor{pryzant2023AutomaticPrompt} have provided their Python source code in a publicly accessible repository\footnote{https://github.com/microsoft/LMOps/tree/main/prompt\_optimization} under the MIT license.
-The project code can be of great help when adapting their algorithm to the \LiSSA Java framework.
-The actual implementation of gradient descent and the bandit-selection algorithm will be the main focus, in order to steer optimized prompts in the right direction.
-
-The primary idea of this thesis is to explore automated optimization.
-The naive approach may yield good results already.
-Feeding more information and processing logic into the optimization system is expected to present better results.
-Especially suitable results may be reached faster by doing more processing on the machine instead of expensive API calls to the large language model.
-
-\section{Was auch immer du da getan und nicht mehr umgearbeitet hast seit dem Proposal}
 \begin{figure}
     \centering
     \includesvg[width=\textwidth]{graphics/LiSSA_pipeline_with_optimization.svg}
     \caption{Overview of the proposed prompt optimization approach for \TLR tasks in the \LiSSAf. Modified from \citewithauthor{fuchss2025LiSSAGeneric}}
-    The new prompt optimization component is highlighted in light blue. 
-    Highlighted in yellow are the actual artifacts. 
-    Highlighted in purple are steps prompting \LLMs for processing. 
+    The new prompt optimization component is highlighted in light blue.
+    Highlighted in yellow are the actual artifacts.
+    Highlighted in purple are steps prompting \LLMs for processing.
     White nodes represent processing inside the framework.
     \label{fig:prompt_optimization_pipeline}
 \end{figure}
 
-The new optimization step, highlighted in light blue in \autoref{fig:prompt_optimization_pipeline}, is an iterative pipeline step to alter the classification prompt.
+To add \APE capabilities to the \LiSSAF, a new pipeline step is introduced.
+\autoref{fig:prompt_optimization_pipeline} provides an overview of the proposed approach.
+The new optimization step, highlighted in light blue, is an iterative pipeline step to alter the classification prompt.
 It will be placed after the initial preprocessing of the input data.
 The \promptoptimizer component will use the preprocessed data to optimize a given prompt.
 The optimized prompt can then be used in the regular \LLM-based prompting step to classify \TLs.
+
+The different prompt optimization algorithms to be used will be introduced in the following subsections.
+First a naive iterative approach is presented in \autoref{approach:sec:naive_iterative}.
+This implementation is the basis for the more sophisticated \ProTeGi algorithm in \autoref{approach:sec:gradient_descent}.
+
+\subsection{Naive Iterative \APE}
+\label{approach:sec:naive_iterative}
+To add \APE capabilities to the \LiSSAF, a naive iterative optimizer is added.
+As in \autoref{sec:Approach:tot} the existing classifiers of the \LiSSAF can be used to evaluate the \TLR performance of the optimized prompts.
+
+\begin{equation}
+    \label{eq:naive_opti}
+    f: llm(p, X) \rightarrow [0, 1] \\
+    t \in [0, 1]
+\end{equation}
+
+More formally as written in \autoref{eq:naive_opti}, a function $f$ will be required to quantify the result, also referred to as performance.
+The current prompt $p$ iteration, called to a \LLM $llm$ using a set of training data $X$, returns this result.
+The metrics provided by an \LiSSA evaluation run: precision, recall and \fone, can be used as this performance function.
+The function $f$ will need to have the same range for any set of training data to ensure the threshold value $t$ will always be viable.
+
+\begin{prompt}{Simple Optimization Prompt}{initial_optimization}
+    \label{prompt:optimization_prompt_simple}
+    \\
+    \input{prompts/optimization-prompt-simple}
+\end{prompt}
+
+To improve \TLR performance, \autoref{prompt:optimization_prompt_simple} is used as the optimization prompt.
+As visualized in \autoref{fig:iterative_core_loop} the expected outputs for training data may also be used to improve the prompt.
+The most naive approach is to simply ask the \LLM to improve the prompt without providing further direction or information about why the prompt did not meet the requirements.
+The hopefully improved prompt will be taken into the next iteration.
+The act of evaluation and improving will be repeated until a threshold value is passed, meaning the prompt is considered good enough.
+To limit resource usage, a hard limit will also be included to put an upper bound on the optimization attempts.
+
+This naive \promptoptimizer implementation can be used for more sophisticated prompt optimization algorithms.
+Furthermore, we are able to compare whether optimization results differ between naive and sophisticated approaches.
+
+\subsection{\APE with \ProTeGi}
+\label{approach:sec:gradient_descent}
+The iterative optimization implementation created for \autoref{approach:sec:naive_iterative} is used as a foundation for the implementation.
+The core concepts of the \ProTeGi optimization algorithm remain the same.
+Details of the \ProTeGi algorithm are introduced in \autoref{sec:gradient_descent}.
+
+\citewithauthor{pryzant2023AutomaticPrompt} have provided their Python source code in a publicly accessible repository\footnote{https://github.com/microsoft/LMOps/tree/main/prompt\_optimization} under the MIT license.
+The project code for their algorithm, is the basis for the adaption to the \LiSSA Java framework.
+The primary idea of this thesis is to explore \APE.
+The naive approach of \autoref{approach:sec:naive_iterative} may yield good results already.
+Feeding more information and processing logic into the optimization system is expected to present better results.
+Especially suitable results may be reached faster by doing more processing on the local machine instead of expensive \API calls to the \LLM.
