@@ -23,11 +23,12 @@ This can be achieved by chaining multiple requests to a \LLM~\cite{long2023Large
     \caption{\Ac{ToT} visualization inspired by \citewithauthor{yao2023TreeThoughts}}
     \label{fig:ToT_visualization}
     Highlighted in green are different prompting techniques.
-    Highlighted in yellow is data, with x being the input which is queried with one of the prompting techniques to the \LLM and output representing the returned result of this query.
+    Their related paths are enclosed in the light blue box.
+    Highlighted in yellow is data, with the input which is queried using one of the prompting techniques to the \LLM and output representing the returned result of this query.
     The rounded boxes represent thoughts of the \LLM.
     Orange thoughts are considered inconsistent and will be disregarded in the next step.
-    Arrows represent the processing flow of data
-    \Todo{Add Highlight around prompt processes to illustrate the encolosed model?}
+    Arrows represent the processing flow of data.
+
 \end{figure}
 
 In \autoref{fig:ToT_visualization} we can see the three different prompting techniques highlighted in green.
@@ -99,6 +100,8 @@ This implementation is the basis for the more sophisticated \ProTeGi algorithm i
 
 \subsection{Naive Iterative \APECapitalized}
 \label{approach:sec:naive_iterative}
+\label{approach:sec:naive_iterative_feedback}
+\Todo{Consider extracting feedback section}
 To add \APE capabilities to the \LiSSAF, a naive iterative optimizer is added.
 As in \autoref{sec:Approach:tot} the existing classifiers of the \LiSSAF can be used to evaluate the \TLR performance of the optimized prompts.
 
