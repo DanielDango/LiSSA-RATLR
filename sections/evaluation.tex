@@ -17,14 +17,14 @@ The three different \APE approaches and \ToT promting proposed in \autoref{ch:Ap
 To make the results comparable, the same datasets as in \citewithauthor{hey2025RequirementsTraceability} are used.
 In \autoref{approach:sec:evaluation}, the evaluation approach is described.
 \autoref{sec:Evaluation:setup} describes the general evaluation setup, including datasets and \LLMs used.
-\Todo{Wo ist \ToT?}
-\autoref{sec:Evaluation:naive_optimization}, \autoref{sec:Evaluation:simple_feedback_optimization}, and \autoref{sec:Evaluation:varying-the-optimization-prompt} present the naive prompt optimization approaches.
+First, \autoref{sec:Evaluation:tot_prompting} presents the results of \ToT prompting for \TLR in the \LiSSAf.
+Then, \autoref{sec:Evaluation:naive_optimization}, \autoref{sec:Evaluation:simple_feedback_optimization}, and \autoref{sec:Evaluation:varying-the-optimization-prompt} present the naive prompt optimization approaches.
 The findings of gradient-based prompt optimization are presented in \autoref{sec:Evaluation:gradient_based_optimization}.
 They are also tested for their generalizability to new datasets in \autoref{sec:Evaluation:cross_dataset_evaluation}.
+\Todo{Ich würde in dem Kapitel generell den Fokus darauf legen, nicht immer alle Prompts zu listen, sondern den fokus auf , was ist da wichtig. Z.B.: Warum ist hier der Komplette prompt; was bringt das dem leser? Wenn der Leser nicht den Kompletten Prompt brauch -> dann appendix. und hier verkürzt.}
 
-\section{Evaluation Approach as in Proposal Document}
+\section{Evaluation Approach}
 \label{approach:sec:evaluation}
-\Todo{Wehe du übersiehst den random Namen hier :monkaW:}
 
 \begin{align}
     \label{eq:precision}
@@ -39,7 +39,6 @@ Evaluating the experimental results of prompt optimization is central to making 
 Precision~(\autoref{eq:precision}) and recall~(\autoref{eq:recall}) are key measures for information retrieval tasks~\cite{hayes2006AdvancingCandidate}.
 They are commonly used by many authors to compare different approaches to \TLR.
 Further the \fone using a fixed $\beta$ in \autoref{eq:f_beta}, are used commonly~\cite{fuchss2025LiSSAGeneric, hey2025RequirementsTraceability}.
-\Todo{Aufzählen wer die Metriken benutzt hat.}
 \directQuote[sec. 7.1]{
     Precision measures the ratio of correctly predicted links and all predicted links.
     Recall measures the ratio of correctly predicted links and all relevant documents.
@@ -100,6 +99,30 @@ Depending on the \APE algorithm, different variables, such as the optimization p
 Unless specified, each evaluation will assume that the model used to optimize the prompt will be used to classify the \TLs later to derive the quantitative metrics for evaluation.
 The datasets and exact configurations used for each evaluation are also available in the replication package~\cite{schwab2025DanielDangoReplicationPackageAutomatedPromptEngineeringforTraceabilityLinkRecovery} for this thesis.
 
+
+\section{Tree-of-Thought Prompting Evaluation}
+\label{sec:Evaluation:tot_prompting}
+
+Before evaluating the proposed \APE approaches, \ToT prompting by \citewithauthor{hulbert2023UsingTreeofThought} is evaluated for the task of \TLR in the \LiSSAf.
+\autoref{tab:tree_of_thought} shows the systematic evaluation results for varying datasets using \ToT prompting compared to the simple \KISS \autoref{prompt:yes_no}.
+The \Average and \WeightedAverage are also included.
+The \Average value is computed across all datasets, while the \WeightedAverage factors the dataset size in as well.
+The amount of \TLs in the gold standard reference for the dataset, seen in \autoref{tab:dataset_overview}, is used as the metric for dataset size.
+
+\begin{table}
+    \centering
+    \renewcommand{\arraystretch}{1.4}
+    \input{tables/TreeOfThought}
+    \renewcommand{\arraystretch}{1}
+    \caption{\ToT promting to compare performance with the \KISS \autoref{prompt:yes_no}.}
+    \label{tab:tree_of_thought}
+\end{table}
+
+We can see in table \autoref{tab:tree_of_thought}, that the \ToT prompts by \citewithauthor{hulbert2023UsingTreeofThought} fail to outperform the simple \KISS \autoref{prompt:yes_no} for all tested datasets on the \gptmini \LLM.
+Precision is slightly higher for several datasets, but recall and \fone are lower across the board.
+The \ToT prompts are not promising for \TLR in the \LiSSAf.
+Instead, this thesis focuses on the \APE approaches described in \autoref{ch:Approach}.
+
 \section{Naive Prompt Optimization}
 \label{sec:Evaluation:naive_optimization}
 
@@ -116,17 +139,15 @@ Sentence completion through GitHub Copilot based on the \ac{gpt-copilot} model h
 
 With these two prompts, the naive prompt optimization can be evaluated.
 The results are quite consistent across different tested \LLMs.
-\Todo{Trenne Eval Setup und Eval Results.}
 The optimized prompt by \OAI's \gpt model is presented as an example of these.
-\Todo{Add other models' outputs to the appendix?}
+The full results of this evaluation are included in the replication package~\cite{schwab2025DanielDangoReplicationPackageAutomatedPromptEngineeringforTraceabilityLinkRecovery}.
+
 
 \subsection{Systematic Evaluation Results}
 \label{subsec:Evaluation:naive_optimization:systematic-evaluation-results}
 
 The systematic evaluation results for varying models and datasets are presented in \autoref{tab:naive_optimization}.
-The \Average and \WeightedAverage are also included.
-The \Average value is computed across all datasets, while the \WeightedAverage factors the dataset size in as well.
-The amount of \TLs in the gold standard reference for the dataset, seen in \autoref{tab:dataset_overview}, is used as the metric for dataset size.
+As in \autoref{tab:tree_of_thought} the \Average and \WeightedAverage are also included.
 
 \begin{table}
     \centering
@@ -205,7 +226,7 @@ The misclassified \TLs are be provided as additional context.
 The \LLM can then use this information to improve the prompt.
 Up to \feedl misclassified \TLs are provided.
 The optimization process only utilizes a subset of the dataset, as explained in \autoref{approach:sec:naive_iterative_feedback}.
-This training subset includes three source artifacts with four target artifact candidates each, resulting in up to twelve possible \TLs.
+This training subset includes \feed source artifacts with four target artifact candidates each, resulting in up to twelve possible \TLs.
 So fewer than \feedl misclassified \TLs may be available.
 The parameter \iterl will be used to limit the number of optimization iterations.
 In this evaluation section, \iterl was always fully utilized, as the required \fone threshold of $1.0$ for the training subset was never reached.
@@ -226,7 +247,6 @@ The full optimization results are included in the replication package~\cite{schw
 \begin{landscape}
     \begin{table}
         \centering
-        %TODO: Careful, currently the tabularx width is manually replaced with \hsize in the table to adjust to landscape mode
         \renewcommand{\arraystretch}{1}
         \input{tables/FeedbackOptimizer}
         \renewcommand{\arraystretch}{1}
@@ -237,18 +257,20 @@ The full optimization results are included in the replication package~\cite{schw
 
 They are visualized in \autoref{tab:feedback_optimizer}
 Noteworthy is that \llama once again fails to comply with the instruction to leave the output format as \textquotesingle yes \textquotesingle or \textquotesingle no \textquotesingle for the \Dronology dataset.
-Also, compared to the naive optimization approach in \autoref{tab:naive_optimization}, more iteration steps actually provide a benefit.
+\Todo{Add prompt to appendix! -> Wo ist der Prompt hin :monakaW:, der fehlt einfach in den Ergebnissen}
+
 
 \subsection{Optimized Prompt Analysis}
 \label{subsec:Evaluation:simple_feedback:optimized-prompt-analysis}
 
-As the model now possesses additional knowledge of the dataset through the misclassified \TLs, we can see that they start to diverge more, compared to the naive optimization approach in \autoref{sec:Evaluation:naive_optimization}.
-To ease comparison, the results of \gpt are presented here again.
+As the model now possesses additional knowledge of the dataset through the misclassified \TLs, we can see that the optimized prompts for each dataset start to diverge.
+Compared to the naive optimization approach in \autoref{sec:Evaluation:naive_optimization}, the optimized prompts are now more tailored to the specific dataset.
+To ease comparison, the results of \gpt for the \WARC dataset are presented here again.
 \autoref{prompt:feedback_optimized_3_1} shows the result of one optimization run with $\feedl=3$ and $\iterl=1$.
 Detailed instructions on how to classify \TLs are generated by the \LLM.
 This is quite common across different models and parameterization for the early iterations.
-\Todo{source?}
-The prompt is also adapted to the \RtR domain as indirectly instructed through the optimization prompt.
+This behaviour can be observed with the full results in the replication package~\cite{schwab2025DanielDangoReplicationPackageAutomatedPromptEngineeringforTraceabilityLinkRecovery}.
+The prompt is also adapted to the \RtR task as indirectly instructed through the optimization prompt.
 
 \begin{prompt}{Optimized Prompt \feedl = 3, \iterl = 1}{feedback_optimized_3_1}
     \\
@@ -256,8 +278,6 @@ The prompt is also adapted to the \RtR domain as indirectly instructed through t
 \end{prompt}
 
 However, later iteration steps start to include more overfitted instructions to the provided misclassified \TLs.
-During the evaluation, I observed that the optimized prompts of the previous step were often still unable to classify the same \TLs correctly.
-\Todo{Can I add evidence for this?}
 This is likely contributing to the overfitting of the prompt to the provided misclassified \TLs.
 \autoref{prompt:feedback_optimized_5_10} in the appendix shows the full result of one optimization run with $\feed=5$ and $\iterl=10$.
 The full optimized prompt can be found in the appendix.
@@ -287,8 +307,6 @@ Their prompt is designed to optimize classification prompts by enhancing the exp
 As it also utilizes feedback from misclassified \TLs, it can be used as an alternative optimization prompt for the naive feedback optimization approach.
 They used the optimization prompt in \autoref{prompt:zadenoori_optimization}.
 The prompt is tailored to their \CoT classification prompt, comprising a five-step pipeline for requirement classification.
-
-\Todo{Ich würde in dem Kapitel generell den Fokus darauf legen, nicht immer alle Prompts zu listen, sondern den fokus auf , was ist da wichtig. Z.B.: Warum ist hier der Komplette prompt; was bringt das dem leser? Wenn der Leser nicht den Kompletten Prompt brauch -> dann appendix. und hier verkürzt.}
 
 \begin{prompt}{Excerpt of \citeauthor{zadenoori2025AutomaticPrompt}'s Optimization Prompt}{zadenoori_optimization_short}
     \\
@@ -414,12 +432,10 @@ The optimized prompt lists three criteria for linked artifacts.
 While the purpose is very general applicable, the functionality already requires domains illustrating features or capabilities.
 They might not be present in high level artifacts specifying the project outline, such as architectural diagrams.
 Last but not least requirements require specific knowledge of the project.
-Evaluating \TLs between documentation and code would likely hide many requirements or only implicitly mention them.
-\Todo{This statement sounds a little far fetched. Source required? (@advisor)}
+Evaluating \TLs between documentation and code might hide many requirements or only implicitly mention them.
 
 \section{Application of an Optimized Prompt to Unfamiliar Datasets}
 \label{sec:Evaluation:cross_dataset_evaluation}
-\Todo{Add Reasoning Prompt Baseline?}
 \APE with the proposed algorithms in my work is always connected to additional costs in execution time and possibly budget for \LLM tokens.
 Thus, the optimized prompts should ideally be generally applicable, eliminating the need for repeated optimization.
 To test this, the single best-performing prompt in terms of \fone will be used to classify \TLs in the other datasets.

@@ -12,12 +12,12 @@
 \chapter{Implementation}
 \label{ch:Implementation}
 
-This chapter describes the implementation of the proposed features to the \LiSSAf to optimize classification prompts for fixed datasets.
+This chapter describes the implementation of the proposed \APE features to the \LiSSAf to optimize classification prompts.
 As outlined in \autoref{ch:Approach}, the goal is to optimize prompts for a given set of \TLR tasks on a fixed dataset.
-\Todo{Link to subsectsion in Approach, name features explicitly und ggf. auch auf die folgenden sections eingehen}
 To achieve this goal, a new \promptoptimizer component is added to the \LiSSA pipeline.
-This component can be combined with further optional \metric and \evaluator components to enable a flexible and reusable architecture.
-\Todo{Unklar, das kennen wir ja noch nicht. Ggf. in erster subsecc zusammenhänge aufzeigen}
+This is elaborated in \autoref{sec:impl:prompt_optimizer_component}.
+This component can be combined with further optional \metric and \evaluator components introduced in \autoref{sec:impl:metric_component} and \autoref{sec:impl:evaluator_component} to enable a flexible and reusable architecture.
+The integration into the existing \LiSSA pipeline is explained in \autoref{sec:impl:lissa_integration}.
 
 \begin{figure}
     \centering
@@ -27,23 +27,27 @@ This component can be combined with further optional \metric and \evaluator comp
 \end{figure}
 
 \autoref{fig:component_diagramm} provides an overview of the components involved in this implementation.
-
-
+The \promptoptimizer component is the central part of the implementation.
+The \method{optimize} method is used to optimize the prompt for a given set of \TLR tasks.
+The source and target \elementstores as in the existing \LiSSA pipeline are provided as arguments to the method for training data.
+The \metric component is used to score the quality of a prompt on a given set of tasks.
+The \method{getMetric} method is used to retrieve the metric implementation for all prompts on set of classification tasks.
+The \evaluator component is used to select a subset of tasks to evaluate the prompt on using the \metric.
+Its \method{sampleAndEvaluate} method is used to selectively evaluate the prompts on a subset of tasks.
+Ideally more evaluation budget is spent on prompts that are expected to perform better.
 
 
 \section{Metric component}
 \label{sec:impl:metric_component}
-\Todo{Ggf. Scoring nenen um nicht mit Eval zu verwechseln}
 The \metric component provides implementations for different metrics to score the quality of a prompt on a given set of tasks.
 Metrics can be divided into two major categories.
+They are visualized in \autoref{fig:metric_component_diagramm}.
 Pointwise metrics will evaluate each \TL prediction and return a separate score for each.
-\Todo{Pointwise nicht der beste Name, wird doch auch aggergeiert}
 Scoring strategies for pointwise metrics are provided by the \scorer subcomponent.
 The overall score can then be calculated by reducing the individual scores using a \reductor.
 The \reductor subcomponent provides different strategies to reduce a collection of scores to a single value.
 In contrast, global metrics will evaluate the entire set of \TL predictions at once and return a single score directly.
 This is because they factor in relationships between different predictions, like whether the correct prediction is a true positive or a true negative.
-
 The scores are cached using \LiSSAs built-in \cache component.
 
 \begin{figure}
@@ -56,10 +60,14 @@ The scores are cached using \LiSSAs built-in \cache component.
 
 Currently, only the \fbeta metric is implemented as a global metric.
 The beta parameter can be altered in the component configuration.
+The score is computed utilizing a \method{reduce} method, that is provided the ground truth as well as the accepted and rejected values.
+
 The pointwise metric implementation relies on the \method{Binary}\scorer and the \method{Mean}\reductor.
 This is also portrayed in \autoref{fig:scorer_reductor_diagramm}.
+A \scorer is required to implement the \method{score} logic for a list of tasks and their classified results.
 The \method{Binary}\scorer will return a score of 1.0 for a correct prediction and 0.0 otherwise.
 A correct prediction is defined as predicting a \TL for a pair of artifacts that actually has a \TL in the ground truth or not predicting a \TL for a pair of artifacts that does not have a \TL in the ground truth.
+An \reductor is required to implement the \method{reduce} logic for a collection of individual scores.
 The \method{Mean}\reductor will then compute the mean of all individual scores to return a single value.
 
 
@@ -70,7 +78,6 @@ The \method{Mean}\reductor will then compute the mean of all individual scores t
     \caption{The subcomponents utilized by the pointwise metric implementation}
     \label{fig:scorer_reductor_diagramm}
 \end{figure}
-\Todo{Was bringt mir \autoref{fig:scorer_reductor_diagramm} genau?}
 
 \section{Evaluator component}
 \label{sec:impl:evaluator_component}
