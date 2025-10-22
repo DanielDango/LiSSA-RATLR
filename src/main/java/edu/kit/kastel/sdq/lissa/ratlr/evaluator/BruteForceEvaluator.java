@@ -29,7 +29,7 @@ public class BruteForceEvaluator extends AbstractEvaluator {
      * Each prompt is evaluated against all remaining examples, and the mean score amongst them is returned
      */
     @Override
-    public List<Double> call(List<String> prompts, List<ClassificationTask> classificationTasks, Metric metric) {
+    public List<Double> sampleAndEvaluate(List<String> prompts, List<ClassificationTask> classificationTasks, Metric metric) {
         int sampleSize = Math.min(classificationTasks.size(), (this.evaluationBudget / prompts.size()));
         List<ClassificationTask> classificationExamples = new ArrayList<>(classificationTasks);
         Collections.shuffle(classificationExamples, this.random);

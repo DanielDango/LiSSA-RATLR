@@ -156,7 +156,7 @@ public class AutomaticPromptOptimizer extends IterativeOptimizer {
         if (prompts.size() == 1) {
             return List.of(1.0);
         }
-        return evaluator.call(prompts, tasks, metric);
+        return evaluator.sampleAndEvaluate(prompts, tasks, metric);
     }
 
     /**
@@ -314,7 +314,7 @@ public class AutomaticPromptOptimizer extends IterativeOptimizer {
         missclassifiedTasks = firstSampleStrategy.sample(missclassifiedTasks, config.maxErrorExamples());
         List<String> sampledPromptCandidates =
                 firstSampleStrategy.sample(promptCandidates, config.maxExpansionFactor() * TODO_JUSTIFY_AND_NAME);
-        List<Double> errorScores = bruteForceEvaluator.call(sampledPromptCandidates, missclassifiedTasks, metric);
+        List<Double> errorScores = bruteForceEvaluator.sampleAndEvaluate(sampledPromptCandidates, missclassifiedTasks, metric);
         List<Integer> sortedIdxs = errorScores.stream()
                 .sorted()
                 .mapToInt(errorScores::indexOf)

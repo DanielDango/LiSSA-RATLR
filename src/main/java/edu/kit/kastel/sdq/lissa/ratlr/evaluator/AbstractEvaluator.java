@@ -65,7 +65,7 @@ public abstract class AbstractEvaluator {
         return switch (configuration.name()) {
             case "mock" -> new MockEvaluator();
             case "bruteforce" -> new BruteForceEvaluator(configuration);
-            case "ucb" -> new UCBanditEvaluator(configuration);
+            case "ucb" -> new UpperConfidenceBoundBanditEvaluator(configuration);
             default -> throw new IllegalStateException("Unexpected value: " + configuration.name());
         };
     }
@@ -79,5 +79,5 @@ public abstract class AbstractEvaluator {
      * @param metric The metric instance to use for scoring the prompts.
      * @return A list of scores corresponding to each prompt.
      */
-    public abstract List<Double> call(List<String> prompts, List<ClassificationTask> examples, Metric metric);
+    public abstract List<Double> sampleAndEvaluate(List<String> prompts, List<ClassificationTask> examples, Metric metric);
 }

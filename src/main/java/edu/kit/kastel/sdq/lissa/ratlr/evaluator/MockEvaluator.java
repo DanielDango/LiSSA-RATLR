@@ -15,7 +15,7 @@ public class MockEvaluator extends AbstractEvaluator {
     }
 
     @Override
-    public List<Double> call(List<String> prompts, List<ClassificationTask> examples, Metric metric) {
+    public List<Double> sampleAndEvaluate(List<String> prompts, List<ClassificationTask> examples, Metric metric) {
         return Collections.nCopies(prompts.size(), 1.0);
     }
 }

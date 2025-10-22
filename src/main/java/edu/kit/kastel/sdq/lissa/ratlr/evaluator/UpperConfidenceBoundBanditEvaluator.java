@@ -28,7 +28,7 @@ import edu.kit.kastel.sdq.lissa.ratlr.promptmetric.Metric;
  *   <li>mode: "ucb"</li>
  * </ul>
  */
-public class UCBanditEvaluator extends AbstractEvaluator {
+public class UpperConfidenceBoundBanditEvaluator extends AbstractEvaluator {
 
     private static final String ROUNDS_KEY = "rounds";
     private static final int DEFAULT_ROUNDS = 40;
@@ -48,11 +48,11 @@ public class UCBanditEvaluator extends AbstractEvaluator {
     private final String mode;
 
     /**
-     * Creates a new UCBanditEvaluator instance with the given configuration.
+     * Creates a new UpperConfidenceBoundBanditEvaluator instance with the given configuration.
      *
      * @param configuration The configuration for the evaluator.
      */
-    public UCBanditEvaluator(ModuleConfiguration configuration) {
+    public UpperConfidenceBoundBanditEvaluator(ModuleConfiguration configuration) {
         super(configuration);
         this.rounds = configuration.argumentAsInt(ROUNDS_KEY, DEFAULT_ROUNDS);
         this.numberOfPromptsPerRound =
@@ -63,8 +63,9 @@ public class UCBanditEvaluator extends AbstractEvaluator {
     }
 
     @Override
-    public List<Double> call(List<String> prompts, List<ClassificationTask> examples, Metric metric) {
-        UCBBandits banditAlgo = new UCBBandits(prompts.size(), this.samplesPerEval, this.c, this.mode);
+    public List<Double> sampleAndEvaluate(List<String> prompts, List<ClassificationTask> examples, Metric metric) {
+        UpperConfidenceBoundBandits banditAlgo =
+                new UpperConfidenceBoundBandits(prompts.size(), this.samplesPerEval, this.c, this.mode);
         int numPromptsPerRound = Math.min(this.numberOfPromptsPerRound, prompts.size());
         for (int ri = 1; ri <= this.rounds; ri++) {
             // Sample the prompts
@@ -96,11 +97,11 @@ public class UCBanditEvaluator extends AbstractEvaluator {
     }
 
     /**
-     * Upper Confidence Bound Bandits
+     * Upper Confidence Bound (UCB) Bandits
      * Implements the UCB and UCB-E algorithms for multi-armed bandit problems.
      * This class maintains counts and scores for each arm (prompt) and selects arms
      */
-    private class UCBBandits {
+    private class UpperConfidenceBoundBandits {
         private final double c;
         private final String mode;
         private final int numPrompts;
@@ -109,7 +110,7 @@ public class UCBanditEvaluator extends AbstractEvaluator {
         private final double[] scores;
         private final Random random;
 
-        public UCBBandits(int numPrompts, int numSamples, double c, String mode) {
+        public UpperConfidenceBoundBandits(int numPrompts, int numSamples, double c, String mode) {
             this.c = c;
             if (!mode.equals("ucb") && !mode.equals("ucb-e")) {
                 throw new IllegalArgumentException("Mode must be 'ucb' or 'ucb-e'");
