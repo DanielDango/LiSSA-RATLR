@@ -108,7 +108,7 @@ class ArchitectureTest {
             });
 
     /**
-     * Prompts for classifiers should only be modified by optimizers or scorers. Otherwise, there will be
+     * Prompts for classifiers should only be modified by optimizers or smetricscorers. Otherwise, there will be
      * inconsistencies with the configuration file.
      */
     @ArchTest
