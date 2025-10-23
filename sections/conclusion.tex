@@ -12,12 +12,13 @@
 
 \chapter{Conclusion}
 \label{ch:Conclusion}
-\Todo{gerne auch hier noch konkrete zahlen; generell hast du ja auch noch ToT gemacht; das sollte im Abstract und der Conclusion als Beitrag glaub auch noch rein. und generell auch die zwei varianten von APE sollten deutlicher in beidem hervorgehoben werden, da das arbeit von dir war.}
 
 This thesis presents an \APE approach using \LLMs to optimize prompts for \RtR \TLR tasks in the \LiSSAF.
 To realize this, a new prompt optimization component is realized for the \LiSSAF.
 Among other strategies for \APE, the gradient descent-based algorithm \ProTeGi is implemented.
 Utilizing the added \promptoptimizer component, prompts can be refined iteratively to provide better classification results on a training set.
+First \ToT prompts were evaluated for the \RtR task.
+They did not indicate better performance than the existing zero-shot or \CoT prompts.
 In addition, the naive strategies of prompting the \LLM to optimize the prompt with or without examples of misclassified \TLs are also presented.
 The approach is evaluated on five datasets from the \RtR task using four \LLMs.
 The results show that the realized approach can improve the performance of \TLR tasks compared to the baseline classification prompts currently used in the \LiSSAF.

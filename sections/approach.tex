@@ -3,10 +3,10 @@
 
 This chapter outlines how the research questions of the thesis are addressed.
 The produced source code can seamlessly integrate into the \LiSSA project.
-In this thesis four different methods are used to test their \TLR performance.
+In this thesis, four different methods are used to test their \TLR performance.
 First, a simple \ToT style prompt is used for classification instead of the existing \zeroshot or \CoT style prompts.
 The usage of this prompting style is presented in \autoref{sec:Approach:tot}.
-Next, naive iterative prompt optimization approaches with and without feedback are be elaborated in \autoref{approach:sec:naive_iterative}.
+Next, naive iterative prompt optimization approaches with and without feedback are elaborated in \autoref{approach:sec:naive_iterative}.
 They provide basic functionality upon which the more sophisticated \ProTeGi algorithm in \autoref{approach:sec:gradient_descent} is based.
 
 
@@ -14,32 +14,32 @@ They provide basic functionality upon which the more sophisticated \ProTeGi algo
 \label{sec:Approach:tot}
 
 \Ac{ToT} is a prompting technique exploring more different branches of thoughts than typical \CoT prompts.
-This can be achieved by chaining multiple requests to a \LLM~\cite{long2023LargeLanguage}.
+This can be achieved by chaining multiple requests to an \LLM~\cite{long2023LargeLanguage}.
 
 \begin{figure}
     \centering
-    \includegraphics{graphics/tree_of_thought.drawio}
+    \includegraphics[width=\textwidth]{graphics/tree_of_thought.drawio}
     \caption{\Ac{ToT} visualization inspired by \citewithauthor{yao2023TreeThoughts}}
     \label{fig:ToT_visualization}
     Highlighted in green are different prompting techniques.
     Their related paths are enclosed in the light blue box.
-    Highlighted in yellow is data, with the input which is queried using one of the prompting techniques to the \LLM and output representing the returned result of this query.
+    Highlighted in yellow is data, with the input, which is queried using one of the prompting techniques to the \LLM, and output representing the returned result of this query.
     The rounded boxes represent thoughts of the \LLM.
     Orange thoughts are considered inconsistent and will be disregarded in the next step.
     Arrows represent the processing flow of data.
 
 \end{figure}
 
-In \autoref{fig:ToT_visualization} we can see the three different prompting techniques highlighted in green.
-Among them are aside from the \ToT prompt also a \zeroshot and \CoT prompt, to visualize the differences.
+In \autoref{fig:ToT_visualization}, we can see the three different prompting techniques highlighted in green.
+Among them are, aside from the \ToT prompt, also a \zeroshot and \CoT prompt, to visualize the differences.
 The input data, highlighted in yellow, is queried with one of the prompting techniques to the \LLM.
-In our case this can be a pair of requirements, for which the output should state whether a \TL exists between them.
-Examining the three different prompting techniques, we note a varying amount of thoughts before the output is reached.
+In our case, this can be a pair of requirements, for which the output should state whether a \TL exists between them.
+Examining the three different prompting techniques, we note a varying number of thoughts before the output is reached.
 Thoughts are represented by white and orange rounded boxes, with orange ones being discarded during the thought process.
-As for the zero-shot prompt the \LLM reaches their conclusion without a thought process.
+As for the zero-shot prompt, the \LLM reaches its conclusion without a thought process.
 The \CoT style prompt results in a linear thought path.
 Thus, if any thought deviates, the \LLM might be led to a false conclusion~\cite{wang2023SelfConsistencyImproves}.
-Prompting with \ToT addresses this, as we can see multiple thoughts explorer per level independently.
+Prompting with \ToT addresses this, as we can see multiple thought explorers per level independently.
 This concrete number is chosen just for illustrative purposes.
 If and only if the \LLM identifies them as wrong, they will be discarded.
 The output is then reached as a consensus of these multiple paths.
@@ -114,15 +114,15 @@ As visualized in \autoref{fig:iterative_core_loop} the expected outputs for trai
 The most naive approach is to simply ask the \LLM to improve the prompt without providing further direction or information.
 Context about why the prompt did not meet the requirements, also referred to as feedback, is not yet provided with \autoref{prompt:optimization_prompt_simple}.
 The optimized prompt is taken into the next iteration.
-The loop of evaluating and optimizing is repeated, until a threshold value is passed, meaning the prompt is considered good enough.
-To limit resource usage, a hard limit is also included to put an upper bound on the number optimization attempts.
+The loop of evaluating and optimizing is repeated until a threshold value is passed, meaning the prompt is considered good enough.
+To limit resource usage, a hard limit is also included to put an upper bound on the number of optimization attempts.
 
 This naive \promptoptimizer implementation is used as a basis for more sophisticated prompt optimization algorithms.
 Furthermore, we are able to compare whether optimization results differ between naive and sophisticated approaches.
 
 \subsection{\APECapitalized with \ProTeGi}
 \label{approach:sec:gradient_descent}
-In this subsection feedback is introduced to the optimization process.
+In this subsection, feedback is introduced to the optimization process.
 The naive iterative optimization implementation created for \autoref{approach:sec:naive_iterative} is used as a foundation for the implementation.
 The core concepts of the \ProTeGi optimization algorithm remain the same.
 Details of the \ProTeGi algorithm are introduced in \autoref{sec:gradient_descent}.
