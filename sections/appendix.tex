@@ -15,32 +15,12 @@
 {\chapter{Anhang}}      % german style
 \label{chap:appendix}
 
-
-\section{Tables}
-\label{sec:appendix:tables}
-
-\newpage
-
-\setcounter{figure}{0}
-\begin{landscape}
-    \begin{table}
-        \centering
-        \renewcommand{\arraystretch}{1.2}
-        \input{tables/GradientOptimizationReasoning}
-        \renewcommand{\arraystretch}{1}
-        \caption{\ProTeGi for the \CoT classification of \LiSSA}
-        \Todo{Why did this table die instead of getting rotated?}
-        \label{tab:gradient_reasoning}
-    \end{table}
-\end{landscape}
-
 \newpage
 
 \section{Prompts}
 \label{sec:appendix:prompts}
 
 \begin{prompt}{Original \Acl{CoT}}{cot}
-    \Todo{Who wrote this prompt?}
     \\
     \input{prompts/original-chain-of-thought}
 \end{prompt}

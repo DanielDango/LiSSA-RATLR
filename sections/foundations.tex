@@ -80,7 +80,10 @@ A prompt performs better the more inputs are correctly mapped onto their expecte
     \includesvg[width=0.7\linewidth]{graphics/Iterative_core_loop}
     \caption{Visualization of a simple iterative optimization algorithm}
     \label{fig:iterative_core_loop}
-    \Todo{Legende einfügen; erklären was die Farben bedeuten etc.}
+    The green boxes represent prompting calls to the \LLM.
+    The yellow boxes are individual data points consisting of some input (x) and the expected classification (y).
+    The diamond represents options for branching.
+    The white boxes are values for or during processing.
 \end{figure}
 
 As seen in \autoref{fig:iterative_core_loop}, the refinement process will start with some initial prompt.
@@ -92,10 +95,9 @@ They prompt the model to generate a likely set of instructions, also called cand
 The instructions will achieve good results when prompted with a batch of \iopairs.
 These pairs of \io data will be processed as text by the \LLM, pre- and or post-processing may be required.
 
-\Todo{Prüfen ob die Beschreibung zum aktuellen Bild passt}
 The initial prompt $p_0$can be optimized using an \LLM in the iterative loop illustrated in \autoref{fig:iterative_core_loop}.
-The current prompt $p_i$ will be adjusted to a new prompt $p_{i+1}$ using an optimization prompt.
-The optimization prompt will be prompted to the \LLM together with the current prompt $p_i$.
+The current prompt $p_i$ is adjusted to a new prompt $p_{i+1}$ using an optimization prompt.
+The optimization prompt is prompted to the \LLM together with the current prompt $p_i$.
 The \LLM will then return a new prompt $p_{i+1}$, which is expected to perform better than $p_i$.
 This cycle can be repeated until a fixed number of iterations is reached or the performance of the current prompt $p_i$ exceeds some threshold value.
 The final prompt $p_n$ will then be returned as the output of the \APE algorithm.
@@ -105,23 +107,24 @@ While this is a very simple and general attempt to \APE, algorithms can of cours
 
 \section{Prompt Optimization with Textual Gradients}
 \label{sec:gradient_descent}
-\Todo{The entire section}
 \citewithauthor{pryzant2023AutomaticPrompt} propose the \ProTeGi algorithm.
-\Todo{2.3 sollte so gebaut werden, dass 2.3.1 und 2.3.2 auch eingeführt werden, also um was es darin geht. 2.3 ist irgenwie teil von 2.2 .. da muss man schauen, wie man das kombinieren / abgrenzen kann.}
 This entire section is based on their work.
 
 In contrast to the general iterative \APE in \autoref{sec:foundations:ape}, they create multiple improved prompts after each step of the optimization during a single iteration.
 This is also illustrated in \autoref{fig:gradient_descent}.
 The set of candidates for optimization, the set of improved candidates that corrected previous shortcomings, as well as a set of paraphrased improved candidates, are taken into consideration when selecting the candidates that are carried to the next iteration.
-Once any candidate performs better than some threshold value or a maximum number of iterations has been reached, the best performing candidate will be returned as the output of the \ProTeGi algorithm.
+Once any candidate performs better than some threshold value or a maximum number of iterations has been reached, the best performing candidate is returned as the output of the \ProTeGi algorithm.
 
 \begin{figure}
     \centering
     \includesvg[width=0.7\linewidth]{graphics/gradient_descent}
     \caption{Overview of the iterative optimization loop in~\cite{pryzant2023AutomaticPrompt}}
     \label{fig:gradient_descent}
+    The green boxes represent prompting calls to the \LLM.
+    The yellow boxes are individual data points consisting of some input (x) and the expected classification (y).
+    The diamond represents options for branching.
+    The white boxes are values for or during processing.
 \end{figure}
-\Todo{add legend, symbolise core loop, add description in text, adjust image to fit page better}
 
 
 The following subsections will explain each step of the \ProTeGi optimization in more detail.
@@ -131,8 +134,7 @@ They then iteratively optimize the initial prompt $p_0$ to produce an approximat
 In order to optimize the prompt, a function is required that computes deviance between the actual output $y$ and the expected output $y_i$ as a numeric value.
 
 \subsection{Evaluation and Expansion}
-\Todo{Auch hier wäre ein Ablauf gut}
-To evaluate the output of the current prompt $p_i$, \citeauthor{pryzant2023AutomaticPrompt} use a loss signal prompt \Todo{Was ist das? Bitte einführen} $\triangledown$, the gradient prompt.
+To evaluate the output of the current prompt $p_i$, \citeauthor{pryzant2023AutomaticPrompt} use a loss signal prompt $\triangledown$, the gradient prompt.
 In addition to the prompt, inputs that were not correctly classified when testing $p_i$ are also provided as context for $\triangledown$.
 The result summarizes the flaws of $p_i$ in natural language.
 This summary is called the textual gradient $g$.
@@ -176,7 +178,7 @@ Otherwise, zero will be returned.
     \end{cases}
 \end{equation}
 
-The lowest scoring prompt is then discarded from $S$ and sampling is repeated with the remainder until the set $S$ only contains the desired amount of candidates.
+The lowest scoring prompt is then discarded from $S$, and sampling is repeated with the remainder until the set $S$ only contains the desired amount of candidates.
 The remaining candidates will be used as initial prompts for the next expansion step.
 This process is called successive rejects.
 A pseudocode implementation of this candidate selection algorithm can be seen in \autoref{alg:gradient_descent_select}.
