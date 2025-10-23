@@ -14,7 +14,6 @@ They provide basic functionality upon which the more sophisticated \ProTeGi algo
 \label{sec:Approach:tot}
 
 \Ac{ToT} is a prompting technique exploring more different branches of thoughts than typical \CoT prompts.
-\Todo{What are thoughts? Can this be introduced in Foundations maybe?}
 This can be achieved by chaining multiple requests to a \LLM~\cite{long2023LargeLanguage}.
 
 \begin{figure}
@@ -101,7 +100,6 @@ This implementation is the basis for the more sophisticated \ProTeGi algorithm i
 \subsection{Naive Iterative \APECapitalized}
 \label{approach:sec:naive_iterative}
 \label{approach:sec:naive_iterative_feedback}
-\Todo{Consider extracting feedback section}
 To add \APE capabilities to the \LiSSAF, a naive iterative optimizer is added.
 As in \autoref{sec:Approach:tot} the existing classifiers of the \LiSSAF can be used to evaluate the \TLR performance of the optimized prompts.
 
@@ -153,5 +151,3 @@ The prompt candidates are compared with each other using the performance functio
 The best performing prompts are then taken into the next iteration of the optimization loop.
 Feeding more information and processing logic into the optimization system is expected to present better results than the naive approach.
 Especially, suitable results may be reached faster and or cheaper by more processing on the local machine instead of expensive \API calls to the \LLM.
-
-\Todo{Ctrl+F nach ".\cite" (Quelle muss vor den Punkt)}

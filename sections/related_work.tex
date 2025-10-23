@@ -1,6 +1,5 @@
 \chapter{Related Work}
 \label{ch:related_work}
-\Todo{Noch etwas ausbauen / ausformulieren}
 \Ac{TLR} through \LLMs is an active field of work to apply rapid advancements in \LLM performance.
 This work rests at the intersection of two different fields of study.
 On the one hand side the field of \TLR does not always rely on \LLMs as shown in \autoref{related:sec:tlr}.
@@ -15,8 +14,6 @@ Before the emergence of \LLMs \IR methods are widely used to recover \TLs.
 \citewithauthor{delucia2012InformationRetrieval} provide an overview about different \IR methods and their performance.
 
 More recently, in work by \citewithauthor{hey2021ImprovingTraceability}, they attempt to overcome the semantic gap, which occurs when two instances of the same artifact are described using differing semantics, by exploring word embeddings.
-\citewithauthor{keim2021TraceLink} propose cross-domain \TLR using agent-like machine learning algorithms.
-\Todo{?? Sicher ?? Kann mich daran nicht erinnern, ist aber auch schon etwas her.  -> Sieht so aus als hätten sie kein ML verwendet?}
 
 In previous work by \citewithauthor{fuchss2025LiSSAGeneric}, simple prompts of \citewithauthor{ewald2024RetrievalAugmentedLarge} are used to recover \TLs between software documentation and architectural diagrams.
 The work of \citeauthor{ewald2024RetrievalAugmentedLarge} adapts prompts studied by \citewithauthor{rodriguez2023PromptsMatter}.
@@ -33,7 +30,6 @@ They manually adjusted prompts for each task to greatly improve recovery rates.
 
 \citewithauthor{zhang2025EnhancingRequirement} use \LLMs to augment \TLR training data through synthetic \Tls.
 They are able to achieve superior results compared to encoders trained on the original data only.
-\Todo{What are encoeders?}
 
 \citewithauthor{fuchss2025RetrievalStudya} use small \LLMs instead of \IR based \TL candidate selection.
 They are able to outperform the traditional \IR approaches \VSM and \LSI.

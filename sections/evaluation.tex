@@ -21,7 +21,6 @@ First, \autoref{sec:Evaluation:tot_prompting} presents the results of \ToT promp
 Then, \autoref{sec:Evaluation:naive_optimization}, \autoref{sec:Evaluation:simple_feedback_optimization}, and \autoref{sec:Evaluation:varying-the-optimization-prompt} present the naive prompt optimization approaches.
 The findings of gradient-based prompt optimization are presented in \autoref{sec:Evaluation:gradient_based_optimization}.
 They are also tested for their generalizability to new datasets in \autoref{sec:Evaluation:cross_dataset_evaluation}.
-\Todo{Ich würde in dem Kapitel generell den Fokus darauf legen, nicht immer alle Prompts zu listen, sondern den fokus auf , was ist da wichtig. Z.B.: Warum ist hier der Komplette prompt; was bringt das dem leser? Wenn der Leser nicht den Kompletten Prompt brauch -> dann appendix. und hier verkürzt.}
 
 \section{Evaluation Approach}
 \label{approach:sec:evaluation}
@@ -92,7 +91,6 @@ However, previous work~\cite{fuchss2025LiSSAGeneric, hey2025RequirementsTraceabi
 Thus, to ensure comparability of results, this embedding model will also be used in this evaluation.
 The similarity retriever in the \LiSSA pipeline will also not be modified for this evaluation.
 The default cosine-similarity-retriever will be utilized.
-\Todo{Whats that, is it important here?}
 Future work may address the current work of \citewithauthor{fuchss2025RetrievalStudya}.
 
 Depending on the \APE algorithm, different variables, such as the optimization prompt, are introduced.
@@ -283,7 +281,7 @@ This is likely contributing to the overfitting of the prompt to the provided mis
 The full optimized prompt can be found in the appendix.
 The \LLM provided 30 indicators for classification.
 One of these is obviously fitted to the WARC dataset, explicitly mentioning it in the first indicator.
-A fitting to the \RtR domain is also present with indicators pointing to requirements directly.
+A fitting to the \RtR task is also present with indicators pointing to requirements directly.
 This can be seen in \autoref{prompt:feedback_optimized_5_10_short}
 
 \begin{prompt}{Shortend Optimized Prompt \feedl = 5, \iterl = 10}{feedback_optimized_5_10_short}

@@ -70,7 +70,6 @@ A correct prediction is defined as predicting a \TL for a pair of artifacts that
 An \reductor is required to implement the \method{reduce} logic for a collection of individual scores.
 The \method{Mean}\reductor will then compute the mean of all individual scores to return a single value.
 
-
 \begin{figure}
     \centering
     \fontsize{8}{10}\selectfont
@@ -79,9 +78,9 @@ The \method{Mean}\reductor will then compute the mean of all individual scores t
     \label{fig:scorer_reductor_diagramm}
 \end{figure}
 
+
 \section{Evaluator component}
 \label{sec:impl:evaluator_component}
-\Todo{Ggf. ABlaufdiagramm statt UML. Nicht klar was das Modul macht}
 The \evaluator component provides implementations to evaluate the quality of a prompt on a given set of tasks.
 In contrast to the \metric component, the \evaluator will not use all tasks to compute the prompt score.
 Instead, more complex sampling strategies can be used to select a subset of tasks.
@@ -90,17 +89,8 @@ The \ucb bandit evaluator is the most noteworthy implementation.
 It will use the \ucb algorithm to select a subset of tasks that are expected to provide the most information gain.
 This is achieved by balancing exploration and exploitation.
 The size of the subset can be configured in the component configuration.
-The \ucb evaluator can be configured with a random seed to ensure reproducibility of results.
+The \ucb evaluator is supplied with a random seed to ensure reproducibility of results.
 
-\begin{figure}
-    \centering
-    \includegraphics[width=\textwidth]{graphics/class_diagrams/evaluator}
-    \caption{The new \evaluator component and its implementations}
-    \label{fig:evaluator_component_diagramm}
-\end{figure}
-
-Other implementations seen in \autoref{fig:evaluator_component_diagramm} are the \method{BruteForceEvaluator}, which will use all tasks to evaluate the prompt.
-The \method{MockEvaluator} is used for testing purposes and will return a fixed score.
 
 \section{Prompt Optimizer component}
 \label{sec:impl:prompt_optimizer_component}
@@ -115,18 +105,18 @@ This component is designed to be used in the \LiSSA evaluation pipeline after th
 These steps are already part of the existing \LiSSA framework for evaluation.
 They are explained in more detail in \autoref{sec:foundations:lissa}.
 \newcommand{\optimizermethod}{\method{optimize}}
-\Todo{Check if this method is still named the same}
 The only functionality required in the \promptoptimizer interface is the \optimizermethod method.
+This method can also be seen in \autoref{fig:optimizer_component_diagramm}.
 The \optimizermethod requires the source and target \elementstores created in the previous pipeline steps as arguments.
 Using the retrieval strategy of the target \elementstore a set of candidate pairs of elements is created.
 This set will also be referred to as the training data, on which the prompt will be optimized.
 
 The prompt to be optimized is provided in the component configuration during the optimizers' instantiation.
 The method will return the optimized prompt as a string.
-When \promptoptimizer implementations utilize \classifiers, the training data or subsets will be passed on to the classification method.
-Utilizing caching for the \LLM queries, which is implemented for \LiSSAs classifiers, the optimization is deterministic and reproducible.
+When \promptoptimizer implementations utilize \classifiers, the training data or subsets will be passed on to the classification method, integrating into the existing \LiSSA classification pipeline.
+Thus, utilizing \LiSSAs caching for the \LLM queries, the optimization is deterministic and reproducible.
 All further implementations should also be deterministic and reproducible.
-Configuration parameters such as random seeds can be utilized.
+Configuration parameters such as random seed are used to ensure this.
 
 \begin{figure}
     \centering
@@ -136,12 +126,15 @@ Configuration parameters such as random seeds can be utilized.
     \label{fig:optimizer_component_diagramm}
 \end{figure}
 
-As seen in \autoref{fig:optimizer_component_diagramm}, the \promptoptimizer component will typically use the \LLM to evaluate different prompts.
-\Todo{It has not been seen...}
+The \promptoptimizer component will typically use the \LLM to evaluate different prompts.
+Three different implementations are provided, as shown in \autoref{fig:optimizer_component_diagramm}.
+The \method{optimizeIntern} is overwritten in the \method{IterativeFeedbackOptimizer} and to add the feedback of previously misclassified \TLs to the optimization prompt.
+Combined with the \method{IterativeOptimizer} this implements the naive \APE algorithms from \autoref{approach:sec:naive_iterative}.
+Many implementations of the \promptoptimizer component will require sampling strategies to reduce the number of calls to the \LLM.
+This keeps the optimization cost manageable, as not every possible classification task is queried with the optimized prompt candidates.
+This is achieved by introducing the new \samplingstrategy subcomponent.
 
-Many implementations of the \promptoptimizer component will require sampling strategies as a heuristic to reduce the number of calls to the \LLM.
-\Todo{Is heuristic the right word here?}
-The \samplingstrategy subcomponent provides different strategies to select a sublist of comparable elements from a collection.
+The \samplingstrategy provides different strategies to select a sublist of comparable elements from a collection.
 The strategies can be instantiated with configuration parameters and are used by the \promptoptimizer component.
 This way, sampling strategies can be swapped easily without changing the actual optimization logic.
 The random sampler uses a fixed random seed to ensure reproducibility of results.
@@ -155,27 +148,33 @@ The random sampler uses a fixed random seed to ensure reproducibility of results
 \end{figure}
 
 In \autoref{fig:sampling_strategy_diagramm}, the sampling strategy subcomponent is depicted.
+The \method{sample} method is required to be implemented by all sampling strategies.
+It will receive a collection of comparable elements and the desired sample size as arguments.
 Currently, three different strategies are implemented.
 \begin{itemize}
     \item The \method{ShuffledFirstSampler} will shuffle the input list using the \method{RandomGenerator} and return the first elements.
     \item The \method{OrderedFirstSampler} will sort the input list and return the first elements.
     \item The \method{FirstSampler} will return the first elements of the input list.
 \end{itemize}
-\Todo{Nicht nur aufzählen, sondern auch kurz erklären}
 
-\Todo{Alles was in Bilder ist muss beschrieben sein}
-\Todo{Zusammenhang zu alten Classifiern muss deutlich erkennbar werden. Fokus dieses ganzen Chapter!}
 
 \section{LiSSA Pipeline Integration}
 \label{sec:impl:lissa_integration}
-\Todo{Can you use \acs{LiSSA} in the title but without the quote?}
-\Todo{Mehr Details, sonst arg kurz}
 The new components are integrated into the \LiSSA pipeline.
 A new command was added to the \LiSSA command-line interface to run the prompt optimization.
 The command will read the configuration file and create the required components using their constructors or factories, respectively.
 To do so an evaluation pipeline object is created and relevant components will be retrieved from it.
 This includes the classifier, aggregator, trace link id postprocessor as well as the source and target \elementstore's.
-The classifier component is used to classify a pair of elements having a \TL or not.
+The classifier component is used to classify a pair of elements having a \TL or not during the optimization process.
+
+The features integrate seamlessly into the existing \LiSSA architecture, espcially existing evaluation configurations can still be used.
+The current classifiers can be utilized by the \metric implementations to classify pairs of elements during the optimization process.
+This enables optimization of both zero-shot and chain-of-thought classification prompts.
+The \ToT classification utilizes the existing \classifiers in \LiSSA as well.
+To integrate sampling of optimization candidates, the \classifiers are extended to modify their classification prompt.
+This functionality is only used by the \metric component.
 
 While the optimization pipeline, as a standalone, is independent of the regular evaluation pipeline, they can be combined.
 This is achieved by feeding the optimized prompt from the optimization pipeline into the evaluation pipeline, indicated by a separate configuration.
+End-to-end tests are provided to ensure the correct integration of the new features into the existing \LiSSA framework.
+The implementation is open source and available in the \replicationPackage.

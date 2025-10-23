@@ -18,18 +18,15 @@ More novel approaches use \LLMs to improve the accuracy and retrieval rates of \
 However, to utilize \LLMs effectively, it is crucial to design appropriate prompts.
 This process of prompt engineering is often done manually and often time-consuming, requiring significant expertise.
 
-In this work, an \APE approach is proposed to automate this task for \TLR in the \LiSSAF.
+In this work, an \APE approach is proposed and realized to automate this task for \TLR in the \LiSSAF.
 Using feedback form previous iterations, \LLMs are used to refine prompts.
 The approach is evaluated on five datasets from the \RtR task using three different \LLMs.
-\Todo{Generell ncohmal auf domain vs task schauen. Domain ist eher sowas wie Healthcare}
 As a baseline, current classification prompts from the \LiSSAF are used.
 
-The results show that the proposed approach can improve the performance of \TLR tasks.
-However, the improvements are not as significant as initially expected.
-\Todo{Nur signifikant verwenden falls Signifikanztests durchgeführt wurden!}
+The results show that the realized approach can improve the performance of \TLR tasks.
 Furthermore, it is demonstrated that the best-performing optimized prompt for a dataset, in terms of \fone, also performs well on other datasets of the same task.
 As the optimized prompts yielded by this work can be used as fixed classification prompts, the \APE algorithm is not required to be applied for every evaluation.
 Overall, this work contributes to the field of \TLR by realizing an approach to \APE using \LLMs.
 
-Further research can be conducted to explore further configurable settings and to investigate the \APE approach on other \TLR domains, with different models and new prompting strategies.
-\Todo{Satzbau/Länge could investigate the APE approach in other TLR domains, with different models, and new prompting strategies .... oder so ähnlich :D}
+Further research can be conducted in order to explore more degrees of freedom for the \APE algorithms.
+The \APE approach can also be investigated in other \TLR domains, with different models and new prompting strategies.
