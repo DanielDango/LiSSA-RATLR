@@ -1,6 +1,8 @@
 /* Licensed under MIT 2025. */
 package edu.kit.kastel.sdq.lissa.ratlr.classifier;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import edu.kit.kastel.sdq.lissa.ratlr.cache.Cache;
@@ -21,6 +23,11 @@ import dev.langchain4j.model.chat.ChatModel;
 public class SimpleClassifier extends Classifier {
 
     /**
+     * The configuration key for the prompt template.
+     */
+    public static final String PROMPT_TEMPLATE_KEY = "template";
+
+    /**
      * The default template for classification requests.
      * This template presents two artifacts and asks if they are related.
      */
@@ -35,6 +42,8 @@ public class SimpleClassifier extends Classifier {
 
             Answer with 'yes' or 'no'.
             """;
+
+    public static final String SIMPLE_CLASSIFIER_NAME = "simple";
 
     private final Cache cache;
 
@@ -51,7 +60,7 @@ public class SimpleClassifier extends Classifier {
     /**
      * The template used for classification requests.
      */
-    private final String template;
+    private String template;
 
     /**
      * Creates a new simple classifier with the specified configuration.
@@ -62,7 +71,7 @@ public class SimpleClassifier extends Classifier {
     public SimpleClassifier(ModuleConfiguration configuration, ContextStore contextStore) {
         super(ChatLanguageModelProvider.threads(configuration), contextStore);
         this.provider = new ChatLanguageModelProvider(configuration);
-        this.template = configuration.argumentAsString("template", DEFAULT_TEMPLATE);
+        this.template = configuration.argumentAsString(PROMPT_TEMPLATE_KEY, DEFAULT_TEMPLATE);
         this.cache = CacheManager.getDefaultInstance().getCache(this, provider.getCacheParameters());
         this.llm = provider.createChatModel();
     }
@@ -92,8 +101,21 @@ public class SimpleClassifier extends Classifier {
      * @return A new simple classifier instance with the same configuration
      */
     @Override
-    protected final Classifier copyOf() {
+    public final Classifier copyOf() {
         return new SimpleClassifier(threads, cache, provider, template, contextStore);
+    }
+
+    @Override
+    public void setClassificationPrompt(String prompt) {
+        this.template = prompt;
+    }
+
+    @Override
+    public Map<String, String> getCacheParameters() {
+        Map<String, String> providerParams = provider.getCacheParameters();
+        Map<String, String> params = new HashMap<>(providerParams);
+        params.put("classifier", SIMPLE_CLASSIFIER_NAME);
+        return params;
     }
 
     /**
