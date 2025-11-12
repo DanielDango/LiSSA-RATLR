@@ -1,19 +1,25 @@
 /* Licensed under MIT 2025. */
 package edu.kit.kastel.sdq.lissa.ratlr.classifier;
 
+import static edu.kit.kastel.sdq.lissa.ratlr.classifier.ReasoningClassifier.REASONING_CLASSIFIER_NAME;
+import static edu.kit.kastel.sdq.lissa.ratlr.classifier.SimpleClassifier.SIMPLE_CLASSIFIER_NAME;
+
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.*;
 
-import edu.kit.kastel.sdq.lissa.ratlr.elementstore.SourceElementStore;
-import edu.kit.kastel.sdq.lissa.ratlr.elementstore.TargetElementStore;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
 import edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore;
+import edu.kit.kastel.sdq.lissa.ratlr.elementstore.SourceElementStore;
+import edu.kit.kastel.sdq.lissa.ratlr.elementstore.TargetElementStore;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.Pair;
 
@@ -63,8 +69,11 @@ public abstract class Classifier {
      * @return A list of classification results
      */
     public List<ClassificationResult> classify(SourceElementStore sourceStore, TargetElementStore targetStore) {
-        var tasks = createClassificationTasks(sourceStore, targetStore);
+        return classify(createClassificationTasks(sourceStore, targetStore));
+    }
 
+    @NotNull
+    private List<ClassificationResult> classify(List<Pair<Element, Element>> tasks) {
         if (threads <= 1) {
             return sequentialClassify(tasks);
         }
@@ -106,7 +115,7 @@ public abstract class Classifier {
             });
         }
 
-        logger.info("Waiting for classification to finish. Tasks in queue: {}", taskQueue.size());
+        logger.debug("Waiting for classification to finish. Tasks in queue: {}", taskQueue.size());
 
         for (Thread worker : workers) {
             try {
@@ -145,6 +154,30 @@ public abstract class Classifier {
     }
 
     /**
+     * Classifies a single classification task.
+     * This method delegates to the abstract {@link #classify(Element, Element)} method
+     * which must be implemented by concrete classifier subclasses.
+     *
+     * @param task The classification task containing source and target elements
+     * @return     A classification result if a trace link is found, empty otherwise
+     */
+    public Optional<ClassificationResult> classify(ClassificationTask task) {
+        return classify(task.source(), task.target());
+    }
+
+    /**
+     * Classifies a collection of classification tasks.
+     * This method can process the classification either sequentially or in parallel
+     * depending on the number of threads configured.
+     *
+     * @param classificationTasks The collection of classification tasks to classify
+     * @return A list of classification results
+     */
+    public List<ClassificationResult> classify(Collection<ClassificationTask> classificationTasks) {
+        return classify(createClassificationTasks(classificationTasks));
+    }
+
+    /**
      * Classifies a pair of elements.
      * This method must be implemented by concrete classifier implementations to define
      * their specific classification logic.
@@ -161,7 +194,15 @@ public abstract class Classifier {
      *
      * @return A new instance of the same classifier type
      */
-    protected abstract Classifier copyOf();
+    public abstract Classifier copyOf();
+
+    /**
+     * Sets the prompt used for classification.
+     * This method is only intended for use by optimizers
+     *
+     * @param prompt The prompt template to use for classification
+     */
+    public abstract void setClassificationPrompt(String prompt);
 
     /**
      * Creates a list of classification tasks from source and target element stores.
@@ -184,6 +225,15 @@ public abstract class Classifier {
         return tasks;
     }
 
+    private static List<Pair<Element, Element>> createClassificationTasks(
+            Collection<ClassificationTask> classificationTasks) {
+        List<Pair<Element, Element>> tasks = new ArrayList<>();
+        for (ClassificationTask task : classificationTasks) {
+            tasks.add(new Pair<>(task.source(), task.target()));
+        }
+        return tasks;
+    }
+
     /**
      * Creates a classifier instance based on the provided configuration.
      * The type of classifier is determined by the first part of the configuration name.
@@ -196,8 +246,8 @@ public abstract class Classifier {
     public static Classifier createClassifier(ModuleConfiguration configuration, ContextStore contextStore) {
         return switch (configuration.name().split(CONFIG_NAME_SEPARATOR)[0]) {
             case "mock" -> new MockClassifier(contextStore);
-            case "simple" -> new SimpleClassifier(configuration, contextStore);
-            case "reasoning" -> new ReasoningClassifier(configuration, contextStore);
+            case SIMPLE_CLASSIFIER_NAME -> new SimpleClassifier(configuration, contextStore);
+            case REASONING_CLASSIFIER_NAME -> new ReasoningClassifier(configuration, contextStore);
             default -> throw new IllegalStateException("Unexpected value: " + configuration.name());
         };
     }
@@ -214,4 +264,12 @@ public abstract class Classifier {
             List<List<ModuleConfiguration>> configs, ContextStore contextStore) {
         return new PipelineClassifier(configs, contextStore);
     }
+
+    /**
+     * Gets the parameters that define the uniqueness of this classifier's cache.
+     * These parameters are used to construct a unique cache name for storing classification results.
+     *
+     * @return A map of parameter names to values that define the cache uniqueness
+     */
+    public abstract Map<String, String> getCacheParameters();
 }
