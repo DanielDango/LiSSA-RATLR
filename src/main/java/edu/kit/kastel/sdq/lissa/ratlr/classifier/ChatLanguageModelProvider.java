@@ -65,6 +65,11 @@ public class ChatLanguageModelProvider {
     public static final double DEFAULT_TEMPERATURE = 0.0;
 
     /**
+     * Time in minutes before an Ollama request times out.
+     */
+    public static final int OLLAMA_MINUTES_TO_TIMEOUT = 10;
+
+    /**
      * The platform to use for the language model.
      */
     private final ChatLanguageModelPlatform platform;
@@ -184,7 +189,7 @@ public class ChatLanguageModelProvider {
         var ollama = OllamaChatModel.builder()
                 .baseUrl(host)
                 .modelName(model)
-                .timeout(Duration.ofMinutes(10))
+                .timeout(Duration.ofMinutes(OLLAMA_MINUTES_TO_TIMEOUT))
                 .temperature(temperature)
                 .seed(seed);
         if (user != null && password != null && !user.isEmpty() && !password.isEmpty()) {
@@ -301,15 +306,21 @@ public class ChatLanguageModelProvider {
      * Returns the parameters used to create the cache key for this model.
      * This method is used to identify the cache uniquely.
      *
-     * @return An array of strings representing the cache parameters
+     * @return A map of strings representing the cache parameters
      * @see edu.kit.kastel.sdq.lissa.ratlr.cache.CacheManager#getCache(Object, String[])
      */
-    public String[] getCacheParameters() {
+    public Map<String, String> getCacheParameters() {
         if (temperature == 0.0) {
             // Backwards compatibility with the old mode that did not have temperature
-            return new String[] {modelName(), String.valueOf(seed())};
+            return Map.of("modelName", modelName(), "seed", String.valueOf(seed()));
         } else {
-            return new String[] {modelName(), String.valueOf(seed()), String.valueOf(temperature())};
+            return Map.of(
+                    "modelName",
+                    modelName(),
+                    "seed",
+                    String.valueOf(seed()),
+                    "temperature",
+                    String.valueOf(temperature()));
         }
     }
 }

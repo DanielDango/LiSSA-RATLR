@@ -41,31 +41,7 @@ public class EvaluateCommand implements Runnable {
                     "Specifies one or more config paths to be invoked by the pipeline iteratively. If the path points to a directory, all files inside are chosen to get invoked.")
     private Path @Nullable [] configs;
 
-    /**
-     * Executes the evaluation command.
-     * This method:
-     * 1. Loads the specified configuration files (or uses default if none specified)
-     * 2. Processes each configuration file sequentially
-     * 3. Runs the trace link analysis pipeline for each configuration
-     * 4. Handles any exceptions that occur during processing
-     */
-    @Override
-    public void run() {
-        List<Path> configsToEvaluate = loadConfigs();
-        logger.info("Found {} config files to invoke", configsToEvaluate.size());
-
-        for (Path config : configsToEvaluate) {
-            logger.info("Invoking the pipeline with '{}'", config);
-            try {
-                var evaluation = new Evaluation(config);
-                evaluation.run();
-            } catch (Exception e) {
-                logger.warn("Configuration '{}' threw an exception: {}", config, e.getMessage());
-            }
-        }
-    }
-
-    private List<Path> loadConfigs() {
+    public static List<Path> loadConfigs(Path[] configs) {
         List<Path> configsToEvaluate = new LinkedList<>();
         if (configs == null) {
             Path defaultConfig = Path.of("config.json");
@@ -77,36 +53,65 @@ public class EvaluateCommand implements Runnable {
             }
             configsToEvaluate.add(defaultConfig);
         } else {
-            addSpecifiedConfigPaths(configsToEvaluate);
+
+            addSpecifiedConfigPaths(configsToEvaluate, configs);
         }
 
         return configsToEvaluate;
     }
 
-    private void addSpecifiedConfigPaths(List<Path> configsToEvaluate) {
+    private static void addSpecifiedConfigPaths(List<Path> configsToEvaluate, Path[] configs) {
         assert configs != null;
         for (Path configPath : configs) {
-            if (Files.notExists(configPath)) {
-                logger.warn("Specified config path '{}' does not exist", configPath);
-                continue;
-            }
+            addSpecifiedConfigPaths(configsToEvaluate, configPath);
+        }
+    }
 
-            if (!Files.isDirectory(configPath)) {
-                configsToEvaluate.add(configPath);
-                continue;
-            }
+    private static void addSpecifiedConfigPaths(List<Path> configsToEvaluate, Path configPath) {
+        if (Files.notExists(configPath)) {
+            logger.warn("Specified config path '{}' does not exist", configPath);
+            return;
+        }
 
-            try (DirectoryStream<Path> configDir = Files.newDirectoryStream(configPath)) {
-                for (Path configDirEntry : configDir) {
-                    if (!Files.isDirectory(configDirEntry)) {
-                        configsToEvaluate.add(configDirEntry);
-                    }
+        if (!Files.isDirectory(configPath)) {
+            configsToEvaluate.add(configPath);
+            return;
+        }
+
+        try (DirectoryStream<Path> configDir = Files.newDirectoryStream(configPath)) {
+            for (Path configDirEntry : configDir) {
+                if (!Files.isDirectory(configDirEntry)) {
+                    configsToEvaluate.add(configDirEntry);
+                } else {
+                    addSpecifiedConfigPaths(configsToEvaluate, configDirEntry);
                 }
-            } catch (IOException e) {
-                logger.warn(
-                        "Skipping specified config path '{}' due to causing an exception: {}",
-                        configPath,
-                        e.getMessage());
+            }
+        } catch (IOException e) {
+            logger.warn(
+                    "Skipping specified config path '{}' due to causing an exception: {}", configPath, e.getMessage());
+        }
+    }
+
+    /**
+     * Executes the evaluation command.
+     * This method:
+     * 1. Loads the specified configuration files (or uses default if none specified)
+     * 2. Processes each configuration file sequentially
+     * 3. Runs the trace link analysis pipeline for each configuration
+     * 4. Handles any exceptions that occur during processing
+     */
+    @Override
+    public void run() {
+        List<Path> configsToEvaluate = loadConfigs(configs);
+        logger.info("Found {} config files to invoke", configsToEvaluate.size());
+
+        for (Path config : configsToEvaluate) {
+            logger.info("Invoking the pipeline with '{}'", config);
+            try {
+                var evaluation = new Evaluation(config);
+                evaluation.run();
+            } catch (Exception e) {
+                logger.warn("Configuration '{}' threw an exception: {}", config, e.getMessage());
             }
         }
     }
