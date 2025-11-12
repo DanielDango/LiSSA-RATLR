@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,7 +52,7 @@ public class TransitiveTraceCommand implements Runnable {
             names = {"-c", "--configs"},
             arity = "2..*",
             description = "Specifies two or more config paths to be invoked sequentially.")
-    private Path[] transitiveTraceConfigs;
+    private Path @Nullable [] transitiveTraceConfigs;
 
     /**
      * Path to the evaluation configuration file used for gold standard comparison.
@@ -61,7 +62,7 @@ public class TransitiveTraceCommand implements Runnable {
     @CommandLine.Option(
             names = {"-e", "--evaluation-config"},
             description = "Specifies the evaluation config path to be invoked after the transitive trace link.")
-    private Path evaluationConfig;
+    private @Nullable Path evaluationConfig;
 
     /**
      * Executes the transitive trace link analysis pipeline.
@@ -87,7 +88,9 @@ public class TransitiveTraceCommand implements Runnable {
 
         if (evaluationConfig == null) {
             logger.warn("No evaluation config path provided, so we just produce the transitive trace links");
-        } else if (goldStandardConfiguration == null) {
+        }
+
+        if (evaluationConfig != null && goldStandardConfiguration == null) {
             logger.error("Loading evaluation config was not possible");
             return;
         }
@@ -132,6 +135,7 @@ public class TransitiveTraceCommand implements Runnable {
      * @return Set of transitive trace links
      */
     private Set<TraceLink> calculateTransitiveTraceLinks(Queue<Set<TraceLink>> traceLinks) {
+        assert !traceLinks.isEmpty();
         Set<TraceLink> transitiveTraceLinks = new LinkedHashSet<>(traceLinks.poll());
         while (!traceLinks.isEmpty()) {
             Set<TraceLink> currentLinks = transitiveTraceLinks;
@@ -163,6 +167,7 @@ public class TransitiveTraceCommand implements Runnable {
      * @param traceLinks Queue to store trace link sets
      */
     private void createNontransitiveTraceLinks(List<Evaluation> evaluations, Queue<Set<TraceLink>> traceLinks) {
+        assert transitiveTraceConfigs != null;
         try {
             for (Path traceConfig : transitiveTraceConfigs) {
                 logger.info("Invoking the pipeline with '{}'", traceConfig);
@@ -190,7 +195,8 @@ public class TransitiveTraceCommand implements Runnable {
      * @param goldStandardConfiguration Gold standard configuration if available
      * @return Joined configuration string
      */
-    private String joinConfigs(List<Evaluation> evaluations, GoldStandardConfiguration goldStandardConfiguration) {
+    private String joinConfigs(
+            List<Evaluation> evaluations, @Nullable GoldStandardConfiguration goldStandardConfiguration) {
         List<String> evaluationConfigs = evaluations.stream()
                 .map(Evaluation::getConfiguration)
                 .map(Configuration::serializeAndDestroyConfiguration)
@@ -215,7 +221,8 @@ public class TransitiveTraceCommand implements Runnable {
      * @param goldStandardConfiguration Gold standard configuration if available
      * @return Generated key string
      */
-    private String createKey(List<Evaluation> evaluations, GoldStandardConfiguration goldStandardConfiguration) {
+    private String createKey(
+            List<Evaluation> evaluations, @Nullable GoldStandardConfiguration goldStandardConfiguration) {
         return KeyGenerator.generateKey(joinConfigs(evaluations, goldStandardConfiguration));
     }
 }

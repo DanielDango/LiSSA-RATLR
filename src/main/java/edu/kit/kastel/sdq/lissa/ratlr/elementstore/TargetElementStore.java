@@ -10,6 +10,7 @@ import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
 import edu.kit.kastel.sdq.lissa.ratlr.elementstore.strategy.RetrievalStrategy;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.Pair;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A store for target elements and their embeddings in the LiSSA framework.
@@ -25,7 +26,7 @@ public class TargetElementStore extends ElementStore {
     /**
      * Strategy to find similar elements.
      */
-    private final RetrievalStrategy retrievalStrategy;
+    private @Nullable final RetrievalStrategy retrievalStrategy;
 
     public TargetElementStore(ModuleConfiguration moduleConfiguration) {
         super(moduleConfiguration, true);

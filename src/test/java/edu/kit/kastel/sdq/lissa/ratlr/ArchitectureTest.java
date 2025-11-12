@@ -46,7 +46,7 @@ class ArchitectureTest {
      * All other classes must use the {@link Environment} class for environment variable access.
      */
     @ArchTest
-    static final ArchRule no_getenv = noClasses()
+    static final ArchRule noDirectEnvironmentAccess = noClasses()
             .that()
             .haveNameNotMatching(Environment.class.getName())
             .and()
@@ -63,7 +63,7 @@ class ArchitectureTest {
      * All other classes must use the {@link KeyGenerator} for UUID generation.
      */
     @ArchTest
-    static final ArchRule no_uuid_outside_key_generator = noClasses()
+    static final ArchRule onlyKeyGeneratorAllowedForUUID = noClasses()
             .that()
             .haveNameNotMatching(KeyGenerator.class.getName())
             .should()

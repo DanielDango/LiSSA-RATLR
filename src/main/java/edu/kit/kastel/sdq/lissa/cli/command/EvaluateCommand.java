@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +39,7 @@ public class EvaluateCommand implements Runnable {
             arity = "1..*",
             description =
                     "Specifies one or more config paths to be invoked by the pipeline iteratively. If the path points to a directory, all files inside are chosen to get invoked.")
-    private Path[] configs;
+    private Path @Nullable [] configs;
 
     public static List<Path> loadConfigs(Path[] configs) {
         List<Path> configsToEvaluate = new LinkedList<>();
@@ -52,6 +53,7 @@ public class EvaluateCommand implements Runnable {
             }
             configsToEvaluate.add(defaultConfig);
         } else {
+
             addSpecifiedConfigPaths(configsToEvaluate, configs);
         }
 
@@ -59,6 +61,7 @@ public class EvaluateCommand implements Runnable {
     }
 
     private static void addSpecifiedConfigPaths(List<Path> configsToEvaluate, Path[] configs) {
+        assert configs != null;
         for (Path configPath : configs) {
             addSpecifiedConfigPaths(configsToEvaluate, configPath);
         }

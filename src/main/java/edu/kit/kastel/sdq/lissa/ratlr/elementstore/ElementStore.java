@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.jspecify.annotations.Nullable;
+
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
 import edu.kit.kastel.sdq.lissa.ratlr.elementstore.strategy.RetrievalStrategy;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
@@ -15,8 +17,9 @@ import edu.kit.kastel.sdq.lissa.ratlr.utils.Pair;
 /**
  * A store for elements and their embeddings in the LiSSA framework.
  * This class manages a collection of elements and their associated vector embeddings,
- * as part of LiSSA's trace link analysis approach.
- *
+ * providing functionality for similarity search and element retrieval as part of
+ * LiSSA's trace link analysis approach.
+ * <p>
  * The store can operate in two distinct roles within the LiSSA pipeline:
  * <ul>
  *     <li>{@link SourceElementStore}</li>
@@ -112,7 +115,7 @@ public class ElementStore {
      * @param id The identifier of the element to retrieve
      * @return A pair containing the element and its embedding, or null if not found
      */
-    public Pair<Element, float[]> getById(String id) {
+    public @Nullable Pair<Element, float[]> getById(String id) {
         var element = idToElementWithEmbedding.get(id);
         if (element == null) {
             return null;

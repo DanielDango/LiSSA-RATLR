@@ -4,6 +4,7 @@ package edu.kit.kastel.sdq.lissa.ratlr.cache;
 import java.time.Instant;
 import java.util.*;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,7 +20,7 @@ import redis.clients.jedis.UnifiedJedis;
  * This class provides a caching mechanism that primarily uses Redis for storage,
  * with a local file cache as a fallback. It supports storing and retrieving both
  * string values and serialized objects.
- *
+ * <p>
  * The cache can operate in three modes:
  * 1. Redis-only: When Redis is available and local cache is not configured
  * 2. Local-only: When Redis is unavailable and local cache is configured
@@ -32,12 +33,12 @@ class RedisCache implements Cache {
     /**
      * Local file-based cache used as a backup.
      */
-    private final LocalCache localCache;
+    private final @Nullable LocalCache localCache;
 
     /**
      * Redis client instance.
      */
-    private UnifiedJedis jedis;
+    private @Nullable UnifiedJedis jedis;
 
     private boolean replaceLocalCacheOnConflict;
 
@@ -47,7 +48,7 @@ class RedisCache implements Cache {
      * @param localCache The local cache to use as backup, or null if no backup is needed
      * @throws IllegalArgumentException If neither Redis nor local cache can be initialized
      */
-    RedisCache(LocalCache localCache, boolean replaceLocalCacheOnConflict) {
+    RedisCache(@Nullable LocalCache localCache, boolean replaceLocalCacheOnConflict) {
         this.localCache = localCache == null || !localCache.isReady() ? null : localCache;
         mapper = new ObjectMapper();
         createRedisConnection();
@@ -141,7 +142,7 @@ class RedisCache implements Cache {
      * @throws IllegalArgumentException If the JSON cannot be deserialized to the target type
      */
     @SuppressWarnings("unchecked")
-    private <T> T convert(String jsonData, Class<T> clazz) {
+    private <T> @Nullable T convert(@Nullable String jsonData, Class<T> clazz) {
         if (jsonData == null) {
             return null;
         }
