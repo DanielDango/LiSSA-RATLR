@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.concurrent.*;
 
 import edu.kit.kastel.sdq.lissa.ratlr.cache.Cache;
-import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheKey;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheManager;
+import edu.kit.kastel.sdq.lissa.ratlr.cache.ClassifierCacheKey;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.ChatLanguageModelProvider;
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
 import edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore;
@@ -107,8 +107,12 @@ public class SummarizePreprocessor extends Preprocessor {
         List<Callable<String>> tasks = new ArrayList<>();
         for (String request : requests) {
             tasks.add(() -> {
-                CacheKey cacheKey = CacheKey.of(
-                        provider.modelName(), provider.seed(), provider.temperature(), CacheKey.Mode.CHAT, request);
+                ClassifierCacheKey cacheKey = ClassifierCacheKey.of(
+                        provider.modelName(),
+                        provider.seed(),
+                        provider.temperature(),
+                        ClassifierCacheKey.Mode.CHAT,
+                        request);
 
                 String cachedResponse = cache.get(cacheKey, String.class);
                 if (cachedResponse != null) {
