@@ -127,7 +127,7 @@ public abstract class Classifier {
         }
 
         List<ClassificationResult> resultList = new ArrayList<>(results);
-        logger.debug("Finished parallel classification with {} results.", resultList.size());
+        logger.info("Finished parallel classification with {} results.", resultList.size());
         return resultList;
     }
 
@@ -149,7 +149,7 @@ public abstract class Classifier {
                     result);
             result.ifPresent(results::add);
         }
-        logger.debug("Finished sequential classification with {} results.", results.size());
+        logger.info("Finished sequential classification with {} results.", results.size());
         return results;
     }
 
