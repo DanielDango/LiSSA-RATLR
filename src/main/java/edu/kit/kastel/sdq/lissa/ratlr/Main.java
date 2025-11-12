@@ -14,7 +14,8 @@ import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheManager;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.Classifier;
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.Configuration;
 import edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore;
-import edu.kit.kastel.sdq.lissa.ratlr.elementstore.ElementStore;
+import edu.kit.kastel.sdq.lissa.ratlr.elementstore.SourceElementStore;
+import edu.kit.kastel.sdq.lissa.ratlr.elementstore.TargetElementStore;
 import edu.kit.kastel.sdq.lissa.ratlr.embeddingcreator.EmbeddingCreator;
 import edu.kit.kastel.sdq.lissa.ratlr.postprocessor.TraceLinkIdPostprocessor;
 import edu.kit.kastel.sdq.lissa.ratlr.preprocessor.Preprocessor;
@@ -86,8 +87,8 @@ public class Main {
 
         EmbeddingCreator embeddingCreator =
                 EmbeddingCreator.createEmbeddingCreator(configuration.embeddingCreator(), contextStore);
-        ElementStore sourceStore = new ElementStore(configuration.sourceStore(), false);
-        ElementStore targetStore = new ElementStore(configuration.targetStore(), true);
+        SourceElementStore sourceStore = new SourceElementStore(configuration.sourceStore());
+        TargetElementStore targetStore = new TargetElementStore(configuration.targetStore());
 
         Classifier classifier = configuration.createClassifier(contextStore);
         ResultAggregator aggregator =

@@ -1,0 +1,61 @@
+/* Licensed under MIT 2025. */
+package edu.kit.kastel.sdq.lissa.ratlr.elementstore;
+
+import java.util.List;
+
+import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
+import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
+import edu.kit.kastel.sdq.lissa.ratlr.utils.Pair;
+
+/**
+ * A store for source elements and their embeddings in the LiSSA framework.
+ * Providing functionality for element retrieval and filtering
+ * <b>Source Store</b> (similarityRetriever = false):
+ * <ul>
+ *      <li>Used to store source elements that will be used as queries in LiSSA's classification phase</li>
+ *      <li>Does not support similarity search as it's unnecessary for source elements</li>
+ *      <li>Can retrieve all elements at once for LiSSA's batch processing</li>
+ *      <li>Supports filtering elements by comparison flag for LiSSA's selective analysis</li>
+ * </ul>
+ */
+public class SourceElementStore extends ElementStore {
+
+    public SourceElementStore(ModuleConfiguration moduleConfiguration) {
+        super(moduleConfiguration, false);
+    }
+
+    public SourceElementStore(List<Pair<Element, float[]>> content) {
+        super(content, null);
+    }
+
+    /**
+     * Retrieves all elements in the store for LiSSA's batch processing.
+     * Defaults to retrieving all elements, regardless of comparison flag.
+     *
+     * @return List of all elements
+     */
+    public List<Element> getAllElements() {
+        return getAllElementsIntern(false).stream().map(Pair::first).toList();
+    }
+
+    /**
+     * Retrieves all elements in the store for LiSSA's batch processing.
+     *
+     * @param onlyCompare If true, only returns elements marked for comparison
+     * @return List of pairs containing elements and their embeddings
+     */
+    public List<Pair<Element, float[]>> getAllElements(boolean onlyCompare) {
+        return getAllElementsIntern(onlyCompare);
+    }
+
+    /**
+     * Retrieves a subset of this source store to be used as training data for optimization.
+     * The training data consists of the first size elements from the source store.
+     *
+     * @param size The number of elements to include in the training source store
+     * @return A new ElementStore containing only the training data elements
+     */
+    public SourceElementStore reduceSourceElementStore(int size) {
+        return new SourceElementStore(this.getAllElements(false).subList(0, Math.min(size, this.size())));
+    }
+}
