@@ -12,8 +12,8 @@ import com.knuddels.jtokkit.api.Encoding;
 import com.knuddels.jtokkit.api.EncodingRegistry;
 
 import edu.kit.kastel.sdq.lissa.ratlr.cache.Cache;
-import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheKey;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheManager;
+import edu.kit.kastel.sdq.lissa.ratlr.cache.ClassifierCacheKey;
 import edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.Futures;
@@ -176,7 +176,8 @@ abstract class CachedEmbeddingCreator extends EmbeddingCreator {
     private static float[] calculateFinalEmbedding(
             EmbeddingModel embeddingModel, Cache cache, String rawNameOfModel, Element element) {
 
-        CacheKey cacheKey = CacheKey.of(rawNameOfModel, -1, -1, CacheKey.Mode.EMBEDDING, element.getContent());
+        ClassifierCacheKey cacheKey =
+                ClassifierCacheKey.of(rawNameOfModel, -1, -1, ClassifierCacheKey.Mode.EMBEDDING, element.getContent());
 
         float[] cachedEmbedding = cache.get(cacheKey, float[].class);
         if (cachedEmbedding != null) {
@@ -211,16 +212,16 @@ abstract class CachedEmbeddingCreator extends EmbeddingCreator {
      * @throws IllegalArgumentException If the token length was not the cause of the failure
      */
     private static float[] tryToFixWithLength(
-            EmbeddingModel embeddingModel, Cache cache, String rawNameOfModel, CacheKey key, String content) {
+            EmbeddingModel embeddingModel, Cache cache, String rawNameOfModel, ClassifierCacheKey key, String content) {
         String newKey = key.localKey() + "_fixed_" + MAX_TOKEN_LENGTH;
 
         // We need the old keys for backwards compatibility
         @SuppressWarnings("deprecation")
-        CacheKey newCacheKey = CacheKey.ofRaw(
+        ClassifierCacheKey newCacheKey = ClassifierCacheKey.ofRaw(
                 rawNameOfModel,
                 -1,
                 -1,
-                CacheKey.Mode.EMBEDDING,
+                ClassifierCacheKey.Mode.EMBEDDING,
                 "(FIXED::%d): %s".formatted(MAX_TOKEN_LENGTH, content),
                 newKey);
 

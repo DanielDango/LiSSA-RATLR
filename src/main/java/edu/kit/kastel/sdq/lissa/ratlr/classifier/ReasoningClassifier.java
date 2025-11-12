@@ -10,8 +10,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import edu.kit.kastel.sdq.lissa.ratlr.cache.Cache;
-import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheKey;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheManager;
+import edu.kit.kastel.sdq.lissa.ratlr.cache.ClassifierCacheKey;
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
 import edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
@@ -178,8 +178,12 @@ public class ReasoningClassifier extends Classifier {
         messages.add(new UserMessage(request));
 
         String messageString = getRepresentation(messages);
-        CacheKey cacheKey = CacheKey.of(
-                provider.modelName(), provider.seed(), provider.temperature(), CacheKey.Mode.CHAT, messageString);
+        ClassifierCacheKey cacheKey = ClassifierCacheKey.of(
+                provider.modelName(),
+                provider.seed(),
+                provider.temperature(),
+                ClassifierCacheKey.Mode.CHAT,
+                messageString);
 
         String cachedResponse = cache.get(cacheKey, String.class);
         if (cachedResponse != null) {
