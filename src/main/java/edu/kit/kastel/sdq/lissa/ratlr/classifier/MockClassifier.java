@@ -1,6 +1,8 @@
 /* Licensed under MIT 2025. */
 package edu.kit.kastel.sdq.lissa.ratlr.classifier;
 
+import java.util.Collections;
+import java.util.Map;
 import java.util.Optional;
 
 import edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore;
@@ -35,7 +37,17 @@ public class MockClassifier extends Classifier {
     }
 
     @Override
-    protected Classifier copyOf() {
+    public Classifier copyOf() {
         return new MockClassifier(contextStore);
+    }
+
+    @Override
+    public void setClassificationPrompt(String prompt) {
+        // as no classification prompt is used, this method does nothing
+    }
+
+    @Override
+    public Map<String, String> getCacheParameters() {
+        return Collections.emptyMap();
     }
 }

@@ -4,7 +4,9 @@ package edu.kit.kastel.sdq.lissa.ratlr.classifier;
 import static dev.langchain4j.internal.Utils.quoted;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -26,6 +28,9 @@ import dev.langchain4j.model.chat.response.ChatResponse;
  * using configurable prompts and caching to improve performance.
  */
 public class ReasoningClassifier extends Classifier {
+
+    public static final String REASONING_CLASSIFIER_NAME = "reasoning";
+
     private final Cache cache;
 
     /**
@@ -41,7 +46,7 @@ public class ReasoningClassifier extends Classifier {
     /**
      * The prompt template used for classification requests.
      */
-    private final String prompt;
+    private String prompt;
 
     /**
      * Whether to use original artifacts instead of nested elements.
@@ -99,9 +104,22 @@ public class ReasoningClassifier extends Classifier {
     }
 
     @Override
-    protected final Classifier copyOf() {
+    public final Classifier copyOf() {
         return new ReasoningClassifier(
                 threads, cache, provider, prompt, useOriginalArtifacts, useSystemMessage, contextStore);
+    }
+
+    @Override
+    public void setClassificationPrompt(String prompt) {
+        this.prompt = prompt;
+    }
+
+    @Override
+    public Map<String, String> getCacheParameters() {
+        Map<String, String> providerParams = provider.getCacheParameters();
+        Map<String, String> params = new HashMap<>(providerParams);
+        params.put("classifier", REASONING_CLASSIFIER_NAME);
+        return params;
     }
 
     /**
