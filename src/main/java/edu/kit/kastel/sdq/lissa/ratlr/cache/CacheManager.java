@@ -24,6 +24,7 @@ public final class CacheManager {
     private static @Nullable CacheManager defaultInstanceManager;
     private final Path directoryOfCaches;
     private final Map<String, RedisCache> caches = new HashMap<>();
+    private final boolean replaceLocalCacheOnConflict;
 
     /**
      * Sets the cache directory for the default cache manager instance.
@@ -50,6 +51,7 @@ public final class CacheManager {
             throw new IllegalArgumentException("path is not a directory: " + cacheDir);
         }
         this.directoryOfCaches = cacheDir;
+        this.replaceLocalCacheOnConflict = true;
     }
 
     /**
@@ -87,6 +89,22 @@ public final class CacheManager {
     }
 
     /**
+     * Gets a cache instance for the specified name using a map of parameters.
+     * The cache name will be constructed by concatenating the parameter values with underscores.
+     *
+     * @param origin The class origin (caller, {@code this})
+     * @param parameters a map of parameters that define what makes a cache unique. E.g., the model name, temperature, and seed.
+     * @return A cache instance for the specified name
+     * @throws IllegalArgumentException If parameters is null or contains null values
+     */
+    public Cache getCache(Object origin, Map<String, String> parameters) {
+        if (parameters == null) {
+            throw new IllegalArgumentException("Parameters must not be null");
+        }
+        return getCache(origin, parameters.values().toArray(new String[0]));
+    }
+
+    /**
      * Gets a cache instance for the specified name, optionally appending a file extension.
      *
      * @param name The name of the cache
@@ -101,7 +119,7 @@ public final class CacheManager {
         }
 
         LocalCache localCache = new LocalCache(directoryOfCaches + "/" + name + (appendEnding ? ".json" : ""));
-        RedisCache cache = new RedisCache(localCache);
+        RedisCache cache = new RedisCache(localCache, replaceLocalCacheOnConflict);
         caches.put(name, cache);
         return cache;
     }
