@@ -305,7 +305,7 @@ public class ChatLanguageModelProvider {
      * Returns the parameters used to create the cache key for this model.
      * This method is used to identify the cache uniquely.
      *
-     * @return An array of strings representing the cache parameters
+     * @return A map of strings representing the cache parameters
      * @see edu.kit.kastel.sdq.lissa.ratlr.cache.CacheManager#getCache(Object, String[])
      */
     public Map<String, String> getCacheParameters() {
