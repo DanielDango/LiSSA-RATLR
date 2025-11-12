@@ -22,20 +22,8 @@ import edu.kit.kastel.sdq.lissa.ratlr.utils.Pair;
  * <p>
  * The store can operate in two distinct roles within the LiSSA pipeline:
  * <ul>
- *     <li><b>Target Store</b> (similarityRetriever = true):
- *         <ul>
- *             <li>Used to store target elements that will be searched for similarity in LiSSA's classification phase</li>
- *             <li>Cannot retrieve all elements at once</li>
- *         </ul>
- *     </li>
- *     <li><b>Source Store</b> (similarityRetriever = false):
- *         <ul>
- *             <li>Used to store source elements that will be used as queries in LiSSA's classification phase</li>
- *             <li>Does not support similarity search as it's unnecessary for source elements</li>
- *             <li>Can retrieve all elements at once for LiSSA's batch processing</li>
- *             <li>Supports filtering elements by comparison flag for LiSSA's selective analysis</li>
- *         </ul>
- *     </li>
+ *     <li>{@link SourceElementStore}</li>
+ *     <li>{@link TargetElementStore}</li>
  * </ul>
  */
 public class ElementStore {
@@ -53,12 +41,6 @@ public class ElementStore {
     private final List<Pair<Element, float[]>> elementsWithEmbedding;
 
     /**
-     * Strategy to find similar elements.
-     * {@code null} indicates source store mode (no similarity search).
-     */
-    private final @Nullable RetrievalStrategy retrievalStrategy;
-
-    /**
      * Creates a new element store for the LiSSA framework.
      *
      * @param configuration The configuration of the module
@@ -68,18 +50,36 @@ public class ElementStore {
      * @throws IllegalArgumentException If max_results is less than 1 in target store mode
      */
     public ElementStore(ModuleConfiguration configuration, boolean similarityRetriever) {
-        if (similarityRetriever) {
-            this.retrievalStrategy = RetrievalStrategy.createStrategy(configuration);
-        } else {
-            if (!"custom".equals(configuration.name())) {
-                RetrievalStrategy.logger.error(
-                        "The element store is created in source store mode, but the retrieval strategy is not set to \"custom\". This is likely a configuration error as source stores do not use retrieval strategies.");
-            }
-            this.retrievalStrategy = null;
+        if (!similarityRetriever && !"custom".equals(configuration.name())) {
+            RetrievalStrategy.logger.error(
+                    "The element store is created in source store mode, but the retrieval strategy is not set to \"custom\". This is likely a configuration error as source stores do not use retrieval strategies.");
         }
 
         elementsWithEmbedding = new ArrayList<>();
         idToElementWithEmbedding = new HashMap<>();
+    }
+
+    /**
+     * Creates a new element store with the provided content.
+     * This constructor is used for initializing the store with existing elements and their embeddings.
+     *
+     * @param content List of pairs containing elements and their embeddings
+     * @param retrievalStrategy The retrieval strategy to use for finding similar elements
+     *                          For source stores, this should be null.
+     */
+    public ElementStore(List<Pair<Element, float[]>> content, RetrievalStrategy retrievalStrategy) {
+
+        elementsWithEmbedding = new ArrayList<>();
+        idToElementWithEmbedding = new HashMap<>();
+        List<Element> elements = new ArrayList<>();
+        List<float[]> embeddings = new ArrayList<>();
+        for (var pair : content) {
+            var element = pair.first();
+            var embedding = pair.second();
+            elements.add(element);
+            embeddings.add(Arrays.copyOf(embedding, embedding.length));
+        }
+        setup(elements, embeddings);
     }
 
     /**
@@ -106,34 +106,6 @@ public class ElementStore {
             elementsWithEmbedding.add(pair);
             idToElementWithEmbedding.put(element.getIdentifier(), pair);
         }
-    }
-
-    /**
-     * Finds elements similar to the given query vector as part of LiSSA's similarity matching.
-     * Only available in target store mode.
-     *
-     * @param query The element and vector to find similar elements for
-     * @return List of similar elements, sorted by similarity
-     * @throws IllegalStateException If this is a source store (similarityRetriever = false)
-     */
-    public final List<Element> findSimilar(Pair<Element, float[]> query) {
-        return findSimilarWithDistances(query).stream().map(Pair::first).toList();
-    }
-
-    /**
-     * Finds elements similar to the given query vector, including their similarity scores.
-     * Used by LiSSA for similarity-based matching in the classification phase.
-     * Only available in target store mode.
-     *
-     * @param query The element and vector to find similar elements for
-     * @return List of pairs containing similar elements and their similarity scores
-     * @throws IllegalStateException If this is a source store (similarityRetriever = false)
-     */
-    public List<Pair<Element, Float>> findSimilarWithDistances(Pair<Element, float[]> query) {
-        if (retrievalStrategy == null) {
-            throw new IllegalStateException("You should set retriever to true to activate this feature.");
-        }
-        return retrievalStrategy.findSimilarElements(query, getAllElementsIntern(true));
     }
 
     /**
@@ -170,28 +142,13 @@ public class ElementStore {
     }
 
     /**
-     * Retrieves all elements in the store for LiSSA's batch processing.
-     * Only available in source store mode.
-     *
-     * @param onlyCompare If true, only returns elements marked for comparison
-     * @return List of pairs containing elements and their embeddings
-     * @throws IllegalStateException If this is a target store (similarityRetriever = true)
-     */
-    public List<Pair<Element, float[]>> getAllElements(boolean onlyCompare) {
-        if (retrievalStrategy != null) {
-            throw new IllegalStateException("You should set retriever to false to activate this feature.");
-        }
-        return getAllElementsIntern(onlyCompare);
-    }
-
-    /**
      * Internal method to retrieve all elements.
      * Available in both source and target store modes for LiSSA's internal processing.
      *
      * @param onlyCompare If true, only returns elements marked for comparison
      * @return List of pairs containing elements and their embeddings
      */
-    private List<Pair<Element, float[]>> getAllElementsIntern(boolean onlyCompare) {
+    protected List<Pair<Element, float[]>> getAllElementsIntern(boolean onlyCompare) {
         List<Pair<Element, float[]>> elements = new ArrayList<>();
         for (Pair<Element, float[]> element : elementsWithEmbedding) {
             if (!onlyCompare || element.first().isCompare()) {
@@ -199,5 +156,9 @@ public class ElementStore {
             }
         }
         return elements;
+    }
+
+    protected int size() {
+        return elementsWithEmbedding.size();
     }
 }

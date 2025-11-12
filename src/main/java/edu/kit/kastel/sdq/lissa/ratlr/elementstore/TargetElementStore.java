@@ -1,0 +1,97 @@
+/* Licensed under MIT 2025. */
+package edu.kit.kastel.sdq.lissa.ratlr.elementstore;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.jetbrains.annotations.NotNull;
+
+import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
+import edu.kit.kastel.sdq.lissa.ratlr.elementstore.strategy.RetrievalStrategy;
+import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
+import edu.kit.kastel.sdq.lissa.ratlr.utils.Pair;
+import org.jspecify.annotations.Nullable;
+
+/**
+ * A store for target elements and their embeddings in the LiSSA framework.
+ * Providing functionality for similarity search and element retrieval
+ * <b>Target Store</b> (similarityRetriever = true):
+ * <ul>
+ *      <li>Used to store target elements that will be searched for similarity in LiSSA's classification phase</li>
+ *      <li>Cannot retrieve all elements at once</li>
+ * </ul>
+ */
+public class TargetElementStore extends ElementStore {
+
+    /**
+     * Strategy to find similar elements.
+     */
+    private @Nullable final RetrievalStrategy retrievalStrategy;
+
+    public TargetElementStore(ModuleConfiguration moduleConfiguration) {
+        super(moduleConfiguration, true);
+        this.retrievalStrategy = RetrievalStrategy.createStrategy(moduleConfiguration);
+    }
+
+    public TargetElementStore(List<Pair<Element, float[]>> content, @NotNull RetrievalStrategy retrievalStrategy) {
+        super(content, retrievalStrategy);
+        this.retrievalStrategy = retrievalStrategy;
+    }
+
+    /**
+     * Retrieves the retrieval strategy used for finding similar elements.
+     *
+     * @return The retrieval strategy
+     */
+    public RetrievalStrategy getRetrievalStrategy() {
+        return retrievalStrategy;
+    }
+
+    /**
+     * Retrieves all elements in the store for LiSSA's batch processing.
+     * TODO Why should this not be used in target stores?
+     *
+     * @return List of all elements
+     */
+    public List<Element> getAllElements() {
+        return getAllElementsIntern(false).stream().map(Pair::first).toList();
+    }
+
+    /**
+     * Retrieves a subset of this target store that corresponds to the source store.
+     * This method finds all elements in this target store that are similar to the elements in the source store.
+     *
+     * @param sourceStore The training source element store
+     * @return A new ElementStore containing only the target elements that correspond to the source elements
+     */
+    public TargetElementStore reduceTargetElementStore(SourceElementStore sourceStore) {
+        List<Pair<Element, float[]>> reducedTargetElements = new ArrayList<>();
+        for (var element : sourceStore.getAllElements(true)) {
+            for (Element candidate : this.findSimilar(element)) {
+                reducedTargetElements.add(this.getById(candidate.getIdentifier()));
+            }
+        }
+        return new TargetElementStore(reducedTargetElements, this.retrievalStrategy);
+    }
+
+    /**
+     * Finds elements similar to the given query vector as part of LiSSA's similarity matching.
+     *
+     * @param query The element and vector to find similar elements for
+     * @return List of similar elements, sorted by similarity
+     */
+    public final List<Element> findSimilar(Pair<Element, float[]> query) {
+        return findSimilarWithDistances(query).stream().map(Pair::first).toList();
+    }
+
+    /**
+     * Finds elements similar to the given query vector, including their similarity scores.
+     * Used by LiSSA for similarity-based matching in the classification phase.
+     *
+     * @param query The element and vector to find similar elements for
+     * @return List of pairs containing similar elements and their similarity scores
+     */
+    public List<Pair<Element, Float>> findSimilarWithDistances(Pair<Element, float[]> query) {
+        return retrievalStrategy.findSimilarElements(query, getAllElementsIntern(true));
+    }
+}
