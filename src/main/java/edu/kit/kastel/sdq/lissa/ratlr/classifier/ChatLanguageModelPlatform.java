@@ -36,7 +36,7 @@ public enum ChatLanguageModelPlatform {
     /**
      * Open WebUI platform (1 thread, default model: "llama3:8b").
      */
-    OPENWEBUI(1, "llama3:8b");
+    OPENWEBUI(10, "llama3:8b");
 
     private final int threads;
     private final String defaultModel;
