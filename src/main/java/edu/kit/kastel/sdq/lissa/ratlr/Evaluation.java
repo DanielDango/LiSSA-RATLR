@@ -120,28 +120,6 @@ public class Evaluation {
     }
 
     /**
-     * Creates a new evaluation instance with the specified configuration file. Overwrites the prompt used for classification.
-     * This constructor is only to be used by the class {@link Optimization}, as the resulting configuration will
-     * not include the prompt.
-     * This constructor:
-     * <ol>
-     *     <li>Validates the configuration file path</li>
-     *     <li>Loads and initializes the configuration</li>
-     *     <li>Sets up all required components for the pipeline, sharing a {@link ContextStore}</li>
-     * </ol>
-     *
-     * @param configFile Path to the configuration file
-     * @param prompt The prompt to use for classification
-     * @throws IOException If there are issues reading the configuration file
-     * @throws NullPointerException If configFile is null
-     */
-    public Evaluation(Path configFile, String prompt) throws IOException {
-        this.configFile = Objects.requireNonNull(configFile);
-        configuration = new ObjectMapper().readValue(configFile.toFile(), Configuration.class);
-        setup(prompt);
-    }
-
-    /**
      * Creates a new evaluation instance with the specified configuration object.
      * This constructor:
      * <ol>
