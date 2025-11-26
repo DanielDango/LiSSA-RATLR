@@ -49,7 +49,7 @@ public abstract class ElementStore {
      *                           Source stores allow retrieving all elements but don't support similarity search.
      * @throws IllegalArgumentException If max_results is less than 1 in target store mode
      */
-    //TODO: Nur im Target Store
+    // TODO: Nur im Target Store
     public ElementStore(ModuleConfiguration configuration, boolean similarityRetriever) {
         if (!similarityRetriever && !"custom".equals(configuration.name())) {
             RetrievalStrategy.logger.error(

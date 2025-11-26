@@ -23,15 +23,26 @@ import edu.kit.kastel.sdq.lissa.ratlr.utils.KeyGenerator;
  * @param content The content that was processed in the cached operation.
  * @param localKey A local key for additional identification, not included in JSON serialization.
  */
-//TODO: Technically, this cache key is for classifiers (chat) or embeddings.
+// TODO: Technically, this cache key is for classifiers (chat) or embeddings.
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record EmbeddingCacheKey(
-        String model, int seed, double temperature, LargeLanguageModelCacheMode mode, String content, @JsonIgnore String localKey)
+        String model,
+        int seed,
+        double temperature,
+        LargeLanguageModelCacheMode mode,
+        String content,
+        @JsonIgnore String localKey)
         implements CacheKey {
 
     public static EmbeddingCacheKey of(String model, int seed, double temperature, String content) {
-        return new EmbeddingCacheKey(model, seed, temperature, LargeLanguageModelCacheMode.EMBEDDING, content, KeyGenerator.generateKey(content));
+        return new EmbeddingCacheKey(
+                model,
+                seed,
+                temperature,
+                LargeLanguageModelCacheMode.EMBEDDING,
+                content,
+                KeyGenerator.generateKey(content));
     }
 
     /**
@@ -40,8 +51,8 @@ public record EmbeddingCacheKey(
      * @deprecated please use {@link #of(String, int, double, String)} instead.
      */
     @Deprecated(forRemoval = false)
-    public static EmbeddingCacheKey ofRaw(
-            String model, int seed, double temperature, String content, String localKey) {
-        return new EmbeddingCacheKey(model, seed, temperature, LargeLanguageModelCacheMode.EMBEDDING, content, localKey);
+    public static EmbeddingCacheKey ofRaw(String model, int seed, double temperature, String content, String localKey) {
+        return new EmbeddingCacheKey(
+                model, seed, temperature, LargeLanguageModelCacheMode.EMBEDDING, content, localKey);
     }
 }

@@ -107,11 +107,8 @@ public class SummarizePreprocessor extends Preprocessor {
         List<Callable<String>> tasks = new ArrayList<>();
         for (String request : requests) {
             tasks.add(() -> {
-                ClassifierCacheKey cacheKey = ClassifierCacheKey.of(
-                        provider.modelName(),
-                        provider.seed(),
-                        provider.temperature(),
-                        request);
+                ClassifierCacheKey cacheKey =
+                        ClassifierCacheKey.of(provider.modelName(), provider.seed(), provider.temperature(), request);
 
                 String cachedResponse = cache.get(cacheKey, String.class);
                 if (cachedResponse != null) {

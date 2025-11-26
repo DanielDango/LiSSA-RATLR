@@ -115,7 +115,7 @@ public class SimpleClassifier extends Classifier {
     public SortedMap<String, String> getCacheParameters() {
         Map<String, String> providerParams = provider.getCacheParameters();
         TreeMap<String, String> params = new TreeMap<>(providerParams);
-        //TODO: Why are classifiers needed here?
+        // TODO: Why are classifiers needed here?
         params.put("classifier", SIMPLE_CLASSIFIER_NAME);
         return params;
     }
@@ -162,8 +162,8 @@ public class SimpleClassifier extends Classifier {
                 .replace("{target_type}", target.getType())
                 .replace("{target_content}", target.getContent());
 
-        ClassifierCacheKey cacheKey = ClassifierCacheKey.of(
-                provider.modelName(), provider.seed(), provider.temperature(), request);
+        ClassifierCacheKey cacheKey =
+                ClassifierCacheKey.of(provider.modelName(), provider.seed(), provider.temperature(), request);
         String cachedResponse = cache.get(cacheKey, String.class);
         if (cachedResponse != null) {
             return cachedResponse;

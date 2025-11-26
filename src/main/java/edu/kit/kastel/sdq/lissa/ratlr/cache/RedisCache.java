@@ -131,7 +131,7 @@ class RedisCache implements Cache {
             localCache.put(key, jsonData);
         }
 
-        //TODO: Copilot stresst
+        // TODO: Copilot stresst
 
         return convert(jsonData, clazz);
     }

@@ -4,13 +4,14 @@ package edu.kit.kastel.sdq.lissa.ratlr.classifier;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.commons.lang3.NotImplementedException;
+
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
 import edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore;
 import edu.kit.kastel.sdq.lissa.ratlr.elementstore.SourceElementStore;
 import edu.kit.kastel.sdq.lissa.ratlr.elementstore.TargetElementStore;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.Pair;
-import org.apache.commons.lang3.NotImplementedException;
 
 /**
  * A classifier that processes elements through a pipeline of multiple classifier stages.
@@ -148,12 +149,14 @@ public class PipelineClassifier extends Classifier {
 
     @Override
     public void setClassificationPrompt(String prompt) {
-        throw new NotImplementedException("PipelineClassifiers do not support setting a single classification prompt. Configure individual classifiers instead.");
+        throw new NotImplementedException(
+                "PipelineClassifiers do not support setting a single classification prompt. Configure individual classifiers instead.");
     }
 
     @Override
     public SortedMap<String, String> getCacheParameters() {
-        throw new NotImplementedException("PipelineClassifiers do not support caching directly. Cache individual classifiers instead.");
+        throw new NotImplementedException(
+                "PipelineClassifiers do not support caching directly. Cache individual classifiers instead.");
     }
 
     /**

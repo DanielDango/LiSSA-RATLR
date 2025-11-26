@@ -4,8 +4,6 @@ package edu.kit.kastel.sdq.lissa.ratlr.embeddingcreator;
 import java.util.*;
 import java.util.concurrent.*;
 
-import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheKey;
-import edu.kit.kastel.sdq.lissa.ratlr.cache.EmbeddingCacheKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,7 +12,9 @@ import com.knuddels.jtokkit.api.Encoding;
 import com.knuddels.jtokkit.api.EncodingRegistry;
 
 import edu.kit.kastel.sdq.lissa.ratlr.cache.Cache;
+import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheKey;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheManager;
+import edu.kit.kastel.sdq.lissa.ratlr.cache.EmbeddingCacheKey;
 import edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.Futures;
@@ -177,8 +177,7 @@ abstract class CachedEmbeddingCreator extends EmbeddingCreator {
     private static float[] calculateFinalEmbedding(
             EmbeddingModel embeddingModel, Cache cache, String rawNameOfModel, Element element) {
 
-        EmbeddingCacheKey cacheKey =
-                EmbeddingCacheKey.of(rawNameOfModel, -1, -1, element.getContent());
+        EmbeddingCacheKey cacheKey = EmbeddingCacheKey.of(rawNameOfModel, -1, -1, element.getContent());
 
         float[] cachedEmbedding = cache.get(cacheKey, float[].class);
         if (cachedEmbedding != null) {
@@ -219,11 +218,7 @@ abstract class CachedEmbeddingCreator extends EmbeddingCreator {
         // We need the old keys for backwards compatibility
         @SuppressWarnings("deprecation")
         EmbeddingCacheKey newCacheKey = EmbeddingCacheKey.ofRaw(
-                rawNameOfModel,
-                -1,
-                -1,
-                "(FIXED::%d): %s".formatted(MAX_TOKEN_LENGTH, content),
-                newKey);
+                rawNameOfModel, -1, -1, "(FIXED::%d): %s".formatted(MAX_TOKEN_LENGTH, content), newKey);
 
         float[] cachedEmbedding = cache.get(newCacheKey, float[].class);
         if (cachedEmbedding != null) {

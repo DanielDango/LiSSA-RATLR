@@ -119,7 +119,7 @@ public class ReasoningClassifier extends Classifier {
     public SortedMap<String, String> getCacheParameters() {
         Map<String, String> providerParams = provider.getCacheParameters();
         TreeMap<String, String> params = new TreeMap<>(providerParams);
-        //TODO: Why are classifiers needed now?
+        // TODO: Why are classifiers needed now?
         params.put("classifier", REASONING_CLASSIFIER_NAME);
         return params;
     }
@@ -198,11 +198,8 @@ public class ReasoningClassifier extends Classifier {
         messages.add(new UserMessage(request));
 
         String messageString = getRepresentation(messages);
-        ClassifierCacheKey cacheKey = ClassifierCacheKey.of(
-                provider.modelName(),
-                provider.seed(),
-                provider.temperature(),
-                messageString);
+        ClassifierCacheKey cacheKey =
+                ClassifierCacheKey.of(provider.modelName(), provider.seed(), provider.temperature(), messageString);
 
         String cachedResponse = cache.get(cacheKey, String.class);
         if (cachedResponse != null) {
