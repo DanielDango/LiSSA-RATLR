@@ -29,8 +29,6 @@ import edu.kit.kastel.sdq.lissa.ratlr.postprocessor.TraceLinkIdPostprocessor;
 import edu.kit.kastel.sdq.lissa.ratlr.preprocessor.Preprocessor;
 import edu.kit.kastel.sdq.lissa.ratlr.resultaggregator.ResultAggregator;
 
-import lombok.Getter;
-
 /**
  * Represents a single evaluation run of the LiSSA framework.
  * This class manages the complete trace link analysis pipeline for a given configuration,
@@ -62,10 +60,9 @@ import lombok.Getter;
  */
 public class Evaluation {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Evaluation.class);
+    private static final Logger logger = LoggerFactory.getLogger(Evaluation.class);
     private final Path configFile;
 
-    @Getter
     private final Configuration configuration;
 
     /** Provider for source artifacts */
@@ -79,25 +76,20 @@ public class Evaluation {
     /** Creator for element embeddings */
     private EmbeddingCreator embeddingCreator;
     /** Store for source elements */
-    @Getter
     private SourceElementStore sourceStore;
     /** Store for target elements */
-    @Getter
     private TargetElementStore targetStore;
     /** Classifier for trace link analysis */
-    @Getter
     private Classifier classifier;
     /** Aggregator for classification results */
-    @Getter
     private ResultAggregator aggregator;
 
     /** Postprocessor for trace link IDs */
-    @Getter
     private TraceLinkIdPostprocessor traceLinkIdPostProcessor;
 
     private List<Element> sourceElements;
     private List<Element> targetElements;
-    private int sourceArtifcatsSize;
+    private int sourceArtifactsSize;
     private int targetArtifactsSize;
 
     /**
@@ -211,16 +203,16 @@ public class Evaluation {
     public Set<TraceLink> run() {
         setupSourceAndTargetStores();
 
-        LOGGER.info("Classifying Tracelinks");
+        logger.info("Classifying Tracelinks");
         var llmResults = classifier.classify(sourceStore, targetStore);
         var traceLinks = aggregator.aggregate(sourceElements, targetElements, llmResults);
 
-        LOGGER.info("Postprocessing Tracelinks");
+        logger.info("Postprocessing Tracelinks");
         traceLinks = traceLinkIdPostProcessor.postprocess(traceLinks);
 
-        LOGGER.info("Evaluating Results");
+        logger.info("Evaluating Results");
         Statistics.generateStatistics(
-                traceLinks, configFile.toFile(), configuration, sourceArtifcatsSize, targetArtifactsSize);
+                traceLinks, configFile.toFile(), configuration, sourceArtifactsSize, targetArtifactsSize);
         Statistics.saveTraceLinks(traceLinks, configFile.toFile(), configuration);
 
         CacheManager.getDefaultInstance().flush();
@@ -229,22 +221,22 @@ public class Evaluation {
     }
 
     /*package-private*/ void setupSourceAndTargetStores() {
-        LOGGER.info("Loading artifacts");
+        logger.info("Loading artifacts");
         var sourceArtifacts = sourceArtifactProvider.getArtifacts();
         var targetArtifacts = targetArtifactProvider.getArtifacts();
 
-        sourceArtifcatsSize = sourceArtifacts.size();
+        sourceArtifactsSize = sourceArtifacts.size();
         targetArtifactsSize = targetArtifacts.size();
 
-        LOGGER.info("Preprocessing artifacts");
+        logger.info("Preprocessing artifacts");
         sourceElements = sourcePreprocessor.preprocess(sourceArtifacts);
         targetElements = targetPreprocessor.preprocess(targetArtifacts);
 
-        LOGGER.info("Calculating embeddings");
+        logger.info("Calculating embeddings");
         var sourceEmbeddings = embeddingCreator.calculateEmbeddings(sourceElements);
         var targetEmbeddings = embeddingCreator.calculateEmbeddings(targetElements);
 
-        LOGGER.info("Building element stores");
+        logger.info("Building element stores");
         sourceStore.setup(sourceElements, sourceEmbeddings);
         targetStore.setup(targetElements, targetEmbeddings);
     }
@@ -265,5 +257,59 @@ public class Evaluation {
      */
     public int getTargetArtifactCount() {
         return targetArtifactProvider.getArtifacts().size();
+    }
+
+    /**
+     * Gets the configuration for this evaluation.
+     *
+     * @return The configuration object
+     */
+    public Configuration getConfiguration() {
+        return configuration;
+    }
+
+    /**
+     * Gets the source element store.
+     *
+     * @return The source element store
+     */
+    public SourceElementStore getSourceStore() {
+        return sourceStore;
+    }
+
+    /**
+     * Gets the target element store.
+     *
+     * @return The target element store
+     */
+    public TargetElementStore getTargetStore() {
+        return targetStore;
+    }
+
+    /**
+     * Gets the classifier used for trace link analysis.
+     *
+     * @return The classifier
+     */
+    public Classifier getClassifier() {
+        return classifier;
+    }
+
+    /**
+     * Gets the result aggregator.
+     *
+     * @return The result aggregator
+     */
+    public ResultAggregator getAggregator() {
+        return aggregator;
+    }
+
+    /**
+     * Gets the trace link ID postprocessor.
+     *
+     * @return The trace link ID postprocessor
+     */
+    public TraceLinkIdPostprocessor getTraceLinkIdPostProcessor() {
+        return traceLinkIdPostProcessor;
     }
 }

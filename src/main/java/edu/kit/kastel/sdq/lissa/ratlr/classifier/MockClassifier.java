@@ -2,8 +2,8 @@
 package edu.kit.kastel.sdq.lissa.ratlr.classifier;
 
 import java.util.Collections;
-import java.util.Map;
 import java.util.Optional;
+import java.util.SortedMap;
 
 import edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
@@ -47,7 +47,7 @@ public class MockClassifier extends Classifier {
     }
 
     @Override
-    public Map<String, String> getCacheParameters() {
-        return Collections.emptyMap();
+    public SortedMap<String, String> getCacheParameters() {
+        return Collections.emptySortedMap();
     }
 }

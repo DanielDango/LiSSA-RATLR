@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.KeyGenerator;
 
 /**
- * Represents a key for classification caching operations in the LiSSA framework.
+ * Represents a key for embedding caching operations in the LiSSA framework.
  * This record is used to uniquely identify cached values based on various parameters
  * such as the model used, seed value, operation mode, and content.
  * <p>
@@ -23,13 +23,25 @@ import edu.kit.kastel.sdq.lissa.ratlr.utils.KeyGenerator;
  * @param content The content that was processed in the cached operation.
  * @param localKey A local key for additional identification, not included in JSON serialization.
  */
+//TODO: Technically, this cache key is for classifiers (chat) or embeddings.
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public record ClassifierCacheKey(
+public record EmbeddingCacheKey(
         String model, int seed, double temperature, LargeLanguageModelCacheMode mode, String content, @JsonIgnore String localKey)
         implements CacheKey {
 
-    public static ClassifierCacheKey of(String model, int seed, double temperature, String content) {
-        return new ClassifierCacheKey(model, seed, temperature, LargeLanguageModelCacheMode.CHAT, content, KeyGenerator.generateKey(content));
+    public static EmbeddingCacheKey of(String model, int seed, double temperature, String content) {
+        return new EmbeddingCacheKey(model, seed, temperature, LargeLanguageModelCacheMode.EMBEDDING, content, KeyGenerator.generateKey(content));
+    }
+
+    /**
+     * Only use this method if you want to use a custom local key. You mostly do not want to do this. Only for special handling of embeddings.
+     * You should always prefer the {@link #of(String, int, double, String)} method.
+     * @deprecated please use {@link #of(String, int, double, String)} instead.
+     */
+    @Deprecated(forRemoval = false)
+    public static EmbeddingCacheKey ofRaw(
+            String model, int seed, double temperature, String content, String localKey) {
+        return new EmbeddingCacheKey(model, seed, temperature, LargeLanguageModelCacheMode.EMBEDDING, content, localKey);
     }
 }

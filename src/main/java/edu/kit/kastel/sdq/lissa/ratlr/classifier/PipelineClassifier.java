@@ -10,6 +10,7 @@ import edu.kit.kastel.sdq.lissa.ratlr.elementstore.SourceElementStore;
 import edu.kit.kastel.sdq.lissa.ratlr.elementstore.TargetElementStore;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.Pair;
+import org.apache.commons.lang3.NotImplementedException;
 
 /**
  * A classifier that processes elements through a pipeline of multiple classifier stages.
@@ -147,24 +148,12 @@ public class PipelineClassifier extends Classifier {
 
     @Override
     public void setClassificationPrompt(String prompt) {
-        for (List<Classifier> layer : classifiers) {
-            for (Classifier classifier : layer) {
-                classifier.setClassificationPrompt(prompt);
-            }
-        }
+        throw new NotImplementedException("PipelineClassifiers do not support setting a single classification prompt. Configure individual classifiers instead.");
     }
 
     @Override
-    public Map<String, String> getCacheParameters() {
-        Map<String, String> result = new HashMap<>();
-        for (int i = 0; i < classifiers.size(); i++) {
-            for (int j = 0; j < classifiers.get(i).size(); j++) {
-                result.put(
-                        "layer_%d_classifier_%d".formatted(i, j),
-                        classifiers.get(i).get(j).getCacheParameters().toString());
-            }
-        }
-        return result;
+    public SortedMap<String, String> getCacheParameters() {
+        throw new NotImplementedException("PipelineClassifiers do not support caching directly. Cache individual classifiers instead.");
     }
 
     /**

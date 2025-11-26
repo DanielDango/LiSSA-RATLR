@@ -65,11 +65,6 @@ public class ChatLanguageModelProvider {
     public static final double DEFAULT_TEMPERATURE = 0.0;
 
     /**
-     * Time in minutes before an Ollama request times out.
-     */
-    public static final int OLLAMA_MINUTES_TO_TIMEOUT = 10;
-
-    /**
      * The platform to use for the language model.
      */
     private final ChatLanguageModelPlatform platform;
@@ -189,7 +184,7 @@ public class ChatLanguageModelProvider {
         var ollama = OllamaChatModel.builder()
                 .baseUrl(host)
                 .modelName(model)
-                .timeout(Duration.ofMinutes(OLLAMA_MINUTES_TO_TIMEOUT))
+                .timeout(Duration.ofMinutes(10))
                 .temperature(temperature)
                 .seed(seed);
         if (user != null && password != null && !user.isEmpty() && !password.isEmpty()) {

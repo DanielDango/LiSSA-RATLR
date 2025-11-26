@@ -4,6 +4,8 @@ package edu.kit.kastel.sdq.lissa.ratlr.embeddingcreator;
 import java.util.*;
 import java.util.concurrent.*;
 
+import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheKey;
+import edu.kit.kastel.sdq.lissa.ratlr.cache.EmbeddingCacheKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,7 +15,6 @@ import com.knuddels.jtokkit.api.EncodingRegistry;
 
 import edu.kit.kastel.sdq.lissa.ratlr.cache.Cache;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheManager;
-import edu.kit.kastel.sdq.lissa.ratlr.cache.ClassifierCacheKey;
 import edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.Futures;
@@ -176,8 +177,8 @@ abstract class CachedEmbeddingCreator extends EmbeddingCreator {
     private static float[] calculateFinalEmbedding(
             EmbeddingModel embeddingModel, Cache cache, String rawNameOfModel, Element element) {
 
-        ClassifierCacheKey cacheKey =
-                ClassifierCacheKey.of(rawNameOfModel, -1, -1, ClassifierCacheKey.Mode.EMBEDDING, element.getContent());
+        EmbeddingCacheKey cacheKey =
+                EmbeddingCacheKey.of(rawNameOfModel, -1, -1, element.getContent());
 
         float[] cachedEmbedding = cache.get(cacheKey, float[].class);
         if (cachedEmbedding != null) {
@@ -212,16 +213,15 @@ abstract class CachedEmbeddingCreator extends EmbeddingCreator {
      * @throws IllegalArgumentException If the token length was not the cause of the failure
      */
     private static float[] tryToFixWithLength(
-            EmbeddingModel embeddingModel, Cache cache, String rawNameOfModel, ClassifierCacheKey key, String content) {
+            EmbeddingModel embeddingModel, Cache cache, String rawNameOfModel, CacheKey key, String content) {
         String newKey = key.localKey() + "_fixed_" + MAX_TOKEN_LENGTH;
 
         // We need the old keys for backwards compatibility
         @SuppressWarnings("deprecation")
-        ClassifierCacheKey newCacheKey = ClassifierCacheKey.ofRaw(
+        EmbeddingCacheKey newCacheKey = EmbeddingCacheKey.ofRaw(
                 rawNameOfModel,
                 -1,
                 -1,
-                ClassifierCacheKey.Mode.EMBEDDING,
                 "(FIXED::%d): %s".formatted(MAX_TOKEN_LENGTH, content),
                 newKey);
 

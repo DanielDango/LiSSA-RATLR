@@ -4,10 +4,11 @@ package edu.kit.kastel.sdq.lissa.ratlr.classifier;
 import static dev.langchain4j.internal.Utils.quoted;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -115,9 +116,10 @@ public class ReasoningClassifier extends Classifier {
     }
 
     @Override
-    public Map<String, String> getCacheParameters() {
+    public SortedMap<String, String> getCacheParameters() {
         Map<String, String> providerParams = provider.getCacheParameters();
-        Map<String, String> params = new HashMap<>(providerParams);
+        TreeMap<String, String> params = new TreeMap<>(providerParams);
+        //TODO: Why are classifiers needed now?
         params.put("classifier", REASONING_CLASSIFIER_NAME);
         return params;
     }
@@ -200,7 +202,6 @@ public class ReasoningClassifier extends Classifier {
                 provider.modelName(),
                 provider.seed(),
                 provider.temperature(),
-                ClassifierCacheKey.Mode.CHAT,
                 messageString);
 
         String cachedResponse = cache.get(cacheKey, String.class);

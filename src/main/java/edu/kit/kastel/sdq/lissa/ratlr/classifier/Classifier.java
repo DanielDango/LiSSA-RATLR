@@ -7,12 +7,11 @@ import static edu.kit.kastel.sdq.lissa.ratlr.classifier.SimpleClassifier.SIMPLE_
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.SortedMap;
 import java.util.concurrent.*;
 
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,7 +71,6 @@ public abstract class Classifier {
         return classify(createClassificationTasks(sourceStore, targetStore));
     }
 
-    @NotNull
     private List<ClassificationResult> classify(List<Pair<Element, Element>> tasks) {
         if (threads <= 1) {
             return sequentialClassify(tasks);
@@ -271,5 +269,5 @@ public abstract class Classifier {
      *
      * @return A map of parameter names to values that define the cache uniqueness
      */
-    public abstract Map<String, String> getCacheParameters();
+    public abstract SortedMap<String, String> getCacheParameters();
 }

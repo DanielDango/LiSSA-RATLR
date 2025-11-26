@@ -4,13 +4,10 @@ package edu.kit.kastel.sdq.lissa.ratlr.elementstore;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jetbrains.annotations.NotNull;
-
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
 import edu.kit.kastel.sdq.lissa.ratlr.elementstore.strategy.RetrievalStrategy;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.Pair;
-import org.jspecify.annotations.Nullable;
 
 /**
  * A store for target elements and their embeddings in the LiSSA framework.
@@ -26,15 +23,15 @@ public class TargetElementStore extends ElementStore {
     /**
      * Strategy to find similar elements.
      */
-    private @Nullable final RetrievalStrategy retrievalStrategy;
+    private final RetrievalStrategy retrievalStrategy;
 
     public TargetElementStore(ModuleConfiguration moduleConfiguration) {
         super(moduleConfiguration, true);
         this.retrievalStrategy = RetrievalStrategy.createStrategy(moduleConfiguration);
     }
 
-    public TargetElementStore(List<Pair<Element, float[]>> content, @NotNull RetrievalStrategy retrievalStrategy) {
-        super(content, retrievalStrategy);
+    public TargetElementStore(List<Pair<Element, float[]>> content, RetrievalStrategy retrievalStrategy) {
+        super(content);
         this.retrievalStrategy = retrievalStrategy;
     }
 
