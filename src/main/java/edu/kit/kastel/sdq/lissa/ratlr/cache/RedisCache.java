@@ -40,7 +40,7 @@ class RedisCache implements Cache {
      */
     private @Nullable UnifiedJedis jedis;
 
-    private boolean replaceLocalCacheOnConflict;
+    private final boolean replaceLocalCacheOnConflict;
 
     /**
      * Creates a new Redis cache instance with an optional local cache backup.
@@ -114,19 +114,24 @@ class RedisCache implements Cache {
             return convert(jsonData, clazz);
         }
         String localData = localCache.get(key);
+        // Value is in redis cache but not in local cache
         if (localData == null && jsonData != null) {
             localCache.put(key, jsonData);
         }
+        // Value is in local cache but not in redis cache
         if (localData != null && jsonData == null) {
             jsonData = localData;
             if (jedis != null) {
                 jedis.hset(key.toJsonKey(), "data", jsonData);
             }
         }
+        // Value is in both caches but they differ
         if (replaceLocalCacheOnConflict && jsonData != null && localData != null && !jsonData.equals(localData)) {
             logger.info("Cache inconsistency detected for key {}, using Redis value and replacing local one", key);
             localCache.put(key, jsonData);
         }
+
+        //TODO: Copilot stresst
 
         return convert(jsonData, clazz);
     }

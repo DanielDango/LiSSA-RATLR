@@ -111,7 +111,6 @@ public class SummarizePreprocessor extends Preprocessor {
                         provider.modelName(),
                         provider.seed(),
                         provider.temperature(),
-                        ClassifierCacheKey.Mode.CHAT,
                         request);
 
                 String cachedResponse = cache.get(cacheKey, String.class);

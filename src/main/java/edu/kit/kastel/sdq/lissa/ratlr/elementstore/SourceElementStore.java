@@ -20,12 +20,22 @@ import edu.kit.kastel.sdq.lissa.ratlr.utils.Pair;
  */
 public class SourceElementStore extends ElementStore {
 
+    /**
+     * Creates a new source element store for the LiSSA framework.
+     *
+     * @param moduleConfiguration The configuration of the module
+     */
     public SourceElementStore(ModuleConfiguration moduleConfiguration) {
         super(moduleConfiguration, false);
     }
 
+    /**
+     * Creates a new source element store with the given content.
+     *
+     * @param content List of pairs containing elements and their embeddings
+     */
     public SourceElementStore(List<Pair<Element, float[]>> content) {
-        super(content, null);
+        super(content);
     }
 
     /**

@@ -16,7 +16,6 @@ import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
  */
 public record ClassificationTask(Element source, Element target, boolean label)
         implements Comparable<ClassificationTask> {
-    @NotNull
     @Override
     public String toString() {
         return "ClassificationTask{" + "source="
@@ -25,8 +24,25 @@ public record ClassificationTask(Element source, Element target, boolean label)
                 + label + '}';
     }
 
+    /**
+     * Compares this classification task to another based on source and target element identifiers and label.
+     * <ul>
+     *     <li>this == other if both source IDs, target IDs, and labels are equal.</li>
+     *     <li>this &lt; other if:
+     *     <ul>
+     *         <li>source ID is less, or</li>
+     *         <li>source IDs are equal and target ID is less, or</li>
+     *         <li>both IDs are equal and this.label is false while other.label is true. </li>
+     *     </ul></li>
+     *     <li>this &gt; other otherwise.</li>
+     * </ul>
+     *
+     * @param other The other classification task to compare to.
+     * @return A negative integer, zero, or a positive integer as this task is less than,
+     *         equal to, or greater than the specified task.
+     */
     @Override
-    public int compareTo(@NotNull ClassificationTask other) {
+    public int compareTo(ClassificationTask other) {
         if (this.source.getIdentifier().equals(other.source.getIdentifier())) {
             if (this.target.getIdentifier().equals(other.target.getIdentifier())) {
                 return Boolean.compare(this.label, other.label);

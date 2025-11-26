@@ -1,9 +1,10 @@
 /* Licensed under MIT 2025. */
 package edu.kit.kastel.sdq.lissa.ratlr.classifier;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import edu.kit.kastel.sdq.lissa.ratlr.cache.Cache;
 import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheManager;
@@ -111,9 +112,10 @@ public class SimpleClassifier extends Classifier {
     }
 
     @Override
-    public Map<String, String> getCacheParameters() {
+    public SortedMap<String, String> getCacheParameters() {
         Map<String, String> providerParams = provider.getCacheParameters();
-        Map<String, String> params = new HashMap<>(providerParams);
+        TreeMap<String, String> params = new TreeMap<>(providerParams);
+        //TODO: Why are classifiers needed here?
         params.put("classifier", SIMPLE_CLASSIFIER_NAME);
         return params;
     }
@@ -161,7 +163,7 @@ public class SimpleClassifier extends Classifier {
                 .replace("{target_content}", target.getContent());
 
         ClassifierCacheKey cacheKey = ClassifierCacheKey.of(
-                provider.modelName(), provider.seed(), provider.temperature(), ClassifierCacheKey.Mode.CHAT, request);
+                provider.modelName(), provider.seed(), provider.temperature(), request);
         String cachedResponse = cache.get(cacheKey, String.class);
         if (cachedResponse != null) {
             return cachedResponse;

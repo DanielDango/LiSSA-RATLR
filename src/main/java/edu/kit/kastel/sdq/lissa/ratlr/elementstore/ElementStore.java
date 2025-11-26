@@ -26,7 +26,7 @@ import edu.kit.kastel.sdq.lissa.ratlr.utils.Pair;
  *     <li>{@link TargetElementStore}</li>
  * </ul>
  */
-public class ElementStore {
+public abstract class ElementStore {
 
     /**
      * Maps element identifiers to their corresponding elements and embeddings.
@@ -49,6 +49,7 @@ public class ElementStore {
      *                           Source stores allow retrieving all elements but don't support similarity search.
      * @throws IllegalArgumentException If max_results is less than 1 in target store mode
      */
+    //TODO: Nur im Target Store
     public ElementStore(ModuleConfiguration configuration, boolean similarityRetriever) {
         if (!similarityRetriever && !"custom".equals(configuration.name())) {
             RetrievalStrategy.logger.error(
@@ -64,10 +65,8 @@ public class ElementStore {
      * This constructor is used for initializing the store with existing elements and their embeddings.
      *
      * @param content List of pairs containing elements and their embeddings
-     * @param retrievalStrategy The retrieval strategy to use for finding similar elements
-     *                          For source stores, this should be null.
      */
-    public ElementStore(List<Pair<Element, float[]>> content, RetrievalStrategy retrievalStrategy) {
+    protected ElementStore(List<Pair<Element, float[]>> content) {
 
         elementsWithEmbedding = new ArrayList<>();
         idToElementWithEmbedding = new HashMap<>();
