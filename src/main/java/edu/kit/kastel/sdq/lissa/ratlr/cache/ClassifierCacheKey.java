@@ -26,10 +26,16 @@ import edu.kit.kastel.sdq.lissa.ratlr.utils.KeyGenerator;
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record ClassifierCacheKey(
-        String model, int seed, double temperature, LargeLanguageModelCacheMode mode, String content, @JsonIgnore String localKey)
+        String model,
+        int seed,
+        double temperature,
+        LargeLanguageModelCacheMode mode,
+        String content,
+        @JsonIgnore String localKey)
         implements CacheKey {
 
     public static ClassifierCacheKey of(String model, int seed, double temperature, String content) {
-        return new ClassifierCacheKey(model, seed, temperature, LargeLanguageModelCacheMode.CHAT, content, KeyGenerator.generateKey(content));
+        return new ClassifierCacheKey(
+                model, seed, temperature, LargeLanguageModelCacheMode.CHAT, content, KeyGenerator.generateKey(content));
     }
 }
