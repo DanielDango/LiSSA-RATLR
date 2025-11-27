@@ -62,15 +62,4 @@ public class SourceElementStore extends ElementStore {
     public List<Pair<Element, float[]>> getAllElements(boolean onlyCompare) {
         return getAllElementsIntern(onlyCompare);
     }
-
-    /**
-     * Retrieves a subset of this source store to be used as training data for optimization.
-     * The training data consists of the first size elements from the source store.
-     *
-     * @param size The number of elements to include in the training source store
-     * @return A new ElementStore containing only the training data elements
-     */
-    public SourceElementStore reduceSourceElementStore(int size) {
-        return new SourceElementStore(this.getAllElements(false).subList(0, Math.min(size, this.size())));
-    }
 }

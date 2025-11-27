@@ -1,8 +1,6 @@
 /* Licensed under MIT 2025. */
 package edu.kit.kastel.sdq.lissa.ratlr.elementstore;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
@@ -54,23 +52,6 @@ public class TargetElementStore extends ElementStore {
      */
     public List<Element> getAllElements() {
         return getAllElementsIntern(false).stream().map(Pair::first).toList();
-    }
-
-    /**
-     * Retrieves a subset of this target store that corresponds to the source store.
-     * This method finds all elements in this target store that are similar to the elements in the source store.
-     *
-     * @param sourceStore The training source element store
-     * @return A new ElementStore containing only the target elements that correspond to the source elements
-     */
-    public TargetElementStore reduceTargetElementStore(SourceElementStore sourceStore) {
-        LinkedHashMap<String, Pair<Element, float[]>> reducedTargetElements = new LinkedHashMap<>();
-        for (var element : sourceStore.getAllElements(true)) {
-            for (Element candidate : this.findSimilar(element)) {
-                reducedTargetElements.putIfAbsent(candidate.getIdentifier(), this.getById(candidate.getIdentifier()));
-            }
-        }
-        return new TargetElementStore(new ArrayList<>(reducedTargetElements.values()), this.retrievalStrategy);
     }
 
     /**
