@@ -196,7 +196,7 @@ public abstract class Classifier {
 
     /**
      * Sets the prompt used for classification.
-     * This method is only intended for use by optimizers
+     * This method is only intended for use by optimizers.
      *
      * @param prompt The prompt template to use for classification
      */
