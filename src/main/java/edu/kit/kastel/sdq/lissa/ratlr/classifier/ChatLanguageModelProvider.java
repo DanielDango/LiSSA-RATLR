@@ -307,6 +307,7 @@ public class ChatLanguageModelProvider {
      * @see edu.kit.kastel.sdq.lissa.ratlr.cache.CacheManager#getCache(Object, String[])
      */
     public SortedMap<String, String> getCacheParameters() {
+        // TODO be real careful here (downward) and consider if you actually need this
         if (temperature == 0.0) {
             // Backwards compatibility with the old mode that did not have temperature
             return new TreeMap<>(Map.of("modelName", modelName(), "seed", String.valueOf(seed())));

@@ -48,7 +48,7 @@ public class ReasoningClassifier extends Classifier {
     /**
      * The prompt template used for classification requests.
      */
-    private volatile String prompt;
+    private String prompt;
 
     /**
      * Whether to use original artifacts instead of nested elements.

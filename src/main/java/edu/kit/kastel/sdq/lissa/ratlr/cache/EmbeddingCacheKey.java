@@ -29,6 +29,8 @@ public record EmbeddingCacheKey(
         String model,
         int seed,
         double temperature,
+        // TODO rmeove unused parameters and overwrite toJson for downwardscompatibility, same for Mode
+        // TODO instead of json remove them from of / raw constructor. Mention in doc
         LargeLanguageModelCacheMode mode,
         String content,
         @JsonIgnore String localKey)

@@ -65,7 +65,7 @@ public class SimpleClassifier extends Classifier {
     /**
      * The template used for classification requests.
      */
-    private volatile String template;
+    private String template;
 
     /**
      * Creates a new simple classifier with the specified configuration.

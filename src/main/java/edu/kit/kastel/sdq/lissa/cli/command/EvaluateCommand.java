@@ -123,7 +123,7 @@ public class EvaluateCommand implements Runnable {
             configsToEvaluate.add(configPath);
             return;
         }
-
+        // TODO Carefull, not fully save
         try (DirectoryStream<Path> configDir = Files.newDirectoryStream(configPath)) {
             for (Path configDirEntry : configDir) {
                 if (!Files.isDirectory(configDirEntry)) {

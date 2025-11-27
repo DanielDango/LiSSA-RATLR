@@ -34,6 +34,7 @@ import edu.kit.kastel.sdq.lissa.ratlr.utils.Pair;
  * </p>
  */
 public abstract class Classifier {
+    // TODO Get prompt template key
     /**
      * Separator used in configuration names.
      */
@@ -244,6 +245,7 @@ public abstract class Classifier {
     public static Classifier createClassifier(ModuleConfiguration configuration, ContextStore contextStore) {
         return switch (configuration.name().split(CONFIG_NAME_SEPARATOR)[0]) {
             case "mock" -> new MockClassifier(contextStore);
+            // TODO Mock constant
             case SIMPLE_CLASSIFIER_NAME -> new SimpleClassifier(configuration, contextStore);
             case REASONING_CLASSIFIER_NAME -> new ReasoningClassifier(configuration, contextStore);
             default -> throw new IllegalStateException("Unexpected value: " + configuration.name());
