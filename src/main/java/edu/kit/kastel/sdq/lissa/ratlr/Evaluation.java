@@ -133,6 +133,7 @@ public class Evaluation {
      * @throws IOException If there are issues reading the configuration
      */
     private void setup() throws IOException {
+        // TODO setup uns setup source and target vereinheitlichen.
         CacheManager.setCacheDir(configuration.cacheDir());
 
         ContextStore contextStore = new ContextStore();
