@@ -5,7 +5,6 @@ import static dev.langchain4j.internal.Utils.quoted;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -117,7 +116,7 @@ public class ReasoningClassifier extends Classifier {
 
     @Override
     public SortedMap<String, String> getCacheParameters() {
-        Map<String, String> providerParams = provider.getCacheParameters();
+        SortedMap<String, String> providerParams = provider.getCacheParameters();
         TreeMap<String, String> params = new TreeMap<>(providerParams);
         // TODO: Why are classifiers needed now?
         params.put("classifier", REASONING_CLASSIFIER_NAME);

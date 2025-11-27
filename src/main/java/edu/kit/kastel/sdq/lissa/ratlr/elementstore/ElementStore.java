@@ -50,7 +50,7 @@ public abstract class ElementStore {
      * @throws IllegalArgumentException If max_results is less than 1 in target store mode
      */
     // TODO: Nur im Target Store
-    public ElementStore(ModuleConfiguration configuration, boolean similarityRetriever) {
+    protected ElementStore(ModuleConfiguration configuration, boolean similarityRetriever) {
         if (!similarityRetriever && !"custom".equals(configuration.name())) {
             RetrievalStrategy.logger.error(
                     "The element store is created in source store mode, but the retrieval strategy is not set to \"custom\". This is likely a configuration error as source stores do not use retrieval strategies.");

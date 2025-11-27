@@ -2,6 +2,7 @@
 package edu.kit.kastel.sdq.lissa.ratlr.elementstore;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
@@ -45,10 +46,11 @@ public class TargetElementStore extends ElementStore {
     }
 
     /**
-     * Retrieves all elements in the store for LiSSA's batch processing.
-     * TODO Why should this not be used in target stores?
+     * Retrieves all elements in the store without their embeddings.
+     * This method is primarily used for batch processing operations that only need element metadata,
+     * such as reducing the target store scope.
      *
-     * @return List of all elements
+     * @return List of all elements (without embeddings)
      */
     public List<Element> getAllElements() {
         return getAllElementsIntern(false).stream().map(Pair::first).toList();
@@ -62,13 +64,13 @@ public class TargetElementStore extends ElementStore {
      * @return A new ElementStore containing only the target elements that correspond to the source elements
      */
     public TargetElementStore reduceTargetElementStore(SourceElementStore sourceStore) {
-        List<Pair<Element, float[]>> reducedTargetElements = new ArrayList<>();
+        LinkedHashMap<String, Pair<Element, float[]>> reducedTargetElements = new LinkedHashMap<>();
         for (var element : sourceStore.getAllElements(true)) {
             for (Element candidate : this.findSimilar(element)) {
-                reducedTargetElements.add(this.getById(candidate.getIdentifier()));
+                reducedTargetElements.putIfAbsent(candidate.getIdentifier(), this.getById(candidate.getIdentifier()));
             }
         }
-        return new TargetElementStore(reducedTargetElements, this.retrievalStrategy);
+        return new TargetElementStore(new ArrayList<>(reducedTargetElements.values()), this.retrievalStrategy);
     }
 
     /**

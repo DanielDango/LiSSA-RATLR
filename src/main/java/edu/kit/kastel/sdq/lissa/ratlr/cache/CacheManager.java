@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.SortedMap;
 
 import org.jspecify.annotations.Nullable;
 
@@ -97,7 +98,7 @@ public final class CacheManager {
      * @return A cache instance for the specified name
      * @throws IllegalArgumentException If parameters is null or contains null values
      */
-    public Cache getCache(Object origin, Map<String, String> parameters) {
+    public Cache getCache(Object origin, SortedMap<String, String> parameters) {
         if (parameters == null) {
             throw new IllegalArgumentException("Parameters must not be null");
         }
