@@ -25,9 +25,8 @@ public record TraceLink(String sourceId, String targetId) implements Comparable<
      */
     @Override
     public int compareTo(TraceLink other) {
-        return this.sourceId.compareTo(other.sourceId) != 0
-                ? this.sourceId.compareTo(other.sourceId)
-                : this.targetId.compareTo(other.targetId);
+        int sourceComparison = this.sourceId.compareTo(other.sourceId);
+        return sourceComparison != 0 ? sourceComparison : this.targetId.compareTo(other.targetId);
     }
 
     public static TraceLink of(String sourceId, String targetId) {

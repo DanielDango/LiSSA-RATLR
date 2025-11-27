@@ -113,7 +113,7 @@ public abstract class Classifier {
             });
         }
 
-        logger.debug("Waiting for classification to finish. Tasks in queue: {}", taskQueue.size());
+        logger.info("Waiting for classification to finish. Tasks in queue: {}", taskQueue.size());
 
         for (Thread worker : workers) {
             try {

@@ -42,9 +42,14 @@ public class SimpleClassifier extends Classifier {
 
             Answer with 'yes' or 'no'.
             """;
-
+    /**
+     * The identifier used for this classifier type in configuration and caching.
+     */
     public static final String SIMPLE_CLASSIFIER_NAME = "simple";
 
+    /**
+     * The cache used for storing classification results.
+     */
     private final Cache cache;
 
     /**
@@ -60,7 +65,7 @@ public class SimpleClassifier extends Classifier {
     /**
      * The template used for classification requests.
      */
-    private String template;
+    private volatile String template;
 
     /**
      * Creates a new simple classifier with the specified configuration.
@@ -113,10 +118,7 @@ public class SimpleClassifier extends Classifier {
     @Override
     public SortedMap<String, String> getCacheParameters() {
         SortedMap<String, String> providerParams = provider.getCacheParameters();
-        TreeMap<String, String> params = new TreeMap<>(providerParams);
-        // TODO: Why are classifiers needed here?
-        params.put("classifier", SIMPLE_CLASSIFIER_NAME);
-        return params;
+        return new TreeMap<>(providerParams);
     }
 
     /**

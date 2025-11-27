@@ -23,7 +23,6 @@ import edu.kit.kastel.sdq.lissa.ratlr.utils.KeyGenerator;
  * @param content The content that was processed in the cached operation.
  * @param localKey A local key for additional identification, not included in JSON serialization.
  */
-// TODO: Technically, this cache key is for classifiers (chat) or embeddings.
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record EmbeddingCacheKey(

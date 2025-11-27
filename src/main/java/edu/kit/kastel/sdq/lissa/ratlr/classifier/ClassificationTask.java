@@ -42,13 +42,14 @@ public record ClassificationTask(Element source, Element target, boolean label)
      */
     @Override
     public int compareTo(ClassificationTask other) {
-        if (this.source.getIdentifier().equals(other.source.getIdentifier())) {
-            if (this.target.getIdentifier().equals(other.target.getIdentifier())) {
-                return Boolean.compare(this.label, other.label);
-            } else {
-                return this.target.getIdentifier().compareTo(other.target.getIdentifier());
-            }
+        int sourceComparison = this.source.getIdentifier().compareTo(other.source.getIdentifier());
+        if (sourceComparison != 0) {
+            return sourceComparison;
         }
-        return this.source.getIdentifier().compareTo(other.source.getIdentifier());
+        int targetComparison = this.target.getIdentifier().compareTo(other.target.getIdentifier());
+        if (targetComparison != 0) {
+            return targetComparison;
+        }
+        return Boolean.compare(this.label, other.label);
     }
 }
