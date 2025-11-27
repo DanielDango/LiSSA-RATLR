@@ -3,6 +3,7 @@ package edu.kit.kastel.sdq.lissa.ratlr;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -20,6 +21,7 @@ import edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore;
 import edu.kit.kastel.sdq.lissa.ratlr.elementstore.SourceElementStore;
 import edu.kit.kastel.sdq.lissa.ratlr.elementstore.TargetElementStore;
 import edu.kit.kastel.sdq.lissa.ratlr.embeddingcreator.EmbeddingCreator;
+import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Artifact;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.TraceLink;
 import edu.kit.kastel.sdq.lissa.ratlr.postprocessor.TraceLinkIdPostprocessor;
@@ -86,15 +88,11 @@ public class Evaluation {
     /**
      * List of source elements processed in this evaluation.
      */
-    private List<Element> sourceElements;
+    private List<Element> sourceElements = new ArrayList<>();
     /**
      * List of target elements processed in this evaluation.
      */
-    private List<Element> targetElements;
-    /** Number of source artifacts */
-    private int sourceArtifactsSize;
-    /** Number of target artifacts */
-    private int targetArtifactsSize;
+    private List<Element> targetElements = new ArrayList<>();
 
     /**
      * Creates a new evaluation instance with the specified configuration file.
@@ -139,8 +137,6 @@ public class Evaluation {
 
         sourceArtifactProvider =
                 ArtifactProvider.createArtifactProvider(configuration.sourceArtifactProvider(), contextStore);
-        sourceElements = List.of();
-        targetElements = List.of();
         targetArtifactProvider =
                 ArtifactProvider.createArtifactProvider(configuration.targetArtifactProvider(), contextStore);
 
@@ -187,7 +183,7 @@ public class Evaluation {
 
         logger.info("Evaluating Results");
         Statistics.generateStatistics(
-                traceLinks, configFile.toFile(), configuration, sourceArtifactsSize, targetArtifactsSize);
+                traceLinks, configFile.toFile(), configuration, getSourceArtifactCount(), getTargetArtifactCount());
         Statistics.saveTraceLinks(traceLinks, configFile.toFile(), configuration);
 
         CacheManager.getDefaultInstance().flush();
@@ -207,19 +203,16 @@ public class Evaluation {
      */
     /*package-private*/ void initializeSourceAndTargetStores() {
         logger.info("Loading artifacts");
-        var sourceArtifacts = sourceArtifactProvider.getArtifacts();
-        var targetArtifacts = targetArtifactProvider.getArtifacts();
-
-        sourceArtifactsSize = sourceArtifacts.size();
-        targetArtifactsSize = targetArtifacts.size();
+        List<Artifact> sourceArtifacts = sourceArtifactProvider.getArtifacts();
+        List<Artifact> targetArtifacts = targetArtifactProvider.getArtifacts();
 
         logger.info("Preprocessing artifacts");
         sourceElements = sourcePreprocessor.preprocess(sourceArtifacts);
         targetElements = targetPreprocessor.preprocess(targetArtifacts);
 
         logger.info("Calculating embeddings");
-        var sourceEmbeddings = embeddingCreator.calculateEmbeddings(sourceElements);
-        var targetEmbeddings = embeddingCreator.calculateEmbeddings(targetElements);
+        List<float[]> sourceEmbeddings = embeddingCreator.calculateEmbeddings(sourceElements);
+        List<float[]> targetEmbeddings = embeddingCreator.calculateEmbeddings(targetElements);
 
         logger.info("Building element stores");
         sourceStore.setup(sourceElements, sourceEmbeddings);
