@@ -255,6 +255,10 @@ public class Evaluation {
 
     /**
      * Gets the source element store.
+     * <p>
+     * Note: The store is initialized after construction but will be empty
+     * until {@link #initializeSourceAndTargetStores()} is called.
+     * </p>
      *
      * @return The source element store
      */
@@ -264,6 +268,10 @@ public class Evaluation {
 
     /**
      * Gets the target element store.
+     * <p>
+     * Note: The store is initialized after construction but will be empty
+     * until {@link #initializeSourceAndTargetStores()} is called.
+     * </p>
      *
      * @return The target element store
      */
@@ -273,6 +281,9 @@ public class Evaluation {
 
     /**
      * Gets the classifier used for trace link analysis.
+     * <p>
+     * Note: Available after construction completes.
+     * </p>
      *
      * @return The classifier
      */
@@ -282,6 +293,9 @@ public class Evaluation {
 
     /**
      * Gets the result aggregator.
+     * <p>
+     * Note: Available after construction completes.
+     * </p>
      *
      * @return The result aggregator
      */
@@ -291,6 +305,9 @@ public class Evaluation {
 
     /**
      * Gets the trace link ID postprocessor.
+     * <p>
+     * Note: Available after construction completes.
+     * </p>
      *
      * @return The trace link ID postprocessor
      */

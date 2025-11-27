@@ -17,9 +17,9 @@ import edu.kit.kastel.sdq.lissa.ratlr.utils.KeyGenerator;
  * Please always use the {@link #of(String, String)} method to create a new instance.
  *
  * @param model The identifier of the model used for the cached operation.
- * @param seed The seed value used for randomization in the cached operation (-1 for donwardcompatibility).
- * @param temperature The temperature setting used in the cached operation (-1 for donwardcompatibility).
- * @param mode The mode of operation that was cached (embedding generation for donwardcompatibility).
+ * @param seed The seed value used for randomization in the cached operation (-1 for backward compatibility).
+ * @param temperature The temperature setting used in the cached operation (-1 for backward compatibility).
+ * @param mode The mode of operation that was cached (embedding generation for backward compatibility).
  * @param content The content that was processed in the cached operation.
  * @param localKey A local key for additional identification, not included in JSON serialization.
  */

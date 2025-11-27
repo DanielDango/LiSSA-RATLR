@@ -47,6 +47,9 @@ public interface Cache {
      * Returns true if this map contains a mapping for the specified key.
      * More formally, returns true if and only if this map contains a mapping for a key k such that Objects.equals(key, k).
      * (There can be at most one such mapping.)
+     *
+     * @param key The cache key to check for existence
+     * @return true if this map contains a mapping for the specified key
      */
     boolean containsKey(CacheKey key);
 }

@@ -143,6 +143,11 @@ public abstract class ElementStore {
         return elements;
     }
 
+    /**
+     * Retrieves the number of elements in the store.
+     *
+     * @return The number of elements in the store
+     */
     protected int size() {
         return elementsWithEmbedding.size();
     }
