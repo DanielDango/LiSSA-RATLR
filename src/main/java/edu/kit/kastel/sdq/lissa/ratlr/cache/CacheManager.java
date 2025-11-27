@@ -21,10 +21,15 @@ public final class CacheManager {
      */
     public static final String DEFAULT_CACHE_DIRECTORY = "cache";
 
+    /**
+     * The default strategy for handling cache conflicts between local and Redis caches.
+     * When true, Redis values take precedence over local cache values in case of conflicts.
+     */
+    private static final boolean DEFAULT_REPLACE_LOCAL_CACHE_ON_CONFLICT = true;
+
     private static @Nullable CacheManager defaultInstanceManager;
     private final Path directoryOfCaches;
     private final Map<String, RedisCache> caches = new HashMap<>();
-    private final boolean replaceLocalCacheOnConflict;
 
     /**
      * Sets the cache directory for the default cache manager instance.
@@ -51,7 +56,6 @@ public final class CacheManager {
             throw new IllegalArgumentException("path is not a directory: " + cacheDir);
         }
         this.directoryOfCaches = cacheDir;
-        this.replaceLocalCacheOnConflict = true;
     }
 
     /**
@@ -103,7 +107,7 @@ public final class CacheManager {
         }
 
         LocalCache localCache = new LocalCache(directoryOfCaches + "/" + name + (appendEnding ? ".json" : ""));
-        RedisCache cache = new RedisCache(localCache, replaceLocalCacheOnConflict);
+        RedisCache cache = new RedisCache(localCache, DEFAULT_REPLACE_LOCAL_CACHE_ON_CONFLICT);
         caches.put(name, cache);
         return cache;
     }

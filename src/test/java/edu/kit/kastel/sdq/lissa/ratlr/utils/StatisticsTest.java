@@ -13,8 +13,6 @@ import edu.kit.kastel.sdq.lissa.ratlr.Statistics;
 
 /**
  * Test class for Statistics utility methods.
- *
- * @author GitHub Copilot (Claude Sonnet 4.5)
  */
 class StatisticsTest {
 

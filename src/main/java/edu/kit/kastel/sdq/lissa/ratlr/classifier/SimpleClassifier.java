@@ -23,7 +23,7 @@ public class SimpleClassifier extends Classifier {
     /**
      * The configuration key for the prompt template.
      */
-    public static final String PROMPT_TEMPLATE_KEY = "template";
+    private static final String PROMPT_TEMPLATE_KEY = "template";
 
     /**
      * The default template for classification requests.
@@ -111,6 +111,11 @@ public class SimpleClassifier extends Classifier {
     @Override
     public void setClassificationPrompt(String prompt) {
         this.template = prompt;
+    }
+
+    @Override
+    public String getClassificationPromptKey() {
+        return PROMPT_TEMPLATE_KEY;
     }
 
     /**

@@ -43,4 +43,10 @@ public class MockClassifier extends Classifier {
     public void setClassificationPrompt(String prompt) {
         // as no classification prompt is used, this method does nothing
     }
+
+    @Override
+    public String getClassificationPromptKey() {
+        // as no classification prompt is used, this method returns an empty string
+        return "";
+    }
 }

@@ -133,13 +133,14 @@ public class Evaluation {
      * @throws IOException If there are issues reading the configuration
      */
     private void setup() throws IOException {
-        // TODO setup uns setup source and target vereinheitlichen.
         CacheManager.setCacheDir(configuration.cacheDir());
 
         ContextStore contextStore = new ContextStore();
 
         sourceArtifactProvider =
                 ArtifactProvider.createArtifactProvider(configuration.sourceArtifactProvider(), contextStore);
+        sourceElements = List.of();
+        targetElements = List.of();
         targetArtifactProvider =
                 ArtifactProvider.createArtifactProvider(configuration.targetArtifactProvider(), contextStore);
 
@@ -175,7 +176,7 @@ public class Evaluation {
      * @return Set of identified trace links
      */
     public Set<TraceLink> run() {
-        setupSourceAndTargetStores();
+        initializeSourceAndTargetStores();
 
         logger.info("Classifying Tracelinks");
         var llmResults = classifier.classify(sourceStore, targetStore);
@@ -204,7 +205,7 @@ public class Evaluation {
      *     <li>Builds element stores with elements and embeddings</li>
      * </ol>
      */
-    /*package-private*/ void setupSourceAndTargetStores() {
+    /*package-private*/ void initializeSourceAndTargetStores() {
         logger.info("Loading artifacts");
         var sourceArtifacts = sourceArtifactProvider.getArtifacts();
         var targetArtifacts = targetArtifactProvider.getArtifacts();
