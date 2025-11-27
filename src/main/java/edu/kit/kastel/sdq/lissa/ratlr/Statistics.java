@@ -247,6 +247,8 @@ public final class Statistics {
      * @return The escaped text suitable for Markdown
      */
     public static String escapeMarkdown(String text) {
+        boolean needsCodeBlock = text.contains("\n") || text.length() > 80;
+
         // List of Markdown special characters to escape
         String markdownSpecialChars = "\\`*_{}[]()#+-.!|>";
 
@@ -258,7 +260,8 @@ public final class Statistics {
             }
             escaped.append(c);
         }
-        if (escaped.toString().contains("\n") || escaped.length() > 80) {
+
+        if (needsCodeBlock) {
             return "\n```\n" + escaped + "\n```";
         }
         return escaped.toString();

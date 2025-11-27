@@ -28,7 +28,9 @@ import dev.langchain4j.model.chat.response.ChatResponse;
  * using configurable prompts and caching to improve performance.
  */
 public class ReasoningClassifier extends Classifier {
-
+    /**
+     * The identifier used for this classifier type in configuration and caching.
+     */
     public static final String REASONING_CLASSIFIER_NAME = "reasoning";
 
     private final Cache cache;
@@ -46,7 +48,7 @@ public class ReasoningClassifier extends Classifier {
     /**
      * The prompt template used for classification requests.
      */
-    private String prompt;
+    private volatile String prompt;
 
     /**
      * Whether to use original artifacts instead of nested elements.
@@ -117,10 +119,7 @@ public class ReasoningClassifier extends Classifier {
     @Override
     public SortedMap<String, String> getCacheParameters() {
         SortedMap<String, String> providerParams = provider.getCacheParameters();
-        TreeMap<String, String> params = new TreeMap<>(providerParams);
-        // TODO: Why are classifiers needed now?
-        params.put("classifier", REASONING_CLASSIFIER_NAME);
-        return params;
+        return new TreeMap<>(providerParams);
     }
 
     /**

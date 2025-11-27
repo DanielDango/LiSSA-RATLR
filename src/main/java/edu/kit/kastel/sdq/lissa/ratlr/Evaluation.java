@@ -83,9 +83,17 @@ public class Evaluation {
     /** Postprocessor for trace link IDs */
     private TraceLinkIdPostprocessor traceLinkIdPostProcessor;
 
+    /**
+     * List of source elements processed in this evaluation.
+     */
     private List<Element> sourceElements;
+    /**
+     * List of target elements processed in this evaluation.
+     */
     private List<Element> targetElements;
+    /** Number of source artifacts */
     private int sourceArtifactsSize;
+    /** Number of target artifacts */
     private int targetArtifactsSize;
 
     /**
@@ -185,6 +193,16 @@ public class Evaluation {
         return traceLinks;
     }
 
+    /**
+     * Sets up the source and target element stores.
+     * This method:
+     * <ol>
+     *     <li>Loads artifacts from source and target providers</li>
+     *     <li>Preprocesses artifacts into elements</li>
+     *     <li>Calculates embeddings for elements</li>
+     *     <li>Builds element stores with elements and embeddings</li>
+     * </ol>
+     */
     /*package-private*/ void setupSourceAndTargetStores() {
         logger.info("Loading artifacts");
         var sourceArtifacts = sourceArtifactProvider.getArtifacts();

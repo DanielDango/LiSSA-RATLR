@@ -40,6 +40,9 @@ class RedisCache implements Cache {
      */
     private @Nullable UnifiedJedis jedis;
 
+    /**
+     * Flag indicating whether to replace local cache entries on conflict with Redis values.
+     */
     private final boolean replaceLocalCacheOnConflict;
 
     /**
@@ -99,8 +102,9 @@ class RedisCache implements Cache {
      * falls back to the local cache.
      * If the value is found in the local cache and Redis is available, it will be synchronized to Redis.
      * If the value is found in Redis and the local cache is available, it will be synchronized to the local cache.
-     * In case of a mismatch between Redis and local cache values, a warning is logged and the replacement strategy is
-     * applied.
+     * In case of a mismatch between Redis and local cache values, a warning is logged and the replacement strategy
+     * is applied: if {@link #replaceLocalCacheOnConflict} is true, the Redis value takes precedence and replaces
+     * the local cache value; otherwise, the local cache value is returned without modification.
      *
      * @param <T> The type to deserialize the value to
      * @param key The cache key to look up
@@ -119,10 +123,8 @@ class RedisCache implements Cache {
             localCache.put(key, jsonData);
         }
         // Value is in local cache but not in redis cache
-        if (localData != null && jsonData == null) {
-            if (jedis != null) {
-                jedis.hset(key.toJsonKey(), "data", localData);
-            }
+        if (localData != null && jsonData == null && jedis != null) {
+            jedis.hset(key.toJsonKey(), "data", localData);
         }
         // Value is in both caches but they differ
         if (replaceLocalCacheOnConflict && jsonData != null && localData != null && !jsonData.equals(localData)) {
