@@ -1,6 +1,7 @@
 /* Licensed under MIT 2025. */
 package edu.kit.kastel.sdq.lissa.ratlr.classifier;
 
+import static edu.kit.kastel.sdq.lissa.ratlr.classifier.MockClassifier.MOCK_CLASSIFIER_NAME;
 import static edu.kit.kastel.sdq.lissa.ratlr.classifier.ReasoningClassifier.REASONING_CLASSIFIER_NAME;
 import static edu.kit.kastel.sdq.lissa.ratlr.classifier.SimpleClassifier.SIMPLE_CLASSIFIER_NAME;
 
@@ -249,8 +250,7 @@ public abstract class Classifier {
      */
     public static Classifier createClassifier(ModuleConfiguration configuration, ContextStore contextStore) {
         return switch (configuration.name().split(CONFIG_NAME_SEPARATOR)[0]) {
-            case "mock" -> new MockClassifier(contextStore);
-            // TODO Mock constant
+            case MOCK_CLASSIFIER_NAME -> new MockClassifier(contextStore);
             case SIMPLE_CLASSIFIER_NAME -> new SimpleClassifier(configuration, contextStore);
             case REASONING_CLASSIFIER_NAME -> new ReasoningClassifier(configuration, contextStore);
             default -> throw new IllegalStateException("Unexpected value: " + configuration.name());

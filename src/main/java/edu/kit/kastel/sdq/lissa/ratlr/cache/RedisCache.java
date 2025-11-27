@@ -104,7 +104,7 @@ class RedisCache implements Cache {
      * If the value is found in Redis and the local cache is available, it will be synchronized to the local cache.
      * In case of a mismatch between Redis and local cache values, a warning is logged and the replacement strategy
      * is applied: if {@link #replaceLocalCacheOnConflict} is true, the Redis value takes precedence and replaces
-     * the local cache value; otherwise, the local cache value is returned without modification.
+     * the local cache value; otherwise, the Redis cache value is returned without modification.
      *
      * @param <T> The type to deserialize the value to
      * @param key The cache key to look up

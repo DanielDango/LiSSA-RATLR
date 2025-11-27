@@ -104,7 +104,7 @@ public class SimpleClassifier extends Classifier {
      * @return A new simple classifier instance with the same configuration
      */
     @Override
-    public final Classifier copyOf() {
+    protected final Classifier copyOf() {
         return new SimpleClassifier(threads, cache, provider, template, contextStore);
     }
 

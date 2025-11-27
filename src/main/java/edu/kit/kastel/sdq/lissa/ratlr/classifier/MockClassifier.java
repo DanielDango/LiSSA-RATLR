@@ -11,6 +11,12 @@ import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
  * This classifier is primarily used for testing and demonstration purposes.
  */
 public class MockClassifier extends Classifier {
+
+    /**
+     * The identifier used for this classifier type in configuration and caching.
+     */
+    public static final String MOCK_CLASSIFIER_NAME = "mock";
+
     /**
      * Creates a new mock classifier instance.
      * The classifier uses a single thread for processing.
@@ -35,7 +41,7 @@ public class MockClassifier extends Classifier {
     }
 
     @Override
-    public Classifier copyOf() {
+    protected Classifier copyOf() {
         return new MockClassifier(contextStore);
     }
 
