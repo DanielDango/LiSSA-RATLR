@@ -59,8 +59,8 @@ public abstract class ElementStore {
         List<Element> elements = new ArrayList<>();
         List<float[]> embeddings = new ArrayList<>();
         for (var pair : content) {
-            var element = pair.first();
-            var embedding = pair.second();
+            Element element = pair.first();
+            float[] embedding = pair.second();
             elements.add(element);
             embeddings.add(Arrays.copyOf(embedding, embedding.length));
         }
