@@ -6,8 +6,6 @@ import static dev.langchain4j.internal.Utils.quoted;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.SortedMap;
-import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -114,12 +112,6 @@ public class ReasoningClassifier extends Classifier {
     @Override
     public void setClassificationPrompt(String prompt) {
         this.prompt = prompt;
-    }
-
-    @Override
-    public SortedMap<String, String> getCacheParameters() {
-        SortedMap<String, String> providerParams = provider.getCacheParameters();
-        return new TreeMap<>(providerParams);
     }
 
     /**

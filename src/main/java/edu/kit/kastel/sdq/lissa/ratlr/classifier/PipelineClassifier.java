@@ -151,12 +151,6 @@ public class PipelineClassifier extends Classifier {
                 "PipelineClassifiers do not support setting a single classification prompt. Configure individual classifiers instead.");
     }
 
-    @Override
-    public SortedMap<String, String> getCacheParameters() {
-        throw new UnsupportedOperationException(
-                "PipelineClassifiers do not support caching directly. Cache individual classifiers instead.");
-    }
-
     /**
      * This method is not supported by the pipeline classifier.
      * The pipeline classifier processes elements through multiple stages and cannot

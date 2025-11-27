@@ -9,7 +9,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.SortedMap;
 import java.util.concurrent.*;
 
 import org.slf4j.Logger;
@@ -193,7 +192,7 @@ public abstract class Classifier {
      *
      * @return A new instance of the same classifier type
      */
-    public abstract Classifier copyOf();
+    protected abstract Classifier copyOf();
 
     /**
      * Sets the prompt used for classification.
@@ -264,12 +263,4 @@ public abstract class Classifier {
             List<List<ModuleConfiguration>> configs, ContextStore contextStore) {
         return new PipelineClassifier(configs, contextStore);
     }
-
-    /**
-     * Gets the parameters that define the uniqueness of this classifier's cache.
-     * These parameters are used to construct a unique cache name for storing classification results.
-     *
-     * @return A map of parameter names to values that define the cache uniqueness
-     */
-    public abstract SortedMap<String, String> getCacheParameters();
 }
