@@ -47,12 +47,13 @@ public class MockClassifier extends Classifier {
 
     @Override
     public void setClassificationPrompt(String prompt) {
-        // as no classification prompt is used, this method does nothing
+        throw new UnsupportedOperationException(
+                "MockClassifier does not support setting a single classification prompt.");
     }
 
     @Override
     public String getClassificationPromptKey() {
-        // as no classification prompt is used, this method returns an empty string
-        return "";
+        throw new UnsupportedOperationException(
+                "MockClassifier does not support retrieving a single classification prompt key.");
     }
 }
