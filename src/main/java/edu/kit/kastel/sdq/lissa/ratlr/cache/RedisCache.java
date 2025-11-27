@@ -120,9 +120,8 @@ class RedisCache implements Cache {
         }
         // Value is in local cache but not in redis cache
         if (localData != null && jsonData == null) {
-            jsonData = localData;
             if (jedis != null) {
-                jedis.hset(key.toJsonKey(), "data", jsonData);
+                jedis.hset(key.toJsonKey(), "data", localData);
             }
         }
         // Value is in both caches but they differ
@@ -131,9 +130,8 @@ class RedisCache implements Cache {
             localCache.put(key, jsonData);
         }
 
-        // TODO: Copilot stresst
-
-        return convert(jsonData, clazz);
+        String valueToReturn = jsonData != null ? jsonData : localData;
+        return convert(valueToReturn, clazz);
     }
 
     /**

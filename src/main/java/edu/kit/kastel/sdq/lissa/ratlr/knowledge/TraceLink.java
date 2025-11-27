@@ -1,8 +1,6 @@
 /* Licensed under MIT 2025. */
 package edu.kit.kastel.sdq.lissa.ratlr.knowledge;
 
-import org.jetbrains.annotations.NotNull;
-
 /**
  * Represents a trace link between two {@link Element Elements} in the LiSSA framework.
  * A trace link establishes a relationship between a source element and a target element,
@@ -12,11 +10,24 @@ import org.jetbrains.annotations.NotNull;
  * @param targetId The unique identifier of the target element
  */
 public record TraceLink(String sourceId, String targetId) implements Comparable<TraceLink> {
+    /**
+     * Compares this trace link to another based on source and target identifiers.
+     * <ul>
+     *     <li>this == other if both source IDs and target IDs are equal.</li>
+     *     <li>this &lt; other if source ID is less, or if source IDs are equal and target ID is less.</li>
+     *     <li>this &gt; other otherwise.</li>
+     * </ul>
+     *
+     * @param other The other trace link to compare to (must not be null).
+     * @return A negative integer, zero, or a positive integer as this trace link is less than,
+     *         equal to, or greater than the specified trace link.
+     * @throws NullPointerException if other is null
+     */
     @Override
-    public int compareTo(@NotNull TraceLink o) {
-        return this.sourceId.compareTo(o.sourceId) != 0
-                ? this.sourceId.compareTo(o.sourceId)
-                : this.targetId.compareTo(o.targetId);
+    public int compareTo(TraceLink other) {
+        return this.sourceId.compareTo(other.sourceId) != 0
+                ? this.sourceId.compareTo(other.sourceId)
+                : this.targetId.compareTo(other.targetId);
     }
 
     public static TraceLink of(String sourceId, String targetId) {

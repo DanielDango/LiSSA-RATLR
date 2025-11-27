@@ -35,9 +35,10 @@ public record ClassificationTask(Element source, Element target, boolean label)
      *     <li>this &gt; other otherwise.</li>
      * </ul>
      *
-     * @param other The other classification task to compare to.
+     * @param other The other classification task to compare to (must not be null).
      * @return A negative integer, zero, or a positive integer as this task is less than,
      *         equal to, or greater than the specified task.
+     * @throws NullPointerException if other is null
      */
     @Override
     public int compareTo(ClassificationTask other) {

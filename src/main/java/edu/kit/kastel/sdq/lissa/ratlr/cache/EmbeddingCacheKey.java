@@ -19,7 +19,7 @@ import edu.kit.kastel.sdq.lissa.ratlr.utils.KeyGenerator;
  * @param model The identifier of the model used for the cached operation.
  * @param seed The seed value used for randomization in the cached operation.
  * @param temperature The temperature setting used in the cached operation.
- * @param mode The mode of operation that was cached (e.g., embedding generation or chat
+ * @param mode The mode of operation that was cached (embedding generation).
  * @param content The content that was processed in the cached operation.
  * @param localKey A local key for additional identification, not included in JSON serialization.
  */

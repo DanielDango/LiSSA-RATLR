@@ -1,7 +1,6 @@
 /* Licensed under MIT 2025. */
 package edu.kit.kastel.sdq.lissa.ratlr.classifier;
 
-import java.util.Map;
 import java.util.Optional;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -113,7 +112,7 @@ public class SimpleClassifier extends Classifier {
 
     @Override
     public SortedMap<String, String> getCacheParameters() {
-        Map<String, String> providerParams = provider.getCacheParameters();
+        SortedMap<String, String> providerParams = provider.getCacheParameters();
         TreeMap<String, String> params = new TreeMap<>(providerParams);
         // TODO: Why are classifiers needed here?
         params.put("classifier", SIMPLE_CLASSIFIER_NAME);
