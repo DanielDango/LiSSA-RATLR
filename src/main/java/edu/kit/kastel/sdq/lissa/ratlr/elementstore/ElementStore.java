@@ -9,8 +9,6 @@ import java.util.Map;
 
 import org.jspecify.annotations.Nullable;
 
-import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
-import edu.kit.kastel.sdq.lissa.ratlr.elementstore.strategy.RetrievalStrategy;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.Pair;
 
@@ -42,20 +40,8 @@ public abstract class ElementStore {
 
     /**
      * Creates a new element store for the LiSSA framework.
-     *
-     * @param configuration The configuration of the module
-     * @param similarityRetriever Whether this store should be a target store (true) or source store (false).
-     *                           Target stores support similarity search but limit results.
-     *                           Source stores allow retrieving all elements but don't support similarity search.
-     * @throws IllegalArgumentException If max_results is less than 1 in target store mode
      */
-    // TODO: Nur im Target Store
-    protected ElementStore(ModuleConfiguration configuration, boolean similarityRetriever) {
-        if (!similarityRetriever && !"custom".equals(configuration.name())) {
-            RetrievalStrategy.logger.error(
-                    "The element store is created in source store mode, but the retrieval strategy is not set to \"custom\". This is likely a configuration error as source stores do not use retrieval strategies.");
-        }
-
+    protected ElementStore() {
         elementsWithEmbedding = new ArrayList<>();
         idToElementWithEmbedding = new HashMap<>();
     }

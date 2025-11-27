@@ -27,7 +27,7 @@ public class TargetElementStore extends ElementStore {
     private final RetrievalStrategy retrievalStrategy;
 
     public TargetElementStore(ModuleConfiguration moduleConfiguration) {
-        super(moduleConfiguration, true);
+        super();
         this.retrievalStrategy = RetrievalStrategy.createStrategy(moduleConfiguration);
     }
 

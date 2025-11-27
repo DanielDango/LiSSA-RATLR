@@ -33,7 +33,6 @@ import edu.kit.kastel.sdq.lissa.ratlr.utils.Pair;
  * </p>
  */
 public abstract class Classifier {
-    // TODO Get prompt template key
     /**
      * Separator used in configuration names.
      */
@@ -201,6 +200,13 @@ public abstract class Classifier {
      * @param prompt The prompt template to use for classification
      */
     public abstract void setClassificationPrompt(String prompt);
+
+    /**
+     * Gets the key used to set the classification prompt in configurations.
+     *
+     * @return The classification prompt key
+     */
+    public abstract String getClassificationPromptKey();
 
     /**
      * Creates a list of classification tasks from source and target element stores.

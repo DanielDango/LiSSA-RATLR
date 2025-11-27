@@ -126,7 +126,7 @@ class RedisCache implements Cache {
         if (localData != null && jsonData == null && jedis != null) {
             jedis.hset(key.toJsonKey(), "data", localData);
         }
-        // Value is in both caches but they differ
+        // Value is in both caches, but they differ
         if (replaceLocalCacheOnConflict && jsonData != null && localData != null && !jsonData.equals(localData)) {
             logger.info("Cache inconsistency detected for key {}, using Redis value and replacing local one", key);
             localCache.put(key, jsonData);

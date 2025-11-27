@@ -31,6 +31,11 @@ public class ReasoningClassifier extends Classifier {
      */
     public static final String REASONING_CLASSIFIER_NAME = "reasoning";
 
+    /**
+     * The configuration key for the classification prompt.
+     */
+    private static final String CLASSIFICATION_PROMPT_KEY = "prompt";
+
     private final Cache cache;
 
     /**
@@ -69,7 +74,10 @@ public class ReasoningClassifier extends Classifier {
         this.provider = new ChatLanguageModelProvider(configuration);
         this.cache = CacheManager.getDefaultInstance().getCache(this, provider.getCacheParameters());
         this.prompt = configuration.argumentAsStringByEnumIndex(
-                "prompt", 0, ReasoningClassifierPrompt.values(), ReasoningClassifierPrompt::getPromptTemplate);
+                CLASSIFICATION_PROMPT_KEY,
+                0,
+                ReasoningClassifierPrompt.values(),
+                ReasoningClassifierPrompt::getPromptTemplate);
         this.useOriginalArtifacts = configuration.argumentAsBoolean("use_original_artifacts", false);
         this.useSystemMessage = configuration.argumentAsBoolean("use_system_message", true);
         this.llm = this.provider.createChatModel();
@@ -114,6 +122,10 @@ public class ReasoningClassifier extends Classifier {
         this.prompt = prompt;
     }
 
+    @Override
+    public String getClassificationPromptKey() {
+        return CLASSIFICATION_PROMPT_KEY;
+    }
     /**
      * Classifies a pair of elements by using the language model to reason about their relationship.
      * The classification result is cached to avoid redundant LLM calls.

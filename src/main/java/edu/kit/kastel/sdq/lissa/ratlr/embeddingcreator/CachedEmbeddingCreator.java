@@ -177,7 +177,7 @@ abstract class CachedEmbeddingCreator extends EmbeddingCreator {
     private static float[] calculateFinalEmbedding(
             EmbeddingModel embeddingModel, Cache cache, String rawNameOfModel, Element element) {
 
-        EmbeddingCacheKey cacheKey = EmbeddingCacheKey.of(rawNameOfModel, -1, -1, element.getContent());
+        EmbeddingCacheKey cacheKey = EmbeddingCacheKey.of(rawNameOfModel, element.getContent());
 
         float[] cachedEmbedding = cache.get(cacheKey, float[].class);
         if (cachedEmbedding != null) {
@@ -217,8 +217,8 @@ abstract class CachedEmbeddingCreator extends EmbeddingCreator {
 
         // We need the old keys for backwards compatibility
         @SuppressWarnings("deprecation")
-        EmbeddingCacheKey newCacheKey = EmbeddingCacheKey.ofRaw(
-                rawNameOfModel, -1, -1, "(FIXED::%d): %s".formatted(MAX_TOKEN_LENGTH, content), newKey);
+        EmbeddingCacheKey newCacheKey =
+                EmbeddingCacheKey.ofRaw(rawNameOfModel, "(FIXED::%d): %s".formatted(MAX_TOKEN_LENGTH, content), newKey);
 
         float[] cachedEmbedding = cache.get(newCacheKey, float[].class);
         if (cachedEmbedding != null) {

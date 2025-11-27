@@ -14,12 +14,12 @@ import edu.kit.kastel.sdq.lissa.ratlr.utils.KeyGenerator;
  * <p>
  * The key can be serialized to JSON for storage and retrieval from the cache.
  * <p>
- * Please always use the {@link #of(String, int, double, String)} method to create a new instance.
+ * Please always use the {@link #of(String, String)} method to create a new instance.
  *
  * @param model The identifier of the model used for the cached operation.
- * @param seed The seed value used for randomization in the cached operation.
- * @param temperature The temperature setting used in the cached operation.
- * @param mode The mode of operation that was cached (embedding generation).
+ * @param seed The seed value used for randomization in the cached operation (-1 for donwardcompatibility).
+ * @param temperature The temperature setting used in the cached operation (-1 for donwardcompatibility).
+ * @param mode The mode of operation that was cached (embedding generation for donwardcompatibility).
  * @param content The content that was processed in the cached operation.
  * @param localKey A local key for additional identification, not included in JSON serialization.
  */
@@ -29,31 +29,23 @@ public record EmbeddingCacheKey(
         String model,
         int seed,
         double temperature,
-        // TODO rmeove unused parameters and overwrite toJson for downwardscompatibility, same for Mode
-        // TODO instead of json remove them from of / raw constructor. Mention in doc
         LargeLanguageModelCacheMode mode,
         String content,
         @JsonIgnore String localKey)
         implements CacheKey {
 
-    public static EmbeddingCacheKey of(String model, int seed, double temperature, String content) {
+    public static EmbeddingCacheKey of(String model, String content) {
         return new EmbeddingCacheKey(
-                model,
-                seed,
-                temperature,
-                LargeLanguageModelCacheMode.EMBEDDING,
-                content,
-                KeyGenerator.generateKey(content));
+                model, -1, -1, LargeLanguageModelCacheMode.EMBEDDING, content, KeyGenerator.generateKey(content));
     }
 
     /**
      * Only use this method if you want to use a custom local key. You mostly do not want to do this. Only for special handling of embeddings.
-     * You should always prefer the {@link #of(String, int, double, String)} method.
-     * @deprecated please use {@link #of(String, int, double, String)} instead.
+     * You should always prefer the {@link #of(String, String)} method.
+     * @deprecated please use {@link #of(String, String)} instead.
      */
     @Deprecated(forRemoval = false)
-    public static EmbeddingCacheKey ofRaw(String model, int seed, double temperature, String content, String localKey) {
-        return new EmbeddingCacheKey(
-                model, seed, temperature, LargeLanguageModelCacheMode.EMBEDDING, content, localKey);
+    public static EmbeddingCacheKey ofRaw(String model, String content, String localKey) {
+        return new EmbeddingCacheKey(model, -1, -1, LargeLanguageModelCacheMode.EMBEDDING, content, localKey);
     }
 }

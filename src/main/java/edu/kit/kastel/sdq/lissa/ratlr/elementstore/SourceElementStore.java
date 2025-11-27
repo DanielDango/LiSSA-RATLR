@@ -4,6 +4,7 @@ package edu.kit.kastel.sdq.lissa.ratlr.elementstore;
 import java.util.List;
 
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
+import edu.kit.kastel.sdq.lissa.ratlr.elementstore.strategy.RetrievalStrategy;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.Pair;
 
@@ -26,7 +27,11 @@ public class SourceElementStore extends ElementStore {
      * @param moduleConfiguration The configuration of the module
      */
     public SourceElementStore(ModuleConfiguration moduleConfiguration) {
-        super(moduleConfiguration, false);
+        super();
+        if (!"custom".equals(moduleConfiguration.name())) {
+            RetrievalStrategy.logger.error(
+                    "The element store is created in source store mode, but the retrieval strategy is not set to \"custom\". This is likely a configuration error as source stores do not use retrieval strategies.");
+        }
     }
 
     /**

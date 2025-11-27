@@ -28,6 +28,7 @@ import picocli.CommandLine;
         description = "Invokes the pipeline and evaluates it")
 public class EvaluateCommand implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(EvaluateCommand.class);
+    private static final int MAX_RECURSION_DEPTH = 50;
 
     /**
      * Array of configuration file paths to be processed.
@@ -101,7 +102,7 @@ public class EvaluateCommand implements Runnable {
     private static void addSpecifiedConfigPaths(List<Path> configsToEvaluate, Path[] configs) {
         assert configs != null;
         for (Path configPath : configs) {
-            addSpecifiedConfigPaths(configsToEvaluate, configPath);
+            addSpecifiedConfigPaths(configsToEvaluate, configPath, 0);
         }
     }
 
@@ -112,8 +113,14 @@ public class EvaluateCommand implements Runnable {
      *
      * @param configsToEvaluate The list to which configuration files will be added
      * @param configPath The path to a configuration file or directory
+     * @param depth Current recursion depth
      */
-    private static void addSpecifiedConfigPaths(List<Path> configsToEvaluate, Path configPath) {
+    private static void addSpecifiedConfigPaths(List<Path> configsToEvaluate, Path configPath, int depth) {
+        if (depth > MAX_RECURSION_DEPTH) {
+            logger.warn("Maximum recursion depth exceeded for path '{}', skipping", configPath);
+            return;
+        }
+
         if (Files.notExists(configPath)) {
             logger.warn("Specified config path '{}' does not exist", configPath);
             return;
@@ -123,13 +130,13 @@ public class EvaluateCommand implements Runnable {
             configsToEvaluate.add(configPath);
             return;
         }
-        // TODO Carefull, not fully save
+
         try (DirectoryStream<Path> configDir = Files.newDirectoryStream(configPath)) {
             for (Path configDirEntry : configDir) {
                 if (!Files.isDirectory(configDirEntry)) {
                     configsToEvaluate.add(configDirEntry);
                 } else {
-                    addSpecifiedConfigPaths(configsToEvaluate, configDirEntry);
+                    addSpecifiedConfigPaths(configsToEvaluate, configDirEntry, depth + 1);
                 }
             }
         } catch (IOException e) {

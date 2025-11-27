@@ -151,6 +151,12 @@ public class PipelineClassifier extends Classifier {
                 "PipelineClassifiers do not support setting a single classification prompt. Configure individual classifiers instead.");
     }
 
+    @Override
+    public String getClassificationPromptKey() {
+        throw new UnsupportedOperationException(
+                "PipelineClassifiers do not support retrieving a single classification prompt key. Access individual classifiers instead.");
+    }
+
     /**
      * This method is not supported by the pipeline classifier.
      * The pipeline classifier processes elements through multiple stages and cannot
