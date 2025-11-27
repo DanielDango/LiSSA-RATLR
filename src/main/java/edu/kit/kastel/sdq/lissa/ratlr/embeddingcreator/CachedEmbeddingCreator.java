@@ -222,7 +222,9 @@ abstract class CachedEmbeddingCreator extends EmbeddingCreator {
 
         float[] cachedEmbedding = cache.get(newCacheKey, float[].class);
         if (cachedEmbedding != null) {
-            STATIC_LOGGER.info("using fixed embedding for: {}", key.localKey());
+            if (STATIC_LOGGER.isInfoEnabled()) {
+                STATIC_LOGGER.info("using fixed embedding for: {}", key.localKey());
+            }
             return cachedEmbedding;
         }
         EncodingRegistry registry = Encodings.newDefaultEncodingRegistry();
@@ -249,7 +251,9 @@ abstract class CachedEmbeddingCreator extends EmbeddingCreator {
         }
         String fixedContent = content.substring(0, left);
         float[] embedding = embeddingModel.embed(fixedContent).content().vector();
-        STATIC_LOGGER.info("using fixed embedding for: {}", key.localKey());
+        if (STATIC_LOGGER.isInfoEnabled()) {
+            STATIC_LOGGER.info("using fixed embedding for: {}", key.localKey());
+        }
         cache.put(newCacheKey, embedding);
         return embedding;
     }

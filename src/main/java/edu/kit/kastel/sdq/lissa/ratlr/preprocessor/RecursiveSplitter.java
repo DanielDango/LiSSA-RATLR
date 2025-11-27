@@ -126,8 +126,7 @@ class RecursiveSplitter {
             int _len = d.length();
             if (total + _len + (!currentDoc.isEmpty() ? separatorLen : 0) > chunkSize) {
                 if (total > chunkSize) {
-                    logger.warn(
-                            "Created a chunk of size " + total + " which is greater than the chunk size " + chunkSize);
+                    logger.warn("Created a chunk of size {} which is greater than the chunk size {}", total, chunkSize);
                 }
                 if (!currentDoc.isEmpty()) {
                     String doc = joinDocs(currentDoc, separator);
