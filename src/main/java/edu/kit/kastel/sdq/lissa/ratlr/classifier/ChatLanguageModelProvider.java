@@ -5,8 +5,6 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Base64;
 import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 import edu.kit.kastel.sdq.lissa.ratlr.configuration.ModuleConfiguration;
 import edu.kit.kastel.sdq.lissa.ratlr.utils.Environment;
@@ -303,22 +301,15 @@ public class ChatLanguageModelProvider {
      * Returns the parameters used to create the cache key for this model.
      * This method is used to identify the cache uniquely.
      *
-     * @return A sorted map of strings representing the cache parameters
+     * @return An array of strings representing the cache parameters
      * @see edu.kit.kastel.sdq.lissa.ratlr.cache.CacheManager#getCache(Object, String[])
      */
-    public SortedMap<String, String> getCacheParameters() {
-        // TODO be real careful here (downward) and consider if you actually need this
+    public String[] getCacheParameters() {
         if (temperature == 0.0) {
             // Backwards compatibility with the old mode that did not have temperature
-            return new TreeMap<>(Map.of("modelName", modelName(), "seed", String.valueOf(seed())));
+            return new String[] {modelName(), String.valueOf(seed())};
         } else {
-            return new TreeMap<>(Map.of(
-                    "modelName",
-                    modelName(),
-                    "seed",
-                    String.valueOf(seed()),
-                    "temperature",
-                    String.valueOf(temperature())));
+            return new String[] {modelName(), String.valueOf(seed()), String.valueOf(temperature())};
         }
     }
 }

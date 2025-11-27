@@ -1,9 +1,7 @@
 /* Licensed under MIT 2025. */
 package edu.kit.kastel.sdq.lissa.ratlr.classifier;
 
-import java.util.Collections;
 import java.util.Optional;
-import java.util.SortedMap;
 
 import edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
@@ -44,10 +42,5 @@ public class MockClassifier extends Classifier {
     @Override
     public void setClassificationPrompt(String prompt) {
         // as no classification prompt is used, this method does nothing
-    }
-
-    @Override
-    public SortedMap<String, String> getCacheParameters() {
-        return Collections.emptySortedMap();
     }
 }
