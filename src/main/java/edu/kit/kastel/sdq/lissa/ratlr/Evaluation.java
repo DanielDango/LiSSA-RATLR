@@ -1,9 +1,6 @@
 /* Licensed under MIT 2025. */
 package edu.kit.kastel.sdq.lissa.ratlr;
 
-import static edu.kit.kastel.sdq.lissa.ratlr.classifier.Classifier.CONFIG_NAME_SEPARATOR;
-import static edu.kit.kastel.sdq.lissa.ratlr.classifier.SimpleClassifier.PROMPT_TEMPLATE_KEY;
-
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
@@ -83,7 +80,6 @@ public class Evaluation {
     private Classifier classifier;
     /** Aggregator for classification results */
     private ResultAggregator aggregator;
-
     /** Postprocessor for trace link IDs */
     private TraceLinkIdPostprocessor traceLinkIdPostProcessor;
 
@@ -108,24 +104,7 @@ public class Evaluation {
     public Evaluation(Path configFile) throws IOException {
         this.configFile = Objects.requireNonNull(configFile);
         configuration = new ObjectMapper().readValue(configFile.toFile(), Configuration.class);
-        setup("");
-    }
-
-    /**
-     * Creates a new evaluation instance with the specified configuration object.
-     * This constructor:
-     * <ol>
-     *     <li>Initializes the configuration</li>
-     *     <li>Sets up all required components for the pipeline, sharing a {@link ContextStore}</li>
-     * </ol>
-     * @param config The configuration object
-     * @throws IOException If there are issues setting up the cache
-     */
-    public Evaluation(Configuration config) throws IOException {
-        this.configuration = config;
-        // TODO maybe dont?
-        this.configFile = null;
-        setup("");
+        setup();
     }
 
     /**
@@ -145,7 +124,7 @@ public class Evaluation {
      *
      * @throws IOException If there are issues reading the configuration
      */
-    private void setup(String prompt) throws IOException {
+    private void setup() throws IOException {
         CacheManager.setCacheDir(configuration.cacheDir());
 
         ContextStore contextStore = new ContextStore();
@@ -161,20 +140,6 @@ public class Evaluation {
         embeddingCreator = EmbeddingCreator.createEmbeddingCreator(configuration.embeddingCreator(), contextStore);
         sourceStore = new SourceElementStore(configuration.sourceStore());
         targetStore = new TargetElementStore(configuration.targetStore());
-        // TODO: careful, this is a hack to allow the optimization to overwrite the prompt and store it to the config
-        //  for serialization. Maybe you can utilize ModuleConfiguration.with() instead?
-        if (!prompt.isEmpty()) {
-            switch (configuration.classifier().name().split(CONFIG_NAME_SEPARATOR)[0]) {
-                case "mock" -> {
-                    // MockClassifier does not use prompts
-                }
-                case "simple" -> configuration.classifier().setArgument(PROMPT_TEMPLATE_KEY, prompt);
-                case "reasoning" -> configuration.classifier().setArgument("prompt", prompt);
-                default ->
-                    throw new IllegalStateException(
-                            "Unexpected value: " + configuration.classifier().name());
-            }
-        }
         classifier = configuration.createClassifier(contextStore);
         aggregator = ResultAggregator.createResultAggregator(configuration.resultAggregator(), contextStore);
 
