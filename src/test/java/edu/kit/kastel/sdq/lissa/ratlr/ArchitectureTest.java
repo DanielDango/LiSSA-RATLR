@@ -17,7 +17,7 @@ import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.lang.ArchRule;
 
 import edu.kit.kastel.sdq.lissa.cli.command.OptimizeCommand;
-import edu.kit.kastel.sdq.lissa.ratlr.cache.ClassifierCacheKey;
+import edu.kit.kastel.sdq.lissa.ratlr.cache.CacheKey;
 import edu.kit.kastel.sdq.lissa.ratlr.classifier.Classifier;
 import edu.kit.kastel.sdq.lissa.ratlr.promptmetric.Metric;
 import edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.PromptOptimizer;
@@ -89,26 +89,26 @@ class ArchitectureTest {
             .because("Lambdas should be functional. ForEach is typically used for side-effects.");
 
     /**
-     * CacheKeys should only be created using the #of method of the ClassifierCacheKey class.
+     * CacheKeys should only be created using the #of method of the CacheKey class.
      */
     @ArchTest
     static final ArchRule cacheKeysShouldBeCreatedUsingKeyGenerator = noClasses()
             .that()
-            .haveNameNotMatching(ClassifierCacheKey.class.getName())
+            .haveNameNotMatching(CacheKey.class.getName())
             .should()
-            .callConstructorWhere(new DescribedPredicate<JavaConstructorCall>("calls ClassifierCacheKey constructor") {
+            .callConstructorWhere(new DescribedPredicate<JavaConstructorCall>("calls CacheKey constructor") {
                 @Override
                 public boolean test(JavaConstructorCall javaConstructorCall) {
                     return javaConstructorCall
                             .getTarget()
                             .getOwner()
                             .getFullName()
-                            .equals(ClassifierCacheKey.class.getName());
+                            .equals(CacheKey.class.getName());
                 }
             });
 
     /**
-     * Prompts for classifiers should only be modified by optimizers or smetricscorers. Otherwise, there will be
+     * Prompts for classifiers should only be modified by optimizers or metric scorers. Otherwise, there will be
      * inconsistencies with the configuration file.
      */
     @ArchTest

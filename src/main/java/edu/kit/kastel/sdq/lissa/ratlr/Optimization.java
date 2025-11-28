@@ -24,7 +24,7 @@ import edu.kit.kastel.sdq.lissa.ratlr.promptoptimizer.PromptOptimizer;
 
 /**
  * Represents a single prompt optimization run of the LiSSA framework.
- * This class utilised the general {@link Evaluation} pipeline and extends it by an optimization step at the end.
+ * This class utilizes the general {@link Evaluation} pipeline and extends it by an optimization step at the end.
  * The pipeline adds these steps:
  * <ol>
  *     <li>Optimizes the prompt</li>

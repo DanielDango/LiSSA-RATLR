@@ -268,7 +268,7 @@ public final class Statistics {
             String configurationIdentifier, String configurationSummary, String prompt) throws UncheckedIOException {
 
         // Store information to one file (config and results)
-        var resultFile = new File("results-prompt-optimization" + configurationIdentifier + ".md");
+        var resultFile = new File("results-prompt-optimization-" + configurationIdentifier + ".md");
         StringBuilder result = new StringBuilder();
         result.append(configurationToString(configurationIdentifier, configurationSummary));
         result.append("## Stats\n");

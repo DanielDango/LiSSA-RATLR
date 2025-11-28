@@ -9,7 +9,7 @@ import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
  * @param target the target element
  * @param groundTruth the ground truth classification
  * @param classification the classification result
- * @param <T>
+ * @param <T> the type of the classification labels
  */
 public record EvaluationResult<T>(Element source, Element target, T groundTruth, T classification) {
 
@@ -28,7 +28,7 @@ public record EvaluationResult<T>(Element source, Element target, T groundTruth,
     @Override
     public String toString() {
         return String.format(
-                "Source: %s, Target: %s,Ground Truth Label: %s,Classification Label: %s",
+                "Source: %s, Target: %s, Ground Truth Label: %s, Classification Label: %s",
                 source.getIdentifier(), target.getIdentifier(), groundTruth, classification);
     }
 }

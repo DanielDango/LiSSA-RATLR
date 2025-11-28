@@ -104,7 +104,6 @@ public abstract class GlobalMetric implements Metric {
         classifier.setClassificationPrompt(prompt);
         List<ClassificationResult> acceptedTraceLinks = new ArrayList<>();
         List<ClassificationResult> rejectedTraceLinks = new ArrayList<>();
-        new Pair<>(new ArrayList<>(), new ArrayList<>());
 
         for (ClassificationTask task : tasks) {
             Optional<ClassificationResult> result = classifier.classify(task);

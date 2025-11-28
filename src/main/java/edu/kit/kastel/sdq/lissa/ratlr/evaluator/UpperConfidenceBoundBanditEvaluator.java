@@ -101,7 +101,7 @@ public class UpperConfidenceBoundBanditEvaluator extends Evaluator {
      * Implements the UCB and UCB-E algorithms for multi-armed bandit problems.
      * This class maintains counts and scores for each arm (prompt) and selects arms
      */
-    private class UpperConfidenceBoundBandits {
+    private static class UpperConfidenceBoundBandits {
         private final double c;
         private final String mode;
         private final int numPrompts;
@@ -156,7 +156,8 @@ public class UpperConfidenceBoundBanditEvaluator extends Evaluator {
         /**
          * Choose the next set of prompts to evaluate based on the UCB algorithm.
          * @param n The number of prompts to choose.
-         * @param t The current round number. TODO ???
+         * @param t The current round number. Used in the UCB formula to determine the level of exploration versus
+         *          exploitation. Higher values of {@code t} increase the exploration term.
          * @return A list of indices of the chosen prompts.
          */
         public List<Integer> choose(int n, int t) {

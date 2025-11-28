@@ -89,7 +89,7 @@ OPENAI_API_KEY=sk-DUMMY
     void testEnd2EndOptimizers(String configPath, String expectedPrompt) throws Exception {
         File config = new File(configPath);
         Assertions.assertTrue(
-                config.exists(), "The configuration file should exists at %s".formatted(config.getAbsolutePath()));
+                config.exists(), "The configuration file should exist at %s".formatted(config.getAbsolutePath()));
         Optimization optimization = new Optimization(config.toPath());
         String optimizedPrompt = optimization.run();
         String escapedOptimizedPrompt = escapeMarkdown(optimizedPrompt);
@@ -98,6 +98,6 @@ OPENAI_API_KEY=sk-DUMMY
                 expectedPrompt.lines().map(String::strip).toList(),
                 escapedOptimizedPrompt.lines().map(String::strip).toList(),
                 "The optimized prompt does not match every line (regardless of line terminators or leading/trailing "
-                        + "spaces) of of the expected prompt.");
+                        + "spaces) of the expected prompt.");
     }
 }

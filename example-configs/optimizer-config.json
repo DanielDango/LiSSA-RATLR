@@ -45,7 +45,7 @@
       "max_results" : "4"
     }
   },
-  "scorer" : {
+  "metric" : {
     "name" : "mock",
     "args" : {}
   },

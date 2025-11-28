@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,7 +55,7 @@ public final class PromptOptimizationUtils {
      * @param text     The input text to parse
      * @param startTag The starting tag to look for
      * @param endTag   The ending tag to look for
-     * @return         A list possibly empty list of extracted substrings found between the specified tags
+     * @return         A possibly empty list of extracted substrings found between the specified tags
      */
     public static List<String> parseTaggedText(String text, String startTag, String endTag) {
         List<String> texts = new ArrayList<>();
@@ -76,7 +75,6 @@ public final class PromptOptimizationUtils {
      * @param prompt The prompt string to sanitize
      * @return The prompt string without leading/trailing quotes and whitespace
      */
-    @NotNull
     public static String sanitizePrompt(String prompt) {
         // Remove leading and trailing quotes and whitespace
         return REMOVE_LEADING_TRAILING_QUOTES
@@ -91,7 +89,6 @@ public final class PromptOptimizationUtils {
      * @param prompts the list of prompts to sanitize
      * @return        a list of sanitized prompts
      */
-    @NotNull
     public static List<String> sanitizePrompts(Collection<String> prompts) {
         return prompts.stream().map(PromptOptimizationUtils::sanitizePrompt).toList();
     }

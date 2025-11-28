@@ -82,7 +82,6 @@ public class Evaluation {
     private Classifier classifier;
     /** Aggregator for classification results */
     private ResultAggregator aggregator;
-
     /** Postprocessor for trace link IDs */
     private TraceLinkIdPostprocessor traceLinkIdPostProcessor;
 
