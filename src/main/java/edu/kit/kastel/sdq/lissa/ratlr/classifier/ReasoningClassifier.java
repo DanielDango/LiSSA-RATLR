@@ -6,6 +6,8 @@ import static dev.langchain4j.internal.Utils.quoted;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -112,7 +114,7 @@ public class ReasoningClassifier extends Classifier {
     }
 
     @Override
-    protected final Classifier copyOf() {
+    public final Classifier copyOf() {
         return new ReasoningClassifier(
                 threads, cache, provider, prompt, useOriginalArtifacts, useSystemMessage, contextStore);
     }
@@ -126,6 +128,13 @@ public class ReasoningClassifier extends Classifier {
     public String getClassificationPromptKey() {
         return CLASSIFICATION_PROMPT_KEY;
     }
+
+    @Override
+    public SortedMap<String, String> getCacheParameters() {
+        SortedMap<String, String> providerParams = provider.getCacheParameters();
+        return new TreeMap<>(providerParams);
+    }
+
     /**
      * Classifies a pair of elements by using the language model to reason about their relationship.
      * The classification result is cached to avoid redundant LLM calls.

@@ -141,7 +141,7 @@ public class PipelineClassifier extends Classifier {
     }
 
     @Override
-    protected Classifier copyOf() {
+    public Classifier copyOf() {
         return new PipelineClassifier(classifiers, this.threads, this.contextStore);
     }
 
@@ -149,6 +149,12 @@ public class PipelineClassifier extends Classifier {
     public void setClassificationPrompt(String prompt) {
         throw new UnsupportedOperationException(
                 "PipelineClassifiers do not support setting a single classification prompt. Configure individual classifiers instead.");
+    }
+
+    @Override
+    public SortedMap<String, String> getCacheParameters() {
+        throw new UnsupportedOperationException(
+                "PipelineClassifiers do not support caching directly. Cache individual classifiers instead.");
     }
 
     @Override

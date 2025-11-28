@@ -1,7 +1,9 @@
 /* Licensed under MIT 2025. */
 package edu.kit.kastel.sdq.lissa.ratlr.classifier;
 
+import java.util.Collections;
 import java.util.Optional;
+import java.util.SortedMap;
 
 import edu.kit.kastel.sdq.lissa.ratlr.context.ContextStore;
 import edu.kit.kastel.sdq.lissa.ratlr.knowledge.Element;
@@ -41,19 +43,24 @@ public class MockClassifier extends Classifier {
     }
 
     @Override
-    protected Classifier copyOf() {
+    public Classifier copyOf() {
         return new MockClassifier(contextStore);
     }
 
     @Override
     public void setClassificationPrompt(String prompt) {
-        throw new UnsupportedOperationException(
-                "MockClassifier does not support setting a single classification prompt.");
+        // TODO: This may / should throw an UnsportedOperationException instead?
+        // as no classification prompt is used, this method does nothing
     }
 
     @Override
     public String getClassificationPromptKey() {
         throw new UnsupportedOperationException(
                 "MockClassifier does not support retrieving a single classification prompt key.");
+    }
+
+    @Override
+    public SortedMap<String, String> getCacheParameters() {
+        return Collections.emptySortedMap();
     }
 }
