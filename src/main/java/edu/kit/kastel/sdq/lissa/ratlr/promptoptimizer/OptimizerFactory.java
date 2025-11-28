@@ -43,6 +43,7 @@ public final class OptimizerFactory {
             case "mock" -> new MockOptimizer();
             case "simple" -> new IterativeOptimizer(configuration, goldStandard, metric, 1);
             case "iterative" -> new IterativeOptimizer(configuration, goldStandard, metric);
+            case "feedback" -> new IterativeFeedbackOptimizer(configuration, goldStandard, metric);
             default -> throw new IllegalStateException("Unexpected value: " + configuration.name());
         };
     }
