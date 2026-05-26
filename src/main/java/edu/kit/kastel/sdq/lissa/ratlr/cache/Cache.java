@@ -124,6 +124,7 @@ public interface Cache<K extends CacheKey> {
      * <ul>
      *     <li>"local" - LocalCache for file-based storage</li>
      *     <li>"redis" - RedisCache for Redis-based storage</li>
+     *     <li>"rest_redis" - RestRedisCache for REST-based Redis storage</li>
      * </ul>
      *
      * @param <K> The type of cache key
@@ -136,7 +137,7 @@ public interface Cache<K extends CacheKey> {
      */
     static <K extends CacheKey> Cache<K> createByType(
             String type, CacheParameter<K> parameters, @Nullable String cacheDir, @Nullable ObjectMapper mapper) {
-        return switch (type) {
+        return switch (type.toLowerCase()) {
             case LOCAL_CACHE_NAME -> {
                 if (cacheDir == null) {
                     throw new IllegalArgumentException("Cache directory must be provided for local cache");
@@ -149,6 +150,7 @@ public interface Cache<K extends CacheKey> {
                 }
                 yield new RedisCache<>(parameters, mapper);
             }
+            case "rest_redis" -> new RestRedisCache<>(parameters, mapper);
             default ->
                 throw new IllegalArgumentException("Unknown cache type: " + type + ". Supported types: local, redis");
         };
